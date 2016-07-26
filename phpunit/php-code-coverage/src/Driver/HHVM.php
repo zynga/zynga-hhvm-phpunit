@@ -17,6 +17,9 @@ namespace SebastianBergmann\CodeCoverage\Driver;
  */
 class HHVM extends Xdebug
 {
+
+  private array $_data;
+
   /**
    * Start collection of code coverage information.
    *
@@ -44,11 +47,28 @@ class HHVM extends Xdebug
     // --
     // If there is more than one executionary pass, mark it as ran.
     // --
-    foreach (array_keys($data) as $file) {
+    $files = array_keys($data);
+    foreach ($files as $file) {
 
       // only process real files.
       if ( ! file_exists($file) ) {
         continue;
+      }
+
+      if ( ! isset($this->_data[$file]) ) {
+        // mark all code once as not-executed, we do this once for each file
+        //  executed as part of your unit test run. There are cases where the
+        //  the same file will get processed multiple times.
+        // --
+        // HHVM has no dead code analysis at this time. We are treating all
+        //   execulatable code as live code and marking the code as such.
+        //
+        // We utilize the cacheTokens="true" functionality to enhance performance
+        //   but it requires a higher memory heap for your unit tests under
+        //   coverage.
+        // --
+        $fileStack = $this->patchExecutableCodeIssue($file);
+        $this->_data[$file] = $fileStack;
       }
 
       $this->debugTokenCode("file=$file");
@@ -57,34 +77,34 @@ class HHVM extends Xdebug
       // HHVM xdebug reports the number of times something is executed,
       //  whereas php:xdebug just does a 0/1 state.
       // --
-      $data = $this->patchExecutedCodeIssue($file, $data);
+      $fileStack = $this->patchExecutedCodeIssue($file, $data[$file]);
 
       // --
-      // HHVM has no dead code analysis at this time. We are treating all
-      //   execulatable code as live code and marking the code as such.
-      //
-      // We utilize the cacheTokens="true" functionality to enhance performance
-      //   but it requires a higher memory heap for your unit tests under
-      //   coverage.
+      // Overlay the overal data rep with the stack rep.
       // --
-      $data = $this->patchExecutableCodeIssue($file, $data);
+      foreach ( $fileStack as $line => $value ) {
+        $this->_data[$file][$line] = $value;
+      }
 
     }
 
-    return $data;
+    return $this->_data;
+
   }
 
   public function debugTokenCode($message) {
-    // echo $message . "\n";
+    if ( $this->_debug === true ) {
+      echo $message . "\n";
+    }
   }
 
-  public function patchExecutedCodeIssue($file, $data) {
-    foreach (array_keys($data[$file]) as $line ) {
-      if ( $data[$file][$line] > 1 ) {
-        $data[$file][$line] = Driver::LINE_EXECUTED;
+  public function patchExecutedCodeIssue($file, $fileStack) {
+    foreach (array_keys($fileStack) as $line ) {
+      if ( $fileStack[$line] > 1 ) {
+        $fileStack[$line] = Driver::LINE_EXECUTED;
       }
     }
-    return $data;
+    return $fileStack;
   }
 
   public function isLineStackExecutable($lineStack) {
@@ -112,7 +132,19 @@ class HHVM extends Xdebug
 
   }
 
-  public function patchExecutableCodeIssue($file, $data) {
+  private bool $_debug = false;
+
+  public function enableDebug() {
+    $this->_debug = true;
+  }
+
+  public function disableDebug() {
+    $this->_debug = false;
+  }
+
+  public function patchExecutableCodeIssue($file) {
+
+    $fileStack = array();
 
     // --
     // JEO: you might want to turn off this caching if you don't run a significant
@@ -133,9 +165,9 @@ class HHVM extends Xdebug
       if (  $currentLine != $line ) {
 
         // do processing logic.
-        if ( $currentLine !== 0 && $this->isLineStackExecutable($lineStack) === true && ! isset($data[$file][$currentLine]) ) {
-          $this->debugTokenCode("line=" . $currentLine . " tokens=" . json_encode($lineStack));
-          $data[$file][$currentLine] = Driver::LINE_NOT_EXECUTED;
+        if ( $currentLine !== 0 && $this->isLineStackExecutable($lineStack) === true ) {
+          $this->debugTokenCode("LIVE_CODE_NOT_EXECUTED line=" . $currentLine . " tokens=" . json_encode($lineStack));
+          $fileStack[$currentLine] = Driver::LINE_NOT_EXECUTED;
         }
 
         // clear stack
@@ -146,7 +178,6 @@ class HHVM extends Xdebug
 
       }
 
-
       // Get the class name for this token.
       $tokenType = get_class($token);
 
@@ -155,7 +186,7 @@ class HHVM extends Xdebug
 
     }
 
-    return $data;
+    return $fileStack;
 
   }
 
