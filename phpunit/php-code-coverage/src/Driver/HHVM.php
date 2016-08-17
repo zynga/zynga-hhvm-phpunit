@@ -19,10 +19,10 @@ namespace SebastianBergmann\CodeCoverage\Driver;
 class HHVM extends Xdebug
 {
 
-  private array $_data;
+  private array $_seenFile;
 
   public function __construct() {
-    $this->_data = array();
+    $this->_seenFile = array();
     parent::__construct();
   }
 
@@ -36,6 +36,12 @@ class HHVM extends Xdebug
     xdebug_start_code_coverage();
   }
 
+  public function withinAcceptableCodePath($file): bool {
+    if ( preg_match('/^\/(usr|opt)/', $file) ) {
+      return false;
+    }
+    return true;
+  }
   /**
    * Stop collection of code coverage information.
    *
@@ -46,33 +52,6 @@ class HHVM extends Xdebug
 
     $data = parent::stop();
 
-    // JEO: The below code is simpler, and works for most of our use case.
-    // --
-    // The bottom code was an attempt at getting the interpreter to do dead
-    // code analysis.
-    // --
-    $files = array_keys($data);
-
-    foreach ($files as $file) {
-
-      // only process real files.
-      if ( ! file_exists($file) ) {
-        continue;
-      }
-
-      $execStack = $data[$file];
-
-      list($didChange, $execStack) = $this->patchExecutedCodeIssue($execStack);
-
-      foreach ( $execStack as $line => $value ) {
-        $data[$file][$line] = $value;
-      }
-
-    }
-
-    return $data;
-
-    /*
     // --
     // JEO: We overload the stop function to enable us to fill in the data that
     //   is currently missing within hhvm's xdebug.
@@ -89,20 +68,30 @@ class HHVM extends Xdebug
         continue;
       }
 
-      if ( ! isset($this->_data[$file]) ) {
-        // mark all code once as not-executed, we do this once for each file
-        //  executed as part of your unit test run. There are cases where the
-        //  the same file will get processed multiple times.
-        // --
-        // HHVM has no dead code analysis at this time. We are treating all
-        //   execulatable code as live code and marking the code as such.
-        //
-        // We utilize the cacheTokens="true" functionality to enhance performance
-        //   but it requires a higher memory heap for your unit tests under
-        //   coverage.
-        // --
+      // exclude any files that aren't hack related.
+      // --
+      // JEO: This is due to our inclusion chain within legacy php code, and how
+      // we track results within this function.
+      // --
+      if ( ! preg_match('/.hh$/', $file ) ) {
+      // A different strategy, exclude /opt/
+      // if ( $this->withinAcceptableCodePath($file) === false ) {
+        unset($data[$file]);
+        continue;
+      }
+
+      if ( in_array($file, $this->_seenFile) !== true ) {
+
         $fileStack = $this->patchExecutableCodeIssue($file);
-        $this->_data[$file] = $fileStack;
+
+        foreach ( $fileStack as $line => $value ) {
+          if ( ! isset($data[$file][$line]) ) {
+            $data[$file][$line] = $value;
+          }
+        }
+
+        $this->_seenFile[] = $file;
+
       }
 
       $this->debugTokenCode("file=$file");
@@ -115,23 +104,15 @@ class HHVM extends Xdebug
 
       list($didChange, $execStack) = $this->patchExecutedCodeIssue($execStack);
 
-      // --
-      // Overlay the overal data rep with the stack rep.
-      // --
-      foreach ( $execStack as $line => $value ) {
-        $this->_data[$file][$line] = $value;
-      }
-
-      unset($data[$file]);
+      $data[$file] = $execStack;
 
     }
 
     // try to clean up after ourselves.
     gc_collect_cycles();
 
-    return $this->_data;
-    */
-   
+    return $data;
+
   }
 
   public function debugTokenCode($message) {
