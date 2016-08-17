@@ -1,4 +1,5 @@
-<?php
+<?hh // partial
+
 /*
  * This file is part of the php-code-coverage package.
  *
@@ -20,6 +21,11 @@ class HHVM extends Xdebug
 
   private array $_data;
 
+  public function __construct() {
+    $this->_data = array();
+    parent::__construct();
+  }
+
   /**
    * Start collection of code coverage information.
    *
@@ -40,6 +46,33 @@ class HHVM extends Xdebug
 
     $data = parent::stop();
 
+    // JEO: The below code is simpler, and works for most of our use case.
+    // --
+    // The bottom code was an attempt at getting the interpreter to do dead
+    // code analysis.
+    // --
+    $files = array_keys($data);
+
+    foreach ($files as $file) {
+
+      // only process real files.
+      if ( ! file_exists($file) ) {
+        continue;
+      }
+
+      $execStack = $data[$file];
+
+      list($didChange, $execStack) = $this->patchExecutedCodeIssue($execStack);
+
+      foreach ( $execStack as $line => $value ) {
+        $data[$file][$line] = $value;
+      }
+
+    }
+
+    return $data;
+
+    /*
     // --
     // JEO: We overload the stop function to enable us to fill in the data that
     //   is currently missing within hhvm's xdebug.
@@ -48,6 +81,7 @@ class HHVM extends Xdebug
     // If there is more than one executionary pass, mark it as ran.
     // --
     $files = array_keys($data);
+
     foreach ($files as $file) {
 
       // only process real files.
@@ -77,19 +111,27 @@ class HHVM extends Xdebug
       // HHVM xdebug reports the number of times something is executed,
       //  whereas php:xdebug just does a 0/1 state.
       // --
-      $fileStack = $this->patchExecutedCodeIssue($file, $data[$file]);
+      $execStack = $data[$file];
+
+      list($didChange, $execStack) = $this->patchExecutedCodeIssue($execStack);
 
       // --
       // Overlay the overal data rep with the stack rep.
       // --
-      foreach ( $fileStack as $line => $value ) {
+      foreach ( $execStack as $line => $value ) {
         $this->_data[$file][$line] = $value;
       }
 
+      unset($data[$file]);
+
     }
 
-    return $this->_data;
+    // try to clean up after ourselves.
+    gc_collect_cycles();
 
+    return $this->_data;
+    */
+   
   }
 
   public function debugTokenCode($message) {
@@ -98,13 +140,15 @@ class HHVM extends Xdebug
     }
   }
 
-  public function patchExecutedCodeIssue($file, $fileStack) {
+  public function patchExecutedCodeIssue(array $fileStack): (bool, array) {
+    $didChange = false;
     foreach (array_keys($fileStack) as $line ) {
       if ( $fileStack[$line] > 1 ) {
         $fileStack[$line] = Driver::LINE_EXECUTED;
+        $didChange = true;
       }
     }
-    return $fileStack;
+    return tuple($didChange, $fileStack);
   }
 
   public function isLineStackExecutable($lineStack) {
