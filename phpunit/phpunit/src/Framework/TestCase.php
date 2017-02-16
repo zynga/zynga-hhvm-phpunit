@@ -107,7 +107,8 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
      *
      * @var bool
      */
-    protected $preserveGlobalState = true;
+    protected $preserveGlobalState = false; // JEO: Changed this to default to off
+
 
     /**
      * Whether or not this test is running in a separate PHP process.
@@ -792,12 +793,20 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
         if ($this->runTestInSeparateProcess === true &&
             $this->inIsolation !== true &&
             !$this instanceof PHPUnit_Extensions_PhptTestCase) {
+
+            echo "Processisolation does -not- play well with resource contention in shared development environments, exiting!\n";
+            echo "SHITSNACKS!\n";
+            exit(255);
+
             $class = new ReflectionClass($this);
+
 
             $template = new Text_Template(
                 __DIR__ . '/../Util/PHP/Template/TestCaseMethod.tpl'
             );
 
+            // JEO: We don't allow for preserving global state within our hack environment.
+            /*
             if ($this->preserveGlobalState) {
                 $constants     = PHPUnit_Util_GlobalState::getConstantsAsString();
                 $globals       = PHPUnit_Util_GlobalState::getGlobalsAsString();
@@ -813,6 +822,11 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
                 $includedFiles = '';
                 $iniSettings   = '';
             }
+            */
+            $constants     = '';
+            $globals       = '';
+            $includedFiles = '';
+            $iniSettings   = '';
 
             $coverage                                   = $result->getCollectCodeCoverageInformation()          ? 'true' : 'false';
             $isStrictAboutTestsThatDoNotTestAnything    = $result->isStrictAboutTestsThatDoNotTestAnything()    ? 'true' : 'false';
@@ -1310,11 +1324,14 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
      */
     public function setPreserveGlobalState($preserveGlobalState)
     {
+      $this->preserveGlobalState = false;
+      /*
         if (is_bool($preserveGlobalState)) {
             $this->preserveGlobalState = $preserveGlobalState;
         } else {
             throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
         }
+       */
     }
 
     /**
