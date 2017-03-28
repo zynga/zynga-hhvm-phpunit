@@ -171,6 +171,13 @@ class HHVM extends Xdebug
 
   }
 
+  public function isAbstractFunction($lineStack) {
+    if ( in_array('PHP_Token_ABSTRACT', $lineStack) && in_array('PHP_Token_FUNCTION', $lineStack) ) {
+      return true;
+    }
+    return false;
+  }
+
   public function isLineStackExecutable($lineStack) {
 
     $fileInclusion = array();
@@ -253,6 +260,8 @@ class HHVM extends Xdebug
     $inCodeBlock = false;
     $codeBlockStart = 0;
 
+    $inAbstractFunction = false;
+
     $currentLine = 0;
     for ( $tokenOffset = 0; $tokenOffset < count($tokens); $tokenOffset++) {
       $token = $tokens[$tokenOffset];
@@ -264,6 +273,20 @@ class HHVM extends Xdebug
       if (  $currentLine != $line ) {
 
         // do processing logic.
+        if ( $this->isAbstractFunction($lineStack) ) {
+          $inAbstractFunction = true;
+        }
+
+        if ( $inAbstractFunction === true && $this->doesLineContainSemiColon($lineStack) ) {
+          $inAbstractFunction = false;
+          continue;
+        }
+
+        // skip because we're within a abstract function
+        if ( $inAbstractFunction === true ) {
+          continue;
+        }
+
         if ( $currentLine !== 0 && $this->isLineStackExecutable($lineStack) === true ) {
           $this->debugTokenCode("  LIVE_CODE_NOT_EXECUTED line=" . $currentLine . " tokens=" . json_encode($lineStack) . ' text=' . $lineText);
           $fileStack[$currentLine] = Driver::LINE_NOT_EXECUTED;
