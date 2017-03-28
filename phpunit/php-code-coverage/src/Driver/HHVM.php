@@ -20,9 +20,13 @@ class HHVM extends Xdebug
 {
 
   private array $_seenFile;
+  private array $_execRanges;
+  private bool $_debug;
 
   public function __construct() {
     $this->_seenFile = array();
+    $this->_execRanges = array();
+    $this->_debug = false;
     parent::__construct();
   }
 
@@ -80,6 +84,8 @@ class HHVM extends Xdebug
         continue;
       }
 
+      $this->debugTokenCode("file=$file");
+
       if ( in_array($file, $this->_seenFile) !== true ) {
 
         $fileStack = $this->patchExecutableCodeIssue($file);
@@ -94,15 +100,13 @@ class HHVM extends Xdebug
 
       }
 
-      $this->debugTokenCode("file=$file");
-
       // --
       // HHVM xdebug reports the number of times something is executed,
       //  whereas php:xdebug just does a 0/1 state.
       // --
       $execStack = $data[$file];
 
-      list($didChange, $execStack) = $this->patchExecutedCodeIssue($execStack);
+      list($didChange, $execStack) = $this->patchExecutedCodeIssue($file, $execStack);
 
       $data[$file] = $execStack;
 
@@ -121,15 +125,47 @@ class HHVM extends Xdebug
     }
   }
 
-  public function patchExecutedCodeIssue(array $fileStack): (bool, array) {
+  public function patchExecutedCodeIssue(string $file, array $fileStack): (bool, array) {
+
     $didChange = false;
+
+    // walk through the keys normalizing for hhvm's exec count change to xdebug.
     foreach (array_keys($fileStack) as $line ) {
       if ( $fileStack[$line] > 1 ) {
         $fileStack[$line] = Driver::LINE_EXECUTED;
         $didChange = true;
       }
     }
+
+    // walk through the executable code ranges and mark the entire block as
+    // executed -if- inners executed.
+    foreach ( $this->_execRanges[$file] as $block ) {
+
+      list($startBlock, $endBlock) = $block;
+
+      // $this->debugTokenCode('EXEC_RANGE file=' . $file . ' start=' . $startBlock . ' end=' . $endBlock);
+
+      $didExecBlock = false;
+      for ( $line = $startBlock; $line <= $endBlock; $line++ ) {
+        if ( isset($fileStack[$line]) && $fileStack[$line] == Driver::LINE_EXECUTED ) {
+          $didExecBlock = true;
+        }
+      }
+
+      if ( $didExecBlock === true ) {
+        for ( $line = $startBlock; $line <= $endBlock; $line++ ) {
+          if ( isset($fileStack[$line]) ) {
+            $fileStack[$line] = Driver::LINE_EXECUTED;
+          }
+        }
+        $didChange = true;
+      }
+
+
+    }
+
     return tuple($didChange, $fileStack);
+
   }
 
   public function isLineStackExecutable($lineStack) {
@@ -144,8 +180,11 @@ class HHVM extends Xdebug
     $executableTokens[] = 'PHP_Token_IF';
 
     // $executableTokens[] = 'PHP_Token_FOREACH';
-    // $executableTokens[] = 'PHP_Token_VARIABLE';
+    // --
+    // $executableTokens[] = 'PHP_Token_VARIABLE'; -- this grabs too many lines of code.
+    // --
     $executableTokens[] = 'PHP_Token_OBJECT_OPERATOR';
+    $executableTokens[] = 'PHP_Token_SEMICOLON';
 
     foreach ( $lineStack as $token ) {
       if ( in_array($token, $executableTokens) === true ) {
@@ -157,7 +196,12 @@ class HHVM extends Xdebug
 
   }
 
-  private bool $_debug = false;
+  public function doesLineContainSemiColon($lineStack) {
+    if ( in_array('PHP_Token_SEMICOLON', $lineStack) ) {
+      return true;
+    }
+    return false;
+  }
 
   public function enableDebug() {
     $this->_debug = true;
@@ -171,6 +215,8 @@ class HHVM extends Xdebug
 
     $fileStack = array();
 
+    $this->_execRanges[$file] = array();
+
     // --
     // JEO: you might want to turn off this caching if you don't run a significant
     // amount of ram within your machines.
@@ -179,9 +225,14 @@ class HHVM extends Xdebug
 
     // Loop across the tokens
     $lineStack = array();
+    $lineText = '';
+
+    $inCodeBlock = false;
+    $codeBlockStart = 0;
 
     $currentLine = 0;
-    foreach ($tokens as $token) {
+    for ( $tokenOffset = 0; $tokenOffset < count($tokens); $tokenOffset++) {
+      $token = $tokens[$tokenOffset];
 
       // line number for the token.
       $line = $token->getLine();
@@ -191,12 +242,41 @@ class HHVM extends Xdebug
 
         // do processing logic.
         if ( $currentLine !== 0 && $this->isLineStackExecutable($lineStack) === true ) {
-          $this->debugTokenCode("LIVE_CODE_NOT_EXECUTED line=" . $currentLine . " tokens=" . json_encode($lineStack));
+          $this->debugTokenCode("  LIVE_CODE_NOT_EXECUTED line=" . $currentLine . " tokens=" . json_encode($lineStack) . ' text=' . $lineText);
           $fileStack[$currentLine] = Driver::LINE_NOT_EXECUTED;
+
+          // Does this executable line contain a semi colon?
+          if ( $this->doesLineContainSemiColon($lineStack) !== true ) {
+            $inCodeBlock = true;
+            $codeBlockStart = $currentLine;
+          } else if ( $inCodeBlock === true && $this->doesLineContainSemiColon($lineStack) === true ) {
+            // end block
+            $codeBlockEnd = $currentLine;
+
+            $this->debugTokenCode('  EXEC_RANGE start=' . $codeBlockStart . ' end=' . $codeBlockEnd);
+
+            $this->_execRanges[$file][] = array($codeBlockStart, $codeBlockEnd);
+
+            $inCodeBlock = false;
+          }
+        } else if ( $inCodeBlock === true && $this->doesLineContainSemiColon($lineStack) === true ) {
+
+          // end block
+          $codeBlockEnd = $currentLine;
+
+          $this->debugTokenCode('  OUT_RANGE start=' . $codeBlockStart . ' end=' . $codeBlockEnd);
+
+          $this->_execRanges[$file][] = array($codeBlockStart, $codeBlockEnd);
+
+          $inCodeBlock = false;
+
+        } else {
+          // $this->debugTokenCode("  NOT_CODE_NOT_EXECUTED line=" . $currentLine . " tokens=" . json_encode($lineStack) . ' text=' . $lineText);
         }
 
         // clear stack
         $lineStack = array();
+        $lineText = '';
 
         // advance the line to new item.
         $currentLine = $line;
@@ -208,6 +288,8 @@ class HHVM extends Xdebug
 
       // add to line stack
       $lineStack[] = $tokenType;
+
+      $lineText .= $token;
 
     }
 
