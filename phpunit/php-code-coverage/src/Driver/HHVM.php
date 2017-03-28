@@ -170,6 +170,18 @@ class HHVM extends Xdebug
 
   public function isLineStackExecutable($lineStack) {
 
+    $fileInclusion = array();
+    $fileInclusion[] = 'PHP_Token_REQUIRE';
+    $fileInclusion[] = 'PHP_Token_REQUIRE_ONCE';
+    $fileInclusion[] = 'PHP_Token_INCLUDE';
+    $fileInclusion[] = 'PHP_Token_INCLUDE_ONCE';
+
+    foreach ( $fileInclusion as $fileInclude ) {
+      if ( in_array($fileInclude, $lineStack) ) {
+        return false;
+      }
+    }
+    
     // --
     // If there is a parseable / executable token this counts as a line that 'could' be executed.
     // --
