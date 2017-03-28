@@ -206,7 +206,7 @@ class HHVM extends Xdebug
     // $executableTokens[] = 'PHP_Token_VARIABLE'; -- this grabs too many lines of code.
     // --
     $executableTokens[] = 'PHP_Token_OBJECT_OPERATOR';
-    $executableTokens[] = 'PHP_Token_SEMICOLON';
+    //$executableTokens[] = 'PHP_Token_SEMICOLON';
 
     foreach ( $lineStack as $token ) {
       if ( in_array($token, $executableTokens) === true ) {
@@ -288,6 +288,7 @@ class HHVM extends Xdebug
         }
 
         if ( $currentLine !== 0 && $this->isLineStackExecutable($lineStack) === true ) {
+
           $this->debugTokenCode("  LIVE_CODE_NOT_EXECUTED line=" . $currentLine . " tokens=" . json_encode($lineStack) . ' text=' . $lineText);
           $fileStack[$currentLine] = Driver::LINE_NOT_EXECUTED;
 
