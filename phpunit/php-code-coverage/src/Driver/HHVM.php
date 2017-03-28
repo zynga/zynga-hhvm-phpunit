@@ -143,7 +143,6 @@ class HHVM extends Xdebug
 
       list($startBlock, $endBlock) = $block;
 
-      // $this->debugTokenCode('EXEC_RANGE file=' . $file . ' start=' . $startBlock . ' end=' . $endBlock);
 
       $didExecBlock = false;
       for ( $line = $startBlock; $line <= $endBlock; $line++ ) {
@@ -154,15 +153,19 @@ class HHVM extends Xdebug
 
       if ( $didExecBlock === true ) {
         for ( $line = $startBlock; $line <= $endBlock; $line++ ) {
-          if ( isset($fileStack[$line]) ) {
-            $fileStack[$line] = Driver::LINE_EXECUTED;
-          }
+          $fileStack[$line] = Driver::LINE_EXECUTED;
         }
+        $this->debugTokenCode('COVERED_RANGE file=' . $file . ' start=' . $startBlock . ' end=' . $endBlock);
         $didChange = true;
       }
 
 
     }
+
+    /*
+    var_dump($file);
+    var_dump($fileStack);
+    */
 
     return tuple($didChange, $fileStack);
 
@@ -181,7 +184,7 @@ class HHVM extends Xdebug
         return false;
       }
     }
-    
+
     // --
     // If there is a parseable / executable token this counts as a line that 'could' be executed.
     // --
@@ -210,6 +213,14 @@ class HHVM extends Xdebug
 
   public function doesLineContainSemiColon($lineStack) {
     if ( in_array('PHP_Token_SEMICOLON', $lineStack) ) {
+      return true;
+    }
+    return false;
+  }
+
+
+  public function doesLineContainIf($lineStack) {
+    if ( in_array('PHP_Token_IF', $lineStack) ) {
       return true;
     }
     return false;
@@ -258,9 +269,10 @@ class HHVM extends Xdebug
           $fileStack[$currentLine] = Driver::LINE_NOT_EXECUTED;
 
           // Does this executable line contain a semi colon?
-          if ( $this->doesLineContainSemiColon($lineStack) !== true ) {
+          if ( $inCodeBlock !== true && $this->doesLineContainSemiColon($lineStack) !== true && $this->doesLineContainIf($lineStack) !== true ) {
             $inCodeBlock = true;
             $codeBlockStart = $currentLine;
+            $this->debugTokenCode('  START_RANGE start=' . $codeBlockStart);
           } else if ( $inCodeBlock === true && $this->doesLineContainSemiColon($lineStack) === true ) {
             // end block
             $codeBlockEnd = $currentLine;
