@@ -79,6 +79,13 @@ class LineStack {
     return false;
   }
 
+  public function doesContainReturn(): bool {
+    if ( $this->contains('PHP_Token_RETURN') === true ) {
+      return true;
+    }
+    return false;
+  }
+
   public function doesContainSemiColon(): bool {
     if ( $this->contains('PHP_Token_SEMICOLON') === true ) {
       return true;

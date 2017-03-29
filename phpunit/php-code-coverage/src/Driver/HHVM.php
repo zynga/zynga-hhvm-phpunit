@@ -13,7 +13,9 @@ namespace SebastianBergmann\CodeCoverage\Driver;
 
 use SebastianBergmann\CodeCoverage\Driver\HHVM\LineStack;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\AbstractBlock;
+use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\CodeBlockInterface;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\IfBlock;
+use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\ReturnBlock;
 
 /**
  * Driver for HHVM's code coverage functionality.
@@ -184,6 +186,46 @@ class HHVM extends Xdebug
     $this->_debug = false;
   }
 
+  public function processCodeBlock(CodeBlockInterface $block, string $file, LineStack $lineStack, int $currentLine, array $fileStack): bool {
+
+    $block->isStartOfBlock($lineStack, $currentLine);
+
+    // Have we found the end of the block we are hunting for?
+    if ( $block->isEndOfBlock($lineStack, $currentLine) === true ) {
+
+      $this->_execRanges[$file][] = array( $block->getStartBlock(), $block->getEndBlock() );
+
+      for ( $lineNo = $block->getStartBlock(); $lineNo <= $block->getEndBlock(); $lineNo++ ) {
+        $fileStack[$lineNo] = Driver::LINE_NOT_EXECUTED;
+      }
+
+      return true;
+
+    }
+
+    // skip because we're within a if
+    if ( $block->getInBlock() === true ) {
+      return true;
+    }
+
+    // let normal execution happen
+    return false;
+
+  }
+
+  public function processCodeBlocks(Vector<CodeBlockInterface> $codeBlocks, string $file, LineStack $lineStack, int $currentLine, array $fileStack): bool {
+
+    foreach ( $codeBlocks as $codeBlock ) {
+      if ( $this->processCodeBlock($codeBlock, $file, $lineStack, $currentLine, $fileStack) === true ) {
+        // Advance the outer line processor loop, until the code block is completed.
+        return true;
+      }
+    }
+
+    return false;
+
+  }
+
   public function patchExecutableCodeIssue($file) {
 
     $fileStack = array();
@@ -202,8 +244,10 @@ class HHVM extends Xdebug
     $inCodeBlock = false;
     $codeBlockStart = 0;
 
-    $abstractBlock = new AbstractBlock();
-    $ifBlock = new IfBlock();
+    $codeBlocks = Vector {};
+    $codeBlocks[] = new AbstractBlock();
+    $codeBlocks[] = new IfBlock();
+    $codeBlocks[] = new ReturnBlock();
 
     $inAbstractFunction = false;
 
@@ -218,6 +262,11 @@ class HHVM extends Xdebug
       // Has the lineno changed?
       if (  $currentLine != $line ) {
 
+        if ( $this->processCodeBlocks($codeBlocks, $file, $lineStack, $currentLine, $fileStack) === true ) {
+          continue;
+        }
+
+        /*
         // is it a mutli line abstract function definition? They don't count towards executable code.
         $abstractBlock->isStartOfBlock($lineStack, $currentLine);
 
@@ -230,7 +279,9 @@ class HHVM extends Xdebug
         if ( $abstractBlock->getInBlock() === true ) {
           continue;
         }
+        */
 
+        /*
         // is it a mutli line if or elseif definition? They count towards executable code, so put them onto the stack when found.
         $ifBlock->isStartOfBlock($lineStack, $currentLine);
 
@@ -243,10 +294,28 @@ class HHVM extends Xdebug
           continue;
         }
 
-        // skip because we're within a abstract function
+        // skip because we're within a if
         if ( $ifBlock->getInBlock() === true ) {
           continue;
         }
+
+        // is it a mutli line return definition? They count towards executable code, so put them onto the stack when found.
+        $returnBlock->isStartOfBlock($lineStack, $currentLine);
+
+        // Have we found the end of the block we are hunting for?
+        if ( $returnBlock->isEndOfBlock($lineStack, $currentLine) === true ) {
+          $this->_execRanges[$file][] = array( $returnBlock->getStartBlock(), $returnBlock->getEndBlock() );
+          for ( $returnno = $returnBlock->getStartBlock(); $returnno <= $returnBlock->getEndBlock(); $returnno++ ) {
+            $fileStack[$returnno] = Driver::LINE_NOT_EXECUTED;
+          }
+          continue;
+        }
+
+        // skip because we're within a if
+        if ( $returnBlock->getInBlock() === true ) {
+          continue;
+        }
+        */
 
         if ( $currentLine !== 0 && $lineStack->isExecutable() === true ) {
 

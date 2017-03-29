@@ -3,8 +3,9 @@
 namespace SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock;
 
 use SebastianBergmann\CodeCoverage\Driver\HHVM\LineStack;
+use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\CodeBlockInterface;
 
-abstract class Base {
+abstract class Base implements CodeBlockInterface {
   private bool $_inBlock;
   private int $_startBlock;
   private int $_endBlock;
