@@ -11,6 +11,10 @@
 
 namespace SebastianBergmann\CodeCoverage\Driver;
 
+use SebastianBergmann\CodeCoverage\Driver\HHVM\LineStack;
+use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\AbstractBlock;
+use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\IfBlock;
+
 /**
  * Driver for HHVM's code coverage functionality.
  *
@@ -171,67 +175,6 @@ class HHVM extends Xdebug
 
   }
 
-  public function isAbstractFunction($lineStack) {
-    if ( in_array('PHP_Token_ABSTRACT', $lineStack) && in_array('PHP_Token_FUNCTION', $lineStack) ) {
-      return true;
-    }
-    return false;
-  }
-
-  public function isLineStackExecutable($lineStack) {
-
-    $fileInclusion = array();
-    $fileInclusion[] = 'PHP_Token_REQUIRE';
-    $fileInclusion[] = 'PHP_Token_REQUIRE_ONCE';
-    $fileInclusion[] = 'PHP_Token_INCLUDE';
-    $fileInclusion[] = 'PHP_Token_INCLUDE_ONCE';
-
-    foreach ( $fileInclusion as $fileInclude ) {
-      if ( in_array($fileInclude, $lineStack) ) {
-        return false;
-      }
-    }
-
-    // --
-    // If there is a parseable / executable token this counts as a line that 'could' be executed.
-    // --
-    $executableTokens = array();
-    $executableTokens[] = 'PHP_Token_RETURN';
-    $executableTokens[] = 'PHP_Token_THROW';
-    $executableTokens[] = 'PHP_Token_EQUAL';
-    $executableTokens[] = 'PHP_Token_IF';
-
-    // $executableTokens[] = 'PHP_Token_FOREACH';
-    // --
-    // $executableTokens[] = 'PHP_Token_VARIABLE'; -- this grabs too many lines of code.
-    // --
-    $executableTokens[] = 'PHP_Token_OBJECT_OPERATOR';
-    //$executableTokens[] = 'PHP_Token_SEMICOLON';
-
-    foreach ( $lineStack as $token ) {
-      if ( in_array($token, $executableTokens) === true ) {
-        return true;
-      }
-    }
-
-    return false;
-
-  }
-
-  public function doesLineContainSemiColon($lineStack) {
-    if ( in_array('PHP_Token_SEMICOLON', $lineStack) ) {
-      return true;
-    }
-    return false;
-  }
-
-
-  public function doesLineContainIf($lineStack) {
-    if ( in_array('PHP_Token_IF', $lineStack) ) {
-      return true;
-    }
-    return false;
-  }
 
   public function enableDebug() {
     $this->_debug = true;
@@ -254,16 +197,19 @@ class HHVM extends Xdebug
     $tokens = \PHP_Token_Stream_CachingFactory::get($file);
 
     // Loop across the tokens
-    $lineStack = array();
-    $lineText = '';
+    $lineStack = new LineStack();
 
     $inCodeBlock = false;
     $codeBlockStart = 0;
+
+    $abstractBlock = new AbstractBlock();
+    $ifBlock = new IfBlock();
 
     $inAbstractFunction = false;
 
     $currentLine = 0;
     for ( $tokenOffset = 0; $tokenOffset < count($tokens); $tokenOffset++) {
+
       $token = $tokens[$tokenOffset];
 
       // line number for the token.
@@ -272,32 +218,47 @@ class HHVM extends Xdebug
       // Has the lineno changed?
       if (  $currentLine != $line ) {
 
-        // do processing logic.
-        if ( $this->isAbstractFunction($lineStack) ) {
-          $inAbstractFunction = true;
-        }
+        // is it a mutli line abstract function definition? They don't count towards executable code.
+        $abstractBlock->isStartOfBlock($lineStack, $currentLine);
 
-        if ( $inAbstractFunction === true && $this->doesLineContainSemiColon($lineStack) ) {
-          $inAbstractFunction = false;
+        // Have we found the end of the block we are hunting for?
+        if ( $abstractBlock->isEndOfBlock($lineStack, $currentLine) === true ) {
           continue;
         }
 
         // skip because we're within a abstract function
-        if ( $inAbstractFunction === true ) {
+        if ( $abstractBlock->getInBlock() === true ) {
           continue;
         }
 
-        if ( $currentLine !== 0 && $this->isLineStackExecutable($lineStack) === true ) {
+        // is it a mutli line if or elseif definition? They count towards executable code, so put them onto the stack when found.
+        $ifBlock->isStartOfBlock($lineStack, $currentLine);
 
-          $this->debugTokenCode("  LIVE_CODE_NOT_EXECUTED line=" . $currentLine . " tokens=" . json_encode($lineStack) . ' text=' . $lineText);
+        // Have we found the end of the block we are hunting for?
+        if ( $ifBlock->isEndOfBlock($lineStack, $currentLine) === true ) {
+          $this->_execRanges[$file][] = array( $ifBlock->getStartBlock(), $ifBlock->getEndBlock() );
+          for ( $ifno = $ifBlock->getStartBlock(); $ifno <= $ifBlock->getEndBlock(); $ifno++ ) {
+            $fileStack[$ifno] = Driver::LINE_NOT_EXECUTED;
+          }
+          continue;
+        }
+
+        // skip because we're within a abstract function
+        if ( $ifBlock->getInBlock() === true ) {
+          continue;
+        }
+
+        if ( $currentLine !== 0 && $lineStack->isExecutable() === true ) {
+
+          $this->debugTokenCode("  LIVE_CODE_NOT_EXECUTED line=" . $currentLine . " tokens=" . $lineStack->toJSON() . ' text=' . $lineStack->getLineText() );
           $fileStack[$currentLine] = Driver::LINE_NOT_EXECUTED;
 
           // Does this executable line contain a semi colon?
-          if ( $inCodeBlock !== true && $this->doesLineContainSemiColon($lineStack) !== true && $this->doesLineContainIf($lineStack) !== true ) {
+          if ( $inCodeBlock !== true && $lineStack->doesContainSemiColon() !== true && $lineStack->doesContainIf() !== true ) {
             $inCodeBlock = true;
             $codeBlockStart = $currentLine;
             $this->debugTokenCode('  START_RANGE start=' . $codeBlockStart);
-          } else if ( $inCodeBlock === true && $this->doesLineContainSemiColon($lineStack) === true ) {
+          } else if ( $inCodeBlock === true && $lineStack->doesContainSemiColon() === true ) {
             // end block
             $codeBlockEnd = $currentLine;
 
@@ -307,7 +268,7 @@ class HHVM extends Xdebug
 
             $inCodeBlock = false;
           }
-        } else if ( $inCodeBlock === true && $this->doesLineContainSemiColon($lineStack) === true ) {
+        } else if ( $inCodeBlock === true && $lineStack->doesContainSemiColon() === true ) {
 
           // end block
           $codeBlockEnd = $currentLine;
@@ -319,12 +280,11 @@ class HHVM extends Xdebug
           $inCodeBlock = false;
 
         } else {
-          // $this->debugTokenCode("  NOT_CODE_NOT_EXECUTED line=" . $currentLine . " tokens=" . json_encode($lineStack) . ' text=' . $lineText);
+          // $this->debugTokenCode("  NOT_CODE_NOT_EXECUTED line=" . $currentLine . " tokens=" . $lineStack->toJSON() . ' text=' . $lineStack->getLineText());
         }
 
         // clear stack
-        $lineStack = array();
-        $lineText = '';
+        $lineStack->clear();
 
         // advance the line to new item.
         $currentLine = $line;
@@ -335,9 +295,8 @@ class HHVM extends Xdebug
       $tokenType = get_class($token);
 
       // add to line stack
-      $lineStack[] = $tokenType;
-
-      $lineText .= $token;
+      $lineStack->addToken($tokenType);
+      $lineStack->addLineText(strval($token));
 
     }
 
