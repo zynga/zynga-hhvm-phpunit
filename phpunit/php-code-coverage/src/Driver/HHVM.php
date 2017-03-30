@@ -266,57 +266,6 @@ class HHVM extends Xdebug
           continue;
         }
 
-        /*
-        // is it a mutli line abstract function definition? They don't count towards executable code.
-        $abstractBlock->isStartOfBlock($lineStack, $currentLine);
-
-        // Have we found the end of the block we are hunting for?
-        if ( $abstractBlock->isEndOfBlock($lineStack, $currentLine) === true ) {
-          continue;
-        }
-
-        // skip because we're within a abstract function
-        if ( $abstractBlock->getInBlock() === true ) {
-          continue;
-        }
-        */
-
-        /*
-        // is it a mutli line if or elseif definition? They count towards executable code, so put them onto the stack when found.
-        $ifBlock->isStartOfBlock($lineStack, $currentLine);
-
-        // Have we found the end of the block we are hunting for?
-        if ( $ifBlock->isEndOfBlock($lineStack, $currentLine) === true ) {
-          $this->_execRanges[$file][] = array( $ifBlock->getStartBlock(), $ifBlock->getEndBlock() );
-          for ( $ifno = $ifBlock->getStartBlock(); $ifno <= $ifBlock->getEndBlock(); $ifno++ ) {
-            $fileStack[$ifno] = Driver::LINE_NOT_EXECUTED;
-          }
-          continue;
-        }
-
-        // skip because we're within a if
-        if ( $ifBlock->getInBlock() === true ) {
-          continue;
-        }
-
-        // is it a mutli line return definition? They count towards executable code, so put them onto the stack when found.
-        $returnBlock->isStartOfBlock($lineStack, $currentLine);
-
-        // Have we found the end of the block we are hunting for?
-        if ( $returnBlock->isEndOfBlock($lineStack, $currentLine) === true ) {
-          $this->_execRanges[$file][] = array( $returnBlock->getStartBlock(), $returnBlock->getEndBlock() );
-          for ( $returnno = $returnBlock->getStartBlock(); $returnno <= $returnBlock->getEndBlock(); $returnno++ ) {
-            $fileStack[$returnno] = Driver::LINE_NOT_EXECUTED;
-          }
-          continue;
-        }
-
-        // skip because we're within a if
-        if ( $returnBlock->getInBlock() === true ) {
-          continue;
-        }
-        */
-
         if ( $currentLine !== 0 && $lineStack->isExecutable() === true ) {
 
           $this->debugTokenCode("  LIVE_CODE_NOT_EXECUTED line=" . $currentLine . " tokens=" . $lineStack->toJSON() . ' text=' . $lineStack->getLineText() );
