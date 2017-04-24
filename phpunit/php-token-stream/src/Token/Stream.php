@@ -8,6 +8,9 @@
  * file that was distributed with this source code.
  */
 
+// JEO: Addded use statement.
+use Zynga\Source\Cache;
+
 /**
  * A stream of PHP tokens.
  */
@@ -105,8 +108,15 @@ class PHP_Token_Stream implements ArrayAccess, Countable, SeekableIterator
     public function __construct($sourceCode)
     {
         if (is_file($sourceCode)) {
-            $this->filename = $sourceCode;
-            $sourceCode     = file_get_contents($sourceCode);
+          $this->filename = $sourceCode;
+
+          // JEO: don't just read it and throw it away.
+          $sourceCode = Zynga_Source_Cache::getSource($sourceCode);
+
+            // JEO: original code below.
+            // --
+            // $sourceCode     = file_get_contents($sourceCode);
+            // --
         }
 
         $this->scan($sourceCode);
@@ -152,7 +162,8 @@ class PHP_Token_Stream implements ArrayAccess, Countable, SeekableIterator
     {
         $id        = 0;
         $line      = 1;
-        $tokens    = token_get_all($sourceCode);
+        $tokens = Zynga_Source_Cache::getTokens($this->filename);
+        // $tokens    = token_get_all($sourceCode);
         $numTokens = count($tokens);
 
         $lastNonWhitespaceTokenWasDoubleColon = false;
