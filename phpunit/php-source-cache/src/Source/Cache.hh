@@ -34,6 +34,17 @@ class Zynga_Source_Cache_File {
 
     try {
 
+      // --
+      //
+      // JEO: TODO, it's late on 2017/04/25, had to turn off the fetching from
+      // mc, I think theres a issue where if the unit test changes, but the
+      // code didn't we don't actually reparse correctly.
+      //
+      // Need coverage to work for tomorrows presentation.
+      //
+      // --
+      return false;
+
       $key = $this->createKey();
 
       $mc = $this->getMemcached();
@@ -67,6 +78,17 @@ class Zynga_Source_Cache_File {
   public function saveToMemcache(): bool {
 
     try {
+
+      // --
+      //
+      // JEO: TODO, it's late on 2017/04/25, had to turn off the fetching from
+      // mc, I think theres a issue where if the unit test changes, but the
+      // code didn't we don't actually reparse correctly.
+      //
+      // Need coverage to work for tomorrows presentation.
+      //
+      // --
+      return true;
 
       $key = $this->createKey();
 

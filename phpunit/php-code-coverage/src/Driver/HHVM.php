@@ -119,7 +119,11 @@ class HHVM extends Xdebug
     }
 
     // try to clean up after ourselves.
-    gc_collect_cycles();
+    // gc_collect_cycles();
+    // --
+    // JEO: ashwin discovered this is a very very expensive
+    // call on newer versions of hhvm.
+    // --
 
     return $data;
 
