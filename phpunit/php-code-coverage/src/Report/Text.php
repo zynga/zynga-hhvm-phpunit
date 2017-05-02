@@ -200,8 +200,14 @@ class Text
         $resetColor  = '';
 
         foreach ($classCoverage as $fullQualifiedPath => $classInfo) {
-            if ($classInfo['statementsCovered'] != 0 ||
-                $this->showUncoveredFiles) {
+
+          $shouldDisplay = true;
+
+          if ( $classInfo['methodsCovered'] === $classInfo['methodCount'] && $classInfo['statementsCovered'] === $classInfo['statementCount'] ) {
+            $shouldDisplay = false;
+          }
+
+            if ( ( $classInfo['statementsCovered'] != 0 || $this->showUncoveredFiles ) && $shouldDisplay === true ) {
                 if ($showColors) {
                     $methodColor = $this->getCoverageColor($classInfo['methodsCovered'], $classInfo['methodCount']);
                     $linesColor  = $this->getCoverageColor($classInfo['statementsCovered'], $classInfo['statementCount']);
