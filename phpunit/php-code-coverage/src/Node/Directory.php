@@ -169,21 +169,59 @@ class Directory extends AbstractNode implements \IteratorAggregate
      */
     public function addFile($name, array $coverageData, array $testData, $cacheTokens)
     {
-        $file = new File(
-            $name,
-            $this,
-            $coverageData,
-            $testData,
-            $cacheTokens
-        );
 
-        $this->children[] = $file;
-        $this->files[]    = &$this->children[count($this->children) - 1];
+      $fileName = $this->getPath() . '/' . $name;
 
-        $this->numExecutableLines = -1;
-        $this->numExecutedLines   = -1;
+      $lastModified = filemtime($fileName);
 
-        return $file;
+      $file = null;
+
+      $file = new File(
+          $name,
+          $this,
+          $coverageData,
+          $testData,
+          $cacheTokens
+      );
+
+      // JEO: This code is going down the path of caching the file objects
+      // themselves, at this moment it has performance issues, so going to
+      // revisit it later.
+      /*
+      if ( \Zynga_Source_Cache::isFileDataStale($fileName, $lastModified) === true ) {
+        \Zynga_Source_Cache::purge($fileName);
+      } else {
+
+        $file = \Zynga_Source_Cache::getFileCoverageObject($fileName);
+
+        if ( $file === null ) {
+
+          // echo "CACHE_MISS fileCoverageObject fileName=$fileName\n";
+
+          $file = new File(
+              $name,
+              $this,
+              $coverageData,
+              $testData,
+              $cacheTokens
+          );
+
+          \Zynga_Source_Cache::setFileCoverageObject($fileName, $file);
+          \Zynga_Source_Cache::setLastModifiedTime($fileName, $lastModified);
+
+        }
+
+      }
+      */
+
+      $this->children[] = $file;
+      $this->files[]    = &$this->children[count($this->children) - 1];
+
+      $this->numExecutableLines = -1;
+      $this->numExecutedLines   = -1;
+
+      return $file;
+
     }
 
     /**

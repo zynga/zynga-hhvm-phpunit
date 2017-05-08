@@ -731,6 +731,8 @@ class CodeCoverage
      */
     private function getLinesToBeIgnored($filename)
     {
+
+
         if (!is_string($filename)) {
             throw InvalidArgumentException::create(
                 1,
@@ -739,10 +741,23 @@ class CodeCoverage
         }
 
         if (!isset($this->ignoredLines[$filename])) {
+
             $this->ignoredLines[$filename] = [];
 
             if ($this->disableIgnoredLines) {
                 return $this->ignoredLines[$filename];
+            }
+
+
+            // --
+            // JEO: ignored lines is a costly beast, we should consider disabling it,
+            // but for now pull it off cache if possible.
+            // --
+            $linesToBeIgnored = \Zynga_Source_Cache::getIgnoredLines($filename);
+
+            if ( $linesToBeIgnored !== null ) {
+              $this->ignoredLines[$filename] = $linesToBeIgnored;
+              return $this->ignoredLines[$filename];
             }
 
             $ignore   = false;
@@ -891,6 +906,8 @@ class CodeCoverage
             );
 
             sort($this->ignoredLines[$filename]);
+
+            \Zynga_Source_Cache::setIgnoredLines($filename, $this->ignoredLines[$filename]);
         }
 
         return $this->ignoredLines[$filename];

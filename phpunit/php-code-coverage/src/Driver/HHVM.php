@@ -119,7 +119,11 @@ class HHVM extends Xdebug
     }
 
     // try to clean up after ourselves.
-    gc_collect_cycles();
+    // gc_collect_cycles();
+    // --
+    // JEO: ashwin discovered this is a very very expensive
+    // call on newer versions of hhvm.
+    // --
 
     return $data;
 
@@ -134,9 +138,9 @@ class HHVM extends Xdebug
   public function patchExecutedCodeIssue(string $file, array $fileStack): (bool, array) {
 
     $didChange = false;
-
+    $fileStackKeys = array_keys($fileStack);
     // walk through the keys normalizing for hhvm's exec count change to xdebug.
-    foreach (array_keys($fileStack) as $line ) {
+    foreach ($fileStackKeys as $line ) {
       if ( $fileStack[$line] > 1 ) {
         $fileStack[$line] = Driver::LINE_EXECUTED;
         $didChange = true;
@@ -252,7 +256,8 @@ class HHVM extends Xdebug
     $inAbstractFunction = false;
 
     $currentLine = 0;
-    for ( $tokenOffset = 0; $tokenOffset < count($tokens); $tokenOffset++) {
+    $tokens_cnt = count($tokens);
+    for ( $tokenOffset = 0; $tokenOffset < $tokens_cnt; $tokenOffset++) {
 
       $token = $tokens[$tokenOffset];
 
