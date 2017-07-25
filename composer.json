@@ -1,0 +1,13 @@
+{
+  "name": "phpunit",
+  "description": "Zynga modifications to the PHPUNIT framework.",
+  "type": "library",
+  "keywords": [
+    "phpunit",
+    "xunit",
+    "testing"
+  ],
+  "require": {
+    "91carriage/phpunit-hhi": "~5.4.0"
+  }
+}
