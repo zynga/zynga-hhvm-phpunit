@@ -8,7 +8,7 @@
     "testing"
   ],
   "config": {
-    "bin-dir": "../bin"
+    "bin-dir": "../../bin"
   },
   "bin": [
     "vendor/phpunit/phpunit/phpunit-vendor",
@@ -16,5 +16,10 @@
   ],
   "require": {
     "91carriage/phpunit-hhi": "~5.4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Zynga\\": "src"
+    }
   }
 }
