@@ -8,7 +8,7 @@
     "testing"
   ],
   "config": {
-    "bin-dir": "./bin"
+    "bin-dir": "../bin"
   },
   "bin": [
     "vendor/phpunit/phpunit/phpunit-vendor",
