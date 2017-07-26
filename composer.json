@@ -1,5 +1,5 @@
 {
-  "name": "Poker/zynga-hhvm-phpunit",
+  "name": "poker/zynga-hhvm-phpunit",
   "description": "Zynga modifications to the PHPUNIT framework.",
   "type": "library",
   "keywords": [
