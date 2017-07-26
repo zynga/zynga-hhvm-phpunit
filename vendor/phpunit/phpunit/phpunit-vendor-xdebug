@@ -42,6 +42,9 @@ if (!defined('PHPUNIT_COMPOSER_INSTALL')) {
     die(1);
 }
 
+// --
+// JEO: This whole bit is going to need work as it deps against zynga shit.
+// --
 
 require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/include/path.hh';
 use Zynga\CodePath;

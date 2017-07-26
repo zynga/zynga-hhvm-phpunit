@@ -7,6 +7,13 @@
     "xunit",
     "testing"
   ],
+  "config": {
+    "bin-dir": "./bin"
+  },
+  "bin": [
+    "vendor/phpunit/phpunit/phpunit-vendor",
+    "vendor/phpunit/phpunit/phpunit-vendor-xdebug"
+  ],
   "require": {
     "91carriage/phpunit-hhi": "~5.4.0"
   }
