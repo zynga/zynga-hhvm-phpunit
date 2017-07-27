@@ -12,7 +12,7 @@
     "vendor/phpunit/phpunit/phpunit-vendor-xdebug"
   ],
   "require": {
-    "91carriage/phpunit-hhi": "~5.4.0",
+    "91carriage/phpunit-hhi": "5.7.1",
     "hhvm": "^3.12"
   }
 }
