@@ -737,7 +737,26 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
             return $result;
         }
 
+        // JEO: Quick get the first and last tests off the stack.
+        $firstTest = null;
+        $lastTest = null;
+
+        foreach ( $this as $test ) {
+          if ( $firstTest === null ) {
+            $firstTest = $test;
+          }
+          $lastTest = $test;
+        }
+
+        // JEO: Run the doSetupBeforeClass on the first test.
+        if ( method_exists($firstTest, 'doSetUpBeforeClass') ) {
+          $firstTest->doSetUpBeforeClass();
+        } else {
+          error_log('WARNING - doSetUpBeforeClass NOT defined on your test=' . get_class($firstTest));
+        }
+
         foreach ($this as $test) {
+
             if ($result->shouldStop()) {
                 break;
             }
@@ -751,7 +770,16 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
             }
 
             $test->run($result);
+
         }
+
+        // JEO: Run the doTearDownAfterClass
+        if ( method_exists($lastTest, 'doTearDownAfterClass') ) {
+          $lastTest->doTearDownAfterClass();
+        } else {
+          error_log('WARNING - doTearDownAfterClass NOT defined on your test=' . get_class($lastTest));
+        }
+
 
         foreach ($hookMethods['afterClass'] as $afterClassMethod) {
             if ($this->testCase === true && class_exists($this->name, false) && method_exists($this->name, $afterClassMethod)) {
