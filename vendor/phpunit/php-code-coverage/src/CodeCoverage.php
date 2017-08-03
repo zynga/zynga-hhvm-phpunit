@@ -289,6 +289,7 @@ class CodeCoverage
         }
 
         $data = $this->driver->stop();
+
         $this->append($data, null, $append, $linesToBeCovered, $linesToBeUsed);
 
         $this->currentId = null;
@@ -322,7 +323,7 @@ class CodeCoverage
         $this->initializeFilesThatAreSeenTheFirstTime($data);
 
         if (!$append) {
-            return;
+          return;
         }
 
         if ($id != 'UNCOVERED_FILES_FROM_WHITELIST') {
@@ -334,13 +335,13 @@ class CodeCoverage
         }
 
         if (empty($data)) {
-            return;
+          return;
         }
 
         $size   = 'unknown';
         $status = null;
 
-        if ($id instanceof \PHPUnit_Framework_TestCase) {
+        if ($id instanceof \Zynga\Framework\Testing\TestCase\V2\Base) {
             $_size = $id->getSize();
 
             if ($_size == \PHPUnit_Util_Test::SMALL) {
@@ -615,6 +616,7 @@ class CodeCoverage
         }
 
         if (empty($linesToBeCovered)) {
+
             return;
         }
 

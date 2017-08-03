@@ -401,7 +401,7 @@ class PHPUnit_Framework_TestResult implements Countable
             $listener->endTest($test, $time);
         }
 
-        if (!$this->lastTestFailed && $test instanceof PHPUnit_Framework_TestCase) {
+        if (!$this->lastTestFailed && $test instanceof \Zynga\Framework\Testing\TestCase\V2\Base) {
             $class  = get_class($test);
             $key    = $class . '::' . $test->getName();
 
@@ -700,6 +700,7 @@ class PHPUnit_Framework_TestResult implements Countable
             } else {
                 $test->runBare();
             }
+
         } catch (PHPUnit_Framework_MockObject_Exception $e) {
             $e = new PHPUnit_Framework_Warning(
                 $e->getMessage()
@@ -764,8 +765,9 @@ class PHPUnit_Framework_TestResult implements Countable
             $linesToBeCovered = [];
             $linesToBeUsed    = [];
 
-            if ($append && $test instanceof PHPUnit_Framework_TestCase) {
+            if ($append && $test instanceof \Zynga\Framework\Testing\TestCase\V2\Base) {
                 try {
+
                     $linesToBeCovered = PHPUnit_Util_Test::getLinesToBeCovered(
                         get_class($test),
                         $test->getName(false)
@@ -775,6 +777,7 @@ class PHPUnit_Framework_TestResult implements Countable
                         get_class($test),
                         $test->getName(false)
                     );
+
                 } catch (PHPUnit_Framework_InvalidCoversTargetException $cce) {
                     $this->addWarning(
                         $test,
@@ -826,6 +829,19 @@ class PHPUnit_Framework_TestResult implements Countable
                 if (!isset($e)) {
                     $e = $cce;
                 }
+            } catch ( Exception $ue ) {
+              $error = true;
+              $e = $ue;
+              /*
+              JEO: frame debugging.
+              $frame = 0;
+              foreach ( $e->getTrace() as $traceItem ) {
+                echo "Trace frame=$frame\n";
+                var_dump($traceItem);
+                $frame++;
+              }
+              var_dump($e);
+              */
             }
         }
 
@@ -874,6 +890,7 @@ class PHPUnit_Framework_TestResult implements Countable
         }
 
         $this->endTest($test, $time);
+
     }
 
     /**

@@ -70,6 +70,7 @@ class PHPUnit_Util_Test
      */
     public static function getLinesToBeCovered($className, $methodName)
     {
+
         $annotations = self::parseTestMethodAnnotations(
             $className,
             $methodName
@@ -526,25 +527,29 @@ class PHPUnit_Util_Test
      */
     public static function parseTestMethodAnnotations($className, $methodName = '')
     {
+
         if (!isset(self::$annotationCache[$className])) {
             $class                             = new ReflectionClass($className);
             self::$annotationCache[$className] = self::parseAnnotations($class->getDocComment());
         }
 
+
         if (!empty($methodName) && !isset(self::$annotationCache[$className . '::' . $methodName])) {
             try {
-                $method      = new ReflectionMethod($className, $methodName);
-                $annotations = self::parseAnnotations($method->getDocComment());
+              $method      = new ReflectionMethod($className, $methodName);
+              $annotations = self::parseAnnotations($method->getDocComment());
             } catch (ReflectionException $e) {
-                $annotations = [];
+              $annotations = [];
             }
             self::$annotationCache[$className . '::' . $methodName] = $annotations;
         }
 
-        return [
+        $data = [
           'class'  => self::$annotationCache[$className],
           'method' => !empty($methodName) ? self::$annotationCache[$className . '::' . $methodName] : []
         ];
+
+        return $data;
     }
 
     /**
@@ -1060,6 +1065,7 @@ class PHPUnit_Util_Test
      */
     private static function resolveReflectionObjectsToLines(array $reflectors)
     {
+      
         $result = [];
 
         foreach ($reflectors as $reflector) {
