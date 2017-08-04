@@ -1,5 +1,5 @@
 {
-  "name": "poker/zynga-hhvm-phpunit",
+  "name": "zynga/zynga-hhvm-phpunit",
   "description": "Zynga modifications to the PHPUNIT framework.",
   "type": "library",
   "keywords": [
@@ -12,7 +12,12 @@
     "vendor/phpunit/phpunit/phpunit-vendor-xdebug"
   ],
   "require": {
-    "91carriage/phpunit-hhi": "5.7.1",
     "hhvm": "^3.12"
-  }
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url":  "git@github-ca.corp.zynga.com:Poker/zynga-hhvm-phpunit-hhi.git"
+    }
+  ]
 }
