@@ -12,7 +12,8 @@
     "vendor/phpunit/phpunit/phpunit-vendor-xdebug"
   ],
   "require": {
-    "hhvm": "^3.12"
+    "hhvm": "^3.12",
+    "zynga/zynga-hhvm-phpunit-hhi"
   },
   "repositories": [
     {
