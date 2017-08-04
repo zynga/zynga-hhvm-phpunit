@@ -13,7 +13,7 @@
   ],
   "require": {
     "hhvm": "^3.12",
-    "zynga/zynga-hhvm-phpunit-hhi"
+    "zynga/zynga-hhvm-phpunit-hhi": "1.0.0"
   },
   "repositories": [
     {
