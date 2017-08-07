@@ -38,6 +38,9 @@
  *
  * @since Class available since Release 2.0.0
  */
+
+ use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
+
 class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Framework_SelfDescribing, IteratorAggregate
 {
     /**
@@ -163,9 +166,9 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
             throw new PHPUnit_Framework_Exception;
         }
 
-        if (!$theClass->isSubClassOf('Zynga\Framework\Testing\TestCase\V2\Base')) {
+        if (!$theClass->isSubClassOf(ZyngaTestCaseBase::class) && !$theClass->isSubClassOf(PHPUnit_Framework_TestCase::class) ) {
           throw new PHPUnit_Framework_Exception(
-              'Class "' . $theClass->name . '" does not extend Zynga\Framework\Testing\TestCase\V2\Base'
+              'Class "' . $theClass->name . '" does not extend (' . ZyngaTestCaseBase::class . ' or ' . PHPUnit_Framework_TestCase::class . ')'
           );
         }
 
@@ -250,7 +253,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                 }
             }
 
-            if ($test instanceof \Zynga\Framework\Testing\TestCase\V2\Base) {
+            if ($test instanceof ZyngaTestCaseBase || $test instanceof PHPUnit_Framework_TestCase) {
                 $test->setGroups($groups);
             }
         }
@@ -594,7 +597,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
             throw new PHPUnit_Framework_Exception('No valid test provided.');
         }
 
-        if ($test instanceof \Zynga\Framework\Testing\TestCase\V2\Base) {
+        if ($test instanceof ZyngaTestCaseBase || $test instanceof PHPUnit_Framework_TestCase) {
             $test->setName($name);
 
             if ($runTestInSeparateProcess) {
@@ -761,7 +764,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                 break;
             }
 
-            if ($test instanceof \Zynga\Framework\Testing\TestCase\V2\Base ||
+            if (($test instanceof ZyngaTestCaseBase || $test instanceof PHPUnit_Framework_TestCase )||
                 $test instanceof self) {
                 $test->setbeStrictAboutChangesToGlobalState($this->beStrictAboutChangesToGlobalState);
                 $test->setBackupGlobals($this->backupGlobals);
@@ -913,7 +916,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
 
         $test = self::createTest($class, $name);
 
-        if ($test instanceof \Zynga\Framework\Testing\TestCase\V2\Base ||
+        if (($test instanceof ZyngaTestCaseBase || $test instanceof PHPUnit_Framework_TestCase) ||
             $test instanceof PHPUnit_Framework_TestSuite_DataProvider) {
             $test->setDependencies(
                 PHPUnit_Util_Test::getDependencies($class->getName(), $name)

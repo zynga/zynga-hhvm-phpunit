@@ -20,6 +20,7 @@ use SebastianBergmann\CodeUnitReverseLookup\Wizard;
 use SebastianBergmann\Environment\Runtime;
 
 use Zynga\Source\Cache as Zynga_Source_Cache;
+use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
 
 /**
  * Provides collection functionality for PHP code coverage information.
@@ -343,7 +344,7 @@ class CodeCoverage
         $size   = 'unknown';
         $status = null;
 
-        if ($id instanceof \Zynga\Framework\Testing\TestCase\V2\Base) {
+        if ($id instanceof ZyngaTestCaseBase || $id instanceof \PHPUnit_Framework_TestCase) {
             $_size = $id->getSize();
 
             if ($_size == \PHPUnit_Util_Test::SMALL) {
@@ -364,6 +365,7 @@ class CodeCoverage
         $this->tests[$id] = ['size' => $size, 'status' => $status];
 
         foreach ($data as $file => $lines) {
+
             if (!$this->filter->isFile($file)) {
                 continue;
             }

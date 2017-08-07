@@ -14,6 +14,7 @@ use SebastianBergmann\CodeCoverage\CoveredCodeNotExecutedException;
 use SebastianBergmann\CodeCoverage\MissingCoversAnnotationException;
 use SebastianBergmann\CodeCoverage\UnintentionallyCoveredCodeException;
 use SebastianBergmann\ResourceOperations\ResourceOperations;
+use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
 
 /**
  * A TestResult collects the results of executing a test case.
@@ -401,7 +402,7 @@ class PHPUnit_Framework_TestResult implements Countable
             $listener->endTest($test, $time);
         }
 
-        if (!$this->lastTestFailed && $test instanceof \Zynga\Framework\Testing\TestCase\V2\Base) {
+        if (!$this->lastTestFailed && ($test instanceof ZyngaTestCaseBase || $test instanceof \PHPUnit_Framework_TestCase)) {
             $class  = get_class($test);
             $key    = $class . '::' . $test->getName();
 
@@ -765,7 +766,7 @@ class PHPUnit_Framework_TestResult implements Countable
             $linesToBeCovered = [];
             $linesToBeUsed    = [];
 
-            if ($append && $test instanceof \Zynga\Framework\Testing\TestCase\V2\Base) {
+            if ($append && ($test instanceof ZyngaTestCaseBase || $test instanceof PHPUnit_Framework_TestCase)) {
                 try {
 
                     $linesToBeCovered = PHPUnit_Util_Test::getLinesToBeCovered(
