@@ -1,184 +1,36 @@
 <?hh // strict
 
-class Zynga_Source_Cache_File {
+namespace Zynga\Source;
 
-  const int CACHE_TTL = 86400;
+use Zynga\Source\Cache\File as Zynga_Source_Cache_File;
 
-  private string $_mcKey;
-
-  public string $fileName;
-  public ?string $source;
-  public mixed $tokens;
-  public mixed $codeCoverageRaw;
-  public mixed $ignoredLines;
-  public int $lastModified;
-
-  public function __construct(string $fileName) {
-
-    $this->_mcKey = '';
-
-    $this->fileName = $fileName;
-    $this->source = null;
-    $this->tokens = null;
-    $this->codeCoverageRaw = null;
-    $this->ignoredLines = null;
-    $this->lastModified = 0;
-
-  }
-
-  public function getMemcached(): Memcached {
-    return Zynga_Source_Cache_LocalMemcache::getMemcached();
-  }
-
-  public function loadFromMemcache(): bool {
-
-    try {
-
-      // --
-      //
-      // JEO: TODO, it's late on 2017/04/25, had to turn off the fetching from
-      // mc, I think theres a issue where if the unit test changes, but the
-      // code didn't we don't actually reparse correctly.
-      //
-      // Need coverage to work for tomorrows presentation.
-      //
-      // --
-      return false;
-
-      $key = $this->createKey();
-
-      $mc = $this->getMemcached();
-
-      $data = $mc->get($key);
-
-      // var_dump($data);
-      if ( $data instanceof Zynga_Source_Cache_File && $data->lastModified > 0 ) {
-
-        $this->lastModified = $data->lastModified;
-        $this->source = $data->source;
-        $this->tokens = $data->tokens;
-        $this->codeCoverageRaw = $data->codeCoverageRaw;
-        $this->ignoredLines = $data->ignoredLines;
-
-        //var_dump($this);
-        //exit();
-
-        return true;
-
-      }
-
-      return false;
-
-    } catch ( Exception $e ) {
-      return false;
-    }
-
-  }
-
-  public function saveToMemcache(): bool {
-
-    try {
-
-      // --
-      //
-      // JEO: TODO, it's late on 2017/04/25, had to turn off the fetching from
-      // mc, I think theres a issue where if the unit test changes, but the
-      // code didn't we don't actually reparse correctly.
-      //
-      // Need coverage to work for tomorrows presentation.
-      //
-      // --
-      return true;
-
-      $key = $this->createKey();
-
-      $ttl = self::CACHE_TTL + time();
-
-      $mc = $this->getMemcached();
-
-      // echo "saving fileName=" . $this->fileName . " key=" . $key . "\n";
-      $mc->set($key, $this, $ttl);
-
-      return true;
-
-    } catch ( Exception $e ) {
-      return false;
-    }
-
-  }
-
-  public function purge(): bool {
-
-    try {
-
-      $key = $this->createKey();
-
-      $mc = $this->getMemcached();
-
-      $mc->delete($key);
-
-      return true;
-
-    } catch ( Exception $e ) {
-      return false;
-    }
-
-  }
-
-  public function isFileDataStale(): bool {
-
-    $lastModified = filemtime($this->fileName);
-
-    if ( $this->lastModified != $lastModified ) {
-      return true;
-    }
-
-    return false;
-  }
-
-
-  public function createKey(): string {
-
-    if ( $this->_mcKey !== '' ) {
-      return $this->_mcKey;
-    }
-
-    $version = 4;
-    $key = 'zsc|jeo:' . $version . ':' . md5($this->fileName);
-
-    $this->_mcKey = $key;
-
-    // var_dump($this->_mcKey);
-
-    return $this->_mcKey;
-
-  }
-
-}
-
-class Zynga_Source_Cache {
+// JEO: As most of this functionality is disabled at this time turning off
+// coverage until we can properly intrument and explore whats going on with the
+// caching.
+// 
+// @codeCoverageIgnoreStart
+class Cache {
 
   private static Map<string, Zynga_Source_Cache_File> $_cache = Map {};
 
-  public static function loadFile(string $fileName): ?Zynga_Source_Cache_File {
+  public static function loadFile(string $fileName): Zynga_Source_Cache_File {
 
     if ( self::$_cache->containsKey($fileName) ) {
       return self::$_cache[$fileName];
     }
 
+    // --
+    // JEO: There is a ton of pre-filtering before this class gets hit,
+    // disabling this check for now.
+    // --
+    /*
     if ( is_file($fileName) !== true ) {
       return null;
     }
+    */
 
     $file = new Zynga_Source_Cache_File($fileName);
-    $file->loadFromMemcache();
-
-    if ( $file->isFileDataStale() == true ) {
-      $file->purge();
-      $file->lastModified = filemtime($file->fileName);
-    }
-
-    $file->saveToMemcache();
+    $file->load();
 
     self::$_cache[$fileName] = $file;
 
@@ -190,24 +42,7 @@ class Zynga_Source_Cache {
 
     $file = self::loadFile($fileName);
 
-    if ( $file instanceof Zynga_Source_Cache_File && $file->source !== null ) {
-      return $file->source;
-    }
-
-    $source = file_get_contents($fileName);
-
-    if ( $file instanceof Zynga_Source_Cache_File && is_string($source) ) {
-
-      $file->source = $source;
-      $file->saveToMemcache();
-
-      if ( is_string($file->source) ) {
-        return $file->source;
-      }
-
-    }
-
-    return $source;
+    return $file->source;
 
   }
 
@@ -215,22 +50,7 @@ class Zynga_Source_Cache {
 
     $file = self::loadFile($fileName);
 
-    if ( $file instanceof Zynga_Source_Cache_File && $file->tokens !== null ) {
-      return $file->tokens;
-    }
-
-    $source = self::getSource($fileName);
-
-    if ( $file instanceof Zynga_Source_Cache_File && is_string($source) ) {
-
-      $file->tokens = token_get_all($source);
-      $file->saveToMemcache();
-
-      return $file->tokens;
-
-    }
-
-    return null;
+    return $file->tokens;
 
   }
 
@@ -300,26 +120,4 @@ class Zynga_Source_Cache {
 
 }
 
-class Zynga_Source_Cache_LocalMemcache {
-
-  private static ?Memcached $_mc;
-
-  public static function getMemcached(): Memcached {
-    try {
-
-      if ( self::$_mc !== null ) {
-        return self::$_mc;
-      }
-
-      $mc = new Memcached();
-      $mc->addServer('localhost', 11211);
-
-      self::$_mc = $mc;
-
-      return self::$_mc;
-    } catch ( Exception $e ) {
-      throw $e;
-    }
-  }
-
-}
+// @codeCoverageIgnoreEnd

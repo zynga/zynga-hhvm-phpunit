@@ -19,6 +19,8 @@ use SebastianBergmann\CodeCoverage\Node\Directory;
 use SebastianBergmann\CodeUnitReverseLookup\Wizard;
 use SebastianBergmann\Environment\Runtime;
 
+use Zynga\Source\Cache as Zynga_Source_Cache;
+
 /**
  * Provides collection functionality for PHP code coverage information.
  */
@@ -755,7 +757,7 @@ class CodeCoverage
             // JEO: ignored lines is a costly beast, we should consider disabling it,
             // but for now pull it off cache if possible.
             // --
-            $linesToBeIgnored = \Zynga_Source_Cache::getIgnoredLines($filename);
+            $linesToBeIgnored = Zynga_Source_Cache::getIgnoredLines($filename);
 
             if ( $linesToBeIgnored !== null ) {
               $this->ignoredLines[$filename] = $linesToBeIgnored;
@@ -909,7 +911,8 @@ class CodeCoverage
 
             sort($this->ignoredLines[$filename]);
 
-            \Zynga_Source_Cache::setIgnoredLines($filename, $this->ignoredLines[$filename]);
+            Zynga_Source_Cache::setIgnoredLines($filename, $this->ignoredLines[$filename]);
+
         }
 
         return $this->ignoredLines[$filename];

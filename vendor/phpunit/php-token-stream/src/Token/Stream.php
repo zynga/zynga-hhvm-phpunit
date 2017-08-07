@@ -8,8 +8,7 @@
  * file that was distributed with this source code.
  */
 
-// JEO: Addded use statement.
-use Zynga\Source\Cache;
+use Zynga\Source\Cache as Zynga_Source_Cache;
 
 /**
  * A stream of PHP tokens.

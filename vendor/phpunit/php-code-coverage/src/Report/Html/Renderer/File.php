@@ -12,8 +12,7 @@ namespace SebastianBergmann\CodeCoverage\Report\Html;
 
 use SebastianBergmann\CodeCoverage\Node\File as FileNode;
 use SebastianBergmann\CodeCoverage\Util;
-
-require_once dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) . '/php-source-cache/src/Source/Cache.hh';
+use Zynga\Source\Cache as Zynga_Source_Cache;
 
 /**
  * Renders a file node.
@@ -399,7 +398,7 @@ class File extends Renderer
     protected function loadFile($file)
     {
 
-      $htmlTemplate = \Zynga_Source_Cache::getCodeCoverageRaw($file);
+      $htmlTemplate = Zynga_Source_Cache::getCodeCoverageRaw($file);
 
       if ( $htmlTemplate !== null ) {
         return $htmlTemplate;
@@ -407,8 +406,8 @@ class File extends Renderer
 
       // echo "loading file=$file\n";
       // JEO: This should already be in the token cache if available?
-      $buffer = \Zynga_Source_Cache::getSource($file);
-      $tokens = \Zynga_Source_Cache::getTokens($file);
+      $buffer = Zynga_Source_Cache::getSource($file);
+      $tokens = Zynga_Source_Cache::getTokens($file);
 
       // JEO: Original code is here, caching version above.
       // $buffer              = file_get_contents($file);
@@ -552,7 +551,7 @@ class File extends Renderer
             unset($result[count($result)-1]);
         }
 
-        \Zynga_Source_Cache::setCodeCoverageRaw($file, $result);
+        Zynga_Source_Cache::setCodeCoverageRaw($file, $result);
 
         return $result;
     }
