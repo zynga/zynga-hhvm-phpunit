@@ -1,0 +1,94 @@
+#!/usr/bin/php
+<?php
+
+// --
+// This script cannot be hacklang due to you might be wanting to restart hhvm 
+// because of hack related strict failures, etc.
+// --
+
+function message($prompt) {
+  echo date('r') . ' - ' . $prompt . "\n";
+  return true;
+}
+
+function run_command($command) {
+  $return_value = null;
+
+  // message("command=$command");
+  system($command, $return_value);
+
+  if ( $return_value == 0 ) {
+    return true;
+  }
+
+  return false;
+}
+
+function hhvm_stop() {
+  return run_command('hh_client stop 2> /dev/null ');
+}
+
+function hhvm_start() {
+  return run_command('hh_client start 2> /dev/null ');
+}
+
+function hhvm_cleanup() {
+
+  $HOME = getenv('HOME');
+  $USER = getenv('USER');
+
+  $removed_hhbc = false;
+  $removed_tmp_hh = false;
+
+  $hhbc_file = $HOME . '/.hhvm.hhbc';
+  $tmp_hh_dir = '/tmp/hh_server';
+
+  if ( is_file($hhbc_file) ) {
+    $removed_hhbc = run_command('rm ' . $hhbc_file . ' 2> /dev/null');
+  }
+
+  if ( is_dir($tmp_hh_dir) ) {
+    run_command('find ' . $tmp_hh_dir . ' -user ' . $USER . ' -type f -exec rm {} \; 2> /dev/null ');
+    run_command('find ' . $tmp_hh_dir . ' -user ' . $USER . ' -type d -exec rm -r {} \; 2> /dev/null ');
+    run_command('find ' . $tmp_hh_dir . ' -user ' . $USER . ' -type l -exec unlink {} \; 2> /dev/null ');
+  }
+
+  return true;
+
+}
+
+function hhvm_restarted() {
+  message("HHVM - up and running!");
+  exit(0);
+}
+
+for ( $i = 0; $i < 5; $i++ ) {
+
+  $hhvm_stopped = false;
+  $hhvm_cleanup = false;
+  $hhvm_started = false;
+
+  $hhvm_stopped = hhvm_stop();
+
+  if ( $hhvm_stopped === true ) {
+    message("HHVM - stopped");
+    $hhvm_cleanup = hhvm_cleanup();
+  }
+
+  if ( $hhvm_stopped === true && $hhvm_cleanup === true ) {
+    message("HHVM - cleaned up");
+    $hhvm_started = hhvm_start();
+  }
+  
+  if ( $hhvm_stopped === true && $hhvm_cleanup === true && $hhvm_started === true ) {
+    message("HHVM - started");
+    hhvm_restarted();
+  }
+
+  message("HHVM - failed restart, sleeping 1");
+  sleep(1);
+
+}
+
+message("HHVM - failed to restart");
+exit(255);

@@ -8,6 +8,7 @@
     "testing"
   ],
   "bin": [
+    "vendor/bin/hhvm-restart-wrapper",
     "vendor/phpunit/phpunit/phpunit-vendor",
     "vendor/phpunit/phpunit/phpunit-vendor-xdebug"
   ],
