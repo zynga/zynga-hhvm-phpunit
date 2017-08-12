@@ -14,11 +14,9 @@
   ],
   "require": {
     "hhvm": "^3.18",
-    "zynga/zynga-hhvm-phpunit-hhi": "*",
-    "zynga/framework/testing": "*"
+    "zynga/zynga-hhvm-phpunit-hhi": "*"
   },
   "repositories": [
-    { "type": "vcs", "url":  "git@github-ca.corp.zynga.com:Poker/zynga-hhvm-phpunit-hhi.git" },
-    { "type": "vcs", "url":  "git@github-ca.corp.zynga.com:Poker/zynga-hhvm-framework-testing.git" }
+    { "type": "vcs", "url":  "git@github-ca.corp.zynga.com:Poker/zynga-hhvm-phpunit-hhi.git" }
   ]
 }
