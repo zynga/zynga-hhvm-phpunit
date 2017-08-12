@@ -13,9 +13,9 @@
     "vendor/phpunit/phpunit/phpunit-vendor-xdebug"
   ],
   "require": {
-    "hhvm": "^3.12",
-    "zynga/zynga-hhvm-phpunit-hhi": "v1.0.1",
-    "zynga/framework/testing": "v2.0.4"
+    "hhvm": "^3.18",
+    "zynga/zynga-hhvm-phpunit-hhi": "*",
+    "zynga/framework/testing": "*"
   },
   "repositories": [
     { "type": "vcs", "url":  "git@github-ca.corp.zynga.com:Poker/zynga-hhvm-phpunit-hhi.git" },
