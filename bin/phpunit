@@ -1,0 +1,99 @@
+#!/usr/local/bin/hhvm
+<?hh
+
+$projectRoot = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
+$userName    = $_ENV['USER'];
+
+$coverageFile = $projectRoot . '/tmp/' . $userName . '-hh-phpunit.coverage';
+$htmlDir      = $projectRoot . '/tmp/' . $userName . '-hh-phpunit-html';
+
+
+if ( ! is_dir($htmlDir) ) {
+  mkdir($htmlDir, 0755, true);
+}
+
+/*
+$displayLink = ZY_SERVER_PATH . '/fbpoker/www/internal/phpunit';
+if ( ! is_link($displayLink) ) {
+  echo "ENV: symLink-created-OK\n";
+  symlink($htmlDir, $displayLink);
+} else {
+  $linkedTo = readlink($displayLink);
+  if ( $linkedTo == $htmlDir ) {
+    echo "ENV: symLink-existing-OK\n";
+  } else {
+    echo "ENV: mismatch=$linkedTo on symlink, removing bad one, and recreating\n";
+    unlink($displayLink);
+    symlink($htmlDir, $displayLink);
+  }
+}
+*/
+
+$testErrorLogFile = $projectRoot . '/tmp/php.log';
+
+$command = array();
+$command[] = '/usr/local/bin/hhvm';
+
+// ---
+// We don't need to run JIT for tests
+// ---
+$command[] = '-d hhvm.jit=false';
+
+// ---
+// Allow remote debugging
+// ---
+$command[] = '--define xdebug.remote_enable=1';
+$command[] = '--define xdebug.remote_autostart=1';
+
+// --
+// Code coverage requires xdebug
+// --
+$command[] = '--define xdebug.enable=On';
+$command[] = '--define xdebug.remove_enable=false';
+
+$command[] = '--define xhprof.output_dir=/tmp';
+$command[] = '--define memory_limit=-1';
+$command[] = '--define error_log=' . escapeshellarg($testErrorLogFile);
+$command[] = '--define log_errors=true';
+$command[] = '--define hhvm.debug.server_error_message=true';
+
+// --
+// The composer version of phpunit.
+// --
+$command[] = escapeshellarg($projectRoot . '/vendor/bin/phpunit-vendor');
+
+// $command[] = '--debug';
+// $command[] = '--stop-on-failure';
+
+// $command[] = '--coverage-clover=' . escapeshellarg($coverageFile);
+$command[] = '--coverage-html=' . escapeshellarg($htmlDir);
+$command[] = '--coverage-text';
+
+$command[] = '--configuration=' . escapeshellarg($projectRoot . '/phpunit.xml');
+// $command[] = '--testdox';
+
+$argvCount = count($argv);
+for ( $i = 1; $i < $argvCount; $i++ ) {
+  $command[] = $argv[$i];
+}
+
+// var_dump($command);
+
+$commandString = join(' ', $command);
+
+var_dump($commandString);
+
+$rv = 0;
+passthru($commandString, $rv);
+
+echo "CODE coverageFile=$coverageFile\n";
+echo "CODE htmlDir=$htmlDir\n";
+// --
+// JEO:
+// echo "SYMLINK=$displayLink utilize your slice name /internal/phpunit/ to view output\n";
+
+if ( $rv == 0 ) {
+  echo "OK!\n";
+}
+
+exit($rv);
