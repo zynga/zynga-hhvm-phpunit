@@ -754,7 +754,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
         // JEO: Run the doSetupBeforeClass on the first test.
         if ( method_exists($firstTest, 'doSetUpBeforeClass') ) {
           $firstTest->doSetUpBeforeClass();
-        } else {
+        } else if (get_class($firstTest) != 'PHPUnit_Framework_TestSuite') {
           error_log('WARNING - doSetUpBeforeClass NOT defined on your test=' . get_class($firstTest));
         }
 
@@ -779,7 +779,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
         // JEO: Run the doTearDownAfterClass
         if ( method_exists($lastTest, 'doTearDownAfterClass') ) {
           $lastTest->doTearDownAfterClass();
-        } else {
+        } else if (get_class($lastTest) != 'PHPUnit_Framework_TestSuite') {
           error_log('WARNING - doTearDownAfterClass NOT defined on your test=' . get_class($lastTest));
         }
 
