@@ -1,5 +1,5 @@
 {
-  "name": "zynga/zynga-hhvm-phpunit",
+  "name": "zynga/phpunit",
   "description": "Zynga modifications to the PHPUNIT framework.",
   "type": "library",
   "keywords": [
