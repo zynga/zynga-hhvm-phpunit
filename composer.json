@@ -18,6 +18,6 @@
     "zynga/zynga-hhvm-phpunit-hhi": "@dev"
   },
   "repositories": [
-    { "type": "vcs", "url":  "git@github-ca.corp.zynga.com:Poker/zynga-hhvm-phpunit-hhi.git" }
+    { "type": "vcs", "url":  "git@github.com:Zynga/zynga-hhvm-phpunit-hhi.git" }
   ]
 }
