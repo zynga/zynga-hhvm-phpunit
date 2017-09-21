@@ -15,7 +15,7 @@
   ],
   "require": {
     "hhvm": "^3.18",
-    "zynga/zynga-hhvm-phpunit-hhi": "@dev"
+    "zynga/phpunit-hhi": "@dev"
   },
   "repositories": [
     { "type": "vcs", "url":  "git@github.com:Zynga/zynga-hhvm-phpunit-hhi.git" }
