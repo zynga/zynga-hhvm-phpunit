@@ -1,4 +1,4 @@
-#!/usr/local/bin/hhvm
+#!/usr/bin/env hhvm
 <?hh
 
 $projectRoot = dirname(dirname(dirname(dirname(dirname(__FILE__)))));

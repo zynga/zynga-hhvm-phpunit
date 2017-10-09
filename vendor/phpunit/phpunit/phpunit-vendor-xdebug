@@ -1,4 +1,4 @@
-#!/usr/local/bin/hhvm
+#!/usr/bin/env hhvm
 <?php
 /*
  * This file is part of PHPUnit.
