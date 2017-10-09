@@ -2,7 +2,12 @@
 <?hh
 
 $projectRoot = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
-$userName    = $_ENV['USER'];
+
+$userName    = 'unknown';
+
+if ( isset($_ENV['USER']) ) {
+  $userName = $_ENV['USER'];
+}
 
 $coverageFile = $projectRoot . '/tmp/' . $userName . '-hh-phpunit.coverage';
 $htmlDir      = $projectRoot . '/tmp/' . $userName . '-hh-phpunit-html';
@@ -32,7 +37,7 @@ if ( ! is_link($displayLink) ) {
 $testErrorLogFile = $projectRoot . '/tmp/php.log';
 
 $command = array();
-$command[] = '/usr/local/bin/hhvm';
+$command[] = PHP_BINARY;
 
 // ---
 // We don't need to run JIT for tests
