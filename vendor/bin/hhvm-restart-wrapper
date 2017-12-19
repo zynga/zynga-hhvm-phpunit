@@ -5,6 +5,7 @@
 // This script cannot be hacklang due to you might be wanting to restart hhvm 
 // because of hack related strict failures, etc.
 // --
+date_default_timezone_set('GMT');
 
 function message($prompt) {
   echo date('r') . ' - ' . $prompt . "\n";
@@ -77,9 +78,23 @@ function hhvm_restart_failure($message) {
   sleep(1);
 }
 
+function os_isMac() {
+  $outputBuffer = array();
+  exec('uname -s', $outputBuffer);
+  if ( isset($outputBuffer[0]) && preg_match('/Darwin/', $outputBuffer[0]) ) {
+    return true;
+  }
+  return false;
+}
+
+$isMac = os_isMac();
+
 for ( $i = 0; $i < 5; $i++ ) {
 
-  if ( hhvm_stop() === true ) {
+  // --
+  // on the mac platform hhvm_stop will not stop a running hhvm server.
+  // --
+  if ( $isMac === false && hhvm_stop() === true ) {
     message("HHVM - stopped");
   } else {
     if ( hhvm_stop_pkill() === true ) {
