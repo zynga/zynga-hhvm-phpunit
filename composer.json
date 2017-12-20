@@ -9,6 +9,7 @@
   ],
   "bin": [
     "bin/phpunit",
+    "bin/run-single-test.hh",
     "vendor/bin/hhvm-restart-wrapper",
     "vendor/phpunit/phpunit/phpunit-vendor",
     "vendor/phpunit/phpunit/phpunit-vendor-xdebug"
