@@ -5,127 +5,327 @@
 // This script cannot be hacklang due to you might be wanting to restart hhvm 
 // because of hack related strict failures, etc.
 // --
+
+abstract class Zynga_Base {
+
+  public function message($prompt) {
+    echo date('r') . ' - ' . $prompt . "\n";
+    return true;
+  }
+
+  public function debug($message) {
+    // $this->message($message);
+    return true;
+  }
+
+}
+
+class Zynga_External_Command extends Zynga_Base {
+  private $_wasFound;
+  private $_commandPath;
+
+  /**
+   * __construct
+   *
+   * @param string $command_name
+   * @param bool $is_required
+   * @access protected
+   * @return void
+   */
+  function __construct($command_name, $is_required) {
+
+    $this->_wasFound = false;
+    $this->_commandPath = null;
+
+    $this->find($command_name);
+
+    if ( $is_required === true && $this->_wasFound === false ) {
+      $this->message('command=' . $command_name . ' is required');
+      exit(255);
+    }
+
+  }
+
+  /**
+   * find
+   *
+   * @access public
+   * @param string $command_name
+   * @return bool
+   */
+  public function find($command_name) {
+    $envPath = getenv('PATH');
+    $paths = explode(PATH_SEPARATOR, $envPath);
+    foreach ( $paths as $path ) {
+      $candidate = $path . DIRECTORY_SEPARATOR . $command_name;
+      if ( is_executable($candidate) ) {
+        $this->_commandPath = $candidate;
+        $this->_wasFound = true;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * wasFound
+   *
+   * @access public
+   * @return void
+   */
+  public function wasFound() {
+    return $this->_wasFound;
+  }
+
+  /**
+   * run
+   *
+   * @access public
+   * @return int
+   */
+  public function run($params) {
+    $return_value = null;
+
+    $command = $this->_commandPath . ' ' . $params;
+
+    $this->debug("  command=$command");
+    system($command, $return_value);
+    $this->debug("  command=$command return_value=$return_value");
+
+    return $return_value;
+
+  }
+
+  /**
+   * runAndCaptureOutput - run the command capturing both the output and return value
+   *
+   * @param string $params
+   * @access public
+   * @return array(return_value, output_as_array)
+   */
+  public function runAndCaptureOutput($params) {
+    $return_value = null;
+    $output = array();
+    $command = $this->_commandPath . ' ' . $params;
+    $this->debug("  command=$command");
+    exec($command, $output, $return_value);
+    $this->debug("  command=$command return_value=$return_value output=" . json_encode($output));
+    return array($return_value, $output);
+  }
+
+}
+
+class Zynga_HHVM_Service extends Zynga_Base {
+  private $_hhClientCommand;
+  private $_pgrepCommand;
+  private $_pkillCommand;
+  private $_findCommand;
+
+  public function __construct($hhClientCommand, $pgrepCommand, $pkillCommand, $findCommand) {
+    $this->_hhClientCommand = $hhClientCommand;
+    $this->_pgrepCommand =  $pgrepCommand;
+    $this->_pkillCommand = $pkillCommand;
+    $this->_findCommand = $findCommand;
+  }
+
+  /**
+   * message - overloaded to add a prefix of "HHVM - "
+   *
+   * @param string $message
+   * @access public
+   * @return bool
+   */
+  public function message($message) {
+    return parent::message('HHVM - ' . $message);
+  }
+
+  /**
+   * start - starts hhvm on the host, and verifies that it is running
+   *
+   * @access public
+   * @return bool
+   */
+  public function start() {
+
+    $this->message('start');
+
+    if ( $this->checkIfRunning() === true ) {
+      $this->message('start, already running');
+      return true;
+    }
+
+    $result = $this->_hhClientCommand->run('start 2>/dev/null');
+
+    if ( $result === 0 && $this->checkIfRunning() === true ) {
+      $this->message('start, isRunning');
+      return true;
+    }
+
+    return false;
+
+  }
+
+  /**
+   * stop - stops hhvm on the box
+   *
+   * @access public
+   * @return bool
+   */
+  public function stop() {
+
+    $this->message('stop');
+
+    if ( $this->checkIfRunning() === false ) {
+      $this->message('stop, not-running');
+      return true;
+    }
+
+    $result = $this->_hhClientCommand->run('stop 2>/dev/null');
+
+    var_dump($result);
+
+    if ( $result === 0 ) {
+
+      $this->message('stop command executed');
+
+      // sweet the daemon shut off properly.
+      if ( $this->checkIfRunning() === false ) {
+        $this->message('stopped');
+        return true;
+      }
+      // sometimes stop will keep a running daemon.
+      if ( $this->forceStop() === true ) {
+        $this->message('forceStop worked');
+        return true;
+      }
+    }
+
+    $this->message('stop failed');
+    return false;
+
+  }
+
+  /**
+   * forceStop - utilize pkill to kill off errant hhvm processes.
+   *
+   * @access public
+   * @return bool
+   */
+  public function forceStop() {
+
+    if ( $this->checkIfRunning() === false ) {
+      return true;
+    }
+
+    $result = $this->_pkillCommand->run(
+      '-u ' . getenv('USER') . ' hh_server'
+    );
+
+    if ( $result === 0 && $this->checkIfRunning() === false ) {
+      return true;
+    }
+
+    return false;
+
+  }
+
+  /**
+   * checkIfRunning - see if hhvm is up and running on the box.
+   *
+   * @access public
+   * @return bool
+   */
+  public function checkIfRunning() {
+
+    list($return_value, $output) = $this->_pgrepCommand->runAndCaptureOutput(
+      '-u ' . getenv('USER') . ' hh_server'
+    );
+
+    if ( $return_value === 1 ) { //&& is_array($count) && count($output) === 0 ) {
+      return false;
+    }
+
+    return true;
+
+  }
+
+  /**
+   * doCleanup - cleans up the hhbc and all temporary files for hhvm.
+   *
+   * @access public
+   * @return bool
+   */
+  public function doCleanup() {
+
+    $HOME = getenv('HOME');
+    $USER = getenv('USER');
+
+    $hhbc_file = $HOME . '/.hhvm.hhbc';
+    $tmp_hh_dir = '/tmp/hh_server';
+
+    if ( is_file($hhbc_file) ) {
+      unlink($hhbc_file);
+    }
+
+    if ( is_dir($tmp_hh_dir) ) {
+      $this->_findCommand->run(
+        $tmp_hh_dir . ' -user ' . $USER . ' -type f -exec rm {} \; 2> /dev/null '
+      );
+      $this->_findCommand->run(
+        $tmp_hh_dir . ' -user ' . $USER . ' -type d -exec rm -r {} \; 2> /dev/null '
+      );
+      $this->_findCommand->run(
+        $tmp_hh_dir . ' -user ' . $USER . ' -type l -exec unlink {} \; 2> /dev/null '
+      );
+    }
+
+    return true;
+
+  }
+
+  public function standup() {
+
+    for ( $i = 0; $i < 5; $i++ ) {
+
+      if ( $this->stop() !== true ) {
+        sleep(1);
+        continue;
+      }
+
+      if ( $this->doCleanup() !== true ) {
+        sleep(1);
+        continue;
+      }
+
+      if ( $this->start() === true ) {
+        sleep(1);
+        exit(0);
+      }
+
+    }
+
+    exit(255);
+
+  }
+
+}
+
+// we always default to GMT
 date_default_timezone_set('GMT');
 
-function message($prompt) {
-  echo date('r') . ' - ' . $prompt . "\n";
-  return true;
-}
+// find the dependent commands
+$pkillCommand       = new Zynga_External_Command('pkill', true);
+$pgrepCommand       = new Zynga_External_Command('pgrep', true);
+$hhClientCommand    = new Zynga_External_Command('hh_client', true);
+$findCommand        = new Zynga_External_Command('find', true);
 
-function run_command($command) {
-  $return_value = null;
+// create the service object
+$hhvmService = new Zynga_HHVM_Service(
+  $hhClientCommand,
+  $pgrepCommand,
+  $pkillCommand,
+  $findCommand
+);
 
-  // message("command=$command");
-  system($command, $return_value);
-  // message("command_rv=$return_value");
-
-  if ( $return_value == 0 ) {
-    return true;
-  }
-
-  return false;
-}
-
-function hhvm_stop() {
-  return run_command('hh_client stop 2> /dev/null ');
-}
-
-function hhvm_stop_pkill() {
-  $user = $_ENV['USER'];
-  return run_command('pkill -u ' . $user . ' hh_server');
-}
-
-function hhvm_start() {
-  return run_command('hh_client start 2> /dev/null ');
-}
-
-function hhvm_restart() {
-  return run_command('hh_client restart 2> /dev/null ');
-}
-
-function hhvm_cleanup() {
-
-  $HOME = getenv('HOME');
-  $USER = getenv('USER');
-
-  $removed_hhbc = false;
-  $removed_tmp_hh = false;
-
-  $hhbc_file = $HOME . '/.hhvm.hhbc';
-  $tmp_hh_dir = '/tmp/hh_server';
-
-  if ( is_file($hhbc_file) ) {
-    $removed_hhbc = run_command('rm ' . $hhbc_file . ' 2> /dev/null');
-  }
-
-  if ( is_dir($tmp_hh_dir) ) {
-    run_command('find ' . $tmp_hh_dir . ' -user ' . $USER . ' -type f -exec rm {} \; 2> /dev/null ');
-    run_command('find ' . $tmp_hh_dir . ' -user ' . $USER . ' -type d -exec rm -r {} \; 2> /dev/null ');
-    run_command('find ' . $tmp_hh_dir . ' -user ' . $USER . ' -type l -exec unlink {} \; 2> /dev/null ');
-  }
-
-  return true;
-
-}
-
-function hhvm_restarted() {
-  message("HHVM - up and running!");
-  exit(0);
-}
-
-function hhvm_restart_failure($message) {
-  message("HHVM - $message - failed, sleeping 1");
-  sleep(1);
-}
-
-function os_isMac() {
-  $outputBuffer = array();
-  exec('uname -s', $outputBuffer);
-  if ( isset($outputBuffer[0]) && preg_match('/Darwin/', $outputBuffer[0]) ) {
-    return true;
-  }
-  return false;
-}
-
-$isMac = os_isMac();
-
-for ( $i = 0; $i < 5; $i++ ) {
-
-  // --
-  // on the mac platform hhvm_stop will not stop a running hhvm server.
-  // --
-  if ( $isMac === false && hhvm_stop() === true ) {
-    message("HHVM - stopped");
-  } else {
-    if ( hhvm_stop_pkill() === true ) {
-      message("HHVM - stopped via pkill");
-    } else {
-      hhvm_restart_failure("hhvm_stop");
-      continue;
-    }
-  }
-  
-  if ( hhvm_cleanup() === true ) {
-    message("HHVM - cleanup completed");
-  } else {
-    hhvm_restart_failure("hhvm_cleanup");
-    continue;
-  }
-
-  if ( hhvm_start() === true ) {
-    message("HHVM - started");
-    hhvm_restarted();
-  }
-
-  if ( hhvm_restart() === true ) {
-    message("HHVM - started, via hh_client restart");
-    hhvm_restarted();
-  } else {
-    hhvm_restart_failure("hhvm_start and hhvm_restart");
-    continue;
-  }
-
-}
-
-message("HHVM - failed to restart");
-exit(255);
+// stand up the service
+$hhvmService->standup();
