@@ -610,6 +610,10 @@ class PHP_Token_AS extends PHP_Token
 {
 }
 
+class PHP_Token_TUPLE extends PHP_Token
+{
+}
+
 class PHP_Token_AT extends PHP_Token
 {
 }
