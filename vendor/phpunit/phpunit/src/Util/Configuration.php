@@ -849,7 +849,8 @@ class PHPUnit_Util_Configuration
         }
 
         if ($testSuiteNodes->length == 1) {
-            return $this->getTestSuite($testSuiteNodes->item(0), $testSuiteFilter);
+            $testSuite = $this->getTestSuite($testSuiteNodes->item(0), $testSuiteFilter);
+            return $testSuite;
         }
 
         if ($testSuiteNodes->length > 1) {
@@ -938,6 +939,9 @@ class PHPUnit_Util_Configuration
                 $prefix,
                 $exclude
             );
+        // var_dump(get_included_files()); 
+        // echo __LINE__ . " - inc files\n";
+        // exit();
             $suite->addTestFiles($files);
         }
 

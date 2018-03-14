@@ -16,23 +16,27 @@ use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\AbstractBlock;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\CodeBlockInterface;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\IfBlock;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\ReturnBlock;
+use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\UseBlock;
+use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\ThrowBlock;
+use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\FunctionBlock;
+use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\MultiLineStatementBlock;
 
 /**
  * Driver for HHVM's code coverage functionality.
  *
  * @codeCoverageIgnore
  */
-class HHVM extends Xdebug
-{
-
+class HHVM extends Xdebug {
   private array $_seenFile;
   private array $_execRanges;
   private bool $_debug;
+  private $_codeBlocks;
 
   public function __construct() {
     $this->_seenFile = array();
     $this->_execRanges = array();
     $this->_debug = false;
+    $this->_codeBlocks = null;
     parent::__construct();
   }
 
@@ -41,17 +45,13 @@ class HHVM extends Xdebug
    *
    * @param bool $determineUnusedAndDead
    */
-  public function start($determineUnusedAndDead = true)
-  {
+  public function start($determineUnusedAndDead = true) {
+
+    //echo "XDEBUG-start called\n";
+    //var_dump(get_included_files());
     xdebug_start_code_coverage();
   }
 
-  public function withinAcceptableCodePath($file): bool {
-    if ( preg_match('/^\/(usr|opt)/', $file) ) {
-      return false;
-    }
-    return true;
-  }
   /**
    * Stop collection of code coverage information.
    *
@@ -59,6 +59,9 @@ class HHVM extends Xdebug
    */
   public function stop()
   {
+
+    //echo "XDEBUG-stop called\n";
+    // var_dump(get_included_files());
 
     $data = parent::stop();
 
@@ -84,8 +87,6 @@ class HHVM extends Xdebug
       // we track results within this function.
       // --
       if ( ! preg_match('/.hh$/', $file ) ) {
-      // A different strategy, exclude /opt/
-      // if ( $this->withinAcceptableCodePath($file) === false ) {
         unset($data[$file]);
         continue;
       }
@@ -112,7 +113,7 @@ class HHVM extends Xdebug
       // --
       $execStack = $data[$file];
 
-      list($didChange, $execStack) = $this->patchExecutedCodeIssue($file, $execStack);
+      $didChange = $this->patchExecutedCodeIssue($file, $execStack);
 
       $data[$file] = $execStack;
 
@@ -129,16 +130,22 @@ class HHVM extends Xdebug
 
   }
 
-  public function debugTokenCode($message) {
+  public function debugTokenCode($message): void {
     if ( $this->_debug === true ) {
       echo $message . "\n";
     }
   }
 
-  public function patchExecutedCodeIssue(string $file, array $fileStack): (bool, array) {
+  public function patchExecutedCodeIssue(string $file, array $fileStack): bool {
+
+    //echo "patchExcCode file=$file pre-fileStack\n";
+    //ksort(&$fileStack);
+    //var_dump($fileStack);
 
     $didChange = false;
+
     $fileStackKeys = array_keys($fileStack);
+
     // walk through the keys normalizing for hhvm's exec count change to xdebug.
     foreach ($fileStackKeys as $line ) {
       if ( $fileStack[$line] > 1 ) {
@@ -151,8 +158,15 @@ class HHVM extends Xdebug
     // executed -if- inners executed.
     foreach ( $this->_execRanges[$file] as $block ) {
 
-      list($startBlock, $endBlock) = $block;
+      $startBlock = $block->getStartBlock();
+      $endBlock = $block->getEndBlock();
 
+      $isFunctionBlock = false;
+      if ( $block instanceof FunctionBlock ) {
+        $isFunctionBlock = true;
+      }
+
+      $this->debugTokenCode('EXEC_POSSIBLE_RANGE file=' . $file . ' block=' . get_class($block) . ' start=' . $startBlock . ' end=' . $endBlock);
 
       $didExecBlock = false;
       for ( $line = $startBlock; $line <= $endBlock; $line++ ) {
@@ -162,25 +176,26 @@ class HHVM extends Xdebug
       }
 
       if ( $didExecBlock === true ) {
+
         for ( $line = $startBlock; $line <= $endBlock; $line++ ) {
           $fileStack[$line] = Driver::LINE_EXECUTED;
         }
+
         $this->debugTokenCode('COVERED_RANGE file=' . $file . ' start=' . $startBlock . ' end=' . $endBlock);
         $didChange = true;
+
       }
 
 
     }
 
-    /*
-    var_dump($file);
-    var_dump($fileStack);
-    */
+    //echo "patchExcCode file=$file post-fileStack\n";
+    //ksort(&$fileStack);
+    //var_dump($fileStack);
 
-    return tuple($didChange, $fileStack);
+    return $didChange;
 
   }
-
 
   public function enableDebug() {
     $this->_debug = true;
@@ -197,17 +212,33 @@ class HHVM extends Xdebug
     // Have we found the end of the block we are hunting for?
     if ( $block->isEndOfBlock($lineStack, $currentLine) === true ) {
 
-      $this->_execRanges[$file][] = array( $block->getStartBlock(), $block->getEndBlock() );
+      $this->_execRanges[$file][] = $block;
 
-      for ( $lineNo = $block->getStartBlock(); $lineNo <= $block->getEndBlock(); $lineNo++ ) {
-        $fileStack[$lineNo] = Driver::LINE_NOT_EXECUTED;
+      $isFileInclusion = $lineStack->isFileInclusion();
+
+      if ( $isFileInclusion === true ) {
+        $this->debugTokenCode(
+          "file=$file block=" . get_class($block) . " rangeStart=" . $block->getStartBlock() .
+          " rangeEnd=" . $block->getEndBlock() . " isFileInclusion=" . $lineStack->isFileInclusion()
+        );
       }
 
-      return true;
+      for ( $lineNo = $block->getStartBlock(); $lineNo <= $block->getEndBlock(); $lineNo++ ) {
+        if ( ! isset($fileStack[$lineNo]) ) {
+          $fileStack[$lineNo] = Driver::LINE_NOT_EXECUTED;
+        }
+        if ( $isFileInclusion === true ) {
+          $fileStack[$lineNo] = Driver::LINE_EXECUTED;
+        }
+      }
+
+      // JEO: This was returning true all the time, which would indicate we are
+      // still within block afaik we've hit end of block due to this flow.
+      return false;
 
     }
 
-    // skip because we're within a if
+    // skip because we're within a multiline block
     if ( $block->getInBlock() === true ) {
       return true;
     }
@@ -217,16 +248,65 @@ class HHVM extends Xdebug
 
   }
 
-  public function processCodeBlocks(Vector<CodeBlockInterface> $codeBlocks, string $file, LineStack $lineStack, int $currentLine, array $fileStack): bool {
+  public function processCodeBlocks(string $file, LineStack $lineStack, int $currentLine, array $fileStack): bool {
+
+    $codeBlocks = $this->getCodeBlocks();
+
+    $this->debugTokenCode("processCodeBlocks currentLine=" . $currentLine);
 
     foreach ( $codeBlocks as $codeBlock ) {
+      //echo "codeBlock=" . get_class($codeBlock) . "\n";
       if ( $this->processCodeBlock($codeBlock, $file, $lineStack, $currentLine, $fileStack) === true ) {
         // Advance the outer line processor loop, until the code block is completed.
+        $this->debugTokenCode('  PROCESS_CODE_BLOCKS - true, block found currentLine=' . $currentLine);
         return true;
       }
     }
 
+    $this->debugTokenCode('  PROCESS_CODE_BLOCKS - false, block not present currentLine=' . $currentLine);
     return false;
+
+  }
+
+  public function initCodeBlocks() {
+
+    if ( $this->_codeBlocks === null ) {
+      $this->_codeBlocks = Vector {};
+    } else {
+      $this->_codeBlocks->clear();
+    }
+
+    $this->_codeBlocks[] = new AbstractBlock();
+    $this->_codeBlocks[] = new IfBlock();
+    $this->_codeBlocks[] = new ReturnBlock();
+    $this->_codeBlocks[] = new UseBlock();
+    $this->_codeBlocks[] = new ThrowBlock();
+    // $this->_codeBlocks[] = new FunctionBlock();
+    $this->_codeBlocks[] = new MultiLineStatementBlock();
+
+    return true;
+  }
+
+  public function getCodeBlocks() {
+
+    if ( $this->_codeBlocks === null ) {
+      $this->initCodeBlocks();
+    }
+
+    return $this->_codeBlocks;
+
+  }
+
+  public function resetCodeBlocks() {
+
+    $this->initCodeBlocks();
+    /*
+    $codeBlocks = $this->getCodeBlocks();
+
+    foreach ( $this->_codeBlocks as $codeBlock ) {
+      $codeBlock->reset();
+    }
+    */
 
   }
 
@@ -248,13 +328,6 @@ class HHVM extends Xdebug
     $inCodeBlock = false;
     $codeBlockStart = 0;
 
-    $codeBlocks = Vector {};
-    $codeBlocks[] = new AbstractBlock();
-    $codeBlocks[] = new IfBlock();
-    $codeBlocks[] = new ReturnBlock();
-
-    $inAbstractFunction = false;
-
     $currentLine = 0;
     $tokens_cnt = count($tokens);
     for ( $tokenOffset = 0; $tokenOffset < $tokens_cnt; $tokenOffset++) {
@@ -267,47 +340,47 @@ class HHVM extends Xdebug
       // Has the lineno changed?
       if (  $currentLine != $line ) {
 
-        if ( $this->processCodeBlocks($codeBlocks, $file, $lineStack, $currentLine, $fileStack) === true ) {
+        $this->debugTokenCode("currentLine=$currentLine != $line");
+
+        // We are done processing the code block if we get a false back from processCodeBlocks
+        if ( $this->processCodeBlocks($file, $lineStack, $currentLine, $fileStack) === true ) {
+
+          $this->debugTokenCode("  PROCESS_CODE_BLOCKS ret=true line=" . $currentLine . " tokens=" . $lineStack->toJSON() . ' text=' . $lineStack->getLineText() );
+
+          // advance the line to new item.
+          $currentLine = $line;
+
+          // Get the class name for this token.
+          $tokenType = get_class($token);
+
+          // add to line stack
+          $lineStack->addToken($tokenType);
+          $lineStack->addLineText(strval($token));
+
+
           continue;
+
         }
 
-        if ( $currentLine !== 0 && $lineStack->isExecutable() === true ) {
+        $isExecutableLine = $lineStack->isExecutable();
+        $doesContainSemiColon = $lineStack->doesContainSemiColon();
 
-          $this->debugTokenCode("  LIVE_CODE_NOT_EXECUTED line=" . $currentLine . " tokens=" . $lineStack->toJSON() . ' text=' . $lineStack->getLineText() );
-          $fileStack[$currentLine] = Driver::LINE_NOT_EXECUTED;
+        $this->debugTokenCode("isExecutableLine=$isExecutableLine doesContainSemiColon=$doesContainSemiColon");
 
-          // Does this executable line contain a semi colon?
-          if ( $inCodeBlock !== true && $lineStack->doesContainSemiColon() !== true && $lineStack->doesContainIf() !== true ) {
-            $inCodeBlock = true;
-            $codeBlockStart = $currentLine;
-            $this->debugTokenCode('  START_RANGE start=' . $codeBlockStart);
-          } else if ( $inCodeBlock === true && $lineStack->doesContainSemiColon() === true ) {
-            // end block
-            $codeBlockEnd = $currentLine;
+        if ( $currentLine !== 0 && $isExecutableLine === true ) {
 
-            $this->debugTokenCode('  EXEC_RANGE start=' . $codeBlockStart . ' end=' . $codeBlockEnd);
-
-            $this->_execRanges[$file][] = array($codeBlockStart, $codeBlockEnd);
-
-            $inCodeBlock = false;
+          if ( ! isset($fileStack[$currentLine]) ) {
+            $this->debugTokenCode("  LIVE_CODE_NOT_EXECUTED file=$file line=" . $currentLine . " tokens=" . $lineStack->toJSON() . ' text=' . $lineStack->getLineText() );
+            $fileStack[$currentLine] = Driver::LINE_NOT_EXECUTED;
           }
-        } else if ( $inCodeBlock === true && $lineStack->doesContainSemiColon() === true ) {
-
-          // end block
-          $codeBlockEnd = $currentLine;
-
-          $this->debugTokenCode('  OUT_RANGE start=' . $codeBlockStart . ' end=' . $codeBlockEnd);
-
-          $this->_execRanges[$file][] = array($codeBlockStart, $codeBlockEnd);
-
-          $inCodeBlock = false;
 
         } else {
-          // $this->debugTokenCode("  NOT_CODE_NOT_EXECUTED line=" . $currentLine . " tokens=" . $lineStack->toJSON() . ' text=' . $lineStack->getLineText());
+          $this->debugTokenCode("  NOT_CODE_NOT_EXECUTED line=" . $currentLine . " tokens=" . $lineStack->toJSON() . ' text=' . $lineStack->getLineText());
         }
 
         // clear stack
         $lineStack->clear();
+        $this->resetCodeBlocks();
 
         // advance the line to new item.
         $currentLine = $line;

@@ -16,6 +16,13 @@ abstract class Base implements CodeBlockInterface {
     $this->_endBlock = -1;
   }
 
+  public function reset(): bool {
+    $this->_inBlock = false;
+    $this->_startBlock = -1;
+    $this->_endBlock = -1;
+    return true;
+  }
+
   public function setInBlock(bool $inBlock): bool {
     $this->_inBlock = $inBlock;
     return true;
