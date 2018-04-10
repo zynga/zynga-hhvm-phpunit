@@ -120,12 +120,16 @@ class Zynga_HHVM_Service extends Zynga_Base {
   private $_pgrepCommand;
   private $_pkillCommand;
   private $_findCommand;
+  private $_executingUser;
+  private $_executingUserHomeDirectory;
 
   public function __construct($hhClientCommand, $pgrepCommand, $pkillCommand, $findCommand) {
     $this->_hhClientCommand = $hhClientCommand;
     $this->_pgrepCommand =  $pgrepCommand;
     $this->_pkillCommand = $pkillCommand;
     $this->_findCommand = $findCommand;
+    $this->_executingUser = '';
+    $this->_executingUserHomeDirectory = '';
   }
 
   /**
@@ -205,6 +209,36 @@ class Zynga_HHVM_Service extends Zynga_Base {
 
   }
 
+  public function getExecutingUser() {
+
+    if ( $this->_executingUser != '' ) {
+      return $this->_executingUser;
+    }
+
+    // try to pull the user off the php environment
+    $this->_executingUser = get_current_user();
+
+    return $this->_executingUser;
+
+  }
+
+  public function getExecutingUserHomeDirectory() {
+
+    if ( $this->_executingUserHomeDirectory != '' ) {
+      return $this->_executingUserHomeDirectory;
+    }
+
+    if ( $this->_executingUser !== '' ) {
+      $pw = posix_getpwnam($this->_executingUser);
+      if ( isset($pw['dir']) ) {
+        $this->_executingUserHomeDirectory = $pw['dir'];
+      }
+    }
+
+    return $this->_executingUserHomeDirectory;
+
+  }
+
   /**
    * forceStop - utilize pkill to kill off errant hhvm processes.
    *
@@ -218,7 +252,7 @@ class Zynga_HHVM_Service extends Zynga_Base {
     }
 
     $result = $this->_pkillCommand->run(
-      '-u ' . getenv('USER') . ' hh_server'
+      '-u ' . $this->getExecutingUser() . ' hh_server'
     );
 
     if ( $result === 0 && $this->checkIfRunning() === false ) {
@@ -238,7 +272,7 @@ class Zynga_HHVM_Service extends Zynga_Base {
   public function checkIfRunning() {
 
     list($return_value, $output) = $this->_pgrepCommand->runAndCaptureOutput(
-      '-u ' . getenv('USER') . ' hh_server'
+      '-u ' . $this->getExecutingUser() . ' hh_server'
     );
 
     if ( $return_value === 1 ) { //&& is_array($count) && count($output) === 0 ) {
@@ -257,8 +291,8 @@ class Zynga_HHVM_Service extends Zynga_Base {
    */
   public function doCleanup() {
 
-    $HOME = getenv('HOME');
-    $USER = getenv('USER');
+    $USER = $this->getExecutingUser();
+    $HOME = $this->getExecutingUserHomeDirectory();
 
     $hhbc_file = $HOME . '/.hhvm.hhbc';
     $tmp_hh_dir = '/tmp/hh_server';
@@ -284,6 +318,24 @@ class Zynga_HHVM_Service extends Zynga_Base {
   }
 
   public function standup() {
+
+    $executingUser = $this->getExecutingUser();
+
+    $this->message('executingUser=' . $executingUser);
+
+    if ( $executingUser === '' ) {
+      $this->message('FAILURE - Unable to determine executing user');
+      exit(255);
+    }
+
+    $executingUserHomeDirectory = $this->getExecutingUserHomeDirectory();
+
+    $this->message('executingUserHomeDirectory=' . $executingUserHomeDirectory);
+
+    if ( $executingUserHomeDirectory === '' ) {
+      $this->message('FAILURE - Unable to determine executing user home directory');
+      exit(255);
+    }
 
     for ( $i = 0; $i < 5; $i++ ) {
 
