@@ -61,12 +61,6 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
      */
     private $messagePrinted = false;
 
-
-    /**
-     * @var CodeCoverage
-     */
-    public $codeCoverage = null;
-
     /**
      * @param PHPUnit_Runner_TestSuiteLoader $loader
      * @param CodeCoverageFilter             $filter
@@ -76,18 +70,12 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
     public function __construct(PHPUnit_Runner_TestSuiteLoader $loader = null, CodeCoverageFilter $filter = null)
     {
         if ($filter === null) {
-            $filter = new CodeCoverageFilter();
+            $filter = new CodeCoverageFilter;
         }
 
         $this->codeCoverageFilter = $filter;
         $this->loader             = $loader;
-        $this->runtime            = new Runtime();
-
-        $this->codeCoverage = new CodeCoverage(
-            null,
-            $this->codeCoverageFilter
-        );
-
+        $this->runtime            = new Runtime;
     }
 
     /**
@@ -100,7 +88,6 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
      */
     public static function run($test, array $arguments = [])
     {
-
         if ($test instanceof ReflectionClass) {
             $test = new PHPUnit_Framework_TestSuite($test);
         }
@@ -119,17 +106,12 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
         }
     }
 
-    private $_testResult = null;
-
     /**
      * @return PHPUnit_Framework_TestResult
      */
     protected function createTestResult()
     {
-      if ( $this->_testResult === null ) {
-        $this->_testResult = new PHPUnit_Framework_TestResult();
-      }
-      return $this->_testResult;
+        return new PHPUnit_Framework_TestResult;
     }
 
     private function processSuiteFilters(PHPUnit_Framework_TestSuite $suite, array $arguments)
@@ -174,7 +156,6 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
      */
     public function doRun(PHPUnit_Framework_Test $suite, array $arguments = [], $exit = true)
     {
-
         if (isset($arguments['configuration'])) {
             $GLOBALS['__PHPUNIT_CONFIGURATION_FILE'] = $arguments['configuration'];
         }
@@ -393,47 +374,51 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
         }
 
         if ($codeCoverageReports > 0) {
+            $codeCoverage = new CodeCoverage(
+                null,
+                $this->codeCoverageFilter
+            );
 
-            $this->codeCoverage->setUnintentionallyCoveredSubclassesWhitelist(
+            $codeCoverage->setUnintentionallyCoveredSubclassesWhitelist(
                 [SebastianBergmann\Comparator\Comparator::class]
             );
 
-            $this->codeCoverage->setAddUncoveredFilesFromWhitelist(
+            $codeCoverage->setAddUncoveredFilesFromWhitelist(
                 $arguments['addUncoveredFilesFromWhitelist']
             );
 
-            $this->codeCoverage->setCheckForUnintentionallyCoveredCode(
+            $codeCoverage->setCheckForUnintentionallyCoveredCode(
                 $arguments['strictCoverage']
             );
 
-            $this->codeCoverage->setCheckForMissingCoversAnnotation(
+            $codeCoverage->setCheckForMissingCoversAnnotation(
                 $arguments['strictCoverage']
             );
 
-            $this->codeCoverage->setProcessUncoveredFilesFromWhitelist(
+            $codeCoverage->setProcessUncoveredFilesFromWhitelist(
                 $arguments['processUncoveredFilesFromWhitelist']
             );
 
             if (isset($arguments['forceCoversAnnotation'])) {
-                $this->codeCoverage->setForceCoversAnnotation(
+                $codeCoverage->setForceCoversAnnotation(
                     $arguments['forceCoversAnnotation']
                 );
             }
 
             if (isset($arguments['disableCodeCoverageIgnore'])) {
-                $this->codeCoverage->setDisableIgnoredLines(true);
+                $codeCoverage->setDisableIgnoredLines(true);
             }
 
             if (isset($arguments['whitelist'])) {
                 $this->codeCoverageFilter->addDirectoryToWhitelist($arguments['whitelist']);
             }
 
-            $result->setCodeCoverage($this->codeCoverage);
+            $result->setCodeCoverage($codeCoverage);
         }
 
-        if ($this->codeCoverageReports > 1) {
+        if ($codeCoverageReports > 1) {
             if (isset($arguments['cacheTokens'])) {
-                $this->codeCoverage->setCacheTokens($arguments['cacheTokens']);
+                $codeCoverage->setCacheTokens($arguments['cacheTokens']);
             }
         }
 
@@ -486,7 +471,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
             $this->printer->printResult($result);
         }
 
-        if (isset($this->codeCoverage)) {
+        if (isset($codeCoverage)) {
             if (isset($arguments['coverageClover'])) {
                 $this->printer->write(
                     "\nGenerating code coverage report in Clover XML format ..."
@@ -494,7 +479,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
 
                 try {
                     $writer = new CloverReport();
-                    $writer->process($this->codeCoverage, $arguments['coverageClover']);
+                    $writer->process($codeCoverage, $arguments['coverageClover']);
 
                     $this->printer->write(" done\n");
                     unset($writer);
@@ -512,7 +497,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
 
                 try {
                     $writer = new Crap4jReport($arguments['crap4jThreshold']);
-                    $writer->process($this->codeCoverage, $arguments['coverageCrap4J']);
+                    $writer->process($codeCoverage, $arguments['coverageCrap4J']);
 
                     $this->printer->write(" done\n");
                     unset($writer);
@@ -538,7 +523,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
                         )
                     );
 
-                    $writer->process($this->codeCoverage, $arguments['coverageHtml']);
+                    $writer->process($codeCoverage, $arguments['coverageHtml']);
 
                     $this->printer->write(" done\n");
                     unset($writer);
@@ -556,7 +541,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
 
                 try {
                     $writer = new PhpReport();
-                    $writer->process($this->codeCoverage, $arguments['coveragePHP']);
+                    $writer->process($codeCoverage, $arguments['coveragePHP']);
 
                     $this->printer->write(" done\n");
                     unset($writer);
@@ -584,7 +569,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
                 );
 
                 $outputStream->write(
-                    $processor->process($this->codeCoverage, $colors)
+                    $processor->process($codeCoverage, $colors)
                 );
             }
 
@@ -595,7 +580,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
 
                 try {
                     $writer = new XmlReport;
-                    $writer->process($this->codeCoverage, $arguments['coverageXml']);
+                    $writer->process($codeCoverage, $arguments['coverageXml']);
 
                     $this->printer->write(" done\n");
                     unset($writer);
@@ -1021,7 +1006,6 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
                 isset($arguments['coverageText']) ||
                 isset($arguments['coverageXml'])) &&
                 $this->runtime->canCollectCodeCoverage()) {
-
                 $filterConfiguration                             = $arguments['configuration']->getFilterConfiguration();
                 $arguments['addUncoveredFilesFromWhitelist']     = $filterConfiguration['whitelist']['addUncoveredFilesFromWhitelist'];
                 $arguments['processUncoveredFilesFromWhitelist'] = $filterConfiguration['whitelist']['processUncoveredFilesFromWhitelist'];

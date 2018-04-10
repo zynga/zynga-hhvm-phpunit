@@ -79,27 +79,6 @@ class LineStack {
     return false;
   }
 
-  public function isUseStatement(): bool {
-    if ( $this->contains('PHP_Token_USE') ) {
-      return true;
-    }
-    return false;
-  }
-
-  public function isThrowStatement(): bool {
-    if ($this->contains('PHP_Token_THROW') ) {
-      return true;
-    }
-    return false;
-  }
-
-  public function hasFunction(): bool {
-    if ($this->contains('PHP_Token_FUNCTION') ) {
-      return true;
-    }
-    return false;
-  }
-
   public function doesContainReturn(): bool {
     if ( $this->contains('PHP_Token_RETURN') === true ) {
       return true;
@@ -141,11 +120,15 @@ class LineStack {
     $fileInclusion[] = 'PHP_Token_REQUIRE_ONCE';
     $fileInclusion[] = 'PHP_Token_INCLUDE';
     $fileInclusion[] = 'PHP_Token_INCLUDE_ONCE';
-    $fileInclusion[] = 'PHP_Token_USE';
     return $this->containsAny($fileInclusion);
   }
 
   public function isExecutable(): bool {
+
+    // We don't count require_once / include_once as executable code.
+    if ( $this->isFileInclusion() === true ) {
+      return false;
+    }
 
     // --
     // If there is a parseable / executable token this counts as a line that 'could' be executed.
@@ -156,7 +139,6 @@ class LineStack {
     $executableTokens[] = 'PHP_Token_EQUAL';
     $executableTokens[] = 'PHP_Token_IF';
     $executableTokens[] = 'PHP_Token_OBJECT_OPERATOR';
-    //$executableTokens[] = 'PHP_Token_USE';
 
     return $this->containsAny($executableTokens);
 

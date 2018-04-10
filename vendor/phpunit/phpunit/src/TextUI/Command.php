@@ -113,35 +113,17 @@ class PHPUnit_TextUI_Command
         return $command->run($_SERVER['argv'], $exit);
     }
 
-    // --
-    // JEO: Modified the create runner to be able to run before argument
-    // parsing this is part of getting code coverage being on when all the
-    // classes load at startup, ex: bootstrap moment, etc.
-    // --
-    private $_testRunner = null;
-
-    public function getRunner()  {
-      // Don't know how much this breaks the world, yet...
-      if ( $this->_testRunner === null ) {
-        $this->_testRunner = new PHPUnit_TextUI_TestRunner(null);
-      }
-      return $this->_testRunner;
-    }
-
     /**
      * @param array $argv
      * @param bool  $exit
      *
      * @return int
      */
-    public function run(array $argv, $exit = true) {
+    public function run(array $argv, $exit = true)
+    {
+        $this->handleArguments($argv);
 
-      // --
-      // JEO: moved the runner creation before the argument collection bit
-      // --
-      $runner = $this->getRunner();
-
-      $this->handleArguments($argv);
+        $runner = $this->createRunner();
 
         if (is_object($this->arguments['test']) &&
             $this->arguments['test'] instanceof PHPUnit_Framework_Test) {
@@ -176,13 +158,6 @@ class PHPUnit_TextUI_Command
         unset($this->arguments['test']);
         unset($this->arguments['testFile']);
 
-        /*
-        var_dump(get_included_files());
-        var_dump($suite);
-        echo __LINE__ . " - kill switch\n";
-        exit();
-        */
-
         try {
             $result = $runner->doRun($suite, $this->arguments, $exit);
         } catch (PHPUnit_Framework_Exception $e) {
@@ -207,10 +182,10 @@ class PHPUnit_TextUI_Command
      *
      * @since Method available since Release 3.6.0
      */
-    // protected function createRunner()
-    // {
-    //    return new PHPUnit_TextUI_TestRunner($this->arguments['loader']);
-    // }
+    protected function createRunner()
+    {
+        return new PHPUnit_TextUI_TestRunner($this->arguments['loader']);
+    }
 
     /**
      * Handles the command-line arguments.
@@ -723,20 +698,11 @@ class PHPUnit_TextUI_Command
             /*
              * Issue #1216
              */
-            // JEO: Adding bootstrap coverage.
-            $runner = $this->getRunner();
-
-            $runner->codeCoverage->start('bootstrap');
-
             if (isset($this->arguments['bootstrap'])) {
-
                 $this->handleBootstrap($this->arguments['bootstrap']);
             } elseif (isset($phpunitConfiguration['bootstrap'])) {
                 $this->handleBootstrap($phpunitConfiguration['bootstrap']);
             }
-
-            // JEO: Bootstrap coverage.
-            $runner->codeCoverage->stop();
 
             /*
              * Issue #657
@@ -776,22 +742,12 @@ class PHPUnit_TextUI_Command
             }
 
             if (!isset($this->arguments['test'])) {
-
-                // JEO: Adding suite creation code coverage.
-                $runner->codeCoverage->start('testSuiteCreation');
-
                 $testSuite = $configuration->getTestSuiteConfiguration(isset($this->arguments['testsuite']) ? $this->arguments['testsuite'] : null);
 
                 if ($testSuite !== null) {
                     $this->arguments['test'] = $testSuite;
                 }
-
-                // JEO: Code covereage stop.
-                $runner->codeCoverage->stop();
-
             }
-
-
         } elseif (isset($this->arguments['bootstrap'])) {
             $this->handleBootstrap($this->arguments['bootstrap']);
         }
@@ -806,8 +762,7 @@ class PHPUnit_TextUI_Command
 
             $this->arguments['test'] = new PHPUnit_Framework_TestSuite;
             $this->arguments['test']->addTest($test);
-
-             }
+        }
 
         if (!isset($this->arguments['test']) ||
             (isset($this->arguments['testDatabaseLogRevision']) && !isset($this->arguments['testDatabaseDSN']))) {
