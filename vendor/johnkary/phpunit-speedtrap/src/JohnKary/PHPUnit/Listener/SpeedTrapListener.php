@@ -123,14 +123,21 @@ class SpeedTrapListener implements \PHPUnit_Framework_TestListener
      */
     public function endTest(\PHPUnit_Framework_Test $test, $time)
     {
-        if (!$test instanceof \PHPUnit_Framework_TestCase) return;
 
-        $time = $this->toMilliseconds($time);
-        $threshold = $this->getSlowThreshold($test);
 
-        if ($this->isSlow($time, $threshold)) {
-            $this->addSlowTest($test, $time);
-        }
+      if (! $test instanceof \PHPUnit_Framework_TestCase && 
+          ! $test instanceof \Zynga\Framework\Testing\TestCase\V2\Base
+      )  {
+        return;
+      }
+
+      $time = $this->toMilliseconds($time);
+      $threshold = $this->slowThreshold;
+
+      if ($this->isSlow($time, $threshold)) {
+        $this->addSlowTest($test, $time);
+      }
+
     }
 
     /**
@@ -176,10 +183,10 @@ class SpeedTrapListener implements \PHPUnit_Framework_TestListener
     /**
      * Stores a test as slow.
      *
-     * @param \PHPUnit_Framework_TestCase $test
+     * @param \PHPUnit_Framework_Test $test
      * @param int                         $time Test execution time in milliseconds
      */
-    protected function addSlowTest(\PHPUnit_Framework_TestCase $test, $time)
+    protected function addSlowTest(\PHPUnit_Framework_Test $test, $time)
     {
         $label = $this->makeLabel($test);
 
@@ -210,10 +217,10 @@ class SpeedTrapListener implements \PHPUnit_Framework_TestListener
     /**
      * Label for describing a test.
      *
-     * @param \PHPUnit_Framework_TestCase $test
+     * @param \PHPUnit_Framework_Test $test
      * @return string
      */
-    protected function makeLabel(\PHPUnit_Framework_TestCase $test)
+    protected function makeLabel(\PHPUnit_Framework_Test $test)
     {
         return sprintf('%s:%s', get_class($test), $test->getName());
     }
