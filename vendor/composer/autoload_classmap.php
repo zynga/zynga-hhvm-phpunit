@@ -6,12 +6,16 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'PHPUnit\\Interfaces\\SkippedTest' => $vendorDir . '/phpunit/phpunit/src/Interfaces/SkippedTest.hh',
+    
     'Zynga\\Source\\Cache' => $vendorDir . '/phpunit/php-source-cache/src/Source/Cache.hh',
     'Zynga\\Source\\Cache\\File' => $vendorDir . '/phpunit/php-source-cache/src/Source/Cache/File.hh',
     'Zynga\\Source\\Cache\\LocalMemcache' => $vendorDir . '/phpunit/php-source-cache/src/Source/Cache/File.hh',
     'File_Iterator' => $vendorDir . '/phpunit/php-file-iterator/src/Iterator.php',
     'File_Iterator_Facade' => $vendorDir . '/phpunit/php-file-iterator/src/Facade.php',
     'File_Iterator_Factory' => $vendorDir . '/phpunit/php-file-iterator/src/Factory.php',
+    'PHPUnit\\Strict\\Assert' => $vendorDir . '/phpunit/phpunit/src/Strict/Assert.hh',
+    'PHPUnit\\Strict\\AssertStaticMethods' => $vendorDir . '/phpunit/phpunit/src/Strict/AssertStaticMethods.hh',
     'PHPUnit\\Framework\\TestCase' => $vendorDir . '/phpunit/phpunit/src/ForwardCompatibility/TestCase.php',
     'PHPUnit_Exception' => $vendorDir . '/phpunit/phpunit/src/Exception.php',
     'PHPUnit_Extensions_GroupTestSuite' => $vendorDir . '/phpunit/phpunit/src/Extensions/GroupTestSuite.php',

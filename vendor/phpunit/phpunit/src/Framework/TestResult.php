@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+use PHPUnit\Interfaces\SkippedTest;
 
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Exception as CodeCoverageException;
@@ -236,7 +237,7 @@ class PHPUnit_Framework_TestResult implements Countable
             if ($this->stopOnIncomplete) {
                 $this->stop();
             }
-        } elseif ($t instanceof PHPUnit_Framework_SkippedTest) {
+        } elseif ($t instanceof SkippedTest) {
             $this->skipped[] = new PHPUnit_Framework_TestFailure($test, $t);
             $notifyMethod    = 'addSkippedTest';
 
@@ -319,7 +320,7 @@ class PHPUnit_Framework_TestResult implements Countable
             if ($this->stopOnIncomplete) {
                 $this->stop();
             }
-        } elseif ($e instanceof PHPUnit_Framework_SkippedTest) {
+        } elseif ($e instanceof SkippedTest) {
             $this->skipped[] = new PHPUnit_Framework_TestFailure($test, $e);
             $notifyMethod    = 'addSkippedTest';
 
