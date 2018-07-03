@@ -1,4 +1,4 @@
-<?php
+<?hh // strict
 /*
  * This file is part of PHPUnit.
  *
@@ -8,12 +8,14 @@
  * file that was distributed with this source code.
  */
 
+namespace PHPUnit\Interfaces;
+
 /**
  * A marker interface for marking any exception/error as result of an unit
  * test as incomplete implementation or currently not implemented.
  *
  * @since      Interface available since Release 2.0.0
  */
-interface PHPUnit_Framework_IncompleteTest
+interface IncompleteTest
 {
 }

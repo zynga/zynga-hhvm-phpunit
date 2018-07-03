@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Interfaces\TestListener;
+
 /**
  * A TestListener that generates a logfile of the test execution in XML markup.
  *
@@ -15,7 +17,7 @@
  *
  * @since Class available since Release 2.1.0
  */
-class PHPUnit_Util_Log_JUnit extends PHPUnit_Util_Printer implements PHPUnit_Framework_TestListener
+class PHPUnit_Util_Log_JUnit extends PHPUnit_Util_Printer implements TestListener
 {
     /**
      * @var DOMDocument

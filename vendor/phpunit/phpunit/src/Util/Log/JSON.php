@@ -8,12 +8,14 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Interfaces\TestListener;
+
 /**
  * A TestListener that generates JSON messages.
  *
  * @since Class available since Release 3.0.0
  */
-class PHPUnit_Util_Log_JSON extends PHPUnit_Util_Printer implements PHPUnit_Framework_TestListener
+class PHPUnit_Util_Log_JSON extends PHPUnit_Util_Printer implements TestListener
 {
     /**
      * @var string

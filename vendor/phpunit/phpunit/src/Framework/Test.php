@@ -23,4 +23,7 @@ interface PHPUnit_Framework_Test extends Countable
      * @return PHPUnit_Framework_TestResult
      */
     public function run(PHPUnit_Framework_TestResult $result = null);
+
+    public function getName(): string;
+    
 }

@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+use PHPUnit\Interfaces\IncompleteTest;
 
 use SebastianBergmann\GlobalState\Snapshot;
 use SebastianBergmann\GlobalState\Restorer;
@@ -381,17 +382,11 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
     /**
      * Gets the name of a TestCase.
      *
-     * @param bool $withDataSet
-     *
      * @return string
      */
-    public function getName($withDataSet = true)
+    public function getName()
     {
-        if ($withDataSet) {
-            return $this->name . $this->getDataSetAsString(false);
-        } else {
-            return $this->name;
-        }
+      return $this->name;
     }
 
     /**
@@ -989,7 +984,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
             }
 
             $this->status = PHPUnit_Runner_BaseTestRunner::STATUS_PASSED;
-        } catch (PHPUnit_Framework_IncompleteTest $e) {
+        } catch (IncompleteTest $e) {
             $this->status        = PHPUnit_Runner_BaseTestRunner::STATUS_INCOMPLETE;
             $this->statusMessage = $e->getMessage();
         } catch (PHPUnit_Framework_SkippedTest $e) {

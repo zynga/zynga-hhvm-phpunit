@@ -6,8 +6,11 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'PHPUnit\\Interfaces\\IncompleteTest' => $vendorDir . '/phpunit/phpunit/src/Interfaces/IncompleteTest.hh',
+    'PHPUnit\\Interfaces\\Exception' => $vendorDir . '/phpunit/phpunit/src/Interfaces/Exception.hh',
     'PHPUnit\\Interfaces\\SkippedTest' => $vendorDir . '/phpunit/phpunit/src/Interfaces/SkippedTest.hh',
-    
+    'PHPUnit\\Interfaces\\TestListener' => $vendorDir . '/phpunit/phpunit/src/Interfaces/TestListener.hh',
+
     'Zynga\\Source\\Cache' => $vendorDir . '/phpunit/php-source-cache/src/Source/Cache.hh',
     'Zynga\\Source\\Cache\\File' => $vendorDir . '/phpunit/php-source-cache/src/Source/Cache/File.hh',
     'Zynga\\Source\\Cache\\LocalMemcache' => $vendorDir . '/phpunit/php-source-cache/src/Source/Cache/File.hh',
@@ -17,7 +20,6 @@ return array(
     'PHPUnit\\Strict\\Assert' => $vendorDir . '/phpunit/phpunit/src/Strict/Assert.hh',
     'PHPUnit\\Strict\\AssertStaticMethods' => $vendorDir . '/phpunit/phpunit/src/Strict/AssertStaticMethods.hh',
     'PHPUnit\\Framework\\TestCase' => $vendorDir . '/phpunit/phpunit/src/ForwardCompatibility/TestCase.php',
-    'PHPUnit_Exception' => $vendorDir . '/phpunit/phpunit/src/Exception.php',
     'PHPUnit_Extensions_GroupTestSuite' => $vendorDir . '/phpunit/phpunit/src/Extensions/GroupTestSuite.php',
     'PHPUnit_Extensions_PhptTestCase' => $vendorDir . '/phpunit/phpunit/src/Extensions/PhptTestCase.php',
     'PHPUnit_Extensions_PhptTestSuite' => $vendorDir . '/phpunit/phpunit/src/Extensions/PhptTestSuite.php',
@@ -80,7 +82,6 @@ return array(
     'PHPUnit_Framework_Exception' => $vendorDir . '/phpunit/phpunit/src/Framework/Exception.php',
     'PHPUnit_Framework_ExceptionWrapper' => $vendorDir . '/phpunit/phpunit/src/Framework/ExceptionWrapper.php',
     'PHPUnit_Framework_ExpectationFailedException' => $vendorDir . '/phpunit/phpunit/src/Framework/ExpectationFailedException.php',
-    'PHPUnit_Framework_IncompleteTest' => $vendorDir . '/phpunit/phpunit/src/Framework/IncompleteTest.php',
     'PHPUnit_Framework_IncompleteTestCase' => $vendorDir . '/phpunit/phpunit/src/Framework/IncompleteTestCase.php',
     'PHPUnit_Framework_IncompleteTestError' => $vendorDir . '/phpunit/phpunit/src/Framework/IncompleteTestError.php',
     'PHPUnit_Framework_InvalidCoversTargetException' => $vendorDir . '/phpunit/phpunit/src/Framework/InvalidCoversTargetException.php',
@@ -140,7 +141,6 @@ return array(
     'PHPUnit_Framework_Test' => $vendorDir . '/phpunit/phpunit/src/Framework/Test.php',
     'PHPUnit_Framework_TestCase' => $vendorDir . '/phpunit/phpunit/src/Framework/TestCase.php',
     'PHPUnit_Framework_TestFailure' => $vendorDir . '/phpunit/phpunit/src/Framework/TestFailure.php',
-    'PHPUnit_Framework_TestListener' => $vendorDir . '/phpunit/phpunit/src/Framework/TestListener.php',
     'PHPUnit_Framework_TestResult' => $vendorDir . '/phpunit/phpunit/src/Framework/TestResult.php',
     'PHPUnit_Framework_TestSuite' => $vendorDir . '/phpunit/phpunit/src/Framework/TestSuite.php',
     'PHPUnit_Framework_TestSuite_DataProvider' => $vendorDir . '/phpunit/phpunit/src/Framework/TestSuite/DataProvider.php',

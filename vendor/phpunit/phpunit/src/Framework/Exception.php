@@ -29,7 +29,10 @@
  * @see http://fabien.potencier.org/article/9/php-serialization-stack-traces-and-exceptions
  * @since Class available since Release 3.4.0
  */
-class PHPUnit_Framework_Exception extends RuntimeException implements PHPUnit_Exception
+
+use PHPUnit\Interfaces\Exception as ExceptionInterface;
+
+class PHPUnit_Framework_Exception extends RuntimeException implements ExceptionInterface
 {
     /**
      * @var array

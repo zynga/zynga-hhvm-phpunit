@@ -8,9 +8,11 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Interfaces\Exception as ExceptionInterface;
+
 /**
  * @since Class available since Release 4.0.0
  */
-class PHPUnit_Runner_Exception extends RuntimeException implements PHPUnit_Exception
+class PHPUnit_Runner_Exception extends RuntimeException implements ExceptionInterface
 {
 }

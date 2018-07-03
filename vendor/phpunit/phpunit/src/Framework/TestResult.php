@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 use PHPUnit\Interfaces\SkippedTest;
+use PHPUnit\Interfaces\IncompleteTest;
+use PHPUnit\Interfaces\TestListener;
 
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Exception as CodeCoverageException;
@@ -179,9 +181,9 @@ class PHPUnit_Framework_TestResult implements Countable
     /**
      * Registers a TestListener.
      *
-     * @param  PHPUnit_Framework_TestListener
+     * @param  TestListener
      */
-    public function addListener(PHPUnit_Framework_TestListener $listener)
+    public function addListener(TestListener $listener)
     {
         $this->listeners[] = $listener;
     }
@@ -189,9 +191,9 @@ class PHPUnit_Framework_TestResult implements Countable
     /**
      * Unregisters a TestListener.
      *
-     * @param PHPUnit_Framework_TestListener $listener
+     * @param TestListener $listener
      */
-    public function removeListener(PHPUnit_Framework_TestListener $listener)
+    public function removeListener(TestListener $listener)
     {
         foreach ($this->listeners as $key => $_listener) {
             if ($listener === $_listener) {
@@ -230,7 +232,7 @@ class PHPUnit_Framework_TestResult implements Countable
             if ($this->stopOnRisky) {
                 $this->stop();
             }
-        } elseif ($t instanceof PHPUnit_Framework_IncompleteTest) {
+        } elseif ($t instanceof IncompleteTest) {
             $this->notImplemented[] = new PHPUnit_Framework_TestFailure($test, $t);
             $notifyMethod           = 'addIncompleteTest';
 
@@ -313,7 +315,7 @@ class PHPUnit_Framework_TestResult implements Countable
             if ($this->stopOnRisky) {
                 $this->stop();
             }
-        } elseif ($e instanceof PHPUnit_Framework_IncompleteTest) {
+        } elseif ($e instanceof IncompleteTest) {
             $this->notImplemented[] = new PHPUnit_Framework_TestFailure($test, $e);
             $notifyMethod           = 'addIncompleteTest';
 

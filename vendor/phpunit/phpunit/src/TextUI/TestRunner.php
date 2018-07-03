@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+use PHPUnit\Interfaces\TestListener;
 
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Exception as CodeCoverageException;
@@ -894,7 +895,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
                         );
                     }
 
-                    if ($listener instanceof PHPUnit_Framework_TestListener) {
+                    if ($listener instanceof TestListener) {
                         $arguments['listeners'][] = $listener;
                     }
                 }

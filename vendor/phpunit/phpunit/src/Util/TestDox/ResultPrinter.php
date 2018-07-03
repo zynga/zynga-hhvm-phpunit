@@ -8,12 +8,14 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Interfaces\TestListener;
+
 /**
  * Base class for printers of TestDox documentation.
  *
  * @since Class available since Release 2.1.0
  */
-abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer implements PHPUnit_Framework_TestListener
+abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer implements TestListener
 {
     /**
      * @var PHPUnit_Util_TestDox_NamePrettifier
