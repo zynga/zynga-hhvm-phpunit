@@ -1,24 +1,25 @@
 #!/usr/local/bin/hhvm
 <?hh
 
-function usage($message) {
-  echo "Error: $message\n";
-  echo "\n";
-  echo "run-single-test.hh <path>Test.hh [testFunction]\n";
-  echo "\n";
-  echo " Runs a single test suite handles the phpunit arguments\n";
-  echo "\n";
-  exit(255);
-}
+$vendorDir = dirname(dirname(dirname(__FILE__)));
+$projectRoot = dirname(dirname($vendorDir));
 
-$projectRoot = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
+require_once $vendorDir . '/autoload.php';
+
+use Zynga\RunSingleTest;
+
+$testRunner = new RunSingleTest(
+  $projectRoot
+);
+
+//$testRunner->run();
+
 
 $filePath = null;
-
 if ( isset($argv[1]) ) {
   $filePath = $argv[1];
 } else {
-  usage('No test file path provided');
+  $runner->usage('No test file path provided');
 }
 
 $testFunction = '';
@@ -32,7 +33,7 @@ $testName = '';
 if ( preg_match( '/\/([a-zA-Z0-9]*Test)\.hh$/', $filePath, $pregs) ) {
   $testName = $pregs[1];
 } else {
-  usage("Expecting a path ending in <TestName>Test.hh");
+  $runner->usage("Expecting a path ending in <TestName>Test.hh");
 }
 
 $command = array();

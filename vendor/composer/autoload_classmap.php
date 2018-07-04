@@ -6,14 +6,16 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'PHPUnit\\Interfaces\\IncompleteTest' => $vendorDir . '/phpunit/phpunit/src/Interfaces/IncompleteTest.hh',
-    'PHPUnit\\Interfaces\\Exception' => $vendorDir . '/phpunit/phpunit/src/Interfaces/Exception.hh',
-    'PHPUnit\\Interfaces\\SkippedTest' => $vendorDir . '/phpunit/phpunit/src/Interfaces/SkippedTest.hh',
-    'PHPUnit\\Interfaces\\TestListener' => $vendorDir . '/phpunit/phpunit/src/Interfaces/TestListener.hh',
+    'PHPUnit\\Interfaces\\IncompleteTest' => $baseDir . '/src/PHPUnit/Interfaces/IncompleteTest.hh',
+    'PHPUnit\\Interfaces\\Exception' => $baseDir . '/src/PHPUnit/Interfaces/Exception.hh',
+    'PHPUnit\\Interfaces\\SkippedTest' => $baseDir . '/src/PHPUnit/Interfaces/SkippedTest.hh',
+    'PHPUnit\\Interfaces\\TestListener' => $baseDir . '/src/PHPUnit/Interfaces/TestListener.hh',
 
+    // JEO: TBD if we will ever re-enable this source caching system.
     'Zynga\\Source\\Cache' => $vendorDir . '/phpunit/php-source-cache/src/Source/Cache.hh',
     'Zynga\\Source\\Cache\\File' => $vendorDir . '/phpunit/php-source-cache/src/Source/Cache/File.hh',
     'Zynga\\Source\\Cache\\LocalMemcache' => $vendorDir . '/phpunit/php-source-cache/src/Source/Cache/File.hh',
+
     'File_Iterator' => $vendorDir . '/phpunit/php-file-iterator/src/Iterator.php',
     'File_Iterator_Facade' => $vendorDir . '/phpunit/php-file-iterator/src/Facade.php',
     'File_Iterator_Factory' => $vendorDir . '/phpunit/php-file-iterator/src/Factory.php',

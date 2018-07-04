@@ -20,5 +20,11 @@
   },
   "repositories": [
     { "type": "vcs", "url":  "git@github.com:Zynga/zynga-hhvm-phpunit-hhi.git" }
-  ]
+  ],
+  "autoload": {
+    "psr-4": {
+      "Zynga\\": "src/Zynga/",
+      "PHPUnit\\Interfaces\\": "src/PHPUnit/Interfaces/"
+    }
+  }
 }
