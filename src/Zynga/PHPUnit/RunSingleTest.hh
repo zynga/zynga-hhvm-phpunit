@@ -1,6 +1,6 @@
 <?hh
 
-namespace Zynga;
+namespace Zynga\PHPUnit;
 
 class RunSingleTest {
   private string $projectRoot;

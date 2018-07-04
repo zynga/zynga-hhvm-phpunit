@@ -6,7 +6,7 @@ $projectRoot = dirname($vendorDir);
 
 require_once $vendorDir . '/autoload.php';
 
-use Zynga\RunSingleTest;
+use Zynga\PHPUnit\RunSingleTest;
 
 $testRunner = new RunSingleTest(
   $projectRoot,
