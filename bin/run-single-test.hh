@@ -1,7 +1,7 @@
 #!/usr/local/bin/hhvm
 <?hh
 
-$vendorDir = dirname(dirname(dirname(__FILE__)));
+$vendorDir = dirname(dirname(dirname(dirname(__FILE__))));
 $projectRoot = dirname(dirname($vendorDir));
 
 require_once $vendorDir . '/autoload.php';
