@@ -9,6 +9,7 @@
  */
 use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Exceptions\SkippedTestError;
 use PHPUnit\Exceptions\Warning;
 use PHPUnit\Framework\WarningTestCase;
 use PHPUnit\Interfaces\IncompleteTest;
@@ -2177,7 +2178,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
                 if (!isset($passedKeys[$dependency])) {
                     $this->result->addError(
                         $this,
-                        new PHPUnit_Framework_SkippedTestError(
+                        new SkippedTestError(
                             sprintf(
                                 'This test depends on "%s" to pass.',
                                 $dependency
@@ -2195,7 +2196,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
                         $passed[$dependency]['size'] > $this->getSize()) {
                         $this->result->addError(
                             $this,
-                            new PHPUnit_Framework_SkippedTestError(
+                            new SkippedTestError(
                                 'This test depends on a test that is larger than itself.'
                             ),
                             0

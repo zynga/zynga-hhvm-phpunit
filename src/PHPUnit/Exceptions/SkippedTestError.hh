@@ -1,4 +1,4 @@
-<?php
+<?hh // strict 
 /*
  * This file is part of PHPUnit.
  *
@@ -7,6 +7,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace PHPUnit\Exceptions;
 
 use PHPUnit\Exceptions\AssertionFailedError;
 
@@ -18,5 +20,5 @@ use PHPUnit\Exceptions\AssertionFailedError;
  */
 use PHPUnit\Interfaces\SkippedTest;
 
-class PHPUnit_Framework_SkippedTestError extends AssertionFailedError implements SkippedTest {
+class SkippedTestError extends AssertionFailedError implements SkippedTest {
 }

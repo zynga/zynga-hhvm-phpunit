@@ -15,6 +15,7 @@ return array(
   'PHPUnit\\Exceptions\\Exception'  => $baseDir . '/src/PHPUnit/Exceptions/Exception.hh',
   'PHPUnit\\Exceptions\\ExceptionWrapper' => $baseDir . '/src/PHPUnit/Exceptions/ExceptionWrapper.hh',
   'PHPUnit\\Exceptions\\InvalidCoversTargetException' => $baseDir . '/src/PHPUnit/Exceptions/InvalidCoversTargetException.hh',
+  'PHPUnit\\Exceptions\\SkippedTestError' => $baseDir . '/src/PHPUnit/Exceptions/SkippedTestError.hh',
   'PHPUnit\\Exceptions\\SyntheticError' => $baseDir . '/src/PHPUnit/Exceptions/SyntheticError.hh',
   'PHPUnit\\Exceptions\\Warning' => $baseDir . '/src/PHPUnit/Exceptions/Warning.hh',
 
@@ -143,7 +144,6 @@ return array(
     'PHPUnit_Framework_SelfDescribing' => $vendorDir . '/phpunit/phpunit/src/Framework/SelfDescribing.php',
     'PHPUnit_Framework_SkippedTest' => $vendorDir . '/phpunit/phpunit/src/Framework/SkippedTest.php',
     'PHPUnit_Framework_SkippedTestCase' => $vendorDir . '/phpunit/phpunit/src/Framework/SkippedTestCase.php',
-    'PHPUnit_Framework_SkippedTestError' => $vendorDir . '/phpunit/phpunit/src/Framework/SkippedTestError.php',
     'PHPUnit_Framework_SkippedTestSuiteError' => $vendorDir . '/phpunit/phpunit/src/Framework/SkippedTestSuiteError.php',
     'PHPUnit_Framework_Test' => $vendorDir . '/phpunit/phpunit/src/Framework/Test.php',
     'PHPUnit_Framework_TestCase' => $vendorDir . '/phpunit/phpunit/src/Framework/TestCase.php',

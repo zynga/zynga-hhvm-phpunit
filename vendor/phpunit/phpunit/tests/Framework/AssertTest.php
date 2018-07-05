@@ -10,6 +10,7 @@
 
 use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Exceptions\SkippedTestError;
 
 /**
  * @since      Class available since Release 2.0.0
@@ -3567,7 +3568,7 @@ XML;
     {
         try {
             $this->markTestSkipped('skipped');
-        } catch (PHPUnit_Framework_SkippedTestError $e) {
+        } catch (SkippedTestError $e) {
             $this->assertEquals('skipped', $e->getMessage());
 
             return;

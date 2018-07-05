@@ -9,6 +9,7 @@
  */
 
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Exceptions\SkippedTestError;
 use PHPUnit\Framework\WarningTestCase;
 
 /**
@@ -507,7 +508,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                     }
 
                     $data = self::incompleteTest($className, $name, $message);
-                } catch (PHPUnit_Framework_SkippedTestError $e) {
+                } catch (SkippedTestError $e) {
                     $message = sprintf(
                         'Test for %s::%s skipped by data provider',
                         $className,

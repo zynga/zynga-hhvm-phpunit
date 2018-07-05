@@ -10,6 +10,7 @@
 
 use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Exceptions\SkippedTestError;
 
 /**
  * A set of assert methods.
@@ -2896,13 +2897,13 @@ abstract class PHPUnit_Framework_Assert
      *
      * @param string $message
      *
-     * @throws PHPUnit_Framework_SkippedTestError
+     * @throws SkippedTestError
      *
      * @since Method available since Release 3.0.0
      */
     public static function markTestSkipped($message = '')
     {
-        throw new PHPUnit_Framework_SkippedTestError($message);
+        throw new SkippedTestError($message);
     }
 
     /**
