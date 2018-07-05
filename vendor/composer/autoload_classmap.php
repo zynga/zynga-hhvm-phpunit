@@ -7,6 +7,11 @@ $baseDir = dirname($vendorDir);
 
 return array(
   'PHPUnit\\Exceptions\\AssertionFailedError'  => $baseDir . '/src/PHPUnit/Exceptions/AssertionFailedError.hh',
+  'PHPUnit\\Exceptions\\Error' => $baseDir . '/src/PHPUnit/Exceptions/Error.hh',
+  'PHPUnit\\Exceptions\\Error\\Deprecated' => $baseDir . '/src/Exceptions/Error/Deprecated.hh',
+  'PHPUnit\\Exceptions\\Error\\Notice' => $baseDir . '/src/Exceptions/Error/Notice.hh',
+  'PHPUnit\\Exceptions\\Error\\Warning' => $baseDir . '/src/Exceptions/Error/Warning.hh',
+
   'PHPUnit\\Exceptions\\Exception'  => $baseDir . '/src/PHPUnit/Exceptions/Exception.hh',
 
   'PHPUnit\\Framework\\AsyncRunner' => $baseDir . '/src/PHPUnit/Framework/AsyncRunner.hh',
@@ -81,10 +86,6 @@ return array(
     'PHPUnit_Framework_Constraint_TraversableContainsOnly' => $vendorDir . '/phpunit/phpunit/src/Framework/Constraint/TraversableContainsOnly.php',
     'PHPUnit_Framework_Constraint_Xor' => $vendorDir . '/phpunit/phpunit/src/Framework/Constraint/Xor.php',
     'PHPUnit_Framework_CoveredCodeNotExecutedException' => $vendorDir . '/phpunit/phpunit/src/Framework/PHPUnit_Framework_CoveredCodeNotExecutedException.php',
-    'PHPUnit_Framework_Error' => $vendorDir . '/phpunit/phpunit/src/Framework/Error.php',
-    'PHPUnit_Framework_Error_Deprecated' => $vendorDir . '/phpunit/phpunit/src/Framework/Error/Deprecated.php',
-    'PHPUnit_Framework_Error_Notice' => $vendorDir . '/phpunit/phpunit/src/Framework/Error/Notice.php',
-    'PHPUnit_Framework_Error_Warning' => $vendorDir . '/phpunit/phpunit/src/Framework/Error/Warning.php',
     'PHPUnit_Framework_ExceptionWrapper' => $vendorDir . '/phpunit/phpunit/src/Framework/ExceptionWrapper.php',
     'PHPUnit_Framework_ExpectationFailedException' => $vendorDir . '/phpunit/phpunit/src/Framework/ExpectationFailedException.php',
     'PHPUnit_Framework_IncompleteTestCase' => $vendorDir . '/phpunit/phpunit/src/Framework/IncompleteTestCase.php',

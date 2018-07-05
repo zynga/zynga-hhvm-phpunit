@@ -1,4 +1,5 @@
-<?php
+<?hh // partial
+
 /*
  * This file is part of PHPUnit.
  *
@@ -8,13 +9,10 @@
  * file that was distributed with this source code.
  */
 
-// Workaround for http://bugs.php.net/bug.php?id=47987,
-// see https://github.com/sebastianbergmann/phpunit/issues#issue/125 for details
-// Use dirname(__DIR__) instead of using /../ because of https://github.com/facebook/hhvm/issues/5215
-require_once dirname(__DIR__) . '/Framework/Error.php';
-require_once dirname(__DIR__) . '/Framework/Error/Notice.php';
-require_once dirname(__DIR__) . '/Framework/Error/Warning.php';
-require_once dirname(__DIR__) . '/Framework/Error/Deprecated.php';
+use PHPUnit\Exceptions\Error;
+use PHPUnit\Exceptions\Error\Deprecated as Error_Deprecated;
+use PHPUnit\Exceptions\Error\Notice as Error_Notice;
+use PHPUnit\Exceptions\Error\Warning as Error_Warning;
 
 /**
  * Error handler that converts PHP errors and warnings to exceptions.
@@ -41,17 +39,17 @@ class PHPUnit_Util_ErrorHandler
      * @param string $errfile
      * @param int    $errline
      *
-     * @throws PHPUnit_Framework_Error
+     * @throws Error
      */
-    public static function handleError($errno, $errstr, $errfile, $errline)
-    {
+    public static function handleError($errno, $errstr, $errfile, $errline) {
         if (!($errno & error_reporting())) {
             return false;
         }
 
         self::$errorStack[] = [$errno, $errstr, $errfile, $errline];
 
-        $trace = debug_backtrace(false);
+        $trace = debug_backtrace();
+
         array_shift($trace);
 
         foreach ($trace as $frame) {
@@ -61,28 +59,32 @@ class PHPUnit_Util_ErrorHandler
         }
 
         if ($errno == E_NOTICE || $errno == E_USER_NOTICE || $errno == E_STRICT) {
-            if (PHPUnit_Framework_Error_Notice::$enabled !== true) {
+
+            if (Error_Notice::$enabled !== true) {
                 return false;
             }
 
-            $exception = 'PHPUnit_Framework_Error_Notice';
+            throw new Error_Notice($errstr, $errno, $errfile, $errline);
+
         } elseif ($errno == E_WARNING || $errno == E_USER_WARNING) {
-            if (PHPUnit_Framework_Error_Warning::$enabled !== true) {
+
+            if (Error_Warning::$enabled !== true) {
                 return false;
             }
 
-            $exception = 'PHPUnit_Framework_Error_Warning';
+            throw new Error_Warning($errstr, $errno, $errfile, $errline);
+
         } elseif ($errno == E_DEPRECATED || $errno == E_USER_DEPRECATED) {
-            if (PHPUnit_Framework_Error_Deprecated::$enabled !== true) {
+
+            if (Error_Deprecated::$enabled !== true) {
                 return false;
             }
 
-            $exception = 'PHPUnit_Framework_Error_Deprecated';
-        } else {
-            $exception = 'PHPUnit_Framework_Error';
+            throw new Error_Deprecated($errstr, $errno, $errfile, $errline);
         }
 
-        throw new $exception($errstr, $errno, $errfile, $errline);
+        throw new Error($errstr, $errno, $errfile, $errline);
+
     }
 
     /**

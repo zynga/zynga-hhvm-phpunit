@@ -7,6 +7,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+use PHPUnit\Exceptions\Error\Notice;
+use PHPUnit\Exceptions\Error\Warning;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 use PHPUnit\Interfaces\TestListener;
 
@@ -200,11 +202,11 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
         }
 
         if (!$arguments['convertNoticesToExceptions']) {
-            PHPUnit_Framework_Error_Notice::$enabled = false;
+            Notice::$enabled = false;
         }
 
         if (!$arguments['convertWarningsToExceptions']) {
-            PHPUnit_Framework_Error_Warning::$enabled = false;
+            Warning::$enabled = false;
         }
 
         if ($arguments['stopOnError']) {

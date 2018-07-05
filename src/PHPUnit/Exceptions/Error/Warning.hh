@@ -1,4 +1,5 @@
-<?php
+<?hh // strict
+
 /*
  * This file is part of PHPUnit.
  *
@@ -8,17 +9,20 @@
  * file that was distributed with this source code.
  */
 
+namespace PHPUnit\Exceptions\Error;
+
+use PHPUnit\Exceptions\Error as BaseError;
+
 /**
- * Wrapper for PHP notices.
+ * Wrapper for PHP warnings.
  * You can disable notice-to-exception conversion by setting
  *
  * <code>
- * PHPUnit_Framework_Error_Notice::$enabled = false;
+ * Warning::$enabled = false;
  * </code>
  *
  * @since Class available since Release 3.3.0
  */
-class PHPUnit_Framework_Error_Notice extends PHPUnit_Framework_Error
-{
-    public static $enabled = true;
+class Warning extends BaseError {
+    public static bool $enabled = true;
 }

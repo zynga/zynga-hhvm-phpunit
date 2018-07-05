@@ -1,4 +1,5 @@
-<?php
+<?hh // strict
+
 /*
  * This file is part of PHPUnit.
  *
@@ -8,6 +9,10 @@
  * file that was distributed with this source code.
  */
 
+namespace PHPUnit\Exceptions;
+
+use \Exception;
+
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 
 /**
@@ -15,8 +20,7 @@ use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
  *
  * @since Class available since Release 2.2.0
  */
-class PHPUnit_Framework_Error extends PHPUnit_Exceptions_Exception
-{
+class Error extends PHPUnit_Exceptions_Exception {
     /**
      * Constructor.
      *
@@ -26,8 +30,8 @@ class PHPUnit_Framework_Error extends PHPUnit_Exceptions_Exception
      * @param int       $line
      * @param Exception $previous
      */
-    public function __construct($message, $code, $file, $line, Exception $previous = null)
-    {
+    public function __construct(string $message, int $code, string $file, int $line, ?Exception $previous = null) {
+
         parent::__construct($message, $code, $previous);
 
         $this->file  = $file;

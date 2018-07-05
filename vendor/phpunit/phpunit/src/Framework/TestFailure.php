@@ -9,6 +9,7 @@
  */
 
 use PHPUnit\Exceptions\AssertionFailedError;
+use PHPUnit\Exceptions\Error;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 
 /**
@@ -101,7 +102,7 @@ class PHPUnit_Framework_TestFailure
             if (!empty($buffer)) {
                 $buffer = trim($buffer) . "\n";
             }
-        } elseif ($e instanceof PHPUnit_Framework_Error) {
+        } elseif ($e instanceof Error) {
             $buffer = $e->getMessage() . "\n";
         } elseif ($e instanceof PHPUnit_Framework_ExceptionWrapper) {
             $buffer = $e->getClassname() . ': ' . $e->getMessage() . "\n";
