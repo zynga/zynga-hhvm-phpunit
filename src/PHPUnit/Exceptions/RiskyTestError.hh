@@ -1,4 +1,4 @@
-<?php
+<?hh // strict
 /*
  * This file is part of PHPUnit.
  *
@@ -8,14 +8,16 @@
  * file that was distributed with this source code.
  */
 
+namespace PHPUnit\Exceptions;
+
 use PHPUnit\Exceptions\AssertionFailedError;
-use \PHPUnit_Framework_RiskyTestError;
+use \PHPUnit_Framework_RiskyTest;
 
 /**
  * Extension to AssertionFailedError to mark the special
- * case of a test that unintentionally covers code.
+ * case of a risky test.
  *
  * @since Class available since Release 4.0.0
  */
-class PHPUnit_Framework_UnintentionallyCoveredCodeError extends PHPUnit_Framework_RiskyTestError {
+class RiskyTestError extends AssertionFailedError implements PHPUnit_Framework_RiskyTest {
 }

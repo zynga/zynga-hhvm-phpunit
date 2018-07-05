@@ -8,11 +8,15 @@
  * file that was distributed with this source code.
  */
 use PHPUnit\Exceptions\AssertionFailedError;
+use PHPUnit\Exceptions\CoveredCodeNotExecutedException;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 use PHPUnit\Exceptions\ExceptionWrapper;
 use PHPUnit\Exceptions\InvalidCoversTargetException;
+use PHPUnit\Exceptions\MissingCoversAnnotationException;
+use PHPUnit\Exceptions\RiskyTestError;
 use PHPUnit\Exceptions\SkippedTestError;
 use PHPUnit\Exceptions\Warning;
+use PHPUnit\Exceptions\UnintentionallyCoveredCodeError;
 use PHPUnit\Framework\WarningTestCase;
 use PHPUnit\Interfaces\SkippedTest;
 use PHPUnit\Interfaces\IncompleteTest;
@@ -20,8 +24,9 @@ use PHPUnit\Interfaces\TestListener;
 
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Exception as CodeCoverageException;
-use SebastianBergmann\CodeCoverage\CoveredCodeNotExecutedException;
-use SebastianBergmann\CodeCoverage\MissingCoversAnnotationException;
+// JEO: Commented out these duplicated? Exceptions?
+//use SebastianBergmann\CodeCoverage\CoveredCodeNotExecutedException;
+//use SebastianBergmann\CodeCoverage\MissingCoversAnnotationException;
 use SebastianBergmann\CodeCoverage\UnintentionallyCoveredCodeException;
 use SebastianBergmann\ResourceOperations\ResourceOperations;
 use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
@@ -721,7 +726,7 @@ class PHPUnit_Framework_TestResult implements Countable
         } catch (AssertionFailedError $e) {
             $failure = true;
 
-            if ($e instanceof PHPUnit_Framework_RiskyTestError) {
+            if ($e instanceof RiskyTestError) {
                 $risky = true;
             } elseif ($e instanceof PHPUnit_Framework_IncompleteTestError) {
                 $incomplete = true;
@@ -752,7 +757,7 @@ class PHPUnit_Framework_TestResult implements Countable
                 if (!$blacklist->isBlacklisted($function['filename'])) {
                     $this->addFailure(
                         $test,
-                        new PHPUnit_Framework_RiskyTestError(
+                        new RiskyTestError(
                             sprintf(
                                 '%s() used in %s:%s',
                                 $function['function'],
@@ -810,7 +815,7 @@ class PHPUnit_Framework_TestResult implements Countable
                 if (!$test->isMedium() && !$test->isLarge()) {
                     $this->addFailure(
                         $test,
-                        new PHPUnit_Framework_UnintentionallyCoveredCodeError(
+                        new UnintentionallyCoveredCodeError(
                             'This test executed code that is not listed as code to be covered or used:' .
                             PHP_EOL . $cce->getMessage()
                         ),
@@ -820,7 +825,7 @@ class PHPUnit_Framework_TestResult implements Countable
             } catch (CoveredCodeNotExecutedException $cce) {
                 $this->addFailure(
                     $test,
-                    new PHPUnit_Framework_CoveredCodeNotExecutedException(
+                    new CoveredCodeNotExecutedException(
                         'This test did not execute all the code that is listed as code to be covered:' .
                         PHP_EOL . $cce->getMessage()
                     ),
@@ -829,7 +834,7 @@ class PHPUnit_Framework_TestResult implements Countable
             } catch (MissingCoversAnnotationException $cce) {
                 $this->addFailure(
                     $test,
-                    new PHPUnit_Framework_MissingCoversAnnotationException(
+                    new MissingCoversAnnotationException(
                         'This test does not have a @covers annotation but is expected to have one'
                     ),
                     $time
@@ -870,7 +875,7 @@ class PHPUnit_Framework_TestResult implements Countable
                  $test->getNumAssertions() == 0) {
             $this->addFailure(
                 $test,
-                new PHPUnit_Framework_RiskyTestError(
+                new RiskyTestError(
                     'This test did not perform any assertions'
                 ),
                 $time
@@ -892,7 +897,7 @@ class PHPUnit_Framework_TestResult implements Countable
             if (isset($annotations['method']['todo'])) {
                 $this->addFailure(
                     $test,
-                    new PHPUnit_Framework_RiskyTestError(
+                    new RiskyTestError(
                         'Test method is annotated with @todo'
                     ),
                     $time

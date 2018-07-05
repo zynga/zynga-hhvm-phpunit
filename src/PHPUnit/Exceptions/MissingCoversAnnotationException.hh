@@ -1,4 +1,5 @@
-<?php
+<?hh // strict
+
 /*
  * This file is part of PHPUnit.
  *
@@ -8,7 +9,10 @@
  * file that was distributed with this source code.
  */
 
+namespace PHPUnit\Exceptions;
+
 use PHPUnit\Exceptions\AssertionFailedError;
+use PHPUnit\Exceptions\RiskyTestError;
 
 /**
  * Extension to AssertionFailedError to mark a test as risky
@@ -16,6 +20,5 @@ use PHPUnit\Exceptions\AssertionFailedError;
  *
  * @since Class available since Release 5.3.0
  */
-class PHPUnit_Framework_MissingCoversAnnotationException extends PHPUnit_Framework_RiskyTestError
-{
+class MissingCoversAnnotationException extends RiskyTestError {
 }

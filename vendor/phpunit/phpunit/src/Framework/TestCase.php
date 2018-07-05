@@ -9,6 +9,7 @@
  */
 use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Exceptions\RiskyTestError;
 use PHPUnit\Exceptions\SkippedTestError;
 use PHPUnit\Exceptions\Warning;
 use PHPUnit\Framework\WarningTestCase;
@@ -1045,7 +1046,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
 
         try {
             $this->stopOutputBuffering();
-        } catch (PHPUnit_Framework_RiskyTestError $_e) {
+        } catch (RiskyTestError $_e) {
             if (!isset($e)) {
                 $e = $_e;
             }
@@ -2353,7 +2354,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
                 ob_end_clean();
             }
 
-            throw new PHPUnit_Framework_RiskyTestError(
+            throw new RiskyTestError(
                 'Test code or tested code did not (only) close its own output buffers'
             );
         }
@@ -2401,7 +2402,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
                     $this->snapshot,
                     $this->createGlobalStateSnapshot($backupGlobals)
                 );
-            } catch (PHPUnit_Framework_RiskyTestError $rte) {
+            } catch (RiskyTestError $rte) {
                 // Intentionally left empty
             }
         }
@@ -2472,7 +2473,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
      * @param Snapshot $before
      * @param Snapshot $after
      *
-     * @throws PHPUnit_Framework_RiskyTestError
+     * @throws RiskyTestError
      */
     private function compareGlobalStateSnapshots(Snapshot $before, Snapshot $after)
     {
@@ -2506,7 +2507,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
      * @param array  $after
      * @param string $header
      *
-     * @throws PHPUnit_Framework_RiskyTestError
+     * @throws RiskyTestError
      */
     private function compareGlobalStateSnapshotPart(array $before, array $after, $header)
     {
@@ -2519,7 +2520,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
                 $exporter->export($after)
             );
 
-            throw new PHPUnit_Framework_RiskyTestError(
+            throw new RiskyTestError(
                 $diff
             );
         }
