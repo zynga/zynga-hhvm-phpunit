@@ -13,6 +13,7 @@ return array(
   'PHPUnit\\Exceptions\\Error\\Notice' => $baseDir . '/src/PHPUnit/Exceptions/Error/Notice.hh',
   'PHPUnit\\Exceptions\\Error\\Warning' => $baseDir . '/src/PHPUnit/Exceptions/Error/Warning.hh',
   'PHPUnit\\Exceptions\\Exception'  => $baseDir . '/src/PHPUnit/Exceptions/Exception.hh',
+  'PHPUnit\\Exceptions\\ExceptionWrapper' => $baseDir . '/src/PHPUnit/Exceptions/ExceptionWrapper.hh',
   'PHPUnit\\Exceptions\\InvalidCoversTargetException' => $baseDir . '/src/PHPUnit/Exceptions/InvalidCoversTargetException.hh',
   'PHPUnit\\Exceptions\\Warning' => $baseDir . '/src/PHPUnit/Exceptions/Warning.hh',
 
@@ -88,7 +89,6 @@ return array(
     'PHPUnit_Framework_Constraint_TraversableContainsOnly' => $vendorDir . '/phpunit/phpunit/src/Framework/Constraint/TraversableContainsOnly.php',
     'PHPUnit_Framework_Constraint_Xor' => $vendorDir . '/phpunit/phpunit/src/Framework/Constraint/Xor.php',
     'PHPUnit_Framework_CoveredCodeNotExecutedException' => $vendorDir . '/phpunit/phpunit/src/Framework/PHPUnit_Framework_CoveredCodeNotExecutedException.php',
-    'PHPUnit_Framework_ExceptionWrapper' => $vendorDir . '/phpunit/phpunit/src/Framework/ExceptionWrapper.php',
     'PHPUnit_Framework_ExpectationFailedException' => $vendorDir . '/phpunit/phpunit/src/Framework/ExpectationFailedException.php',
     'PHPUnit_Framework_IncompleteTestCase' => $vendorDir . '/phpunit/phpunit/src/Framework/IncompleteTestCase.php',
     'PHPUnit_Framework_IncompleteTestError' => $vendorDir . '/phpunit/phpunit/src/Framework/IncompleteTestError.php',

@@ -1,4 +1,10 @@
-<?php
+<?hh // partial
+
+// --
+// JEO: For some reason its not able to find PHPUnit_Util_Filter, so no strict
+// for now.
+// --
+
 /*
  * This file is part of PHPUnit.
  *
@@ -8,7 +14,13 @@
  * file that was distributed with this source code.
  */
 
+namespace PHPUnit\Exceptions;
+
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
+use \Exception;
+use \PHPUnit_Util_Filter;
+use \PHPUnit_Framework_TestFailure;
 
 /**
  * Wraps Exceptions thrown by code under test.
@@ -21,23 +33,21 @@ use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
  *
  * @since Class available since Release 4.3.0
  */
-class PHPUnit_Framework_ExceptionWrapper extends PHPUnit_Exceptions_Exception
-{
+class ExceptionWrapper extends PHPUnit_Exceptions_Exception {
     /**
      * @var string
      */
-    protected $classname;
+    protected string $classname;
 
     /**
-     * @var PHPUnit_Framework_ExceptionWrapper|null
+     * @var ExceptionWrapper|null
      */
-    protected $previous;
+    protected ?ExceptionWrapper $_previous;
 
     /**
      * @param Throwable|Exception $e
      */
-    public function __construct($e)
-    {
+    public function __construct(Exception $e) {
         // PDOException::getCode() is a string.
         // @see http://php.net/manual/en/class.pdoexception.php#95812
         parent::__construct($e->getMessage(), (int) $e->getCode());
@@ -52,31 +62,32 @@ class PHPUnit_Framework_ExceptionWrapper extends PHPUnit_Exceptions_Exception
             unset($this->serializableTrace[$i]['args']);
         }
 
-        if ($e->getPrevious()) {
-            $this->previous = new self($e->getPrevious());
+        $previous = $e->getPrevious();
+
+        if ($previous !== null) {
+            $this->_previous = new self($previous);
         }
+
     }
 
     /**
      * @return string
      */
-    public function getClassname()
-    {
+    public function getClassname(): string {
         return $this->classname;
     }
 
     /**
-     * @return PHPUnit_Framework_ExceptionWrapper
+     * @return ExceptionWrapper
      */
-    public function getPreviousWrapped()
-    {
-        return $this->previous;
+    public function getPreviousWrapped(): ?ExceptionWrapper {
+      return $this->_previous;
     }
 
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         $string = PHPUnit_Framework_TestFailure::exceptionToString($this);
 

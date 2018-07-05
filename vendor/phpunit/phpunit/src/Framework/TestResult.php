@@ -9,6 +9,7 @@
  */
 use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Exceptions\ExceptionWrapper;
 use PHPUnit\Exceptions\InvalidCoversTargetException;
 use PHPUnit\Exceptions\Warning;
 use PHPUnit\Framework\WarningTestCase;
@@ -262,7 +263,7 @@ class PHPUnit_Framework_TestResult implements Countable
 
         // @see https://github.com/sebastianbergmann/phpunit/issues/1953
         if ($t instanceof Error) {
-            $t = new PHPUnit_Framework_ExceptionWrapper($t);
+            $t = new ExceptionWrapper($t);
         }
 
         foreach ($this->listeners as $listener) {
@@ -731,10 +732,10 @@ class PHPUnit_Framework_TestResult implements Countable
         } catch (PHPUnit_Exceptions_Exception $e) {
             $error = true;
         } catch (Throwable $e) {
-            $e     = new PHPUnit_Framework_ExceptionWrapper($e);
+            $e     = new ExceptionWrapper($e);
             $error = true;
         } catch (Exception $e) {
-            $e     = new PHPUnit_Framework_ExceptionWrapper($e);
+            $e     = new ExceptionWrapper($e);
             $error = true;
         }
 
