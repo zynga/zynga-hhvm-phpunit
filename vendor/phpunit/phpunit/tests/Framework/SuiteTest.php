@@ -22,6 +22,8 @@ require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPAR
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'OverrideTestCase.php';
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'RequirementsClassBeforeClassHookTest.php';
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
 /**
  * @since      Class available since Release 2.0.0
  * @covers     PHPUnit_Framework_TestSuite
@@ -98,7 +100,7 @@ class Framework_SuiteTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Exception
+     * @expectedException PHPUnit_Exceptions_Exception
      */
     public function testNoTestCaseClass()
     {

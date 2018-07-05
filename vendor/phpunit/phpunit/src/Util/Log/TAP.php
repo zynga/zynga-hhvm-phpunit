@@ -8,6 +8,7 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 use PHPUnit\Interfaces\TestListener;
 
 /**
@@ -38,7 +39,7 @@ class PHPUnit_Util_Log_TAP extends PHPUnit_Util_Printer implements TestListener
      *
      * @param mixed $out
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      *
      * @since Method available since Release 3.3.4
      */

@@ -8,6 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 use PHPUnit\Interfaces\TestListener;
 use SebastianBergmann\Environment\Console;
 use \PHPUnit_Util_Printer;
@@ -131,7 +132,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements TestL
      * @param int|string $numberOfColumns
      * @param bool       $reverse
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      *
      * @since Method available since Release 3.0.0
      */

@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
 /**
  * Constraint that asserts that the value it is evaluated for is of a
  * specified type.
@@ -59,14 +61,14 @@ class PHPUnit_Framework_Constraint_IsType extends PHPUnit_Framework_Constraint
     /**
      * @param string $type
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      */
     public function __construct($type)
     {
         parent::__construct();
 
         if (!isset($this->types[$type])) {
-            throw new PHPUnit_Framework_Exception(
+            throw new PHPUnit_Exceptions_Exception(
                 sprintf(
                     'Type specified for PHPUnit_Framework_Constraint_IsType <%s> ' .
                     'is not a valid type.',

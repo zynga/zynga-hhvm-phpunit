@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
 /**
  * Constraint that evaluates against a specified closure.
  */
@@ -18,7 +20,7 @@ class PHPUnit_Framework_Constraint_Callback extends PHPUnit_Framework_Constraint
     /**
      * @param callable $callback
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      */
     public function __construct($callback)
     {

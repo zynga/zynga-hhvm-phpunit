@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
 /**
  * Test helpers.
  *
@@ -383,7 +385,7 @@ class PHPUnit_Util_Test
      * @return array|Iterator when a data provider is specified and exists
      *                        null           when no data provider is specified
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      *
      * @since Method available since Release 3.2.0
      */
@@ -408,7 +410,7 @@ class PHPUnit_Util_Test
 
             foreach ($data as $key => $value) {
                 if (!is_array($value)) {
-                    throw new PHPUnit_Framework_Exception(
+                    throw new PHPUnit_Exceptions_Exception(
                         sprintf(
                             'Data set %s is invalid.',
                             is_int($key) ? '#' . $key : '"' . $key . '"'
@@ -431,7 +433,7 @@ class PHPUnit_Util_Test
      * @return array|Iterator when a data provider is specified and exists
      *                        null           when no data provider is specified
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      */
     private static function getDataFromDataProviderAnnotation($docComment, $className, $methodName)
     {
@@ -479,7 +481,7 @@ class PHPUnit_Util_Test
      * @return array when @testWith annotation is defined
      *               null  when @testWith annotation is omitted
      *
-     * @throws PHPUnit_Framework_Exception when @testWith annotation is defined but cannot be parsed
+     * @throws PHPUnit_Exceptions_Exception when @testWith annotation is defined but cannot be parsed
      */
     public static function getDataFromTestWithAnnotation($docComment)
     {
@@ -498,7 +500,7 @@ class PHPUnit_Util_Test
             }
 
             if (!$data) {
-                throw new PHPUnit_Framework_Exception('The dataset for the @testWith annotation cannot be parsed.');
+                throw new PHPUnit_Exceptions_Exception('The dataset for the @testWith annotation cannot be parsed.');
             }
 
             return $data;
@@ -1065,7 +1067,7 @@ class PHPUnit_Util_Test
      */
     private static function resolveReflectionObjectsToLines(array $reflectors)
     {
-      
+
         $result = [];
 
         foreach ($reflectors as $reflector) {

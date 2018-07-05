@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
 /**
  * Windows utility for PHP sub-processes.
  *
@@ -24,7 +26,7 @@ class PHPUnit_Util_PHP_Windows extends PHPUnit_Util_PHP_Default
     protected function getHandles()
     {
         if (false === $stdout_handle = tmpfile()) {
-            throw new PHPUnit_Framework_Exception(
+            throw new PHPUnit_Exceptions_Exception(
                 'A temporary file could not be created; verify that your TEMP environment variable is writable'
             );
         }

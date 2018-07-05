@@ -8,6 +8,7 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 use PHPUnit\Interfaces\TestListener;
 
 /**
@@ -205,7 +206,7 @@ class PHPUnit_Util_TestDox_ResultPrinter_XML extends PHPUnit_Util_Printer implem
         }
 
         if ($this->exception !== null) {
-            if ($this->exception instanceof PHPUnit_Framework_Exception) {
+            if ($this->exception instanceof PHPUnit_Exceptions_Exception) {
                 $steps = $this->exception->getSerializableTrace();
             } else {
                 $steps = $this->exception->getTrace();

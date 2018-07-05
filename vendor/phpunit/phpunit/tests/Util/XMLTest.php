@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
 /**
  * @since      Class available since Release 3.3.0
  * @covers     PHPUnit_Util_XML
@@ -48,7 +50,7 @@ class Util_XMLTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Exception
+     * @expectedException PHPUnit_Exceptions_Exception
      * @expectedExceptionMessage Could not load XML from empty string
      */
     public function testLoadEmptyString()
@@ -57,7 +59,7 @@ class Util_XMLTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Exception
+     * @expectedException PHPUnit_Exceptions_Exception
      * @expectedExceptionMessage Could not load XML from array
      */
     public function testLoadArray()
@@ -66,7 +68,7 @@ class Util_XMLTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Exception
+     * @expectedException PHPUnit_Exceptions_Exception
      * @expectedExceptionMessage Could not load XML from boolean
      */
     public function testLoadBoolean()

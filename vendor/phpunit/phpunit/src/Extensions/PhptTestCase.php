@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
 /**
  * Runner for PHPT test cases.
  *
@@ -58,16 +60,15 @@ class PHPUnit_Extensions_PhptTestCase implements PHPUnit_Framework_Test, PHPUnit
      * @param string           $filename
      * @param PHPUnit_Util_PHP $phpUtil
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      */
-    public function __construct($filename, $phpUtil = null)
-    {
+    public function __construct($filename, $phpUtil = null) {
         if (!is_string($filename)) {
             throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'string');
         }
 
         if (!is_file($filename)) {
-            throw new PHPUnit_Framework_Exception(
+            throw new PHPUnit_Exceptions_Exception(
                 sprintf(
                     'File "%s" does not exist.',
                     $filename
@@ -259,7 +260,7 @@ class PHPUnit_Extensions_PhptTestCase implements PHPUnit_Framework_Test, PHPUnit
     /**
      * @return array
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      */
     private function parse()
     {
@@ -306,7 +307,7 @@ class PHPUnit_Extensions_PhptTestCase implements PHPUnit_Framework_Test, PHPUnit
 
                 continue;
             } elseif (empty($section)) {
-                throw new PHPUnit_Framework_Exception('Invalid PHPT file');
+                throw new PHPUnit_Exceptions_Exception('Invalid PHPT file');
             }
 
             $sections[$section] .= $line;
@@ -326,7 +327,7 @@ class PHPUnit_Extensions_PhptTestCase implements PHPUnit_Framework_Test, PHPUnit
 
                 // only allow files from the test directory
                 if (!is_file($testDirectory . $externalFilename) || !is_readable($testDirectory . $externalFilename)) {
-                    throw new PHPUnit_Framework_Exception(
+                    throw new PHPUnit_Exceptions_Exception(
                         sprintf(
                             'Could not load --%s-- %s for PHPT file',
                             $section . '_EXTERNAL',
@@ -370,12 +371,12 @@ class PHPUnit_Extensions_PhptTestCase implements PHPUnit_Framework_Test, PHPUnit
         }
 
         if (!$isValid) {
-            throw new PHPUnit_Framework_Exception('Invalid PHPT file');
+            throw new PHPUnit_Exceptions_Exception('Invalid PHPT file');
         }
 
         foreach ($unsupportedSections as $section) {
             if (isset($sections[$section])) {
-                throw new PHPUnit_Framework_Exception(
+                throw new PHPUnit_Exceptions_Exception(
                     'PHPUnit does not support this PHPT file'
                 );
             }

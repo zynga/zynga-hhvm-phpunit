@@ -8,12 +8,14 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
 /**
  * Wrapper for PHP errors.
  *
  * @since Class available since Release 2.2.0
  */
-class PHPUnit_Framework_Error extends PHPUnit_Framework_Exception
+class PHPUnit_Framework_Error extends PHPUnit_Exceptions_Exception
 {
     /**
      * Constructor.

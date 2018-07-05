@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
 /**
  * Command-line options parsing class.
  *
@@ -79,7 +81,7 @@ class PHPUnit_Util_Getopt
 
             if (($spec = strstr($short_options, $opt)) === false ||
                 $arg[$i] == ':') {
-                throw new PHPUnit_Framework_Exception(
+                throw new PHPUnit_Exceptions_Exception(
                     "unrecognized option -- $opt"
                 );
             }
@@ -96,7 +98,7 @@ class PHPUnit_Util_Getopt
                         break;
                     } elseif (list(, $opt_arg) = each($args)) {
                     } else {
-                        throw new PHPUnit_Framework_Exception(
+                        throw new PHPUnit_Exceptions_Exception(
                             "option requires an argument -- $opt"
                         );
                     }
@@ -132,7 +134,7 @@ class PHPUnit_Util_Getopt
 
             if ($opt_rest != '' && $opt[0] != '=' && $i + 1 < $count &&
                 $opt == substr($long_options[$i+1], 0, $opt_len)) {
-                throw new PHPUnit_Framework_Exception(
+                throw new PHPUnit_Exceptions_Exception(
                     "option --$opt is ambiguous"
                 );
             }
@@ -141,13 +143,13 @@ class PHPUnit_Util_Getopt
                 if (substr($long_opt, -2) != '==') {
                     if (!strlen($opt_arg) &&
                         !(list(, $opt_arg) = each($args))) {
-                        throw new PHPUnit_Framework_Exception(
+                        throw new PHPUnit_Exceptions_Exception(
                             "option --$opt requires an argument"
                         );
                     }
                 }
             } elseif ($opt_arg) {
-                throw new PHPUnit_Framework_Exception(
+                throw new PHPUnit_Exceptions_Exception(
                     "option --$opt doesn't allow an argument"
                 );
             }
@@ -158,6 +160,6 @@ class PHPUnit_Util_Getopt
             return;
         }
 
-        throw new PHPUnit_Framework_Exception("unrecognized option --$opt");
+        throw new PHPUnit_Exceptions_Exception("unrecognized option --$opt");
     }
 }

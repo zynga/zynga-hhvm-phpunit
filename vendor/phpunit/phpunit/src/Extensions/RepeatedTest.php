@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
 /**
  * A Decorator that runs a test repeatedly.
  *
@@ -30,7 +32,7 @@ class PHPUnit_Extensions_RepeatedTest extends PHPUnit_Extensions_TestDecorator
      * @param int                    $timesRepeat
      * @param bool                   $processIsolation
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      */
     public function __construct(PHPUnit_Framework_Test $test, $timesRepeat = 1, $processIsolation = false)
     {
@@ -68,7 +70,7 @@ class PHPUnit_Extensions_RepeatedTest extends PHPUnit_Extensions_TestDecorator
      *
      * @return PHPUnit_Framework_TestResult
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      */
     public function run(PHPUnit_Framework_TestResult $result = null)
     {

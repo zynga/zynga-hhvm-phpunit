@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
 /**
  * Base class for all test runners.
  *
@@ -66,7 +68,7 @@ abstract class PHPUnit_Runner_BaseTestRunner
                 $suiteClassName,
                 $suiteClassFile
             );
-        } catch (PHPUnit_Framework_Exception $e) {
+        } catch (PHPUnit_Exceptions_Exception $e) {
             $this->runFailed($e->getMessage());
 
             return;
@@ -98,7 +100,7 @@ abstract class PHPUnit_Runner_BaseTestRunner
         } catch (ReflectionException $e) {
             try {
                 $test = new PHPUnit_Framework_TestSuite($testClass);
-            } catch (PHPUnit_Framework_Exception $e) {
+            } catch (PHPUnit_Exceptions_Exception $e) {
                 $test = new PHPUnit_Framework_TestSuite;
                 $test->setName($suiteClassName);
             }

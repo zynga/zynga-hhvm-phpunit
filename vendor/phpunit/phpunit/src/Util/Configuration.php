@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
 /**
  * Wrapper for the PHPUnit XML configuration file.
  *
@@ -181,7 +183,7 @@ class PHPUnit_Util_Configuration
         $realpath = realpath($filename);
 
         if ($realpath === false) {
-            throw new PHPUnit_Framework_Exception(
+            throw new PHPUnit_Exceptions_Exception(
                 sprintf(
                     'Could not read "%s".',
                     $filename

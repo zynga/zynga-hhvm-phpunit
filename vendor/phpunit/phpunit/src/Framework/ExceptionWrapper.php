@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
 /**
  * Wraps Exceptions thrown by code under test.
  *
@@ -19,7 +21,7 @@
  *
  * @since Class available since Release 4.3.0
  */
-class PHPUnit_Framework_ExceptionWrapper extends PHPUnit_Framework_Exception
+class PHPUnit_Framework_ExceptionWrapper extends PHPUnit_Exceptions_Exception
 {
     /**
      * @var string

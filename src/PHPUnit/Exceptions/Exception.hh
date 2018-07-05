@@ -1,4 +1,5 @@
-<?php
+<?hh // partial
+
 /*
  * This file is part of PHPUnit.
  *
@@ -7,6 +8,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+namespace PHPUnit\Exceptions;
 
 /**
  * Base class for all PHPUnit Framework exceptions.
@@ -29,24 +32,31 @@
  * @see http://fabien.potencier.org/article/9/php-serialization-stack-traces-and-exceptions
  * @since Class available since Release 3.4.0
  */
+use \RuntimeException;
+use \Exception as BaseException;
 
 use PHPUnit\Interfaces\Exception as ExceptionInterface;
 
-class PHPUnit_Framework_Exception extends RuntimeException implements ExceptionInterface
-{
+use \PHPUnit_Framework_TestFailure;
+use \PHPUnit_Util_Filter;
+
+class Exception extends RuntimeException implements ExceptionInterface {
     /**
      * @var array
      */
-    protected $serializableTrace;
+    protected array $serializableTrace;
 
-    public function __construct($message = '', $code = 0, Exception $previous = null)
-    {
+    public function __construct(string $message = '', int $code = 0, ?BaseException $previous = null) {
+
         parent::__construct($message, $code, $previous);
 
+        $this->serializableTrace = array();
         $this->serializableTrace = $this->getTrace();
+
         foreach ($this->serializableTrace as $i => $call) {
             unset($this->serializableTrace[$i]['args']);
         }
+
     }
 
     /**
@@ -54,16 +64,15 @@ class PHPUnit_Framework_Exception extends RuntimeException implements ExceptionI
      *
      * @return array
      */
-    public function getSerializableTrace()
-    {
-        return $this->serializableTrace;
+    public function getSerializableTrace(): array {
+      return $this->serializableTrace;
     }
 
     /**
      * @return string
      */
-    public function __toString()
-    {
+    public function __toString() {
+
         $string = PHPUnit_Framework_TestFailure::exceptionToString($this);
 
         if ($trace = PHPUnit_Util_Filter::getFilteredStacktrace($this)) {
@@ -73,8 +82,11 @@ class PHPUnit_Framework_Exception extends RuntimeException implements ExceptionI
         return $string;
     }
 
-    public function __sleep()
-    {
-        return array_keys(get_object_vars($this));
+    public function __sleep(): mixed {
+      $objectVars = get_object_vars($this);
+      if ( is_array($objectVars) ) {
+        return array_keys($objectVars);
+      }
+      return null;
     }
 }

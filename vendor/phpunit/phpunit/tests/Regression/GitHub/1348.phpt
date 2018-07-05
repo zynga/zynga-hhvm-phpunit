@@ -28,7 +28,7 @@ Time: %s, Memory: %s
 There was 1 error:
 
 1) Issue1348Test::testSTDERR
-PHPUnit_Framework_Exception: STDERR works as usual.
+PHPUnit_Exceptions_Exception: STDERR works as usual.
 
 ERRORS!
 Tests: 2, Assertions: 1, Errors: 1.

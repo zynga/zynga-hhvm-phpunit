@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
 /**
  * Logical AND.
  *
@@ -28,7 +30,7 @@ class PHPUnit_Framework_Constraint_And extends PHPUnit_Framework_Constraint
     /**
      * @param PHPUnit_Framework_Constraint[] $constraints
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      */
     public function setConstraints(array $constraints)
     {
@@ -36,7 +38,7 @@ class PHPUnit_Framework_Constraint_And extends PHPUnit_Framework_Constraint
 
         foreach ($constraints as $constraint) {
             if (!($constraint instanceof PHPUnit_Framework_Constraint)) {
-                throw new PHPUnit_Framework_Exception(
+                throw new PHPUnit_Exceptions_Exception(
                     'All parameters to ' . __CLASS__ .
                     ' must be a constraint object.'
                 );

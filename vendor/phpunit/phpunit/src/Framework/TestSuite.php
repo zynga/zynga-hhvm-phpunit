@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
 /**
  * A TestSuite is a composite of Tests. It runs a collection of test cases.
  *
@@ -138,7 +140,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      * @param mixed  $theClass
      * @param string $name
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      */
     public function __construct($theClass = '', $name = '')
     {
@@ -164,11 +166,11 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
         }
 
         if (!$argumentsValid) {
-            throw new PHPUnit_Framework_Exception;
+            throw new PHPUnit_Exceptions_Exception;
         }
 
         if (!$theClass->isSubClassOf(ZyngaTestCaseBase::class) && !$theClass->isSubClassOf(PHPUnit_Framework_TestCase::class) ) {
-          throw new PHPUnit_Framework_Exception(
+          throw new PHPUnit_Exceptions_Exception(
               'Class "' . $theClass->name . '" does not extend (' . ZyngaTestCaseBase::class . ' or ' . PHPUnit_Framework_TestCase::class . ')'
           );
         }
@@ -265,7 +267,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      *
      * @param mixed $testClass
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      */
     public function addTestSuite($testClass)
     {
@@ -305,7 +307,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                 $this->addTest(new self($testClass));
             }
         } else {
-            throw new PHPUnit_Framework_Exception;
+            throw new PHPUnit_Exceptions_Exception;
         }
     }
 
@@ -319,7 +321,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      *
      * @param string $filename
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      *
      * @since Method available since Release 2.3.0
      */
@@ -399,7 +401,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      *
      * @param array|Iterator $filenames
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      *
      * @since Method available since Release 2.3.0
      */
@@ -448,7 +450,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      *
      * @return PHPUnit_Framework_Test
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      */
     public static function createTest(ReflectionClass $theClass, $name)
     {
@@ -595,7 +597,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
         }
 
         if (!isset($test)) {
-            throw new PHPUnit_Framework_Exception('No valid test provided.');
+            throw new PHPUnit_Exceptions_Exception('No valid test provided.');
         }
 
         if ($test instanceof ZyngaTestCaseBase || $test instanceof PHPUnit_Framework_TestCase) {
@@ -812,7 +814,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
     /**
      * @param bool $runTestInSeparateProcess
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      *
      * @since Method available since Release 3.7.0
      */

@@ -19,6 +19,7 @@ if (!defined('TEST_FILES_PATH')) {
 require TEST_FILES_PATH . 'CoverageNamespacedFunctionTest.php';
 require TEST_FILES_PATH . 'NamespaceCoveredFunction.php';
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 /**
  * @since      Class available since Release 3.3.6
  */
@@ -518,7 +519,7 @@ class Util_TestTest extends PHPUnit_Framework_TestCase
     public function testTestWithThrowsProperExceptionIfDatasetCannotBeParsed()
     {
         $this->setExpectedExceptionRegExp(
-            'PHPUnit_Framework_Exception',
+            'PHPUnit_Exceptions_Exception',
             '/^The dataset for the @testWith annotation cannot be parsed.$/'
         );
         PHPUnit_Util_Test::getDataFromTestWithAnnotation('/**

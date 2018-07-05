@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
 /**
  * Utility class for code filtering.
  *
@@ -42,7 +44,7 @@ class PHPUnit_Util_Filter
             $eTrace = $e->getSyntheticTrace();
             $eFile  = $e->getSyntheticFile();
             $eLine  = $e->getSyntheticLine();
-        } elseif ($e instanceof PHPUnit_Framework_Exception) {
+        } elseif ($e instanceof PHPUnit_Exceptions_Exception) {
             $eTrace = $e->getSerializableTrace();
             $eFile  = $e->getFile();
             $eLine  = $e->getLine();

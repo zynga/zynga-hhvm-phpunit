@@ -8,12 +8,14 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
 /**
  * Thrown when an there is a warning.
  *
  * @since Class available since Release 5.0.0
  */
-class PHPUnit_Framework_Warning extends PHPUnit_Framework_Exception implements PHPUnit_Framework_SelfDescribing
+class PHPUnit_Framework_Warning extends PHPUnit_Exceptions_Exception implements PHPUnit_Framework_SelfDescribing
 {
     /**
      * Wrapper for getMessage() which is declared as final.

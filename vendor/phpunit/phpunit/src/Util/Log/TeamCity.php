@@ -8,6 +8,7 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 use SebastianBergmann\Comparator\ComparisonFailure;
 
 /**
@@ -326,7 +327,7 @@ class PHPUnit_Util_Log_TeamCity extends PHPUnit_TextUI_ResultPrinter
     {
         $message = '';
 
-        if (!$e instanceof PHPUnit_Framework_Exception) {
+        if (!$e instanceof PHPUnit_Exceptions_Exception) {
             if (strlen(get_class($e)) != 0) {
                 $message = $message . get_class($e);
             }

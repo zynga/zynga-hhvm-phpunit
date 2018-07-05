@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
 /**
  * Default utility for PHP sub-processes.
  *
@@ -33,14 +35,14 @@ class PHPUnit_Util_PHP_Default extends PHPUnit_Util_PHP
      *
      * @return array
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      */
     public function runJob($job, array $settings = [])
     {
         if ($this->useTempFile || $this->stdin) {
             if (!($this->tempFile = tempnam(sys_get_temp_dir(), 'PHPUnit')) ||
                 file_put_contents($this->tempFile, $job) === false) {
-                throw new PHPUnit_Framework_Exception(
+                throw new PHPUnit_Exceptions_Exception(
                     'Unable to write temporary file'
                 );
             }
@@ -69,7 +71,7 @@ class PHPUnit_Util_PHP_Default extends PHPUnit_Util_PHP
      *
      * @return array
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      */
     protected function runProcess($job, $settings)
     {
@@ -102,7 +104,7 @@ class PHPUnit_Util_PHP_Default extends PHPUnit_Util_PHP
         );
 
         if (!is_resource($process)) {
-            throw new PHPUnit_Framework_Exception(
+            throw new PHPUnit_Exceptions_Exception(
                 'Unable to spawn worker process'
             );
         }
@@ -127,7 +129,7 @@ class PHPUnit_Util_PHP_Default extends PHPUnit_Util_PHP
                     break;
                 } elseif ($n === 0) {
                     proc_terminate($process, 9);
-                    throw new PHPUnit_Framework_Exception(sprintf('Job execution aborted after %d seconds', $this->timeout));
+                    throw new PHPUnit_Exceptions_Exception(sprintf('Job execution aborted after %d seconds', $this->timeout));
                 } elseif ($n > 0) {
                     foreach ($r as $pipe) {
                         $pipeOffset = 0;
@@ -194,7 +196,7 @@ class PHPUnit_Util_PHP_Default extends PHPUnit_Util_PHP
      * @param resource $pipe
      * @param string   $job
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      *
      * @since Method available since Release 3.5.12
      */

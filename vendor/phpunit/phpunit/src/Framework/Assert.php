@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
 /**
  * A set of assert methods.
  *
@@ -2725,7 +2727,7 @@ abstract class PHPUnit_Framework_Assert
      *
      * @return mixed
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      */
     public static function readAttribute($classOrObject, $attributeName)
     {
@@ -2771,7 +2773,7 @@ abstract class PHPUnit_Framework_Assert
      *
      * @return mixed
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      *
      * @since Method available since Release 4.0.0
      */
@@ -2805,7 +2807,7 @@ abstract class PHPUnit_Framework_Assert
             $class = $class->getParentClass();
         }
 
-        throw new PHPUnit_Framework_Exception(
+        throw new PHPUnit_Exceptions_Exception(
             sprintf(
                 'Attribute "%s" not found in class.',
                 $attributeName
@@ -2822,7 +2824,7 @@ abstract class PHPUnit_Framework_Assert
      *
      * @return mixed
      *
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      *
      * @since Method available since Release 4.0.0
      */
@@ -2866,7 +2868,7 @@ abstract class PHPUnit_Framework_Assert
             return $value;
         }
 
-        throw new PHPUnit_Framework_Exception(
+        throw new PHPUnit_Exceptions_Exception(
             sprintf(
                 'Attribute "%s" not found in object.',
                 $attributeName

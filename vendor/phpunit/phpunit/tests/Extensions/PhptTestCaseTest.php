@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
 class Extensions_PhptTestCaseTest extends \PHPUnit_Framework_TestCase
 {
     const EXPECT_CONTENT = <<<EOF
@@ -146,7 +148,7 @@ EOF;
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Exception
+     * @expectedException PHPUnit_Exceptions_Exception
      * @expectedExceptionMessage Invalid PHPT file
      */
     public function testShouldThrowsAnExceptionWhenPhptFileIsEmpty()
@@ -157,7 +159,7 @@ EOF;
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Exception
+     * @expectedException PHPUnit_Exceptions_Exception
      * @expectedExceptionMessage Invalid PHPT file
      */
     public function testShouldThrowsAnExceptionWhenFileSectionIsMissing()
@@ -174,7 +176,7 @@ EOF
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Exception
+     * @expectedException PHPUnit_Exceptions_Exception
      * @expectedExceptionMessage Invalid PHPT file
      */
     public function testShouldThrowsAnExceptionWhenThereIsNoExpecOrExpectifOrExpecregexSectionInPhptFile()

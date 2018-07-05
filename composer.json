@@ -24,6 +24,7 @@
   "autoload": {
     "psr-4": {
       "Zynga\\PHPUnit\\": "src/Zynga/PHPUnit/",
+      "PHPUnit\\Exceptions\\": "src/PHPUnit/Exceptions/",
       "PHPUnit\\Framework\\": "src/PHPUnit/Framework/",
       "PHPUnit\\Interfaces\\": "src/PHPUnit/Interfaces/"
     }

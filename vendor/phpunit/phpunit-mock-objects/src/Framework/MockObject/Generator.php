@@ -8,6 +8,7 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 use Doctrine\Instantiator\Instantiator;
 use Doctrine\Instantiator\Exception\InvalidArgumentException as InstantiatorInvalidArgumentException;
 use Doctrine\Instantiator\Exception\UnexpectedValueException as InstantiatorUnexpectedValueException;
@@ -139,7 +140,7 @@ class PHPUnit_Framework_MockObject_Generator
      * @return PHPUnit_Framework_MockObject_MockObject
      *
      * @throws InvalidArgumentException
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      * @throws PHPUnit_Framework_MockObject_RuntimeException
      *
      * @since  Method available since Release 1.0.0
@@ -358,7 +359,7 @@ class PHPUnit_Framework_MockObject_Generator
      * @return PHPUnit_Framework_MockObject_MockObject
      *
      * @throws PHPUnit_Framework_MockObject_RuntimeException
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      *
      * @since  Method available since Release 1.0.0
      */
@@ -421,7 +422,7 @@ class PHPUnit_Framework_MockObject_Generator
      * @return PHPUnit_Framework_MockObject_MockObject
      *
      * @throws PHPUnit_Framework_MockObject_RuntimeException
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      *
      * @since  Method available since Release 1.2.3
      */
@@ -485,7 +486,7 @@ class PHPUnit_Framework_MockObject_Generator
      * @return object
      *
      * @throws PHPUnit_Framework_MockObject_RuntimeException
-     * @throws PHPUnit_Framework_Exception
+     * @throws PHPUnit_Exceptions_Exception
      *
      * @since  Method available since Release 1.1.0
      */

@@ -8,6 +8,7 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 use PHPUnit\Interfaces\TestListener;
 
 /**
@@ -162,7 +163,7 @@ class PHPUnit_TextUI_Command
 
         try {
             $result = $runner->doRun($suite, $this->arguments, $exit);
-        } catch (PHPUnit_Framework_Exception $e) {
+        } catch (PHPUnit_Exceptions_Exception $e) {
             print $e->getMessage() . "\n";
         }
 
@@ -250,7 +251,7 @@ class PHPUnit_TextUI_Command
                 'd:c:hv',
                 array_keys($this->longOptions)
             );
-        } catch (PHPUnit_Framework_Exception $e) {
+        } catch (PHPUnit_Exceptions_Exception $e) {
             $this->showError($e->getMessage());
         }
 
@@ -875,7 +876,7 @@ class PHPUnit_TextUI_Command
     {
         try {
             PHPUnit_Util_Fileloader::checkAndLoad($filename);
-        } catch (PHPUnit_Framework_Exception $e) {
+        } catch (PHPUnit_Exceptions_Exception $e) {
             $this->showError($e->getMessage());
         }
     }
