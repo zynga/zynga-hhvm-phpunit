@@ -9,6 +9,7 @@
  */
 
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Exceptions\IncompleteTestError;
 use PHPUnit\Exceptions\SkippedTestError;
 use PHPUnit\Framework\WarningTestCase;
 
@@ -494,7 +495,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                         $className,
                         $name
                     );
-                } catch (PHPUnit_Framework_IncompleteTestError $e) {
+                } catch (IncompleteTestError $e) {
                     $message = sprintf(
                         'Test for %s::%s marked incomplete by data provider',
                         $className,

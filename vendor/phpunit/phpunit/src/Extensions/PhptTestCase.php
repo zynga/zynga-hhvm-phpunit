@@ -10,6 +10,7 @@
 
 use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Exceptions\IncompleteTestError;
 use PHPUnit\Exceptions\SkippedTestError;
 
 /**
@@ -198,7 +199,7 @@ class PHPUnit_Extensions_PhptTestCase implements PHPUnit_Framework_Test, PHPUnit
                 if ($xfail !== false) {
                     $result->addFailure(
                         $this,
-                        new PHPUnit_Framework_IncompleteTestError(
+                        new IncompleteTestError(
                             $xfail,
                             0,
                             $e
@@ -217,7 +218,7 @@ class PHPUnit_Extensions_PhptTestCase implements PHPUnit_Framework_Test, PHPUnit
             if ($result->allCompletelyImplemented() && $xfail !== false) {
                 $result->addFailure(
                     $this,
-                    new PHPUnit_Framework_IncompleteTestError(
+                    new IncompleteTestError(
                         'XFAIL section but test passes'
                     ),
                     $time
