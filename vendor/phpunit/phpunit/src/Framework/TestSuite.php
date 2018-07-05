@@ -39,7 +39,8 @@
  * @since Class available since Release 2.0.0
  */
 
- use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
+use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
+use PHPUnit\Framework\AsyncRunner;
 
 class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Framework_SelfDescribing, IteratorAggregate
 {
@@ -671,6 +672,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
         $this->groups = $groups;
     }
 
+
     /**
      * Runs the tests and collects their result in a TestResult.
      *
@@ -758,6 +760,15 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
           error_log('WARNING - doSetUpBeforeClass NOT defined on your test=' . get_class($firstTest));
         }
 
+        // Prototype async method.
+        $testStack = array();
+        foreach ($this as $test) {
+          $testStack[] = AsyncRunner::runTestAsync($test, $result);
+        }
+
+        \HH\Asio\join(AsyncRunner::runTests($testStack));
+
+        /*
         foreach ($this as $test) {
 
             if ($result->shouldStop()) {
@@ -775,6 +786,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
             $test->run($result);
 
         }
+        */
 
         // JEO: Run the doTearDownAfterClass
         if ( method_exists($lastTest, 'doTearDownAfterClass') ) {

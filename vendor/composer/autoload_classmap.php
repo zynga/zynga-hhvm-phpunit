@@ -6,10 +6,12 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'PHPUnit\\Interfaces\\IncompleteTest' => $baseDir . '/src/PHPUnit/Interfaces/IncompleteTest.hh',
-    'PHPUnit\\Interfaces\\Exception' => $baseDir . '/src/PHPUnit/Interfaces/Exception.hh',
-    'PHPUnit\\Interfaces\\SkippedTest' => $baseDir . '/src/PHPUnit/Interfaces/SkippedTest.hh',
-    'PHPUnit\\Interfaces\\TestListener' => $baseDir . '/src/PHPUnit/Interfaces/TestListener.hh',
+  'PHPUnit\\Framework\\AsyncRunner' => $baseDir . '/src/PHPUnit/Framework/AsyncRunner.hh',
+
+  'PHPUnit\\Interfaces\\IncompleteTest' => $baseDir . '/src/PHPUnit/Interfaces/IncompleteTest.hh',
+  'PHPUnit\\Interfaces\\Exception' => $baseDir . '/src/PHPUnit/Interfaces/Exception.hh',
+  'PHPUnit\\Interfaces\\SkippedTest' => $baseDir . '/src/PHPUnit/Interfaces/SkippedTest.hh',
+  'PHPUnit\\Interfaces\\TestListener' => $baseDir . '/src/PHPUnit/Interfaces/TestListener.hh',
 
     // JEO: TBD if we will ever re-enable this source caching system.
     'Zynga\\Source\\Cache' => $vendorDir . '/phpunit/php-source-cache/src/Source/Cache.hh',
