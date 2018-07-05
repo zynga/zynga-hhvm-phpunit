@@ -8,6 +8,7 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 
 /**
@@ -166,6 +167,6 @@ class PHPUnit_Framework_TestFailure
      */
     public function isFailure()
     {
-        return ($this->thrownException() instanceof PHPUnit_Framework_AssertionFailedError);
+        return ($this->thrownException() instanceof AssertionFailedError);
     }
 }

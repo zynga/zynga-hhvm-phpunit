@@ -8,8 +8,10 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\AssertionFailedError;
+
 /**
- * Extension to PHPUnit_Framework_AssertionFailedError to mark a test as risky
+ * Extension to AssertionFailedError to mark a test as risky
  * when it does not have a @covers annotation but is expected to have one.
  *
  * @since Class available since Release 5.3.0

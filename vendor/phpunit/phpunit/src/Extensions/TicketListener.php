@@ -10,6 +10,8 @@
 
 use PHPUnit\Interfaces\TestListener;
 
+use PHPUnit\Exceptions\AssertionFailedError;
+
 /**
  * Base class for test listeners that interact with an issue tracker.
  *
@@ -42,10 +44,10 @@ abstract class PHPUnit_Extensions_TicketListener implements TestListener
      * A failure occurred.
      *
      * @param PHPUnit_Framework_Test                 $test
-     * @param PHPUnit_Framework_AssertionFailedError $e
+     * @param AssertionFailedError $e
      * @param float                                  $time
      */
-    public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e, $time)
+    public function addFailure(PHPUnit_Framework_Test $test, AssertionFailedError $e, $time)
     {
     }
 

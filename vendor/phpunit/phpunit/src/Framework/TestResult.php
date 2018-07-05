@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 use PHPUnit\Interfaces\SkippedTest;
 use PHPUnit\Interfaces\IncompleteTest;
@@ -303,10 +304,10 @@ class PHPUnit_Framework_TestResult implements Countable
      * The passed in exception caused the failure.
      *
      * @param PHPUnit_Framework_Test                 $test
-     * @param PHPUnit_Framework_AssertionFailedError $e
+     * @param AssertionFailedError $e
      * @param float                                  $time
      */
-    public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e, $time)
+    public function addFailure(PHPUnit_Framework_Test $test, AssertionFailedError $e, $time)
     {
         if ($e instanceof PHPUnit_Framework_RiskyTest ||
             $e instanceof PHPUnit_Framework_OutputError) {
@@ -712,7 +713,7 @@ class PHPUnit_Framework_TestResult implements Countable
             );
 
             $warning = true;
-        } catch (PHPUnit_Framework_AssertionFailedError $e) {
+        } catch (AssertionFailedError $e) {
             $failure = true;
 
             if ($e instanceof PHPUnit_Framework_RiskyTestError) {

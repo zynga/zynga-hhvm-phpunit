@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\AssertionFailedError;
+
 /**
  * Exception for expectations which failed their check.
  *
@@ -17,8 +19,7 @@
  *
  * @since Class available since Release 3.0.0
  */
-class PHPUnit_Framework_ExpectationFailedException extends PHPUnit_Framework_AssertionFailedError
-{
+class PHPUnit_Framework_ExpectationFailedException extends AssertionFailedError {
     /**
      * @var SebastianBergmann\Comparator\ComparisonFailure
      */

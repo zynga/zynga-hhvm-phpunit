@@ -8,6 +8,7 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 
 /**
@@ -192,7 +193,7 @@ class PHPUnit_Extensions_PhptTestCase implements PHPUnit_Framework_Test, PHPUnit
 
             try {
                 $this->assertPhptExpectation($sections, $jobResult['stdout']);
-            } catch (PHPUnit_Framework_AssertionFailedError $e) {
+            } catch (AssertionFailedError $e) {
                 if ($xfail !== false) {
                     $result->addFailure(
                         $this,

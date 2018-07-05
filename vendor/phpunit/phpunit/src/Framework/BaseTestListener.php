@@ -12,9 +12,11 @@
 use PHPUnit\Interfaces\TestListener;
 
 use \Exception;
+
+use PHPUnit\Exceptions\AssertionFailedError;
+
 use \PHPUnit_Framework_Test;
 use \PHPUnit_Framework_TestCase;
-use \PHPUnit_Framework_AssertionFailedError;
 
 /**
  * An empty Listener that can be extended to implement TestListener
@@ -33,7 +35,7 @@ abstract class PHPUnit_Framework_BaseTestListener implements TestListener
     {
     }
 
-    public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e, float $time): void
+    public function addFailure(PHPUnit_Framework_Test $test, AssertionFailedError $e, float $time): void
     {
     }
 

@@ -8,12 +8,14 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\AssertionFailedError;
+
 /**
- * Extension to PHPUnit_Framework_AssertionFailedError to mark the special
+ * Extension to AssertionFailedError to mark the special
  * case of a test that printed output.
  *
  * @since Class available since Release 3.6.0
  */
-class PHPUnit_Framework_OutputError extends PHPUnit_Framework_AssertionFailedError
+class PHPUnit_Framework_OutputError extends AssertionFailedError
 {
 }

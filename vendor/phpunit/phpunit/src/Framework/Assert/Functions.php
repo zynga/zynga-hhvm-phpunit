@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\AssertionFailedError;
+
 /**
  * Returns a matcher that matches when the method is executed
  * zero or more times.
@@ -627,7 +629,7 @@ function assertCount($expectedCount, $haystack, $message = '')
  * @param mixed  $actual
  * @param string $message
  *
- * @throws PHPUnit_Framework_AssertionFailedError
+ * @throws AssertionFailedError
  */
 function assertEmpty($actual, $message = '')
 {
@@ -680,7 +682,7 @@ function assertEquals($expected, $actual, $message = '', $delta = 0.0, $maxDepth
  * @param bool   $condition
  * @param string $message
  *
- * @throws PHPUnit_Framework_AssertionFailedError
+ * @throws AssertionFailedError
  */
 function assertNotTrue($condition, $message = '')
 {
@@ -696,7 +698,7 @@ function assertNotTrue($condition, $message = '')
  * @param bool   $condition
  * @param string $message
  *
- * @throws PHPUnit_Framework_AssertionFailedError
+ * @throws AssertionFailedError
  */
 function assertFalse($condition, $message = '')
 {
@@ -1087,7 +1089,7 @@ function assertNotCount($expectedCount, $haystack, $message = '')
  * @param mixed  $actual
  * @param string $message
  *
- * @throws PHPUnit_Framework_AssertionFailedError
+ * @throws AssertionFailedError
  */
 function assertNotEmpty($actual, $message = '')
 {
@@ -1158,7 +1160,7 @@ function assertNotInternalType($expected, $actual, $message = '')
  * @param bool   $condition
  * @param string $message
  *
- * @throws PHPUnit_Framework_AssertionFailedError
+ * @throws AssertionFailedError
  */
 function assertNotFalse($condition, $message = '')
 {
@@ -1527,7 +1529,7 @@ function assertThat($value, PHPUnit_Framework_Constraint $constraint, $message =
  * @param bool   $condition
  * @param string $message
  *
- * @throws PHPUnit_Framework_AssertionFailedError
+ * @throws AssertionFailedError
  */
 function assertTrue($condition, $message = '')
 {

@@ -12,8 +12,10 @@
 namespace PHPUnit\Interfaces;
 
 use \Exception;
+
+use PHPUnit\Exceptions\AssertionFailedError;
+
 use \PHPUnit_Framework_Test;
-use \PHPUnit_Framework_AssertionFailedError;
 use \PHPUnit_Framework_TestSuite;
 
 /**
@@ -50,11 +52,11 @@ interface TestListener
     /**
      * A failure occurred.
      *
-     * @param PHPUnit_Framework_Test                 $test
-     * @param PHPUnit_Framework_AssertionFailedError $e
-     * @param float                                  $time
+     * @param PHPUnit_Framework_Test $test
+     * @param AssertionFailedError $e
+     * @param float $time
      */
-    public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e, float $time): void;
+    public function addFailure(PHPUnit_Framework_Test $test, AssertionFailedError $e, float $time): void;
 
     /**
      * Incomplete test.

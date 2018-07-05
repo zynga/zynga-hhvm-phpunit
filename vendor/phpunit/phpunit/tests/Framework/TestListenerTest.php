@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\AssertionFailedError;
+
 /**
  * @since      Class available since Release 2.0.0
  * @covers     PHPUnit_Framework_TestCase
@@ -34,7 +36,7 @@ class Framework_TestListenerTest extends PHPUnit_Framework_TestCase implements P
         $this->warningCount++;
     }
 
-    public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e, $time)
+    public function addFailure(PHPUnit_Framework_Test $test, AssertionFailedError $e, $time)
     {
         $this->failureCount++;
     }

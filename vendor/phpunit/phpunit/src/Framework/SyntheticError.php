@@ -8,13 +8,14 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\AssertionFailedError;
+
 /**
  * Creates a synthetic failed assertion.
  *
  * @since Class available since Release 3.5.0
  */
-class PHPUnit_Framework_SyntheticError extends PHPUnit_Framework_AssertionFailedError
-{
+class PHPUnit_Framework_SyntheticError extends AssertionFailedError {
     /**
      * The synthetic file.
      *

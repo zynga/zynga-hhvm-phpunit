@@ -8,8 +8,16 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\AssertionFailedError;
+use \PHPUnit_Framework_RiskyTestError;
+
+// --
+// JEO: Note, the comment here is misleading as it points to assertionfailederror,
+// yet extends riskytesterror, in the future we should determine what breaks
+// if we move it to not derive from risky test?
+// --
 /**
- * Extension to PHPUnit_Framework_AssertionFailedError to mark the special
+ * Extension to AssertionFailedError to mark the special
  * case of a test that does not execute the code it wants to cover.
  *
  * @since Class available since Release 5.2.0

@@ -5,10 +5,12 @@ namespace JohnKary\PHPUnit\Listener;
 use PHPUnit\Interfaces\TestListener;
 
 use \Exception;
+
+use PHPUnit\Exceptions\AssertionFailedError;
+
 use \PHPUnit_Framework_Test;
 use \PHPUnit_Framework_TestSuite;
 use \PHPUnit_Framework_TestCase;
-use \PHPUnit_Framework_AssertionFailedError;
 
 /**
  * A PHPUnit TestListener that exposes your slowest running tests by outputting
@@ -72,11 +74,11 @@ class SpeedTrapListener implements TestListener
     /**
      * A failure occurred.
      *
-     * @param PHPUnit_Framework_Test                 $test
-     * @param PHPUnit_Framework_AssertionFailedError $e
-     * @param float                                   $time
+     * @param PHPUnit_Framework_Test $test
+     * @param AssertionFailedError $e
+     * @param float $time
      */
-    public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e, float $time): void
+    public function addFailure(PHPUnit_Framework_Test $test, AssertionFailedError $e, float $time): void
     {
     }
 

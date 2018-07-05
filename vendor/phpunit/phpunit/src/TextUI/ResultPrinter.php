@@ -8,13 +8,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 use PHPUnit\Interfaces\TestListener;
 use SebastianBergmann\Environment\Console;
 use \PHPUnit_Util_Printer;
 
 use \PHPUnit_Framework_Test;
-use \PHPUnit_Framework_AssertionFailedError;
 use \PHPUnit_Framework_TestSuite;
 
 /**
@@ -443,10 +443,10 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements TestL
      * A failure occurred.
      *
      * @param PHPUnit_Framework_Test                 $test
-     * @param PHPUnit_Framework_AssertionFailedError $e
+     * @param AssertionFailedError $e
      * @param float                                  $time
      */
-    public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e, float $time): void
+    public function addFailure(PHPUnit_Framework_Test $test, AssertionFailedError $e, float $time): void
     {
         $this->writeProgressWithColor('bg-red, fg-white', 'F');
         $this->lastTestFailed = true;

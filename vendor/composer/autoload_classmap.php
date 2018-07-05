@@ -6,8 +6,9 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+  'PHPUnit\\Exceptions\\AssertionFailedError'  => $baseDir . '/src/PHPUnit/Exceptions/AssertionFailedError.hh',
   'PHPUnit\\Exceptions\\Exception'  => $baseDir . '/src/PHPUnit/Exceptions/Exception.hh',
-  
+
   'PHPUnit\\Framework\\AsyncRunner' => $baseDir . '/src/PHPUnit/Framework/AsyncRunner.hh',
 
   'PHPUnit\\Interfaces\\IncompleteTest' => $baseDir . '/src/PHPUnit/Interfaces/IncompleteTest.hh',
@@ -33,7 +34,6 @@ return array(
     'PHPUnit_Extensions_TestDecorator' => $vendorDir . '/phpunit/phpunit/src/Extensions/TestDecorator.php',
     'PHPUnit_Extensions_TicketListener' => $vendorDir . '/phpunit/phpunit/src/Extensions/TicketListener.php',
     'PHPUnit_Framework_Assert' => $vendorDir . '/phpunit/phpunit/src/Framework/Assert.php',
-    'PHPUnit_Framework_AssertionFailedError' => $vendorDir . '/phpunit/phpunit/src/Framework/AssertionFailedError.php',
     'PHPUnit_Framework_BaseTestListener' => $vendorDir . '/phpunit/phpunit/src/Framework/BaseTestListener.php',
     'PHPUnit_Framework_CodeCoverageException' => $vendorDir . '/phpunit/phpunit/src/Framework/CodeCoverageException.php',
     'PHPUnit_Framework_Constraint' => $vendorDir . '/phpunit/phpunit/src/Framework/Constraint.php',
