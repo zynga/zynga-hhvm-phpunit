@@ -1,4 +1,5 @@
-<?php
+<?hh // strict
+
 /*
  * This file is part of PHPUnit.
  *
@@ -8,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+namespace PHPUnit\Exceptions;
+
 use PHPUnit\Exceptions\AssertionFailedError;
 
 /**
@@ -15,27 +18,27 @@ use PHPUnit\Exceptions\AssertionFailedError;
  *
  * @since Class available since Release 3.5.0
  */
-class PHPUnit_Framework_SyntheticError extends AssertionFailedError {
+class SyntheticError extends AssertionFailedError {
     /**
      * The synthetic file.
      *
      * @var string
      */
-    protected $syntheticFile = '';
+    protected string $syntheticFile = '';
 
     /**
      * The synthetic line number.
      *
      * @var int
      */
-    protected $syntheticLine = 0;
+    protected int $syntheticLine = 0;
 
     /**
      * The synthetic trace.
      *
      * @var array
      */
-    protected $syntheticTrace = [];
+    protected Vector<mixed> $syntheticTrace = Vector {};
 
     /**
      * Constructor.
@@ -46,8 +49,7 @@ class PHPUnit_Framework_SyntheticError extends AssertionFailedError {
      * @param int    $line
      * @param array  $trace
      */
-    public function __construct($message, $code, $file, $line, $trace)
-    {
+    public function __construct(string $message, int $code, string $file, int $line, Vector<mixed> $trace) {
         parent::__construct($message, $code);
 
         $this->syntheticFile  = $file;
@@ -58,24 +60,22 @@ class PHPUnit_Framework_SyntheticError extends AssertionFailedError {
     /**
      * @return string
      */
-    public function getSyntheticFile()
-    {
+    public function getSyntheticFile(): string {
         return $this->syntheticFile;
     }
 
     /**
      * @return int
      */
-    public function getSyntheticLine()
-    {
+    public function getSyntheticLine(): int {
         return $this->syntheticLine;
     }
 
     /**
      * @return array
      */
-    public function getSyntheticTrace()
-    {
+    public function getSyntheticTrace(): Vector<mixed> {
         return $this->syntheticTrace;
     }
+    
 }

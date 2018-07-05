@@ -9,6 +9,7 @@
  */
 
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Exceptions\SyntheticError;
 
 /**
  * Utility class for code filtering.
@@ -40,8 +41,8 @@ class PHPUnit_Util_Filter
             $filteredStacktrace = [];
         }
 
-        if ($e instanceof PHPUnit_Framework_SyntheticError) {
-            $eTrace = $e->getSyntheticTrace();
+        if ($e instanceof SyntheticError) {
+            $eTrace = $e->getSyntheticTrace()->toArray();
             $eFile  = $e->getSyntheticFile();
             $eLine  = $e->getSyntheticLine();
         } elseif ($e instanceof PHPUnit_Exceptions_Exception) {
