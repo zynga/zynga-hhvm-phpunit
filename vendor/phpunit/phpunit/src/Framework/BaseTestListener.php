@@ -9,6 +9,7 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\Warning;
 use PHPUnit\Interfaces\TestListener;
 
 use \Exception;
@@ -31,7 +32,7 @@ abstract class PHPUnit_Framework_BaseTestListener implements TestListener
     {
     }
 
-    public function addWarning(PHPUnit_Framework_Test $test, PHPUnit_Framework_Warning $e, float $time): void
+    public function addWarning(PHPUnit_Framework_Test $test, Warning $e, float $time): void
     {
     }
 

@@ -7,17 +7,20 @@ $baseDir = dirname($vendorDir);
 
 return array(
   'PHPUnit\\Exceptions\\AssertionFailedError'  => $baseDir . '/src/PHPUnit/Exceptions/AssertionFailedError.hh',
+  'PHPUnit\\Framework\\CodeCoverageException' => $baseDir . '/src/PHPUnit/Exceptions/CodeCoverageException.hh',
   'PHPUnit\\Exceptions\\Error' => $baseDir . '/src/PHPUnit/Exceptions/Error.hh',
-  'PHPUnit\\Exceptions\\Error\\Deprecated' => $baseDir . '/src/Exceptions/Error/Deprecated.hh',
-  'PHPUnit\\Exceptions\\Error\\Notice' => $baseDir . '/src/Exceptions/Error/Notice.hh',
-  'PHPUnit\\Exceptions\\Error\\Warning' => $baseDir . '/src/Exceptions/Error/Warning.hh',
-
+  'PHPUnit\\Exceptions\\Error\\Deprecated' => $baseDir . '/src/PHPUnit/Exceptions/Error/Deprecated.hh',
+  'PHPUnit\\Exceptions\\Error\\Notice' => $baseDir . '/src/PHPUnit/Exceptions/Error/Notice.hh',
+  'PHPUnit\\Exceptions\\Error\\Warning' => $baseDir . '/src/PHPUnit/Exceptions/Error/Warning.hh',
   'PHPUnit\\Exceptions\\Exception'  => $baseDir . '/src/PHPUnit/Exceptions/Exception.hh',
+  'PHPUnit\\Exceptions\\InvalidCoversTargetException' => $baseDir . '/src/PHPUnit/Exceptions/InvalidCoversTargetException.hh',
+  'PHPUnit\\Exceptions\\Warning' => $baseDir . '/src/PHPUnit/Exceptions/Warning.hh',
 
   'PHPUnit\\Framework\\AsyncRunner' => $baseDir . '/src/PHPUnit/Framework/AsyncRunner.hh',
+  'PHPUnit\\Framework\\WarningTestCase' => $baseDir . '/src/PHPUnit/Framework/WarningTestCase.hh',
 
-  'PHPUnit\\Interfaces\\IncompleteTest' => $baseDir . '/src/PHPUnit/Interfaces/IncompleteTest.hh',
   'PHPUnit\\Interfaces\\Exception' => $baseDir . '/src/PHPUnit/Interfaces/Exception.hh',
+  'PHPUnit\\Interfaces\\IncompleteTest' => $baseDir . '/src/PHPUnit/Interfaces/IncompleteTest.hh',
   'PHPUnit\\Interfaces\\SkippedTest' => $baseDir . '/src/PHPUnit/Interfaces/SkippedTest.hh',
   'PHPUnit\\Interfaces\\TestListener' => $baseDir . '/src/PHPUnit/Interfaces/TestListener.hh',
 
@@ -40,7 +43,6 @@ return array(
     'PHPUnit_Extensions_TicketListener' => $vendorDir . '/phpunit/phpunit/src/Extensions/TicketListener.php',
     'PHPUnit_Framework_Assert' => $vendorDir . '/phpunit/phpunit/src/Framework/Assert.php',
     'PHPUnit_Framework_BaseTestListener' => $vendorDir . '/phpunit/phpunit/src/Framework/BaseTestListener.php',
-    'PHPUnit_Framework_CodeCoverageException' => $vendorDir . '/phpunit/phpunit/src/Framework/CodeCoverageException.php',
     'PHPUnit_Framework_Constraint' => $vendorDir . '/phpunit/phpunit/src/Framework/Constraint.php',
     'PHPUnit_Framework_Constraint_And' => $vendorDir . '/phpunit/phpunit/src/Framework/Constraint/And.php',
     'PHPUnit_Framework_Constraint_ArrayHasKey' => $vendorDir . '/phpunit/phpunit/src/Framework/Constraint/ArrayHasKey.php',
@@ -90,7 +92,6 @@ return array(
     'PHPUnit_Framework_ExpectationFailedException' => $vendorDir . '/phpunit/phpunit/src/Framework/ExpectationFailedException.php',
     'PHPUnit_Framework_IncompleteTestCase' => $vendorDir . '/phpunit/phpunit/src/Framework/IncompleteTestCase.php',
     'PHPUnit_Framework_IncompleteTestError' => $vendorDir . '/phpunit/phpunit/src/Framework/IncompleteTestError.php',
-    'PHPUnit_Framework_InvalidCoversTargetException' => $vendorDir . '/phpunit/phpunit/src/Framework/InvalidCoversTargetException.php',
     'PHPUnit_Framework_MissingCoversAnnotationException' => $vendorDir . '/phpunit/phpunit/src/Framework/PHPUnit_Framework_MissingCoversAnnotationException.php',
     'PHPUnit_Framework_MockObject_BadMethodCallException' => $vendorDir . '/phpunit/phpunit-mock-objects/src/Framework/MockObject/Exception/BadMethodCallException.php',
     'PHPUnit_Framework_MockObject_Builder_Identity' => $vendorDir . '/phpunit/phpunit-mock-objects/src/Framework/MockObject/Builder/Identity.php',
@@ -151,8 +152,6 @@ return array(
     'PHPUnit_Framework_TestSuite' => $vendorDir . '/phpunit/phpunit/src/Framework/TestSuite.php',
     'PHPUnit_Framework_TestSuite_DataProvider' => $vendorDir . '/phpunit/phpunit/src/Framework/TestSuite/DataProvider.php',
     'PHPUnit_Framework_UnintentionallyCoveredCodeError' => $vendorDir . '/phpunit/phpunit/src/Framework/UnintentionallyCoveredCodeError.php',
-    'PHPUnit_Framework_Warning' => $vendorDir . '/phpunit/phpunit/src/Framework/Warning.php',
-    'PHPUnit_Framework_WarningTestCase' => $vendorDir . '/phpunit/phpunit/src/Framework/WarningTestCase.php',
     'PHPUnit_Runner_BaseTestRunner' => $vendorDir . '/phpunit/phpunit/src/Runner/BaseTestRunner.php',
     'PHPUnit_Runner_Exception' => $vendorDir . '/phpunit/phpunit/src/Runner/Exception.php',
     'PHPUnit_Runner_Filter_Factory' => $vendorDir . '/phpunit/phpunit/src/Runner/Filter/Factory.php',

@@ -9,6 +9,9 @@
  */
 use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Exceptions\InvalidCoversTargetException;
+use PHPUnit\Exceptions\Warning;
+use PHPUnit\Framework\WarningTestCase;
 use PHPUnit\Interfaces\SkippedTest;
 use PHPUnit\Interfaces\IncompleteTest;
 use PHPUnit\Interfaces\TestListener;
@@ -275,12 +278,12 @@ class PHPUnit_Framework_TestResult implements Countable
      * The passed in exception caused the warning.
      *
      * @param PHPUnit_Framework_Test    $test
-     * @param PHPUnit_Framework_Warning $e
+     * @param Warning $e
      * @param float                     $time
      *
      * @since Method available since Release 5.1.0
      */
-    public function addWarning(PHPUnit_Framework_Test $test, PHPUnit_Framework_Warning $e, $time)
+    public function addWarning(PHPUnit_Framework_Test $test, Warning $e, $time)
     {
         if ($this->stopOnWarning) {
             $this->stop();
@@ -665,14 +668,14 @@ class PHPUnit_Framework_TestResult implements Countable
         }
 
         $collectCodeCoverage = $this->codeCoverage !== null &&
-                               !$test instanceof PHPUnit_Framework_WarningTestCase;
+                               !$test instanceof WarningTestCase;
 
         if ($collectCodeCoverage) {
             $this->codeCoverage->start($test);
         }
 
         $monitorFunctions = $this->beStrictAboutResourceUsageDuringSmallTests &&
-                            !$test instanceof PHPUnit_Framework_WarningTestCase &&
+                            !$test instanceof WarningTestCase &&
                             $test->getSize() == PHPUnit_Util_Test::SMALL &&
                             function_exists('xdebug_start_function_monitor');
 
@@ -683,7 +686,7 @@ class PHPUnit_Framework_TestResult implements Countable
         PHP_Timer::start();
 
         try {
-            if (!$test instanceof PHPUnit_Framework_WarningTestCase &&
+            if (!$test instanceof WarningTestCase &&
                 $test->getSize() != PHPUnit_Util_Test::UNKNOWN &&
                 $this->enforceTimeLimit &&
                 extension_loaded('pcntl') && class_exists('PHP_Invoker')) {
@@ -708,7 +711,7 @@ class PHPUnit_Framework_TestResult implements Countable
             }
 
         } catch (PHPUnit_Framework_MockObject_Exception $e) {
-            $e = new PHPUnit_Framework_Warning(
+            $e = new Warning(
                 $e->getMessage()
             );
 
@@ -723,7 +726,7 @@ class PHPUnit_Framework_TestResult implements Countable
             } elseif ($e instanceof PHPUnit_Framework_SkippedTestError) {
                 $skipped = true;
             }
-        } catch (PHPUnit_Framework_Warning $e) {
+        } catch (Warning $e) {
             $warning = true;
         } catch (PHPUnit_Exceptions_Exception $e) {
             $error = true;
@@ -784,10 +787,10 @@ class PHPUnit_Framework_TestResult implements Countable
                         $test->getName(false)
                     );
 
-                } catch (PHPUnit_Framework_InvalidCoversTargetException $cce) {
+                } catch (InvalidCoversTargetException $cce) {
                     $this->addWarning(
                         $test,
-                        new PHPUnit_Framework_Warning(
+                        new Warning(
                             $cce->getMessage()
                         ),
                         $time

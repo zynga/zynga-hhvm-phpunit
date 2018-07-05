@@ -10,6 +10,7 @@
 
 use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Exceptions\Warning;
 use PHPUnit\Interfaces\TestListener;
 
 /**
@@ -66,12 +67,12 @@ class PHPUnit_Util_Log_TAP extends PHPUnit_Util_Printer implements TestListener
      * A warning occurred.
      *
      * @param PHPUnit_Framework_Test    $test
-     * @param PHPUnit_Framework_Warning $e
+     * @param Warning $e
      * @param float                     $time
      *
      * @since Method available since Release 5.1.0
      */
-    public function addWarning(PHPUnit_Framework_Test $test, PHPUnit_Framework_Warning $e, $time)
+    public function addWarning(PHPUnit_Framework_Test $test, Warning $e, $time)
     {
         $this->writeNotOk($test, 'Warning');
     }

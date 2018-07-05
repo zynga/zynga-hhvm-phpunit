@@ -9,6 +9,8 @@
  */
 use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Exceptions\Warning;
+use PHPUnit\Framework\WarningTestCase;
 use PHPUnit\Interfaces\IncompleteTest;
 
 use SebastianBergmann\GlobalState\Snapshot;
@@ -802,7 +804,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
             $result = $this->createResult();
         }
 
-        if (!$this instanceof PHPUnit_Framework_WarningTestCase) {
+        if (!$this instanceof WarningTestCase) {
             $this->setTestResultObject($result);
             $this->setUseErrorHandlerFromAnnotation($test);
         }
@@ -812,7 +814,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
             $result->convertErrorsToExceptions($this->useErrorHandler);
         }
 
-        if (!$this instanceof PHPUnit_Framework_WarningTestCase && !$this->handleDependencies()) {
+        if (!$this instanceof WarningTestCase && !$this->handleDependencies()) {
             return;
         }
 
@@ -977,7 +979,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
             $this->assertPostConditions();
 
             if (!empty($this->warnings)) {
-                throw new PHPUnit_Framework_Warning(
+                throw new Warning(
                     implode(
                         "\n",
                         array_unique($this->warnings)
@@ -992,7 +994,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
         } catch (PHPUnit_Framework_SkippedTest $e) {
             $this->status        = PHPUnit_Runner_BaseTestRunner::STATUS_SKIPPED;
             $this->statusMessage = $e->getMessage();
-        } catch (PHPUnit_Framework_Warning $e) {
+        } catch (Warning $e) {
             $this->status        = PHPUnit_Runner_BaseTestRunner::STATUS_WARNING;
             $this->statusMessage = $e->getMessage();
         } catch (AssertionFailedError $e) {

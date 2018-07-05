@@ -10,10 +10,12 @@
  */
 use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Exceptions\Warning;
 use PHPUnit\Interfaces\TestListener;
-use SebastianBergmann\Environment\Console;
-use \PHPUnit_Util_Printer;
 
+use SebastianBergmann\Environment\Console;
+
+use \PHPUnit_Util_Printer;
 use \PHPUnit_Framework_Test;
 use \PHPUnit_Framework_TestSuite;
 
@@ -456,12 +458,12 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements TestL
      * A warning occurred.
      *
      * @param PHPUnit_Framework_Test    $test
-     * @param PHPUnit_Framework_Warning $e
+     * @param Warning $e
      * @param float                     $time
      *
      * @since Method available since Release 5.1.0
      */
-    public function addWarning(PHPUnit_Framework_Test $test, PHPUnit_Framework_Warning $e, $time)
+    public function addWarning(PHPUnit_Framework_Test $test, Warning $e, $time)
     {
         $this->writeProgressWithColor('fg-yellow, bold', 'W');
         $this->lastTestFailed = true;

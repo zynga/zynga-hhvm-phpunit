@@ -9,6 +9,8 @@
  */
 
 use PHPUnit\Exceptions\AssertionFailedError;
+use PHPUnit\Exceptions\Warning;
+use PHPUnit\Framework\WarningTestCase;
 use PHPUnit\Interfaces\TestListener;
 
 /**
@@ -136,12 +138,12 @@ abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer i
      * A warning occurred.
      *
      * @param PHPUnit_Framework_Test    $test
-     * @param PHPUnit_Framework_Warning $e
+     * @param Warning $e
      * @param float                     $time
      *
      * @since Method available since Release 5.1.0
      */
-    public function addWarning(PHPUnit_Framework_Test $test, PHPUnit_Framework_Warning $e, $time)
+    public function addWarning(PHPUnit_Framework_Test $test, Warning $e, $time)
     {
         if (!$this->isOfInterest($test)) {
             return;
@@ -388,7 +390,7 @@ abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer i
             return false;
         }
 
-        if ($test instanceof PHPUnit_Framework_WarningTestCase) {
+        if ($test instanceof WarningTestCase) {
             return false;
         }
 

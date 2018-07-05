@@ -1,4 +1,5 @@
-<?php
+<?hh // strict
+
 /*
  * This file is part of PHPUnit.
  *
@@ -8,22 +9,23 @@
  * file that was distributed with this source code.
  */
 
+namespace PHPUnit\Exceptions;
+
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use \PHPUnit_Framework_SelfDescribing;
 
 /**
  * Thrown when an there is a warning.
  *
  * @since Class available since Release 5.0.0
  */
-class PHPUnit_Framework_Warning extends PHPUnit_Exceptions_Exception implements PHPUnit_Framework_SelfDescribing
-{
+class Warning extends PHPUnit_Exceptions_Exception implements PHPUnit_Framework_SelfDescribing {
     /**
      * Wrapper for getMessage() which is declared as final.
      *
      * @return string
      */
-    public function toString()
-    {
+    public function toString(): string {
         return $this->getMessage();
     }
 }

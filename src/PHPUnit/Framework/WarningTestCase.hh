@@ -1,4 +1,5 @@
-<?php
+<?hh // strict
+
 /*
  * This file is part of PHPUnit.
  *
@@ -8,45 +9,48 @@
  * file that was distributed with this source code.
  */
 
+namespace PHPUnit\Framework;
+
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Exceptions\Warning as WarningException;
+
+use \PHPUnit_Framework_TestCase;
 
 /**
  * A warning.
  *
  * @since Class available since Release 2.0.0
  */
-class PHPUnit_Framework_WarningTestCase extends PHPUnit_Framework_TestCase
-{
+class WarningTestCase extends PHPUnit_Framework_TestCase {
     /**
      * @var string
      */
-    protected $message = '';
+    protected string $message = '';
 
     /**
      * @var bool
      */
-    protected $backupGlobals = false;
+    protected ?bool $backupGlobals = false;
 
     /**
      * @var bool
      */
-    protected $backupStaticAttributes = false;
+    protected ?bool $backupStaticAttributes = false;
 
     /**
      * @var bool
      */
-    protected $runTestInSeparateProcess = false;
+    protected ?bool $runTestInSeparateProcess = false;
 
     /**
      * @var bool
      */
-    protected $useErrorHandler = false;
+    protected bool $useErrorHandler = false;
 
     /**
      * @param string $message
      */
-    public function __construct($message = '')
-    {
+    public function __construct(string $message = '') {
         $this->message = $message;
         parent::__construct('Warning');
     }
@@ -54,9 +58,8 @@ class PHPUnit_Framework_WarningTestCase extends PHPUnit_Framework_TestCase
     /**
      * @throws PHPUnit_Exceptions_Exception
      */
-    protected function runTest()
-    {
-        throw new PHPUnit_Framework_Warning($this->message);
+    protected function runTest(): void {
+        throw new WarningException($this->message);
     }
 
     /**
@@ -64,8 +67,7 @@ class PHPUnit_Framework_WarningTestCase extends PHPUnit_Framework_TestCase
      *
      * @since Method available since Release 3.0.0
      */
-    public function getMessage()
-    {
+    public function getMessage(): string {
         return $this->message;
     }
 
@@ -76,8 +78,8 @@ class PHPUnit_Framework_WarningTestCase extends PHPUnit_Framework_TestCase
      *
      * @since Method available since Release 3.4.0
      */
-    public function toString()
-    {
+    public function toString(): string {
         return 'Warning';
     }
+
 }

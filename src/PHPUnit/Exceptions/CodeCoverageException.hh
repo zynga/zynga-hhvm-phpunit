@@ -1,4 +1,5 @@
-<?php
+<?hh // strict
+
 /*
  * This file is part of PHPUnit.
  *
@@ -8,9 +9,12 @@
  * file that was distributed with this source code.
  */
 
+namespace PHPUnit\Exceptions;
+
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+
 /**
  * @since Class available since Release 4.0.0
  */
-class PHPUnit_Framework_InvalidCoversTargetException extends PHPUnit_Framework_CodeCoverageException
-{
+class CodeCoverageException extends PHPUnit_Exceptions_Exception {
 }

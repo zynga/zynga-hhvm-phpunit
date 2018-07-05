@@ -8,9 +8,10 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\AssertionFailedError;
+use PHPUnit\Framework\WarningTestCase;
 use PHPUnit\Interfaces\TestListener;
 
-use PHPUnit\Exceptions\AssertionFailedError;
 
 /**
  * Base class for test listeners that interact with an issue tracker.
@@ -117,7 +118,7 @@ abstract class PHPUnit_Extensions_TicketListener implements TestListener
      */
     public function startTest(PHPUnit_Framework_Test $test)
     {
-        if (!$test instanceof PHPUnit_Framework_WarningTestCase) {
+        if (!$test instanceof WarningTestCase) {
             if ($this->ran) {
                 return;
             }
@@ -141,7 +142,7 @@ abstract class PHPUnit_Extensions_TicketListener implements TestListener
      */
     public function endTest(PHPUnit_Framework_Test $test, $time)
     {
-        if (!$test instanceof PHPUnit_Framework_WarningTestCase) {
+        if (!$test instanceof WarningTestCase) {
             if ($test->getStatus() == PHPUnit_Runner_BaseTestRunner::STATUS_PASSED) {
                 $ifStatus   = ['assigned', 'new', 'reopened'];
                 $newStatus  = 'closed';

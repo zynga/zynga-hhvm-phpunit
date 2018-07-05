@@ -9,6 +9,7 @@
  */
 
 use PHPUnit\Exceptions\AssertionFailedError;
+use PHPUnit\Exceptions\Warning;
 
 /**
  * @since      Class available since Release 2.0.0
@@ -31,7 +32,7 @@ class Framework_TestListenerTest extends PHPUnit_Framework_TestCase implements P
         $this->errorCount++;
     }
 
-    public function addWarning(PHPUnit_Framework_Test $test, PHPUnit_Framework_Warning $e, $time)
+    public function addWarning(PHPUnit_Framework_Test $test, Warning $e, $time)
     {
         $this->warningCount++;
     }

@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\CodeCoverageException;
+use PHPUnit\Exceptions\InvalidCoversTargetException;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 
 /**
@@ -66,7 +68,7 @@ class PHPUnit_Util_Test
      *
      * @return array|bool
      *
-     * @throws PHPUnit_Framework_CodeCoverageException
+     * @throws CodeCoverageException
      *
      * @since Method available since Release 4.0.0
      */
@@ -107,7 +109,7 @@ class PHPUnit_Util_Test
      *
      * @return array
      *
-     * @throws PHPUnit_Framework_CodeCoverageException
+     * @throws CodeCoverageException
      *
      * @since Method available since Release 4.2.0
      */
@@ -122,7 +124,7 @@ class PHPUnit_Util_Test
 
         if (!empty($annotations['class'][$mode . 'DefaultClass'])) {
             if (count($annotations['class'][$mode . 'DefaultClass']) > 1) {
-                throw new PHPUnit_Framework_CodeCoverageException(
+                throw new CodeCoverageException(
                     sprintf(
                         'More than one @%sClass annotation in class or interface "%s".',
                         $mode,
@@ -944,7 +946,7 @@ class PHPUnit_Util_Test
      *
      * @return array
      *
-     * @throws PHPUnit_Framework_InvalidCoversTargetException
+     * @throws InvalidCoversTargetException
      *
      * @since Method available since Release 4.0.0
      */
@@ -964,7 +966,7 @@ class PHPUnit_Util_Test
                     if (!class_exists($className) &&
                         !interface_exists($className) &&
                         !trait_exists($className)) {
-                        throw new PHPUnit_Framework_InvalidCoversTargetException(
+                        throw new InvalidCoversTargetException(
                             sprintf(
                                 'Trying to @cover or @use not existing class or ' .
                                 'interface "%s".',
@@ -1006,7 +1008,7 @@ class PHPUnit_Util_Test
                                interface_exists($className) ||
                                trait_exists($className)) &&
                               method_exists($className, $methodName))) {
-                            throw new PHPUnit_Framework_InvalidCoversTargetException(
+                            throw new InvalidCoversTargetException(
                                 sprintf(
                                     'Trying to @cover or @use not existing method "%s::%s".',
                                     $className,
@@ -1044,7 +1046,7 @@ class PHPUnit_Util_Test
                 if (!class_exists($className) &&
                     !interface_exists($className) &&
                     !trait_exists($className)) {
-                    throw new PHPUnit_Framework_InvalidCoversTargetException(
+                    throw new InvalidCoversTargetException(
                         sprintf(
                             'Trying to @cover or @use not existing class or ' .
                             'interface "%s".',

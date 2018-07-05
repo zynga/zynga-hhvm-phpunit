@@ -14,6 +14,7 @@ namespace PHPUnit\Interfaces;
 use \Exception;
 
 use PHPUnit\Exceptions\AssertionFailedError;
+use PHPUnit\Exceptions\Warning;
 
 use \PHPUnit_Framework_Test;
 use \PHPUnit_Framework_TestSuite;
@@ -38,7 +39,7 @@ interface TestListener
      * A warning occurred.
      *
      * @param PHPUnit_Framework_Test    $test
-     * @param PHPUnit_Framework_Warning $e
+     * @param Warning $e
      * @param float                     $time
      *
      * @since Method available since Release 6.0.0
@@ -47,7 +48,7 @@ interface TestListener
      *
      * @see   https://github.com/sebastianbergmann/phpunit/pull/1840#issuecomment-162535997
      */
-//  public function addWarning(PHPUnit_Framework_Test $test, PHPUnit_Framework_Warning $e, $time);
+//  public function addWarning(PHPUnit_Framework_Test $test, Warning $e, $time);
 
     /**
      * A failure occurred.

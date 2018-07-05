@@ -16,9 +16,9 @@ if (!defined('TEST_FILES_PATH')) {
     );
 }
 
-require TEST_FILES_PATH . 'CoverageNamespacedFunctionTest.php';
 require TEST_FILES_PATH . 'NamespaceCoveredFunction.php';
 
+use PHPUnit\Exceptions\CodeCoverageException;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 /**
  * @since      Class available since Release 3.3.6
@@ -603,7 +603,7 @@ class Util_TestTest extends PHPUnit_Framework_TestCase
      * @covers            PHPUnit_Util_Test::getLinesToBeCovered
      * @covers            PHPUnit_Util_Test::getLinesToBeCoveredOrUsed
      * @covers            PHPUnit_Util_Test::resolveElementToReflectionObjects
-     * @expectedException PHPUnit_Framework_CodeCoverageException
+     * @expectedException CodeCoverageException
      */
     public function testGetLinesToBeCovered2()
     {
@@ -616,7 +616,7 @@ class Util_TestTest extends PHPUnit_Framework_TestCase
      * @covers            PHPUnit_Util_Test::getLinesToBeCovered
      * @covers            PHPUnit_Util_Test::getLinesToBeCoveredOrUsed
      * @covers            PHPUnit_Util_Test::resolveElementToReflectionObjects
-     * @expectedException PHPUnit_Framework_CodeCoverageException
+     * @expectedException CodeCoverageException
      */
     public function testGetLinesToBeCovered3()
     {
@@ -629,7 +629,7 @@ class Util_TestTest extends PHPUnit_Framework_TestCase
      * @covers            PHPUnit_Util_Test::getLinesToBeCovered
      * @covers            PHPUnit_Util_Test::getLinesToBeCoveredOrUsed
      * @covers            PHPUnit_Util_Test::resolveElementToReflectionObjects
-     * @expectedException PHPUnit_Framework_CodeCoverageException
+     * @expectedException CodeCoverageException
      */
     public function testGetLinesToBeCovered4()
     {
@@ -656,7 +656,7 @@ class Util_TestTest extends PHPUnit_Framework_TestCase
     /**
      * @covers            PHPUnit_Util_Test::getLinesToBeCovered
      * @covers            PHPUnit_Util_Test::getLinesToBeCoveredOrUsed
-     * @expectedException PHPUnit_Framework_CodeCoverageException
+     * @expectedException CodeCoverageException
      */
     public function testTwoCoversDefaultClassAnnoationsAreNotAllowed()
     {
