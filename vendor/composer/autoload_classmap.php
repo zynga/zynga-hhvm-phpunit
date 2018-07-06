@@ -35,7 +35,9 @@ return array(
   'PHPUnit\\Interfaces\\SkippedTest' => $baseDir . '/src/PHPUnit/Interfaces/SkippedTest.hh',
   'PHPUnit\\Interfaces\\TestListener' => $baseDir . '/src/PHPUnit/Interfaces/TestListener.hh',
 
+  'PHPUnit\\Util\\UtilTestSuiteIterator' => $baseDir . '/src/PHPUnit/Util/UtilTestSuiteIterator.hh',
   'PHPUnit\\Util\\UtilString' => $baseDir . '/src/PHPUnit/Util/UtilString.hh',
+  'PHPUnit\\Util\\UtilType' => $baseDir . '/src/PHPUnit/Util/UtilType.hh',
   'PHPUnit\\Util\\UtilXML' => $baseDir . '/src/PHPUnit/Util/UtilXML.hh',
 
     // JEO: TBD if we will ever re-enable this source caching system.
@@ -193,8 +195,6 @@ return array(
     'PHPUnit_Util_TestDox_ResultPrinter_HTML' => $vendorDir . '/phpunit/phpunit/src/Util/TestDox/ResultPrinter/HTML.php',
     'PHPUnit_Util_TestDox_ResultPrinter_Text' => $vendorDir . '/phpunit/phpunit/src/Util/TestDox/ResultPrinter/Text.php',
     'PHPUnit_Util_TestDox_ResultPrinter_XML' => $vendorDir . '/phpunit/phpunit/src/Util/TestDox/ResultPrinter/XML.php',
-    'PHPUnit_Util_TestSuiteIterator' => $vendorDir . '/phpunit/phpunit/src/Util/TestSuiteIterator.php',
-    'PHPUnit_Util_Type' => $vendorDir . '/phpunit/phpunit/src/Util/Type.php',
     'PHP_Timer' => $vendorDir . '/phpunit/php-timer/src/Timer.php',
     'PHP_Token' => $vendorDir . '/phpunit/php-token-stream/src/Token.php',
     'PHP_TokenWithScope' => $vendorDir . '/phpunit/php-token-stream/src/Token.php',

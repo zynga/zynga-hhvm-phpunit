@@ -13,6 +13,7 @@ use PHPUnit\Exceptions\IncompleteTestError;
 use PHPUnit\Exceptions\SkippedTestError;
 use PHPUnit\Framework\AsyncRunner;
 use PHPUnit\Framework\WarningTestCase;
+use PHPUnit\Util\UtilTestSuiteIterator;
 
 use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
 
@@ -1048,7 +1049,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      */
     public function getIterator()
     {
-        $iterator = new PHPUnit_Util_TestSuiteIterator($this);
+        $iterator = new UtilTestSuiteIterator($this);
 
         if ($this->iteratorFilter !== null) {
             $iterator = $this->iteratorFilter->factory($iterator, $this);

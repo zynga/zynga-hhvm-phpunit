@@ -12,7 +12,9 @@ use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 use PHPUnit\Exceptions\IncompleteTestError;
 use PHPUnit\Exceptions\SkippedTestError;
+use PHPUnit\Util\UtilType;
 use PHPUnit\Util\UtilXML;
+
 /**
  * A set of assert methods.
  *
@@ -281,7 +283,7 @@ abstract class PHPUnit_Framework_Assert
         }
 
         if ($isNativeType == null) {
-            $isNativeType = PHPUnit_Util_Type::isType($type);
+            $isNativeType = UtilType::isType($type);
         }
 
         static::assertThat(
@@ -364,7 +366,7 @@ abstract class PHPUnit_Framework_Assert
         }
 
         if ($isNativeType == null) {
-            $isNativeType = PHPUnit_Util_Type::isType($type);
+            $isNativeType = UtilType::isType($type);
         }
 
         static::assertThat(

@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Util\UtilTestSuiteIterator;
+
 /**
  * We have a TestSuite object A.
  * In TestSuite object A we have Tests tagged with @group.
@@ -36,7 +38,7 @@ class PHPUnit_Extensions_GroupTestSuite extends PHPUnit_Framework_TestSuite
         }
 
         $tests = new RecursiveIteratorIterator(
-            new PHPUnit_Util_TestSuiteIterator($suite),
+            new UtilTestSuiteIterator($suite),
             RecursiveIteratorIterator::LEAVES_ONLY
         );
 
