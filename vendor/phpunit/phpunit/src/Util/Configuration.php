@@ -9,6 +9,7 @@
  */
 
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Util\UtilXML;
 
 /**
  * Wrapper for the PHPUnit XML configuration file.
@@ -158,7 +159,7 @@ class PHPUnit_Util_Configuration
     protected function __construct($filename)
     {
         $this->filename = $filename;
-        $this->document = PHPUnit_Util_XML::loadFile($filename, false, true, true);
+        $this->document = UtilXML::loadFile($filename, false, true, true);
         $this->xpath    = new DOMXPath($this->document);
     }
 
@@ -346,7 +347,7 @@ class PHPUnit_Util_Configuration
                             $argument->tagName == 'directory') {
                                 $arguments[] = $this->toAbsolutePath((string) $argument->textContent);
                             } else {
-                                $arguments[] = PHPUnit_Util_XML::xmlToVariable($argument);
+                                $arguments[] = UtilXML::xmlToVariable($argument);
                             }
                         }
                     }

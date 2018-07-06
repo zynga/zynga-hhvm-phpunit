@@ -11,6 +11,7 @@
 use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Exceptions\Warning;
 use PHPUnit\Interfaces\TestListener;
+use PHPUnit\Util\UtilXML;
 
 /**
  * A TestListener that generates a logfile of the test execution in XML markup.
@@ -170,7 +171,7 @@ class PHPUnit_Util_Log_JUnit extends PHPUnit_Util_Printer implements TestListene
         if ($this->logIncompleteSkipped && $this->currentTestCase !== null) {
             $error = $this->document->createElement(
                 'error',
-                PHPUnit_Util_XML::prepareString(
+                UtilXML::prepareString(
                     "Incomplete Test\n" .
                     PHPUnit_Util_Filter::getFilteredStacktrace($e)
                 )
@@ -200,7 +201,7 @@ class PHPUnit_Util_Log_JUnit extends PHPUnit_Util_Printer implements TestListene
         if ($this->logIncompleteSkipped && $this->currentTestCase !== null) {
             $error = $this->document->createElement(
                 'error',
-                PHPUnit_Util_XML::prepareString(
+                UtilXML::prepareString(
                     "Risky Test\n" .
                     PHPUnit_Util_Filter::getFilteredStacktrace($e)
                 )
@@ -230,7 +231,7 @@ class PHPUnit_Util_Log_JUnit extends PHPUnit_Util_Printer implements TestListene
         if ($this->logIncompleteSkipped && $this->currentTestCase !== null) {
             $error = $this->document->createElement(
                 'error',
-                PHPUnit_Util_XML::prepareString(
+                UtilXML::prepareString(
                     "Skipped Test\n" .
                     PHPUnit_Util_Filter::getFilteredStacktrace($e)
                 )
@@ -453,7 +454,7 @@ class PHPUnit_Util_Log_JUnit extends PHPUnit_Util_Printer implements TestListene
 
         $fault = $this->document->createElement(
             $type,
-            PHPUnit_Util_XML::prepareString($buffer)
+            UtilXML::prepareString($buffer)
         );
 
         $fault->setAttribute('type', get_class($e));

@@ -1,4 +1,5 @@
-<?php
+<?hh // strict
+
 /*
  * This file is part of PHPUnit.
  *
@@ -8,13 +9,14 @@
  * file that was distributed with this source code.
  */
 
+namespace PHPUnit\Util;
+
 /**
  * String helpers.
  *
  * @since Class available since Release 3.6.0
  */
-class PHPUnit_Util_String
-{
+class UtilString {
     /**
      * Converts a string to UTF-8 encoding.
      *
@@ -22,8 +24,7 @@ class PHPUnit_Util_String
      *
      * @return string
      */
-    public static function convertToUtf8($string)
-    {
+    public static function convertToUtf8(string $string): string {
         if (!self::isUtf8($string)) {
             if (function_exists('mb_convert_encoding')) {
                 $string = mb_convert_encoding($string, 'UTF-8');
@@ -42,8 +43,7 @@ class PHPUnit_Util_String
      *
      * @return bool
      */
-    protected static function isUtf8($string)
-    {
+    protected static function isUtf8(string $string): bool {
         $length = strlen($string);
 
         for ($i = 0; $i < $length; $i++) {

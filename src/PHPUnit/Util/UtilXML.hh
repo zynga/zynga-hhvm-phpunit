@@ -1,4 +1,5 @@
-<?php
+<?hh // strict
+
 /*
  * This file is part of PHPUnit.
  *
@@ -8,15 +9,25 @@
  * file that was distributed with this source code.
  */
 
+namespace PHPUnit\Util;
+
+use \DOMCharacterData;
+use \DOMElement;
+use \DOMDocument;
+use \DOMNode;
+use \DOMText;
+
+use \ReflectionClass;
+
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Util\UtilString;
 
 /**
  * XML helpers.
  *
  * @since Class available since Release 3.2.0
  */
-class PHPUnit_Util_XML
-{
+class UtilXML {
     /**
      * Load an $actual document into a DOMDocument.  This is called
      * from the selector assertions.
@@ -41,8 +52,10 @@ class PHPUnit_Util_XML
      *
      * @since Method available since Release 3.3.0
      */
-    public static function load($actual, $isHtml = false, $filename = '', $xinclude = false, $strict = false)
+    public static function load(mixed $actual, bool $isHtml = false, string $filename = '',
+      bool $xinclude = false, bool $strict = false): DOMDocument
     {
+      $cwd = null;
         if ($actual instanceof DOMDocument) {
             return $actual;
         }
@@ -61,7 +74,7 @@ class PHPUnit_Util_XML
             @chdir(dirname($filename));
         }
 
-        $document                     = new DOMDocument;
+        $document                     = new DOMDocument();
         $document->preserveWhiteSpace = false;
 
         $internal  = libxml_use_internal_errors(true);
@@ -126,7 +139,7 @@ class PHPUnit_Util_XML
      *
      * @since Method available since Release 3.3.0
      */
-    public static function loadFile($filename, $isHtml = false, $xinclude = false, $strict = false)
+    public static function loadFile(string $filename, bool $isHtml = false, bool $xinclude = false, bool $strict = false): DOMDocument
     {
         $reporting = error_reporting(0);
         $contents  = file_get_contents($filename);
@@ -149,7 +162,7 @@ class PHPUnit_Util_XML
      *
      * @since Method available since Release 3.3.0
      */
-    public static function removeCharacterDataNodes(DOMNode $node)
+    public static function removeCharacterDataNodes(DOMNode $node): void
     {
         if ($node->hasChildNodes()) {
             for ($i = $node->childNodes->length - 1; $i >= 0; $i--) {
@@ -172,13 +185,12 @@ class PHPUnit_Util_XML
      *
      * @since Method available since Release 3.4.6
      */
-    public static function prepareString($string)
-    {
+    public static function prepareString(string $string): string {
         return preg_replace(
             '/[\\x00-\\x08\\x0b\\x0c\\x0e-\\x1f\\x7f]/',
             '',
             htmlspecialchars(
-                PHPUnit_Util_String::convertToUtf8($string),
+                UtilString::convertToUtf8($string),
                 ENT_QUOTES,
                 'UTF-8'
             )
@@ -194,12 +206,13 @@ class PHPUnit_Util_XML
      *
      * @since Method available since Release 3.4.0
      */
-    public static function xmlToVariable(DOMElement $element)
-    {
+    public static function xmlToVariable(DOMElement $element): mixed {
         $variable = null;
 
         switch ($element->tagName) {
             case 'array':
+
+                $offset = 0;
                 $variable = [];
 
                 foreach ($element->getElementsByTagName('element') as $element) {
@@ -214,7 +227,8 @@ class PHPUnit_Util_XML
                     if ($element->hasAttribute('key')) {
                         $variable[(string) $element->getAttribute('key')] = $value;
                     } else {
-                        $variable[] = $value;
+                        $variable[$offset] = $value;
+                        $offset++;
                     }
                 }
                 break;
@@ -235,7 +249,8 @@ class PHPUnit_Util_XML
                     $class    = new ReflectionClass($className);
                     $variable = $class->newInstanceArgs($constructorArgs);
                 } else {
-                    $variable = new $className;
+                    $class = new ReflectionClass($className);
+                    $variable = $class->newInstance();
                 }
                 break;
 

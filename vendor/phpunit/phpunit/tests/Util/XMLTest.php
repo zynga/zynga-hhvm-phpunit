@@ -9,10 +9,11 @@
  */
 
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Util\UtilXML;
 
 /**
  * @since      Class available since Release 3.3.0
- * @covers     PHPUnit_Util_XML
+ * @covers     UtilXML
  */
 class Util_XMLTest extends PHPUnit_Framework_TestCase
 {
@@ -23,7 +24,7 @@ class Util_XMLTest extends PHPUnit_Framework_TestCase
     {
         $e = null;
 
-        $escapedString = PHPUnit_Util_XML::prepareString($char);
+        $escapedString = UtilXML::prepareString($char);
         $xml           = "<?xml version='1.0' encoding='UTF-8' ?><tag>$escapedString</tag>";
         $dom           = new DomDocument('1.0', 'UTF-8');
 
@@ -33,7 +34,7 @@ class Util_XMLTest extends PHPUnit_Framework_TestCase
         }
 
         $this->assertNull($e, sprintf(
-            'PHPUnit_Util_XML::prepareString("\x%02x") should not crash DomDocument',
+            'UtilXML::prepareString("\x%02x") should not crash DomDocument',
             ord($char)
         ));
     }
@@ -55,7 +56,7 @@ class Util_XMLTest extends PHPUnit_Framework_TestCase
      */
     public function testLoadEmptyString()
     {
-        PHPUnit_Util_XML::load('');
+        UtilXML::load('');
     }
 
     /**
@@ -64,7 +65,7 @@ class Util_XMLTest extends PHPUnit_Framework_TestCase
      */
     public function testLoadArray()
     {
-        PHPUnit_Util_XML::load([1, 2, 3]);
+        UtilXML::load([1, 2, 3]);
     }
 
     /**
@@ -73,6 +74,6 @@ class Util_XMLTest extends PHPUnit_Framework_TestCase
      */
     public function testLoadBoolean()
     {
-        PHPUnit_Util_XML::load(false);
+        UtilXML::load(false);
     }
 }

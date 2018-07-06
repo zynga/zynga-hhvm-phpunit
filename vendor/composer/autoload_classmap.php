@@ -35,6 +35,9 @@ return array(
   'PHPUnit\\Interfaces\\SkippedTest' => $baseDir . '/src/PHPUnit/Interfaces/SkippedTest.hh',
   'PHPUnit\\Interfaces\\TestListener' => $baseDir . '/src/PHPUnit/Interfaces/TestListener.hh',
 
+  'PHPUnit\\Util\\UtilString' => $baseDir . '/src/PHPUnit/Util/UtilString.hh',
+  'PHPUnit\\Util\\UtilXML' => $baseDir . '/src/PHPUnit/Util/UtilXML.hh',
+
     // JEO: TBD if we will ever re-enable this source caching system.
     'Zynga\\Source\\Cache' => $vendorDir . '/phpunit/php-source-cache/src/Source/Cache.hh',
     'Zynga\\Source\\Cache\\File' => $vendorDir . '/phpunit/php-source-cache/src/Source/Cache/File.hh',
@@ -184,7 +187,6 @@ return array(
     'PHPUnit_Util_PHP_Windows' => $vendorDir . '/phpunit/phpunit/src/Util/PHP/Windows.php',
     'PHPUnit_Util_Printer' => $vendorDir . '/phpunit/phpunit/src/Util/Printer.php',
     'PHPUnit_Util_Regex' => $vendorDir . '/phpunit/phpunit/src/Util/Regex.php',
-    'PHPUnit_Util_String' => $vendorDir . '/phpunit/phpunit/src/Util/String.php',
     'PHPUnit_Util_Test' => $vendorDir . '/phpunit/phpunit/src/Util/Test.php',
     'PHPUnit_Util_TestDox_NamePrettifier' => $vendorDir . '/phpunit/phpunit/src/Util/TestDox/NamePrettifier.php',
     'PHPUnit_Util_TestDox_ResultPrinter' => $vendorDir . '/phpunit/phpunit/src/Util/TestDox/ResultPrinter.php',
@@ -193,7 +195,6 @@ return array(
     'PHPUnit_Util_TestDox_ResultPrinter_XML' => $vendorDir . '/phpunit/phpunit/src/Util/TestDox/ResultPrinter/XML.php',
     'PHPUnit_Util_TestSuiteIterator' => $vendorDir . '/phpunit/phpunit/src/Util/TestSuiteIterator.php',
     'PHPUnit_Util_Type' => $vendorDir . '/phpunit/phpunit/src/Util/Type.php',
-    'PHPUnit_Util_XML' => $vendorDir . '/phpunit/phpunit/src/Util/XML.php',
     'PHP_Timer' => $vendorDir . '/phpunit/php-timer/src/Timer.php',
     'PHP_Token' => $vendorDir . '/phpunit/php-token-stream/src/Token.php',
     'PHP_TokenWithScope' => $vendorDir . '/phpunit/php-token-stream/src/Token.php',
