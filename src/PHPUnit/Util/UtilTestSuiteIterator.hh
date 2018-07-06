@@ -26,27 +26,25 @@ use \PHPUnit_Framework_TestSuite;
  * @since Class available since Release 3.1.0
  */
 // JEO: removed => implements RecursiveIterator<PHPUnit_Framework_Test>
-class UtilTestSuiteIterator  {
-    /**
-     * @var int
-     */
-    protected int $position;
+class UtilTestSuiteIterator  implements Iterator<PHPUnit_Framework_Test> {
 
     /**
      * @var PHPUnit_Framework_Test[]
      */
     protected Vector<PHPUnit_Framework_Test> $tests;
+    protected KeyedIterator<int, PHPUnit_Framework_Test> $testIterator;
 
     /**
      * @param PHPUnit_Framework_TestSuite $testSuite
      */
     public function __construct(PHPUnit_Framework_TestSuite $testSuite) {
-      $this->position = 0;
       $this->tests = Vector {};
 
       foreach ( $testSuite->tests() as $test ) {
         $this->tests->add($test);
       }
+
+      $this->testIterator = $this->tests->getIterator();
 
     }
 
@@ -54,7 +52,7 @@ class UtilTestSuiteIterator  {
      * Rewinds the Iterator to the first element.
      */
     public function rewind(): void {
-      $this->position = 0;
+      $this->testIterator->rewind();
     }
 
     /**
@@ -63,7 +61,8 @@ class UtilTestSuiteIterator  {
      * @return bool
      */
     public function valid(): bool {
-      return $this->position < $this->tests->count();
+      $valid = $this->testIterator->valid();
+      return $valid;
     }
 
     /**
@@ -72,7 +71,8 @@ class UtilTestSuiteIterator  {
      * @return int
      */
     public function key(): int {
-        return $this->position;
+      $pos = $this->testIterator->key();
+      return $pos;
     }
 
     /**
@@ -80,18 +80,16 @@ class UtilTestSuiteIterator  {
      *
      * @return PHPUnit_Framework_Test
      */
-    public function current(): ?PHPUnit_Framework_Test {
-      if ( $this->valid() === true ) {
-        return $this->tests[$this->position];
-      }
-      return null;
+    public function current(): PHPUnit_Framework_Test {
+      $elem = $this->testIterator->current();
+      return $elem;
     }
 
     /**
      * Moves forward to next element.
      */
     public function next(): void {
-      $this->position++;
+      $this->testIterator->next();
     }
 
     /**
@@ -99,32 +97,45 @@ class UtilTestSuiteIterator  {
      *
      * @return UtilTestSuiteIterator
      */
-    public function getChildren(): ?UtilTestSuiteIterator {
+    /*
+    public function getChildren(): this {
+      return $this;
+      /*
+      $children = null;
 
       $elem = $this->current();
 
       if ( $elem instanceof PHPUnit_Framework_TestSuite ) {
-        return new self($elem);
+        $children = new UtilTestSuiteIterator($elem);
+      } else {
+        $children = new UtilTestSuiteIterator(new PHPUnit_Framework_TestSuite('', ''));
       }
 
-      return null;
-
+      error_log('JEO getChildren elem=' . get_class($elem) . ' children=' . json_encode($children));
+      return $children;
     }
+    */
 
     /**
      * Checks whether the current element has children.
      *
      * @return bool
      */
-    public function hasChildren(): bool{
+    /*
+    public function hasChildren(): bool {
+
+      $hasChildren = false;
+
       $elem = $this->current();
 
       if ( $elem instanceof PHPUnit_Framework_TestSuite ) {
-        return true;
+        $hasChildren = true;
       }
 
-      return false;
+      error_log('JEO hasChildren elem=' . get_class($elem) . ' hasChildren=' . json_encode($hasChildren));
+      return $hasChildren;
 
     }
+    */
 
 }
