@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\ExpectationFailedException;
+
 /**
  * Invocation matcher which looks for specific parameters in the invocations.
  *
@@ -30,7 +32,7 @@ class PHPUnit_Framework_MockObject_Matcher_Parameters extends PHPUnit_Framework_
     protected $invocation;
 
     /**
-     * @var PHPUnit_Framework_ExpectationFailedException
+     * @var ExpectationFailedException
      */
     private $parameterVerificationResult;
 
@@ -82,7 +84,7 @@ class PHPUnit_Framework_MockObject_Matcher_Parameters extends PHPUnit_Framework_
             $this->parameterVerificationResult = $this->verify();
 
             return $this->parameterVerificationResult;
-        } catch (PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (ExpectationFailedException $e) {
             $this->parameterVerificationResult = $e;
 
             throw $this->parameterVerificationResult;
@@ -96,7 +98,7 @@ class PHPUnit_Framework_MockObject_Matcher_Parameters extends PHPUnit_Framework_
      *
      * @return bool
      *
-     * @throws PHPUnit_Framework_ExpectationFailedException
+     * @throws ExpectationFailedException
      */
     public function verify()
     {
@@ -105,7 +107,7 @@ class PHPUnit_Framework_MockObject_Matcher_Parameters extends PHPUnit_Framework_
         }
 
         if ($this->invocation === null) {
-            throw new PHPUnit_Framework_ExpectationFailedException(
+            throw new ExpectationFailedException(
                 'Mocked method does not exist.'
             );
         }
@@ -122,7 +124,7 @@ class PHPUnit_Framework_MockObject_Matcher_Parameters extends PHPUnit_Framework_
                 $message .= "\nTo allow 0 or more parameters with any value, omit ->with() or use ->withAnyParameters() instead.";
             }
 
-            throw new PHPUnit_Framework_ExpectationFailedException(
+            throw new ExpectationFailedException(
                 sprintf($message, $this->invocation->toString())
             );
         }
@@ -145,7 +147,7 @@ class PHPUnit_Framework_MockObject_Matcher_Parameters extends PHPUnit_Framework_
     /**
      * @return bool
      *
-     * @throws PHPUnit_Framework_ExpectationFailedException
+     * @throws ExpectationFailedException
      */
     private function guardAgainstDuplicateEvaluationOfParameterConstraints()
     {

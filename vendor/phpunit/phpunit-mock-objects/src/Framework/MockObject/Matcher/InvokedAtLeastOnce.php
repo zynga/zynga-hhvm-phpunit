@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\ExpectationFailedException;
+
 /**
  * Invocation matcher which checks if a method has been invoked at least one
  * time.
@@ -30,14 +32,14 @@ class PHPUnit_Framework_MockObject_Matcher_InvokedAtLeastOnce extends PHPUnit_Fr
      * Verifies that the current expectation is valid. If everything is OK the
      * code should just return, if not it must throw an exception.
      *
-     * @throws PHPUnit_Framework_ExpectationFailedException
+     * @throws ExpectationFailedException
      */
     public function verify()
     {
         $count = $this->getInvocationCount();
 
         if ($count < 1) {
-            throw new PHPUnit_Framework_ExpectationFailedException(
+            throw new ExpectationFailedException(
                 'Expected invocation at least once but it never occurred.'
             );
         }

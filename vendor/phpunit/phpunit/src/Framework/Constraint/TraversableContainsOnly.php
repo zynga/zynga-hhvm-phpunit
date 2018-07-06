@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\ExpectationFailedException;
+
 /**
  * Constraint that asserts that the Traversable it is applied to contains
  * only values of a given type.
@@ -61,7 +63,7 @@ class PHPUnit_Framework_Constraint_TraversableContainsOnly extends PHPUnit_Frame
      *
      * @return mixed
      *
-     * @throws PHPUnit_Framework_ExpectationFailedException
+     * @throws ExpectationFailedException
      */
     public function evaluate($other, $description = '', $returnResult = false)
     {

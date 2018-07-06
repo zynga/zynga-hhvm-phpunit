@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\ExpectationFailedException;
+
 class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
 {
     public function testMockedMethodIsNeverCalled()
@@ -660,7 +662,7 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
         try {
             $mock->__phpunit_verify();
             $this->fail('Expected exception');
-        } catch (PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (ExpectationFailedException $e) {
             $this->assertSame(
                 "Expectation failed for method name is equal to <string:right> when invoked 1 time(s).\n"
                 . "Method was expected to be called 1 times, actually called 0 times.\n",
@@ -685,7 +687,7 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
         try {
             $mock->__phpunit_verify();
             $this->fail('Expected exception');
-        } catch (PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (ExpectationFailedException $e) {
             $this->assertSame(
                 "Expectation failed for method name is equal to <string:right> when invoked 1 time(s).\n"
                 . "Method was expected to be called 1 times, actually called 0 times.\n",
@@ -708,7 +710,7 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
 
         try {
             $mock->right(['second']);
-        } catch (PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (ExpectationFailedException $e) {
             $this->assertSame(
                 "Expectation failed for method name is equal to <string:right> when invoked 1 time(s)\n"
                 . "Parameter 0 for invocation SomeClass::right(Array (...)) does not match expected value.\n"
@@ -720,7 +722,7 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
         try {
             $mock->__phpunit_verify();
             $this->fail('Expected exception');
-        } catch (PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (ExpectationFailedException $e) {
             $this->assertSame(
                 "Expectation failed for method name is equal to <string:right> when invoked 1 time(s).\n"
                 . "Parameter 0 for invocation SomeClass::right(Array (...)) does not match expected value.\n"
@@ -753,7 +755,7 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
         try {
             $mock->right();
             $this->fail('Expected exception');
-        } catch (PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (ExpectationFailedException $e) {
             $this->assertSame(
                 'SomeClass::right() was not expected to be called.',
                 $e->getMessage()
@@ -776,7 +778,7 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
         try {
             $mock->right();
             $this->fail('Expected exception');
-        } catch (PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (ExpectationFailedException $e) {
             $this->assertSame(
                 'SomeClass::right() was not expected to be called.',
                 $e->getMessage()
@@ -799,7 +801,7 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
         try {
             $mock->right();
             $this->fail('Expected exception');
-        } catch (PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (ExpectationFailedException $e) {
             $this->assertSame(
                 "Expectation failed for method name is equal to <string:right> when invoked 1 time(s)\n" .
                 "Parameter count for invocation SomeClass::right() is too low.\n" .

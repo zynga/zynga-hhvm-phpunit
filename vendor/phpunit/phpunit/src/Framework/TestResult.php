@@ -14,6 +14,7 @@ use PHPUnit\Exceptions\ExceptionWrapper;
 use PHPUnit\Exceptions\IncompleteTestError;
 use PHPUnit\Exceptions\InvalidCoversTargetException;
 use PHPUnit\Exceptions\MissingCoversAnnotationException;
+use PHPUnit\Exceptions\OutputError;
 use PHPUnit\Exceptions\RiskyTestError;
 use PHPUnit\Exceptions\SkippedTestError;
 use PHPUnit\Exceptions\Warning;
@@ -321,7 +322,7 @@ class PHPUnit_Framework_TestResult implements Countable
     public function addFailure(PHPUnit_Framework_Test $test, AssertionFailedError $e, $time)
     {
         if ($e instanceof PHPUnit_Framework_RiskyTest ||
-            $e instanceof PHPUnit_Framework_OutputError) {
+            $e instanceof OutputError) {
             $this->risky[] = new PHPUnit_Framework_TestFailure($test, $e);
             $notifyMethod  = 'addRiskyTest';
 
@@ -884,7 +885,7 @@ class PHPUnit_Framework_TestResult implements Countable
         } elseif ($this->beStrictAboutOutputDuringTests && $test->hasOutput()) {
             $this->addFailure(
                 $test,
-                new PHPUnit_Framework_OutputError(
+                new OutputError(
                     sprintf(
                         'This test printed output: %s',
                         $test->getActualOutput()

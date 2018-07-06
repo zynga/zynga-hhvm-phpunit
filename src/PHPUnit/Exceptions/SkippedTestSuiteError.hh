@@ -1,4 +1,5 @@
-<?php
+<?hh // strict
+
 /*
  * This file is part of PHPUnit.
  *
@@ -8,14 +9,16 @@
  * file that was distributed with this source code.
  */
 
+namespace PHPUnit\Exceptions;
+
 use PHPUnit\Exceptions\AssertionFailedError;
+use PHPUnit\Interfaces\SkippedTest;
 
 /**
  * Extension to AssertionFailedError to mark the special
- * case of a test that printed output.
+ * case of a skipped test suite.
  *
- * @since Class available since Release 3.6.0
+ * @since Class available since Release 3.1.0
  */
-class PHPUnit_Framework_OutputError extends AssertionFailedError
-{
+class SkippedTestSuiteError extends AssertionFailedError implements SkippedTest {
 }

@@ -9,6 +9,7 @@
  */
 
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Exceptions\ExpectationFailedException;
 
 /**
  * Logical AND.
@@ -64,7 +65,7 @@ class PHPUnit_Framework_Constraint_And extends PHPUnit_Framework_Constraint
      *
      * @return mixed
      *
-     * @throws PHPUnit_Framework_ExpectationFailedException
+     * @throws ExpectationFailedException
      */
     public function evaluate($other, $description = '', $returnResult = false)
     {

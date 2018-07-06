@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\ExpectationFailedException;
+
 /**
  * Constraint that asserts that one value is identical to another.
  *
@@ -58,7 +60,7 @@ class PHPUnit_Framework_Constraint_IsIdentical extends PHPUnit_Framework_Constra
      *
      * @return mixed
      *
-     * @throws PHPUnit_Framework_ExpectationFailedException
+     * @throws ExpectationFailedException
      */
     public function evaluate($other, $description = '', $returnResult = false)
     {

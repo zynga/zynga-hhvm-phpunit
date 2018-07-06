@@ -10,6 +10,7 @@
 
 use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Exceptions\ExpectationFailedException;
 use PHPUnit\Exceptions\Warning;
 use PHPUnit\Interfaces\TestListener;
 
@@ -98,7 +99,7 @@ class PHPUnit_Util_Log_TAP extends PHPUnit_Util_Printer implements TestListener
           'severity' => 'fail'
         ];
 
-        if ($e instanceof PHPUnit_Framework_ExpectationFailedException) {
+        if ($e instanceof ExpectationFailedException) {
             $cf = $e->getComparisonFailure();
 
             if ($cf !== null) {

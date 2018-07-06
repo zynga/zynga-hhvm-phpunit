@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\ExpectationFailedException;
+
 /**
  * Logical OR.
  *
@@ -54,7 +56,7 @@ class PHPUnit_Framework_Constraint_Or extends PHPUnit_Framework_Constraint
      *
      * @return mixed
      *
-     * @throws PHPUnit_Framework_ExpectationFailedException
+     * @throws ExpectationFailedException
      */
     public function evaluate($other, $description = '', $returnResult = false)
     {

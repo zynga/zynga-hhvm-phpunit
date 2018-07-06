@@ -11,6 +11,7 @@
 use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Exceptions\Error;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Exceptions\ExpectationFailedException;
 use PHPUnit\Exceptions\ExceptionWrapper;
 
 /**
@@ -96,7 +97,7 @@ class PHPUnit_Framework_TestFailure
         if ($e instanceof PHPUnit_Framework_SelfDescribing) {
             $buffer = $e->toString();
 
-            if ($e instanceof PHPUnit_Framework_ExpectationFailedException && $e->getComparisonFailure()) {
+            if ($e instanceof ExpectationFailedException && $e->getComparisonFailure()) {
                 $buffer = $buffer . $e->getComparisonFailure()->getDiff();
             }
 

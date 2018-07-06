@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\ExpectationFailedException;
+
 /**
  * Interface for classes which must verify a given expectation.
  *
@@ -19,7 +21,7 @@ interface PHPUnit_Framework_MockObject_Verifiable
      * Verifies that the current expectation is valid. If everything is OK the
      * code should just return, if not it must throw an exception.
      *
-     * @throws PHPUnit_Framework_ExpectationFailedException
+     * @throws ExpectationFailedException
      */
     public function verify();
 }

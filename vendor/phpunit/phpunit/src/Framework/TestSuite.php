@@ -11,7 +11,10 @@
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 use PHPUnit\Exceptions\IncompleteTestError;
 use PHPUnit\Exceptions\SkippedTestError;
+use PHPUnit\Framework\AsyncRunner;
 use PHPUnit\Framework\WarningTestCase;
+
+use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
 
 /**
  * A TestSuite is a composite of Tests. It runs a collection of test cases.
@@ -43,10 +46,6 @@ use PHPUnit\Framework\WarningTestCase;
  *
  * @since Class available since Release 2.0.0
  */
-
-use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
-use PHPUnit\Framework\AsyncRunner;
-
 class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Framework_SelfDescribing, IteratorAggregate
 {
     /**
@@ -713,7 +712,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                     call_user_func([$this->name, $beforeClassMethod]);
                 }
             }
-        } catch (PHPUnit_Framework_SkippedTestSuiteError $e) {
+        } catch (SkippedTestSuiteError $e) {
             $numTests = count($this);
 
             for ($i = 0; $i < $numTests; $i++) {
@@ -896,13 +895,13 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      *
      * @param string $message
      *
-     * @throws PHPUnit_Framework_SkippedTestSuiteError
+     * @throws SkippedTestSuiteError
      *
      * @since Method available since Release 3.0.0
      */
     public function markTestSuiteSkipped($message = '')
     {
-        throw new PHPUnit_Framework_SkippedTestSuiteError($message);
+        throw new SkippedTestSuiteError($message);
     }
 
     /**

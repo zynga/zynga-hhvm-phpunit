@@ -10,6 +10,7 @@
 
 use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Exceptions\ExpectationFailedException;
 use PHPUnit\Exceptions\IncompleteTestError;
 use PHPUnit\Exceptions\SkippedTestError;
 
@@ -1241,7 +1242,7 @@ XML;
 
     /**
      * @covers            PHPUnit_Framework_Assert::assertEqualXMLStructure
-     * @expectedException PHPUnit_Framework_ExpectationFailedException
+     * @expectedException ExpectationFailedException
      */
     public function testXMLStructureWrongNumberOfAttributes()
     {
@@ -1258,7 +1259,7 @@ XML;
 
     /**
      * @covers            PHPUnit_Framework_Assert::assertEqualXMLStructure
-     * @expectedException PHPUnit_Framework_ExpectationFailedException
+     * @expectedException ExpectationFailedException
      */
     public function testXMLStructureWrongNumberOfNodes()
     {
@@ -3870,7 +3871,7 @@ XML;
         $message = '';
         try {
             $this->assertJsonStringEqualsJsonFile($file, $actual, $message);
-        } catch (PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (ExpectationFailedException $e) {
             $this->assertEquals(
                 'Failed asserting that \'{"Mascott":"Beastie"}\' matches JSON string "{"Mascott":"Tux"}".',
                 $e->getMessage()

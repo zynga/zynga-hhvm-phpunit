@@ -9,6 +9,7 @@
  */
 
 use SebastianBergmann\Exporter\Exporter;
+use PHPUnit\Exceptions\ExpectationFailedException;
 
 /**
  * Abstract base class for constraints. which are placed upon any value.
@@ -40,7 +41,7 @@ abstract class PHPUnit_Framework_Constraint implements Countable, PHPUnit_Framew
      *
      * @return mixed
      *
-     * @throws PHPUnit_Framework_ExpectationFailedException
+     * @throws ExpectationFailedException
      */
     public function evaluate($other, $description = '', $returnResult = false)
     {
@@ -93,7 +94,7 @@ abstract class PHPUnit_Framework_Constraint implements Countable, PHPUnit_Framew
      * @param string                                         $description       Additional information about the test
      * @param SebastianBergmann\Comparator\ComparisonFailure $comparisonFailure
      *
-     * @throws PHPUnit_Framework_ExpectationFailedException
+     * @throws ExpectationFailedException
      */
     protected function fail($other, $description, SebastianBergmann\Comparator\ComparisonFailure $comparisonFailure = null)
     {
@@ -112,11 +113,11 @@ abstract class PHPUnit_Framework_Constraint implements Countable, PHPUnit_Framew
             $failureDescription = $description . "\n" . $failureDescription;
         }
 
-        throw new PHPUnit_Framework_ExpectationFailedException(
+        throw new ExpectationFailedException(
             $failureDescription,
             $comparisonFailure
         );
-        
+
     }
 
     /**

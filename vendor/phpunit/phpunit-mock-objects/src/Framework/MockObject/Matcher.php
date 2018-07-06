@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Exceptions\ExpectationFailedException;
+
 /**
  * Main matcher which defines a full expectation using method, parameter and
  * invocation matchers.
@@ -134,8 +136,8 @@ class PHPUnit_Framework_MockObject_Matcher implements PHPUnit_Framework_MockObje
                 !$this->parametersMatcher->matches($invocation)) {
                 $this->parametersMatcher->verify();
             }
-        } catch (PHPUnit_Framework_ExpectationFailedException $e) {
-            throw new PHPUnit_Framework_ExpectationFailedException(
+        } catch (ExpectationFailedException $e) {
+            throw new ExpectationFailedException(
                 sprintf(
                     "Expectation failed for %s when %s\n%s",
                     $this->methodNameMatcher->toString(),
@@ -203,8 +205,8 @@ class PHPUnit_Framework_MockObject_Matcher implements PHPUnit_Framework_MockObje
             if (!$this->methodNameMatcher->matches($invocation)) {
                 return false;
             }
-        } catch (PHPUnit_Framework_ExpectationFailedException $e) {
-            throw new PHPUnit_Framework_ExpectationFailedException(
+        } catch (ExpectationFailedException $e) {
+            throw new ExpectationFailedException(
                 sprintf(
                     "Expectation failed for %s when %s\n%s",
                     $this->methodNameMatcher->toString(),
@@ -220,7 +222,7 @@ class PHPUnit_Framework_MockObject_Matcher implements PHPUnit_Framework_MockObje
 
     /**
      * @throws PHPUnit_Framework_MockObject_RuntimeException
-     * @throws PHPUnit_Framework_ExpectationFailedException
+     * @throws ExpectationFailedException
      */
     public function verify()
     {
@@ -247,8 +249,8 @@ class PHPUnit_Framework_MockObject_Matcher implements PHPUnit_Framework_MockObje
             if (!$invocationIsAny && !$invocationIsNever) {
                 $this->parametersMatcher->verify();
             }
-        } catch (PHPUnit_Framework_ExpectationFailedException $e) {
-            throw new PHPUnit_Framework_ExpectationFailedException(
+        } catch (ExpectationFailedException $e) {
+            throw new ExpectationFailedException(
                 sprintf(
                     "Expectation failed for %s when %s.\n%s",
                     $this->methodNameMatcher->toString(),

@@ -9,6 +9,7 @@
  */
 
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Exceptions\ExpectationFailedException;
 
 /**
  * Constraint that checks if one value is equal to another.
@@ -105,7 +106,7 @@ class PHPUnit_Framework_Constraint_IsEqual extends PHPUnit_Framework_Constraint
      *
      * @return mixed
      *
-     * @throws PHPUnit_Framework_ExpectationFailedException
+     * @throws ExpectationFailedException
      */
     public function evaluate($other, $description = '', $returnResult = false)
     {
@@ -136,7 +137,7 @@ class PHPUnit_Framework_Constraint_IsEqual extends PHPUnit_Framework_Constraint
                 return false;
             }
 
-            throw new PHPUnit_Framework_ExpectationFailedException(
+            throw new ExpectationFailedException(
                 trim($description . "\n" . $f->getMessage()),
                 $f
             );
