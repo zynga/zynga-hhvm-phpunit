@@ -45,3 +45,8 @@ number of times that a pieces of code is executed.
 We have chosen to fork the phpunit library completly now, to make the whole stack
 and its deps hacklang compliant.
 
+# Licenses
+
+We have preserved the top level directories of all the dependencies within
+the third-party directory.
+
