@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Util\UtilInvalidArgumentHelper;
+
 /**
  * Invocation matcher which looks for a specific method name in the invocations.
  *
@@ -33,7 +35,7 @@ class PHPUnit_Framework_MockObject_Matcher_MethodName extends PHPUnit_Framework_
     {
         if (!$constraint instanceof PHPUnit_Framework_Constraint) {
             if (!is_string($constraint)) {
-                throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'string');
+                throw UtilInvalidArgumentHelper::factory(1, 'string');
             }
 
             $constraint = new PHPUnit_Framework_Constraint_IsEqual(

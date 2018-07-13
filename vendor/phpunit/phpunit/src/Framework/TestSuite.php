@@ -1,4 +1,5 @@
-<?php
+<?hh
+
 /*
  * This file is part of PHPUnit.
  *
@@ -13,9 +14,16 @@ use PHPUnit\Exceptions\IncompleteTestError;
 use PHPUnit\Exceptions\SkippedTestError;
 use PHPUnit\Framework\AsyncRunner;
 use PHPUnit\Framework\WarningTestCase;
+use PHPUnit\Interfaces\SelfDescribingInterface;
+use PHPUnit\Interfaces\TestInterface;
+use PHPUnit\Interfaces\TestSuiteInterface;
+use PHPUnit\Util\UtilInvalidArgumentHelper;
+use PHPUnit\Util\UtilTest;
 use PHPUnit\Util\UtilTestSuiteIterator;
 
 use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
+
+use \IteratorAggregate;
 
 /**
  * A TestSuite is a composite of Tests. It runs a collection of test cases.
@@ -47,81 +55,84 @@ use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
  *
  * @since Class available since Release 2.0.0
  */
-class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Framework_SelfDescribing, IteratorAggregate
+class PHPUnit_Framework_TestSuite implements
+  TestSuiteInterface,
+  SelfDescribingInterface,
+  IteratorAggregate<TestSuiteInterface>
 {
     /**
      * Last count of tests in this suite.
      *
      * @var int|null
      */
-    private $cachedNumTests;
+    private ?int $cachedNumTests = null;
 
     /**
      * Enable or disable the backup and restoration of the $GLOBALS array.
      *
      * @var bool
      */
-    protected $backupGlobals = null;
+    protected ?bool $backupGlobals = null;
 
     /**
      * Enable or disable the backup and restoration of static attributes.
      *
      * @var bool
      */
-    protected $backupStaticAttributes = null;
+    protected ?bool $backupStaticAttributes = null;
 
     /**
      * @var bool
      */
-    private $beStrictAboutChangesToGlobalState = null;
+    private ?bool $beStrictAboutChangesToGlobalState = null;
 
     /**
      * @var bool
      */
-    protected $runTestInSeparateProcess = false;
+    protected ?bool $runTestInSeparateProcess = false;
 
     /**
      * The name of the test suite.
      *
      * @var string
      */
-    protected $name = '';
+    protected string $name = '';
 
     /**
      * The test groups of the test suite.
      *
      * @var array
      */
-    protected $groups = [];
+    protected Map<string, Vector<TestInterface>> $groups = Map {};
 
     /**
      * The tests in the test suite.
      *
      * @var array
      */
-    protected $tests = [];
+    protected Vector<TestInterface> $tests = Vector {};
 
     /**
      * The number of tests in the test suite.
      *
      * @var int
      */
-    protected $numTests = -1;
+    protected int $numTests = -1;
 
     /**
      * @var bool
      */
-    protected $testCase = false;
+    protected bool $testCase = false;
 
     /**
      * @var array
      */
-    protected $foundClasses = [];
+    protected Vector<string> $foundClasses = Vector {};
 
     /**
      * @var PHPUnit_Runner_Filter_Factory
      */
-    private $iteratorFilter = null;
+    private ?PHPUnit_Runner_Filter_Factory $iteratorFilter = null;
 
     /**
      * Constructs a new TestSuite:
@@ -145,51 +156,32 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      *
      * @throws PHPUnit_Exceptions_Exception
      */
-    public function __construct($theClass = '', $name = '')
-    {
-        $argumentsValid = false;
+    public function __construct(?ReflectionClass $theClass) {
 
-        if (is_object($theClass) &&
-            $theClass instanceof ReflectionClass) {
-            $argumentsValid = true;
-        } elseif (is_string($theClass) &&
-                 $theClass !== '' &&
-                 class_exists($theClass, false)) {
-            $argumentsValid = true;
-
-            if ($name == '') {
-                $name = $theClass;
-            }
-
-            $theClass = new ReflectionClass($theClass);
-        } elseif (is_string($theClass)) {
-            $this->setName($theClass);
-
-            return;
-        }
-
-        if (!$argumentsValid) {
-            throw new PHPUnit_Exceptions_Exception;
-        }
-
-        if (!$theClass->isSubClassOf(ZyngaTestCaseBase::class) && !$theClass->isSubClassOf(PHPUnit_Framework_TestCase::class) ) {
+      // JEO: Come back to this, as they are getting cranky with isSubclassOf
+      /*
+      if ( $theClass->isSubClassOf(ZyngaTestCaseBase::class) !== true &&
+           $theClass->isSubClassOf(PHPUnit_Framework_TestCase::class) !== true ) {
           throw new PHPUnit_Exceptions_Exception(
-              'Class "' . $theClass->name . '" does not extend (' . ZyngaTestCaseBase::class . ' or ' . PHPUnit_Framework_TestCase::class . ')'
+              'Class "' . $theClass->name . '" does not extend ' .
+              '(' . ZyngaTestCaseBase::class . ' or ' .
+              PHPUnit_Framework_TestCase::class . ')'
           );
         }
+      */
 
-        if ($name != '') {
-            $this->setName($name);
-        } else {
-            $this->setName($theClass->getName());
-        }
+      if ( ! $theClass instanceof ReflectionClass ) {
+        return;
+      }
+
+        $this->name = $theClass->name;
 
         $constructor = $theClass->getConstructor();
 
         if ($constructor !== null &&
             !$constructor->isPublic()) {
             $this->addTest(
-                self::warning(
+                new WarningTestCase(
                     sprintf(
                         'Class "%s" has no public constructor.',
                         $theClass->getName()
@@ -206,7 +198,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
 
         if (empty($this->tests)) {
             $this->addTest(
-                self::warning(
+                new WarningTestCase(
                     sprintf(
                         'No tests found in class "%s".',
                         $theClass->getName()
@@ -234,34 +226,45 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      * @param PHPUnit_Framework_Test $test
      * @param array                  $groups
      */
-    public function addTest(PHPUnit_Framework_Test $test, $groups = [])
-    {
+    public function addTest(TestInterface $test, Vector<string> $groups = Vector {}): void{
+
         $class = new ReflectionClass($test);
 
         if (!$class->isAbstract()) {
-            $this->tests[]  = $test;
+
+            $this->tests->add($test);
             $this->numTests = -1;
 
-            if ($test instanceof self &&
-                empty($groups)) {
+            if ($test instanceof TestInterface && $groups->count() == 0) {
                 $groups = $test->getGroups();
             }
 
-            if (empty($groups)) {
-                $groups = ['default'];
+            if ($groups->count() == 0) {
+                $groups->add('default');
             }
 
             foreach ($groups as $group) {
-                if (!isset($this->groups[$group])) {
-                    $this->groups[$group] = [$test];
-                } else {
-                    $this->groups[$group][] = $test;
+
+              $groupData = Vector {};
+
+              if ( $this->groups->containsKey($group) ) {
+                $t_groupData = $this->groups->get($group);
+                if ( $groupData instanceof Vector ) {
+                  $groupData = $t_groupData;
                 }
+              }
+
+              if ( $groupData instanceof Vector ) {
+                $groupData->add($test);
+                $this->groups->set($group, $groupData);
+              }
+
             }
 
-            if ($test instanceof ZyngaTestCaseBase || $test instanceof PHPUnit_Framework_TestCase) {
-                $test->setGroups($groups);
+            if ( $test instanceof TestInterface ) {
+              $test->setGroups($groups);
             }
+
         }
     }
 
@@ -274,12 +277,13 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      */
     public function addTestSuite($testClass)
     {
+      /*
         if (is_string($testClass) && class_exists($testClass)) {
             $testClass = new ReflectionClass($testClass);
         }
 
         if (!is_object($testClass)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(
+            throw UtilInvalidArgumentHelper::factory(
                 1,
                 'class name or object'
             );
@@ -310,8 +314,9 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                 $this->addTest(new self($testClass));
             }
         } else {
-            throw new PHPUnit_Exceptions_Exception;
+            throw new PHPUnit_Exceptions_Exception();
         }
+        */
     }
 
     /**
@@ -331,7 +336,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
     public function addTestFile($filename)
     {
         if (!is_string($filename)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'string');
+            throw UtilInvalidArgumentHelper::factory(1, 'string');
         }
 
         if (file_exists($filename) && substr($filename, -5) == '.phpt') {
@@ -408,11 +413,11 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      *
      * @since Method available since Release 2.3.0
      */
-    public function addTestFiles($filenames)
+    public function addTestFiles(Traversable $filenames)
     {
         if (!(is_array($filenames) ||
              (is_object($filenames) && $filenames instanceof Iterator))) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(
+            throw UtilInvalidArgumentHelper::factory(
                 1,
                 'array or iterator'
             );
@@ -460,27 +465,34 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
         $className = $theClass->getName();
 
         if (!$theClass->isInstantiable()) {
-            return self::warning(
+            return new WarningTestCase(
                 sprintf('Cannot instantiate class "%s".', $className)
             );
         }
 
-        $backupSettings = PHPUnit_Util_Test::getBackupSettings(
+        $backupSettings = UtilTest::getBackupSettings(
             $className,
             $name
         );
 
-        $preserveGlobalState = PHPUnit_Util_Test::getPreserveGlobalStateSettings(
+        $preserveGlobalState = UtilTest::getPreserveGlobalStateSettings(
             $className,
             $name
         );
 
-        $runTestInSeparateProcess = PHPUnit_Util_Test::getProcessIsolationSettings(
+        $runTestInSeparateProcess = UtilTest::getProcessIsolationSettings(
             $className,
             $name
         );
+
 
         $constructor = $theClass->getConstructor();
+
+        $test = $theClass->newInstance($name);
+
+        /*
+        $t = null;
+        $data = null;
 
         if ($constructor !== null) {
             $parameters = $constructor->getParameters();
@@ -488,10 +500,10 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
             // TestCase() or TestCase($name)
             if (count($parameters) < 2) {
                 $test = new $className($name);
-            } // TestCase($name, $data)
-            else {
+            } else {
                 try {
-                    $data = PHPUnit_Util_Test::getProvidedData(
+                  // Data providers are disabled.
+                    $data = UtilTest::getProvidedData(
                         $className,
                         $name
                     );
@@ -508,7 +520,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                         $message .= "\n" . $_message;
                     }
 
-                    $data = self::incompleteTest($className, $name, $message);
+                    $data = new PHPUnit_Framework_IncompleteTestCase($className, $name, $message);
                 } catch (SkippedTestError $e) {
                     $message = sprintf(
                         'Test for %s::%s skipped by data provider',
@@ -542,7 +554,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                         $message .= "\n" . $_message;
                     }
 
-                    $data = self::warning($message);
+                    $data = new WarningTestCase($message);
                 }
 
                 // Test method with @dataProvider.
@@ -552,7 +564,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                     );
 
                     if (empty($data)) {
-                        $data = self::warning(
+                        $data = new WarningTestCase(
                             sprintf(
                                 'No tests found in suite "%s".',
                                 $test->getName()
@@ -560,7 +572,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                         );
                     }
 
-                    $groups = PHPUnit_Util_Test::getGroups($className, $name);
+                    $groups = UtilTest::getGroups($className, $name);
 
                     if ($data instanceof WarningTestCase ||
                         $data instanceof PHPUnit_Framework_SkippedTestCase ||
@@ -594,16 +606,18 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                         }
                     }
                 } else {
-                    $test = new $className;
+                    $test = new $className();
                 }
             }
         }
+        */
 
         if (!isset($test)) {
             throw new PHPUnit_Exceptions_Exception('No valid test provided.');
         }
 
-        if ($test instanceof ZyngaTestCaseBase || $test instanceof PHPUnit_Framework_TestCase) {
+        if ($test instanceof TestInterface) {
+
             $test->setName($name);
 
             if ($runTestInSeparateProcess) {
@@ -635,7 +649,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      */
     protected function createResult()
     {
-        return new PHPUnit_Framework_TestResult;
+        return new PHPUnit_Framework_TestResult();
     }
 
     /**
@@ -672,9 +686,8 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      *
      * @since Method available since Release 4.0.0
      */
-    public function setGroupDetails(array $groups)
-    {
-        $this->groups = $groups;
+    public function setGroupDetails(Map<string, Vector<TestInterface>> $groups): void {
+      $this->groups = $groups;
     }
 
 
@@ -685,41 +698,54 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      *
      * @return PHPUnit_Framework_TestResult
      */
-    public function run(PHPUnit_Framework_TestResult $result = null)
-    {
+    public function run(?PHPUnit_Framework_TestResult $result = null) {
+
         if ($result === null) {
             $result = $this->createResult();
         }
 
         if (count($this) == 0) {
+
             return $result;
         }
 
-        $hookMethods = PHPUnit_Util_Test::getHookMethods($this->name);
+        $hookMethods = UtilTest::getHookMethods($this->name);
 
         $result->startTestSuite($this);
 
+        $t = null;
+
         try {
+
             $this->setUp();
 
-            foreach ($hookMethods['beforeClass'] as $beforeClassMethod) {
-                if ($this->testCase === true &&
-                    class_exists($this->name, false) &&
-                    method_exists($this->name, $beforeClassMethod)) {
-                    if ($missingRequirements = PHPUnit_Util_Test::getMissingRequirements($this->name, $beforeClassMethod)) {
-                        $this->markTestSuiteSkipped(implode(PHP_EOL, $missingRequirements));
-                    }
+            if ( $hookMethods->containsKey('beforeClass') ) {
+              $beforeClassHooks = $hookMethods->get('beforeClass');
 
-                    call_user_func([$this->name, $beforeClassMethod]);
+              if ( $beforeClassHooks instanceof Vector ) {
+                foreach ($beforeClassHooks as $beforeClassMethod) {
+                  if ($this->testCase === true &&
+                      class_exists($this->name, false) &&
+                      method_exists($this->name, $beforeClassMethod)) {
+                      if ($missingRequirements = UtilTest::getMissingRequirements($this->name, $beforeClassMethod)) {
+                          $this->markTestSuiteSkipped(implode(PHP_EOL, $missingRequirements));
+                      }
+
+                      call_user_func([$this->name, $beforeClassMethod]);
+                  }
                 }
+              }
             }
+
+
         } catch (SkippedTestSuiteError $e) {
+
             $numTests = count($this);
 
-            for ($i = 0; $i < $numTests; $i++) {
-                $result->startTest($this);
-                $result->addFailure($this, $e, 0);
-                $result->endTest($this, 0);
+            foreach ( $this->tests as $test ) {
+                $result->startTest($test);
+                $result->addFailure($test, $e, 0.0);
+                $result->endTest($test, 0.0);
             }
 
             $this->tearDown();
@@ -735,15 +761,14 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
         if (isset($t)) {
             $numTests = count($this);
 
-            for ($i = 0; $i < $numTests; $i++) {
-                $result->startTest($this);
-                $result->addError($this, $t, 0);
-                $result->endTest($this, 0);
+            foreach ( $this->tests as $test) {
+                $result->startTest($test);
+                $result->addError($test, $t, 0.0);
+                $result->endTest($test, 0.0);
             }
 
             $this->tearDown();
             $result->endTestSuite($this);
-
             return $result;
         }
 
@@ -759,7 +784,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
         }
 
         // JEO: Run the doSetupBeforeClass on the first test.
-        if ( method_exists($firstTest, 'doSetUpBeforeClass') ) {
+        if ( $firstTest instanceof ZyngaTestCaseBase && method_exists($firstTest, 'doSetUpBeforeClass') ) {
           $firstTest->doSetUpBeforeClass();
         } else if (get_class($firstTest) != 'PHPUnit_Framework_TestSuite') {
           error_log('WARNING - doSetUpBeforeClass NOT defined on your test=' . get_class($firstTest));
@@ -767,7 +792,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
 
         // Prototype async method.
         $testStack = array();
-        foreach ($this as $test) {
+        foreach ($this->tests as $test) {
           $testStack[] = AsyncRunner::runTestAsync($test, $result);
         }
 
@@ -780,7 +805,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                 break;
             }
 
-            if (($test instanceof ZyngaTestCaseBase || $test instanceof PHPUnit_Framework_TestCase )||
+            if (($test instanceof TestInterface )||
                 $test instanceof self) {
                 $test->setbeStrictAboutChangesToGlobalState($this->beStrictAboutChangesToGlobalState);
                 $test->setBackupGlobals($this->backupGlobals);
@@ -794,17 +819,21 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
         */
 
         // JEO: Run the doTearDownAfterClass
-        if ( method_exists($lastTest, 'doTearDownAfterClass') ) {
+        if ( $lastTest instanceof ZyngaTestCaseBase && method_exists($lastTest, 'doTearDownAfterClass') ) {
           $lastTest->doTearDownAfterClass();
         } else if (get_class($lastTest) != 'PHPUnit_Framework_TestSuite') {
           error_log('WARNING - doTearDownAfterClass NOT defined on your test=' . get_class($lastTest));
         }
 
-
-        foreach ($hookMethods['afterClass'] as $afterClassMethod) {
-            if ($this->testCase === true && class_exists($this->name, false) && method_exists($this->name, $afterClassMethod)) {
+        if ( $hookMethods->containsKey('afterClass') ) {
+          $afterClassHooks = $hookMethods->get('afterClass');
+          if ( $afterClassHooks instanceof Vector ) {
+            foreach ($afterClassHooks as $afterClassMethod) {
+              if ($this->testCase === true && class_exists($this->name, false) && method_exists($this->name, $afterClassMethod)) {
                 call_user_func([$this->name, $afterClassMethod]);
+              }
             }
+          }
         }
 
         $this->tearDown();
@@ -826,7 +855,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
         if (is_bool($runTestInSeparateProcess)) {
             $this->runTestInSeparateProcess = $runTestInSeparateProcess;
         } else {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
+            throw UtilInvalidArgumentHelper::factory(1, 'boolean');
         }
     }
 
@@ -838,9 +867,8 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      * @param PHPUnit_Framework_Test       $test
      * @param PHPUnit_Framework_TestResult $result
      */
-    public function runTest(PHPUnit_Framework_Test $test, PHPUnit_Framework_TestResult $result)
-    {
-        $test->run($result);
+    public function runTest(PHPUnit_Framework_Test $test, PHPUnit_Framework_TestResult $result) {
+      $test->run($result);
     }
 
     /**
@@ -848,9 +876,9 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      *
      * @param  string
      */
-    public function setName($name)
-    {
-        $this->name = $name;
+    public function setName(string $name): bool {
+      $this->name = $name;
+      return true;
     }
 
     /**
@@ -886,8 +914,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      *
      * @since Method available since Release 4.0.0
      */
-    public function setTests(array $tests)
-    {
+    public function setTests(Vector<TestInterface> $tests): void {
         $this->tests = $tests;
     }
 
@@ -919,7 +946,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
 
         if (!$method->isPublic()) {
             $this->addTest(
-                self::warning(
+                new WarningTestCase(
                     sprintf(
                         'Test method "%s" in test class "%s" is not public.',
                         $name,
@@ -933,16 +960,16 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
 
         $test = self::createTest($class, $name);
 
-        if (($test instanceof ZyngaTestCaseBase || $test instanceof PHPUnit_Framework_TestCase) ||
+        if (($test instanceof ZyngaZyngaTestCaseBaseBase || $test instanceof PHPUnit_Framework_ZyngaTestCaseBase) ||
             $test instanceof PHPUnit_Framework_TestSuite_DataProvider) {
             $test->setDependencies(
-                PHPUnit_Util_Test::getDependencies($class->getName(), $name)
+                UtilTest::getDependencies($class->getName(), $name)
             );
         }
 
         $this->addTest(
             $test,
-            PHPUnit_Util_Test::getGroups($class->getName(), $name)
+            UtilTest::getGroups($class->getName(), $name)
         );
     }
 
@@ -951,7 +978,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      *
      * @return bool
      */
-    public static function isTestMethod(ReflectionMethod $method)
+    public function isTestMethod(ReflectionMethod $method)
     {
         if (strpos($method->name, 'test') === 0) {
             return true;
@@ -984,8 +1011,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      *
      * @since Method available since Release 4.3.0
      */
-    protected static function skipTest($class, $methodName, $message)
-    {
+    protected static function skipTest($class, $methodName, $message) {
         return new PHPUnit_Framework_SkippedTestCase($class, $methodName, $message);
     }
 

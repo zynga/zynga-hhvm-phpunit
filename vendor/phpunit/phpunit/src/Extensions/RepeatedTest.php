@@ -9,6 +9,7 @@
  */
 
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Util\UtilInvalidArgumentHelper;
 
 /**
  * A Decorator that runs a test repeatedly.
@@ -42,7 +43,7 @@ class PHPUnit_Extensions_RepeatedTest extends PHPUnit_Extensions_TestDecorator
             $timesRepeat >= 0) {
             $this->timesRepeat = $timesRepeat;
         } else {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(
+            throw UtilInvalidArgumentHelper::factory(
                 2,
                 'positive integer'
             );

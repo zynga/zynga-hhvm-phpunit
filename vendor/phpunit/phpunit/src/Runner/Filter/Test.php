@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Util\UtilTest;
+
 /**
  * @since Class available since Release 4.0.0
  */
@@ -96,7 +98,7 @@ class PHPUnit_Runner_Filter_Test extends RecursiveFilterIterator
             return true;
         }
 
-        $tmp = PHPUnit_Util_Test::describe($test, false);
+        $tmp = UtilTest::describe($test, false);
 
         if ($tmp[0] != '') {
             $name = implode('::', $tmp);

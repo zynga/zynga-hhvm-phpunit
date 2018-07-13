@@ -1,4 +1,4 @@
-<?hh // partial
+<?hh // strict
 
 /*
  * This file is part of PHPUnit.
@@ -35,26 +35,33 @@ namespace PHPUnit\Exceptions;
 use \RuntimeException;
 use \Exception as BaseException;
 
+use PHPUnit\Framework\TestFailure;
 use PHPUnit\Interfaces\Exception as ExceptionInterface;
+use PHPUnit\Util\FilterUtil;
 
 use \PHPUnit_Framework_TestFailure;
-use \PHPUnit_Util_Filter;
 
 class Exception extends RuntimeException implements ExceptionInterface {
     /**
      * @var array
      */
-    protected array $serializableTrace;
+    protected Vector<mixed> $serializableTrace;
 
     public function __construct(string $message = '', int $code = 0, ?BaseException $previous = null) {
 
         parent::__construct($message, $code, $previous);
 
-        $this->serializableTrace = array();
-        $this->serializableTrace = $this->getTrace();
+        $this->serializableTrace = Vector {};
 
-        foreach ($this->serializableTrace as $i => $call) {
-            unset($this->serializableTrace[$i]['args']);
+        $trace = $this->getTrace();
+
+        foreach ($trace as $i => $call) {
+
+          // strip the function arguments off the call
+          unset($call['args']);
+
+          $this->serializableTrace->add($call);
+
         }
 
     }
@@ -64,18 +71,18 @@ class Exception extends RuntimeException implements ExceptionInterface {
      *
      * @return array
      */
-    public function getSerializableTrace(): array {
+    public function getSerializableTrace(): Vector<mixed> {
       return $this->serializableTrace;
     }
 
     /**
      * @return string
      */
-    public function __toString() {
+    public function __toString(): string {
 
-        $string = PHPUnit_Framework_TestFailure::exceptionToString($this);
+        $string = TestFailure::exceptionToString($this);
 
-        if ($trace = PHPUnit_Util_Filter::getFilteredStacktrace($this)) {
+        if ($trace = FilterUtil::getFilteredStacktrace($this)) {
             $string .= "\n" . $trace;
         }
 

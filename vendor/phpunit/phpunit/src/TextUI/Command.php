@@ -129,7 +129,7 @@ class PHPUnit_TextUI_Command
         $runner = $this->createRunner();
 
         if (is_object($this->arguments['test']) &&
-            $this->arguments['test'] instanceof PHPUnit_Framework_Test) {
+            $this->arguments['test'] instanceof PHPUnit_Framework_TestSuite) {
             $suite = $this->arguments['test'];
         } else {
             $suite = $runner->getTest(

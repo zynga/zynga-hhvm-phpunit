@@ -12,13 +12,8 @@
 namespace PHPUnit\Exceptions;
 
 use PHPUnit\Exceptions\AssertionFailedError;
-use PHPUnit\Exceptions\RiskyTestError;
+use PHPUnit\Exceptions\Error\RiskyTestError;
 
-// --
-// JEO: Note, the comment here is misleading as it points to assertionfailederror,
-// yet extends riskytesterror, in the future we should determine what breaks
-// if we move it to not derive from risky test?
-// --
 /**
  * Extension to AssertionFailedError to mark the special
  * case of a test that does not execute the code it wants to cover.

@@ -45,7 +45,7 @@ abstract class PHPUnit_Runner_BaseTestRunner
      * @param string $suiteClassFile
      * @param mixed  $suffixes
      *
-     * @return PHPUnit_Framework_Test
+     * @return PHPUnit_Framework_TestSuite
      */
     public function getTest($suiteClassName, $suiteClassFile = '', $suffixes = '')
     {
@@ -101,7 +101,7 @@ abstract class PHPUnit_Runner_BaseTestRunner
             try {
                 $test = new PHPUnit_Framework_TestSuite($testClass);
             } catch (PHPUnit_Exceptions_Exception $e) {
-                $test = new PHPUnit_Framework_TestSuite;
+                $test = new PHPUnit_Framework_TestSuite();
                 $test->setName($suiteClassName);
             }
         }

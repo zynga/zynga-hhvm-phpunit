@@ -1,0 +1,118 @@
+<?hh // strict
+
+namespace PHPUnit\Constraint;
+
+/*
+ * This file is part of PHPUnit.
+ *
+ * (c) Sebastian Bergmann <sebastian@phpunit.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Exceptions\ExpectationFailedException;
+use PHPUnit\Constraint\Base as ConstraintBase;
+use PHPUnit\Interfaces\ConstraintInterface;
+
+/**
+ * Logical AND.
+ *
+ * @since Class available since Release 3.0.0
+ */
+class AndConstraint extends ConstraintBase {
+  /**
+   * @var PHPUnit_Framework_Constraint[]
+   */
+  protected Vector<ConstraintInterface> $constraints = Vector {};
+
+  /**
+   * @var PHPUnit_Framework_Constraint
+   */
+  protected ?ConstraintInterface $lastConstraint = null;
+
+  /**
+   * @param PHPUnit_Framework_Constraint[] $constraints
+   *
+   * @throws PHPUnit_Exceptions_Exception
+   */
+  public function setConstraints(Vector<ConstraintInterface> $constraints): void {
+    $this->constraints = $constraints;
+  }
+
+  /**
+   * Evaluates the constraint for parameter $other
+   *
+   * If $returnResult is set to false (the default), an exception is thrown
+   * in case of a failure. null is returned otherwise.
+   *
+   * If $returnResult is true, the result of the evaluation is returned as
+   * a boolean value instead: true in case of success, false in case of a
+   * failure.
+   *
+   * @param mixed  $other        Value or object to evaluate.
+   * @param string $description  Additional information about the test
+   * @param bool   $returnResult Whether to return a result or throw an exception
+   *
+   * @return mixed
+   *
+   * @throws ExpectationFailedException
+   */
+  public function evaluate(mixed $other, string $description = '', bool $returnResult = false): mixed {
+    $success = true;
+    $constraint = null;
+
+    foreach ($this->constraints as $constraint) {
+      if (!$constraint->evaluate($other, $description, true)) {
+        $success = false;
+        break;
+      }
+    }
+
+    if ($returnResult) {
+      return $success;
+    }
+
+    if (!$success) {
+      $this->fail($other, $description);
+    }
+
+  }
+
+  /**
+   * Returns a string representation of the constraint.
+   *
+   * @return string
+   */
+  public function toString(): string {
+    $text = '';
+
+    foreach ($this->constraints as $key => $constraint) {
+      if ($key > 0) {
+        $text .= ' and ';
+      }
+
+      $text .= $constraint->toString();
+    }
+
+    return $text;
+  }
+
+  /**
+   * Counts the number of constraint elements.
+   *
+   * @return int
+   *
+   * @since Method available since Release 3.4.0
+   */
+  public function count(): int {
+    $count = 0;
+
+    foreach ($this->constraints as $constraint) {
+      $count += count($constraint);
+    }
+
+    return $count;
+  }
+}

@@ -13,15 +13,17 @@ namespace PHPUnit\Framework;
 
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 use PHPUnit\Exceptions\Warning as WarningException;
+use PHPUnit\Interfaces\TestInterface;
 
 use \PHPUnit_Framework_TestCase;
+use \PHPUnit_Framework_TestResult;
 
 /**
  * A warning.
  *
  * @since Class available since Release 2.0.0
  */
-class WarningTestCase extends PHPUnit_Framework_TestCase {
+class WarningTestCase extends PHPUnit_Framework_TestCase implements TestInterface {
     /**
      * @var string
      */
@@ -30,17 +32,17 @@ class WarningTestCase extends PHPUnit_Framework_TestCase {
     /**
      * @var bool
      */
-    protected ?bool $backupGlobals = false;
+    protected bool $backupGlobals = false;
 
     /**
      * @var bool
      */
-    protected ?bool $backupStaticAttributes = false;
+    protected bool $backupStaticAttributes = false;
 
     /**
      * @var bool
      */
-    protected ?bool $runTestInSeparateProcess = false;
+    protected bool $runTestInSeparateProcess = false;
 
     /**
      * @var bool
@@ -58,7 +60,7 @@ class WarningTestCase extends PHPUnit_Framework_TestCase {
     /**
      * @throws PHPUnit_Exceptions_Exception
      */
-    protected function runTest(): void {
+    protected function runTest(): ?PHPUnit_Framework_TestResult {
         throw new WarningException($this->message);
     }
 

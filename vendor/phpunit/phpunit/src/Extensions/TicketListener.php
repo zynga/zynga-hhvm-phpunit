@@ -11,7 +11,7 @@
 use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Framework\WarningTestCase;
 use PHPUnit\Interfaces\TestListener;
-
+use PHPUnit\Util\UtilTest;
 
 /**
  * Base class for test listeners that interact with an issue tracker.
@@ -124,7 +124,7 @@ abstract class PHPUnit_Extensions_TicketListener implements TestListener
             }
 
             $name    = $test->getName(false);
-            $tickets = PHPUnit_Util_Test::getTickets(get_class($test), $name);
+            $tickets = UtilTest::getTickets(get_class($test), $name);
 
             foreach ($tickets as $ticket) {
                 $this->ticketCounts[$ticket][$name] = 1;
@@ -160,7 +160,7 @@ abstract class PHPUnit_Extensions_TicketListener implements TestListener
             }
 
             $name    = $test->getName(false);
-            $tickets = PHPUnit_Util_Test::getTickets(get_class($test), $name);
+            $tickets = UtilTest::getTickets(get_class($test), $name);
 
             foreach ($tickets as $ticket) {
                 // Remove this test from the totals (if it passed).

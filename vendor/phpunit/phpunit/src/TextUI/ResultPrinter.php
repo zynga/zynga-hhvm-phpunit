@@ -11,7 +11,10 @@
 use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 use PHPUnit\Exceptions\Warning;
+use PHPUnit\Interfaces\TestInterface;
 use PHPUnit\Interfaces\TestListener;
+use PHPUnit\Util\UtilInvalidArgumentHelper;
+use PHPUnit\Util\UtilTest;
 
 use SebastianBergmann\Environment\Console;
 
@@ -143,28 +146,28 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements TestL
         parent::__construct($out);
 
         if (!is_bool($verbose)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(2, 'boolean');
+            throw UtilInvalidArgumentHelper::factory(2, 'boolean');
         }
 
         $availableColors = [self::COLOR_NEVER, self::COLOR_AUTO, self::COLOR_ALWAYS];
 
         if (!in_array($colors, $availableColors)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(
+            throw UtilInvalidArgumentHelper::factory(
                 3,
                 vsprintf('value from "%s", "%s" or "%s"', $availableColors)
             );
         }
 
         if (!is_bool($debug)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(4, 'boolean');
+            throw UtilInvalidArgumentHelper::factory(4, 'boolean');
         }
 
         if (!is_int($numberOfColumns) && $numberOfColumns != 'max') {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(5, 'integer or "max"');
+            throw UtilInvalidArgumentHelper::factory(5, 'integer or "max"');
         }
 
         if (!is_bool($reverse)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(6, 'boolean');
+            throw UtilInvalidArgumentHelper::factory(6, 'boolean');
         }
 
         $console            = new Console();
@@ -431,11 +434,11 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements TestL
     /**
      * An error occurred.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                  $time
      */
-    public function addError(PHPUnit_Framework_Test $test, Exception $e, float $time): void
+    public function addError(TestInterface $test, Exception $e, float $time): void
     {
         $this->writeProgressWithColor('fg-red, bold', 'E');
         $this->lastTestFailed = true;
@@ -444,11 +447,11 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements TestL
     /**
      * A failure occurred.
      *
-     * @param PHPUnit_Framework_Test                 $test
+     * @param TestInterface                 $test
      * @param AssertionFailedError $e
      * @param float                                  $time
      */
-    public function addFailure(PHPUnit_Framework_Test $test, AssertionFailedError $e, float $time): void
+    public function addFailure(TestInterface $test, AssertionFailedError $e, float $time): void
     {
         $this->writeProgressWithColor('bg-red, fg-white', 'F');
         $this->lastTestFailed = true;
@@ -457,13 +460,13 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements TestL
     /**
      * A warning occurred.
      *
-     * @param PHPUnit_Framework_Test    $test
+     * @param TestInterface    $test
      * @param Warning $e
      * @param float                     $time
      *
      * @since Method available since Release 5.1.0
      */
-    public function addWarning(PHPUnit_Framework_Test $test, Warning $e, $time)
+    public function addWarning(TestInterface $test, Warning $e, $time)
     {
         $this->writeProgressWithColor('fg-yellow, bold', 'W');
         $this->lastTestFailed = true;
@@ -472,11 +475,11 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements TestL
     /**
      * Incomplete test.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                  $time
      */
-    public function addIncompleteTest(PHPUnit_Framework_Test $test, Exception $e, float $time): void
+    public function addIncompleteTest(TestInterface $test, Exception $e, float $time): void
     {
         $this->writeProgressWithColor('fg-yellow, bold', 'I');
         $this->lastTestFailed = true;
@@ -485,13 +488,13 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements TestL
     /**
      * Risky test.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                  $time
      *
      * @since Method available since Release 4.0.0
      */
-    public function addRiskyTest(PHPUnit_Framework_Test $test, Exception $e, float $time): void
+    public function addRiskyTest(TestInterface $test, Exception $e, float $time): void
     {
         $this->writeProgressWithColor('fg-yellow, bold', 'R');
         $this->lastTestFailed = true;
@@ -500,13 +503,13 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements TestL
     /**
      * Skipped test.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                  $time
      *
      * @since Method available since Release 3.0.0
      */
-    public function addSkippedTest(PHPUnit_Framework_Test $test, Exception $e, float $time): void
+    public function addSkippedTest(TestInterface $test, Exception $e, float $time): void
     {
         $this->writeProgressWithColor('fg-cyan, bold', 'S');
         $this->lastTestFailed = true;
@@ -542,15 +545,15 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements TestL
     /**
      * A test started.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      */
-    public function startTest(PHPUnit_Framework_Test $test): void
+    public function startTest(TestInterface $test): void
     {
         if ($this->debug) {
             $this->write(
                 sprintf(
                     "\nStarting test '%s'.\n",
-                    PHPUnit_Util_Test::describe($test)
+                    UtilTest::describe($test)
                 )
             );
         }
@@ -559,16 +562,15 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements TestL
     /**
      * A test ended.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param float                  $time
      */
-    public function endTest(PHPUnit_Framework_Test $test, float $time): void
-    {
+    public function endTest(TestInterface $test, float $time): void {
         if (!$this->lastTestFailed) {
             $this->writeProgress('.');
         }
 
-        if ($test instanceof PHPUnit_Framework_TestCase) {
+        if ($test instanceof TestInterface) {
             $this->numAssertions += $test->getNumAssertions();
         } elseif ($test instanceof PHPUnit_Extensions_PhptTestCase) {
             $this->numAssertions++;
@@ -576,7 +578,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements TestL
 
         $this->lastTestFailed = false;
 
-        if ($test instanceof PHPUnit_Framework_TestCase) {
+        if ($test instanceof TestInterface) {
             if (!$test->hasExpectationOnOutput()) {
                 $this->write($test->getActualOutput());
             }

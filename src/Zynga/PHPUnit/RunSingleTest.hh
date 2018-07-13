@@ -46,6 +46,7 @@ class RunSingleTest {
 
     $command = array();
     $command[] = $this->projectRoot . '/vendor/bin/phpunit';
+    $command[] = '--verbose';
     $command[] = '--debug';
 
     // add filter to get only a single function

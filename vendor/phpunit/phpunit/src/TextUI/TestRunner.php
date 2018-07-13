@@ -10,6 +10,7 @@
 use PHPUnit\Exceptions\Error\Notice;
 use PHPUnit\Exceptions\Error\Warning;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Interfaces\TestInterface;
 use PHPUnit\Interfaces\TestListener;
 
 use SebastianBergmann\CodeCoverage\CodeCoverage;
@@ -83,7 +84,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
     }
 
     /**
-     * @param PHPUnit_Framework_Test|ReflectionClass $test
+     * @param TestInterface|ReflectionClass $test
      * @param array                                  $arguments
      *
      * @return PHPUnit_Framework_TestResult
@@ -96,8 +97,8 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
             $test = new PHPUnit_Framework_TestSuite($test);
         }
 
-        if ($test instanceof PHPUnit_Framework_Test) {
-            $aTestRunner = new self;
+        if ($test instanceof TestInterface) {
+            $aTestRunner = new self();
 
             return $aTestRunner->doRun(
                 $test,
@@ -111,7 +112,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
     }
 
     /**
-     * @return PHPUnit_Framework_TestResult
+     * @return PHPUnit_ Result
      */
     protected function createTestResult()
     {
@@ -152,13 +153,13 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
     }
 
     /**
-     * @param PHPUnit_Framework_Test $suite
+     * @param PHPUnit_Framework_TestSuite $suite
      * @param array                  $arguments
      * @param bool                   $exit
      *
      * @return PHPUnit_Framework_TestResult
      */
-    public function doRun(PHPUnit_Framework_Test $suite, array $arguments = [], $exit = true)
+    public function doRun(PHPUnit_Framework_TestSuite $suite, array $arguments = [], $exit = true)
     {
         if (isset($arguments['configuration'])) {
             $GLOBALS['__PHPUNIT_CONFIGURATION_FILE'] = $arguments['configuration'];

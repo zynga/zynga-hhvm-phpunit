@@ -7,10 +7,11 @@ use PHPUnit\Interfaces\TestListener;
 use \Exception;
 
 use PHPUnit\Exceptions\AssertionFailedError;
+use PHPUnit\Interfaces\TestInterface;
+use PHPUnit\Interfaces\TestSuiteInterface;
 
 use \PHPUnit_Framework_Test;
 use \PHPUnit_Framework_TestSuite;
-use \PHPUnit_Framework_TestCase;
 
 /**
  * A PHPUnit TestListener that exposes your slowest running tests by outputting
@@ -63,83 +64,76 @@ class SpeedTrapListener implements TestListener
     /**
      * An error occurred.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                   $time
      */
-    public function addError(PHPUnit_Framework_Test $test, Exception $e, float $time): void
+    public function addError(TestInterface $test, Exception $e, float $time): void
     {
     }
 
     /**
      * A failure occurred.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param AssertionFailedError $e
      * @param float $time
      */
-    public function addFailure(PHPUnit_Framework_Test $test, AssertionFailedError $e, float $time): void
+    public function addFailure(TestInterface $test, AssertionFailedError $e, float $time): void
     {
     }
 
     /**
      * Incomplete test.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param \Exception              $e
      * @param float                   $time
      */
-    public function addIncompleteTest(PHPUnit_Framework_Test $test, Exception $e, float $time): void
+    public function addIncompleteTest(TestInterface $test, Exception $e, float $time): void
     {
     }
 
     /**
      * Risky test.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param \Exception              $e
      * @param float                   $time
      * @since  Method available since Release 4.0.0
      */
-    public function addRiskyTest(PHPUnit_Framework_Test $test, Exception $e, float $time): void
+    public function addRiskyTest(TestInterface $test, Exception $e, float $time): void
     {
     }
 
     /**
      * Skipped test.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param \Exception              $e
      * @param float                   $time
      */
-    public function addSkippedTest(PHPUnit_Framework_Test $test, Exception $e, float $time): void
+    public function addSkippedTest(TestInterface $test, Exception $e, float $time): void
     {
     }
 
     /**
      * A test started.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      */
-    public function startTest(PHPUnit_Framework_Test $test): void
+    public function startTest(TestInterface $test): void
     {
     }
 
     /**
      * A test ended.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param float                   $time
      */
-    public function endTest(PHPUnit_Framework_Test $test, float $time): void
+    public function endTest(TestInterface $test, float $time): void
     {
-
-
-      if (! $test instanceof PHPUnit_Framework_TestCase &&
-          ! $test instanceof \Zynga\Framework\Testing\TestCase\V2\Base
-      )  {
-        return;
-      }
 
       $time = $this->toMilliseconds($time);
       $threshold = $this->slowThreshold;
@@ -155,7 +149,7 @@ class SpeedTrapListener implements TestListener
      *
      * @param PHPUnit_Framework_TestSuite $suite
      */
-    public function startTestSuite(PHPUnit_Framework_TestSuite $suite): void
+    public function startTestSuite(TestSuiteInterface $suite): void
     {
         $this->suites++;
     }
@@ -165,7 +159,7 @@ class SpeedTrapListener implements TestListener
      *
      * @param PHPUnit_Framework_TestSuite $suite
      */
-    public function endTestSuite(PHPUnit_Framework_TestSuite $suite): void
+    public function endTestSuite(TestSuiteInterface $suite): void
     {
         $this->suites--;
 
@@ -185,7 +179,7 @@ class SpeedTrapListener implements TestListener
      * @param int $slowThreshold Test execution time at which a test should be considered slow (milliseconds)
      * @return bool
      */
-    protected function isSlow($time, $slowThreshold)
+    protected function isSlow(int $time, int $slowThreshold): bool
     {
         return $time >= $slowThreshold;
     }
@@ -193,10 +187,10 @@ class SpeedTrapListener implements TestListener
     /**
      * Stores a test as slow.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param int                         $time Test execution time in milliseconds
      */
-    protected function addSlowTest(PHPUnit_Framework_Test $test, int $time): void
+    protected function addSlowTest(TestInterface $test, int $time): void
     {
         $label = $this->makeLabel($test);
 
@@ -227,10 +221,10 @@ class SpeedTrapListener implements TestListener
     /**
      * Label for describing a test.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @return string
      */
-    protected function makeLabel(PHPUnit_Framework_Test $test): string
+    protected function makeLabel(TestInterface $test): string
     {
         return sprintf('%s:%s', get_class($test), $test->getName());
     }
@@ -322,13 +316,19 @@ class SpeedTrapListener implements TestListener
      * public function testLongRunningProcess() {}
      * </code>
      *
-     * @param PHPUnit_Framework_TestCase $test
+     * @param TestInterface $test
      * @return int
      */
-    protected function getSlowThreshold(PHPUnit_Framework_TestCase $test)
-    {
+    protected function getSlowThreshold(TestInterface $test): int {
         $ann = $test->getAnnotations();
 
-        return isset($ann['method']['slowThreshold'][0]) ? $ann['method']['slowThreshold'][0] : $this->slowThreshold;
+        $slowThreshold = $this->slowThreshold;
+        if ( $ann->methodAnnotations->containsKey('slowThreshold') ) {
+          $slowThreshold = intval($ann->methodAnnotations->get('slowThreshold'));
+        }
+
+        return $slowThreshold;
+
     }
+
 }

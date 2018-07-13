@@ -56,10 +56,11 @@ class ExceptionWrapper extends PHPUnit_Exceptions_Exception {
         $this->file      = $e->getFile();
         $this->line      = $e->getLine();
 
-        $this->serializableTrace = $e->getTrace();
+        $eTrace = $e->getTrace();
 
-        foreach ($this->serializableTrace as $i => $call) {
-            unset($this->serializableTrace[$i]['args']);
+        foreach ( $eTrace as $frame ) {
+          unset($frame['args']);
+          $this->serializableTrace->add($frame);
         }
 
         $previous = $e->getPrevious();

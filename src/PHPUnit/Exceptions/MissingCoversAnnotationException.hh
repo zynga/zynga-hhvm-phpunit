@@ -11,8 +11,7 @@
 
 namespace PHPUnit\Exceptions;
 
-use PHPUnit\Exceptions\AssertionFailedError;
-use PHPUnit\Exceptions\RiskyTestError;
+use PHPUnit\Exceptions\Error\RiskyTestError;
 
 /**
  * Extension to AssertionFailedError to mark a test as risky

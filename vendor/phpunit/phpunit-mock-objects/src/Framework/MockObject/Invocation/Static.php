@@ -9,14 +9,14 @@
  */
 
 use SebastianBergmann\Exporter\Exporter;
+use PHPUnit\Interfaces\SelfDescribingInterface;
 
 /**
  * Represents a static invocation.
  *
  * @since Class available since Release 1.0.0
  */
-class PHPUnit_Framework_MockObject_Invocation_Static implements PHPUnit_Framework_MockObject_Invocation, PHPUnit_Framework_SelfDescribing
-{
+class PHPUnit_Framework_MockObject_Invocation_Static implements PHPUnit_Framework_MockObject_Invocation, SelfDescribingInterface {
     /**
      * @var array
      */

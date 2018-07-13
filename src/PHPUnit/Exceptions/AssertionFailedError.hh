@@ -12,14 +12,14 @@
 namespace PHPUnit\Exceptions;
 
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
-use \PHPUnit_Framework_SelfDescribing;
+use PHPUnit\Interfaces\SelfDescribingInterface;
 
 /**
  * Thrown when an assertion failed.
  *
  * @since Class available since Release 2.0.0
  */
-class AssertionFailedError extends PHPUnit_Exceptions_Exception implements PHPUnit_Framework_SelfDescribing {
+class AssertionFailedError extends PHPUnit_Exceptions_Exception implements SelfDescribingInterface {
   /**
    * Wrapper for getMessage() which is declared as final.
    *

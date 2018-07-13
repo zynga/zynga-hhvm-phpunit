@@ -8,7 +8,9 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Interfaces\TestInterface;
 use PHPUnit\Util\UtilTestSuiteIterator;
+use PHPUnit\Util\UtilTest;
 
 /**
  * We have a TestSuite object A.
@@ -43,8 +45,8 @@ class PHPUnit_Extensions_GroupTestSuite extends PHPUnit_Framework_TestSuite
         );
 
         foreach ($tests as $test) {
-            if ($test instanceof PHPUnit_Framework_TestCase) {
-                $testGroups = PHPUnit_Util_Test::getGroups(
+            if ($test instanceof TestInterface) {
+                $testGroups = UtilTest::getGroups(
                     get_class($test),
                     $test->getName(false)
                 );

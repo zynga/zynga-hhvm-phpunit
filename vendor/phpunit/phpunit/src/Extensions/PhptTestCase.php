@@ -12,14 +12,15 @@ use PHPUnit\Exceptions\AssertionFailedError;
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
 use PHPUnit\Exceptions\IncompleteTestError;
 use PHPUnit\Exceptions\SkippedTestError;
+use PHPUnit\Interfaces\SelfDescribingInterface;
+use PHPUnit\Util\UtilInvalidArgumentHelper;
 
 /**
  * Runner for PHPT test cases.
  *
  * @since Class available since Release 3.1.4
  */
-class PHPUnit_Extensions_PhptTestCase implements PHPUnit_Framework_Test, PHPUnit_Framework_SelfDescribing
-{
+class PHPUnit_Extensions_PhptTestCase implements PHPUnit_Framework_Test, SelfDescribingInterface {
     /**
      * @var string
      */
@@ -67,7 +68,7 @@ class PHPUnit_Extensions_PhptTestCase implements PHPUnit_Framework_Test, PHPUnit
      */
     public function __construct($filename, $phpUtil = null) {
         if (!is_string($filename)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'string');
+            throw UtilInvalidArgumentHelper::factory(1, 'string');
         }
 
         if (!is_file($filename)) {

@@ -37,6 +37,7 @@ return array(
 
   'PHPUnit\\Util\\UtilTestSuiteIterator' => $baseDir . '/src/PHPUnit/Util/UtilTestSuiteIterator.hh',
   'PHPUnit\\Util\\UtilString' => $baseDir . '/src/PHPUnit/Util/UtilString.hh',
+  'PHPUnit\\Util\\Test' => $baseDir . '/src/PHPUnit/Util/UtilTest.hh',
   'PHPUnit\\Util\\UtilType' => $baseDir . '/src/PHPUnit/Util/UtilType.hh',
   'PHPUnit\\Util\\UtilXML' => $baseDir . '/src/PHPUnit/Util/UtilXML.hh',
 
@@ -189,7 +190,6 @@ return array(
     'PHPUnit_Util_PHP_Windows' => $vendorDir . '/phpunit/phpunit/src/Util/PHP/Windows.php',
     'PHPUnit_Util_Printer' => $vendorDir . '/phpunit/phpunit/src/Util/Printer.php',
     'PHPUnit_Util_Regex' => $vendorDir . '/phpunit/phpunit/src/Util/Regex.php',
-    'PHPUnit_Util_Test' => $vendorDir . '/phpunit/phpunit/src/Util/Test.php',
     'PHPUnit_Util_TestDox_NamePrettifier' => $vendorDir . '/phpunit/phpunit/src/Util/TestDox/NamePrettifier.php',
     'PHPUnit_Util_TestDox_ResultPrinter' => $vendorDir . '/phpunit/phpunit/src/Util/TestDox/ResultPrinter.php',
     'PHPUnit_Util_TestDox_ResultPrinter_HTML' => $vendorDir . '/phpunit/phpunit/src/Util/TestDox/ResultPrinter/HTML.php',

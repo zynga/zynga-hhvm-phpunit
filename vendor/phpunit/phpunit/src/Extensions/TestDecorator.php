@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Interfaces\SelfDescribingInterface;
+
 /**
  * A Decorator for Tests.
  *
@@ -17,8 +19,7 @@
  *
  * @since Class available since Release 2.0.0
  */
-class PHPUnit_Extensions_TestDecorator extends PHPUnit_Framework_Assert implements PHPUnit_Framework_Test, PHPUnit_Framework_SelfDescribing
-{
+class PHPUnit_Extensions_TestDecorator extends PHPUnit_Framework_Assert implements PHPUnit_Framework_Test, SelfDescribingInterface {
     /**
      * The Test to be decorated.
      *

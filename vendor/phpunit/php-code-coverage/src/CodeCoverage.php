@@ -1,4 +1,5 @@
-<?php
+<?hh
+
 /*
  * This file is part of the php-code-coverage package.
  *
@@ -20,6 +21,7 @@ use SebastianBergmann\CodeUnitReverseLookup\Wizard;
 use SebastianBergmann\Environment\Runtime;
 
 use Zynga\Source\Cache as Zynga_Source_Cache;
+use PHPUnit\Util\UtilTest;
 use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
 
 /**
@@ -138,20 +140,20 @@ class CodeCoverage
      *
      * @throws RuntimeException
      */
-    public function __construct(Driver $driver = null, Filter $filter = null)
+    public function __construct(?Driver $driver = null, ?Filter $filter = null)
     {
         if ($driver === null) {
             $driver = $this->selectDriver();
         }
 
         if ($filter === null) {
-            $filter = new Filter;
+            $filter = new Filter();
         }
 
         $this->driver = $driver;
         $this->filter = $filter;
 
-        $this->wizard = new Wizard;
+        $this->wizard = new Wizard();
     }
 
     /**
@@ -161,7 +163,7 @@ class CodeCoverage
      */
     public function getReport()
     {
-        $builder = new Builder;
+        $builder = new Builder();
 
         return $builder->build($this);
     }
@@ -275,8 +277,11 @@ class CodeCoverage
      *
      * @throws InvalidArgumentException
      */
-    public function stop($append = true, $linesToBeCovered = [], array $linesToBeUsed = [])
-    {
+    public function stop(
+      $append = true,
+      Map<string, Vector<int>> $linesToBeCovered = Map {},
+      Map<string, Vector<int>> $linesToBeUsed = Map {}
+      ) {
         if (!is_bool($append)) {
             throw InvalidArgumentException::create(
                 1,
@@ -311,14 +316,17 @@ class CodeCoverage
      *
      * @throws RuntimeException
      */
-    public function append(array $data, $id = null, $append = true, $linesToBeCovered = [], array $linesToBeUsed = [])
+    public function append(
+      array $data, $id = null, $append = true,
+      Map<string, Vector<int>> $linesToBeCovered = Map {},
+      Map<string, Vector<int>> $linesToBeUsed = Map {})
     {
         if ($id === null) {
             $id = $this->currentId;
         }
 
         if ($id === null) {
-            throw new RuntimeException;
+            throw new RuntimeException();
         }
 
         $this->applyListsFilter($data);
@@ -347,11 +355,11 @@ class CodeCoverage
         if ($id instanceof ZyngaTestCaseBase || $id instanceof \PHPUnit_Framework_TestCase) {
             $_size = $id->getSize();
 
-            if ($_size == \PHPUnit_Util_Test::SMALL) {
+            if ($_size == \UtilTest::SMALL) {
                 $size = 'small';
-            } elseif ($_size == \PHPUnit_Util_Test::MEDIUM) {
+            } elseif ($_size == \UtilTest::MEDIUM) {
                 $size = 'medium';
-            } elseif ($_size == \PHPUnit_Util_Test::LARGE) {
+            } elseif ($_size == \UtilTest::LARGE) {
                 $size = 'large';
             }
 
@@ -606,12 +614,15 @@ class CodeCoverage
      * @throws MissingCoversAnnotationException
      * @throws UnintentionallyCoveredCodeException
      */
-    private function applyCoversAnnotationFilter(array &$data, $linesToBeCovered, array $linesToBeUsed)
+    private function applyCoversAnnotationFilter(
+      array $data,
+      Map<string, Vector<int>> $linesToBeCovered,
+      Map<string, Vector<int>> $linesToBeUsed)
     {
         if ($linesToBeCovered === false ||
             ($this->forceCoversAnnotation && empty($linesToBeCovered))) {
             if ($this->checkForMissingCoversAnnotation) {
-                throw new MissingCoversAnnotationException;
+                throw new MissingCoversAnnotationException();
             }
 
             $data = [];
@@ -789,6 +800,7 @@ class CodeCoverage
             foreach ($tokens as $token) {
                 switch (get_class($token)) {
                     case 'PHP_Token_COMMENT':
+                      // FALLTHROUGH
                     case 'PHP_Token_DOC_COMMENT':
                         $_token = trim($token);
                         $_line  = trim($lines[$token->getLine() - 1]);
@@ -828,8 +840,11 @@ class CodeCoverage
                         break;
 
                     case 'PHP_Token_INTERFACE':
+                      // FALLTHROUGH
                     case 'PHP_Token_TRAIT':
+                      // FALLTHROUGH
                     case 'PHP_Token_CLASS':
+                      // FALLTHROUGH
                     case 'PHP_Token_FUNCTION':
                         /* @var \PHP_Token_Interface $token */
 
@@ -884,12 +899,14 @@ class CodeCoverage
                         break;
 
                     case 'PHP_Token_NAMESPACE':
-                        $this->ignoredLines[$filename][] = $token->getEndLine();
-
-                    // Intentional fallthrough
+                      $this->ignoredLines[$filename][] = $token->getEndLine();
+                      // FALLTHROUGH
                     case 'PHP_Token_DECLARE':
+                      // FALLTHROUGH
                     case 'PHP_Token_OPEN_TAG':
+                      // FALLTHROUGH
                     case 'PHP_Token_CLOSE_TAG':
+                      // FALLTHROUGH
                     case 'PHP_Token_USE':
                         $this->ignoredLines[$filename][] = $token->getLine();
                         break;
@@ -927,7 +944,10 @@ class CodeCoverage
      *
      * @throws UnintentionallyCoveredCodeException
      */
-    private function performUnintentionallyCoveredCodeCheck(array &$data, array $linesToBeCovered, array $linesToBeUsed)
+    private function performUnintentionallyCoveredCodeCheck(
+      array &$data,
+      Map<string, Vector<int>> $linesToBeCovered,
+      Map<string, Vector<int>> $linesToBeUsed)
     {
         $allowedLines = $this->getAllowedLines(
             $linesToBeCovered,
@@ -960,7 +980,10 @@ class CodeCoverage
      *
      * @throws CoveredCodeNotExecutedException
      */
-    private function performUnexecutedCoveredCodeCheck(array &$data, array $linesToBeCovered, array $linesToBeUsed)
+    private function performUnexecutedCoveredCodeCheck(
+      array $data,
+      Map<string, Vector<int>> $linesToBeCovered,
+      Map<string, Vector<int>> $linesToBeUsed)
     {
         $expectedLines = $this->getAllowedLines(
             $linesToBeCovered,
@@ -985,7 +1008,7 @@ class CodeCoverage
             }
 
             foreach (array_keys($lines) as $line) {
-                $message .= sprintf('- %s:%d' . PHP_EOL, $file, $line);
+                $message .= sprintf('- %s:%d%s', $file, $line, PHP_EOL);
             }
         }
 
@@ -994,43 +1017,43 @@ class CodeCoverage
         }
     }
 
+    private function _mergeLineStacks(Map<string, Vector<int>> $dest, Map<string, Vector<int>> $source): void {
+
+      foreach ($source as $file => $lines) {
+
+        $t_lines = Vector {};
+
+        if ( $dest->containsKey($file) === true ) {
+          $t_existing = $dest->get($file);
+          if ( $t_existing instanceof Vector ) {
+            $t_lines = $t_existing;
+          }
+        }
+
+        foreach ( $lines as $line ) {
+          if ( $t_lines instanceof Vector && $t_lines->containsKey($line) == -1 ) {
+            $t_lines->add($line);
+          }
+        }
+
+        $dest->set($file, $t_lines);
+
+      }
+    }
     /**
      * @param array $linesToBeCovered
      * @param array $linesToBeUsed
      *
      * @return array
      */
-    private function getAllowedLines(array $linesToBeCovered, array $linesToBeUsed)
+    private function getAllowedLines(
+      Map<string, Vector<int>> $linesToBeCovered,
+      Map<string, Vector<int>> $linesToBeUsed): Map<string, Vector<int>>
     {
-        $allowedLines = [];
+        $allowedLines = Map {};
 
-        foreach (array_keys($linesToBeCovered) as $file) {
-            if (!isset($allowedLines[$file])) {
-                $allowedLines[$file] = [];
-            }
-
-            $allowedLines[$file] = array_merge(
-                $allowedLines[$file],
-                $linesToBeCovered[$file]
-            );
-        }
-
-        foreach (array_keys($linesToBeUsed) as $file) {
-            if (!isset($allowedLines[$file])) {
-                $allowedLines[$file] = [];
-            }
-
-            $allowedLines[$file] = array_merge(
-                $allowedLines[$file],
-                $linesToBeUsed[$file]
-            );
-        }
-
-        foreach (array_keys($allowedLines) as $file) {
-            $allowedLines[$file] = array_flip(
-                array_unique($allowedLines[$file])
-            );
-        }
+        $this->_mergeLineStacks($allowedLines, $linesToBeCovered);
+        $this->_mergeLineStacks($allowedLines, $linesToBeUsed);
 
         return $allowedLines;
     }
@@ -1042,18 +1065,18 @@ class CodeCoverage
      */
     private function selectDriver()
     {
-        $runtime = new Runtime;
+        $runtime = new Runtime();
 
         if (!$runtime->canCollectCodeCoverage()) {
             throw new RuntimeException('No code coverage driver available');
         }
 
         if ($runtime->isHHVM()) {
-            return new HHVM;
+            return new HHVM();
         } elseif ($runtime->isPHPDBG()) {
-            return new PHPDBG;
+            return new PHPDBG();
         } else {
-            return new Xdebug;
+            return new Xdebug();
         }
     }
 

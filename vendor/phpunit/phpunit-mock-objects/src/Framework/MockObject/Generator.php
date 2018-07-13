@@ -9,6 +9,7 @@
  */
 
 use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
+use PHPUnit\Util\UtilInvalidArgumentHelper;
 use Doctrine\Instantiator\Instantiator;
 use Doctrine\Instantiator\Exception\InvalidArgumentException as InstantiatorInvalidArgumentException;
 use Doctrine\Instantiator\Exception\UnexpectedValueException as InstantiatorUnexpectedValueException;
@@ -148,15 +149,15 @@ class PHPUnit_Framework_MockObject_Generator
     public function getMock($type, $methods = [], array $arguments = [], $mockClassName = '', $callOriginalConstructor = true, $callOriginalClone = true, $callAutoload = true, $cloneArguments = true, $callOriginalMethods = false, $proxyTarget = null, $allowMockingUnknownTypes = true)
     {
         if (!is_array($type) && !is_string($type)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'array or string');
+            throw UtilInvalidArgumentHelper::factory(1, 'array or string');
         }
 
         if (!is_string($mockClassName)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(4, 'string');
+            throw UtilInvalidArgumentHelper::factory(4, 'string');
         }
 
         if (!is_array($methods) && !is_null($methods)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(2, 'array', $methods);
+            throw UtilInvalidArgumentHelper::factory(2, 'array', $methods);
         }
 
         if ($type === 'Traversable' || $type === '\\Traversable') {
@@ -366,11 +367,11 @@ class PHPUnit_Framework_MockObject_Generator
     public function getMockForAbstractClass($originalClassName, array $arguments = [], $mockClassName = '', $callOriginalConstructor = true, $callOriginalClone = true, $callAutoload = true, $mockedMethods = [], $cloneArguments = true)
     {
         if (!is_string($originalClassName)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'string');
+            throw UtilInvalidArgumentHelper::factory(1, 'string');
         }
 
         if (!is_string($mockClassName)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(3, 'string');
+            throw UtilInvalidArgumentHelper::factory(3, 'string');
         }
 
         if (class_exists($originalClassName, $callAutoload) ||
@@ -429,11 +430,11 @@ class PHPUnit_Framework_MockObject_Generator
     public function getMockForTrait($traitName, array $arguments = [], $mockClassName = '', $callOriginalConstructor = true, $callOriginalClone = true, $callAutoload = true, $mockedMethods = [], $cloneArguments = true)
     {
         if (!is_string($traitName)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'string');
+            throw UtilInvalidArgumentHelper::factory(1, 'string');
         }
 
         if (!is_string($mockClassName)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(3, 'string');
+            throw UtilInvalidArgumentHelper::factory(3, 'string');
         }
 
         if (!trait_exists($traitName, $callAutoload)) {
@@ -493,11 +494,11 @@ class PHPUnit_Framework_MockObject_Generator
     public function getObjectForTrait($traitName, array $arguments = [], $traitClassName = '', $callOriginalConstructor = true, $callOriginalClone = true, $callAutoload = true)
     {
         if (!is_string($traitName)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'string');
+            throw UtilInvalidArgumentHelper::factory(1, 'string');
         }
 
         if (!is_string($traitClassName)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(3, 'string');
+            throw UtilInvalidArgumentHelper::factory(3, 'string');
         }
 
         if (!trait_exists($traitName, $callAutoload)) {
