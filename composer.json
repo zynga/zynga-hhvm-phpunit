@@ -23,7 +23,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "Zynga\\": "src/Zynga/",
+      "Zynga\\PHPUnit\\": "src/Zynga/PHPUnit/",
       "PHPUnit\\": "src/PHPUnit/",
       "SebastianBergmann\\": "src/SebastianBergmann/",
       "Symfony\\": "src/Symfony/"
