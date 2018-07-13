@@ -15,12 +15,8 @@
     "vendor/phpunit/phpunit/phpunit-vendor-xdebug"
   ],
   "require": {
-    "hhvm": "^3.18",
-    "zynga/phpunit-hhi": "@dev"
+    "hhvm": "^3.18"
   },
-  "repositories": [
-    { "type": "vcs", "url":  "git@github.com:Zynga/zynga-hhvm-phpunit-hhi.git" }
-  ],
   "autoload": {
     "psr-4": {
       "Zynga\\PHPUnit\\": "src/Zynga/PHPUnit/",
