@@ -21,6 +21,7 @@ use PHPUnit\Interfaces\TestListener;
 use PHPUnit\Interfaces\TestSuiteInterface;
 use PHPUnit\Util\PrinterUtil;
 use PHPUnit\Util\TestUtil;
+use Symfony\Component\Yaml\Dumper;
 
 use \Exception;
 
@@ -116,7 +117,7 @@ class TAPUtil extends PrinterUtil implements TestListener {
             }
         }
 
-        $yaml = new Symfony\Component\Yaml\Dumper();
+        $yaml = new Dumper();
 
         $this->writeString(
             sprintf(
@@ -279,5 +280,5 @@ class TAPUtil extends PrinterUtil implements TestListener {
     public function writeHook(Map<string, mixed> $buffer): string {
       return '';
     }
-    
+
 }
