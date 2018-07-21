@@ -8,8 +8,6 @@
  * file that was distributed with this source code.
  */
 
-use PHPUnit\Exceptions\ExpectationFailedException;
-
 /**
  * Invocation matcher which checks if a method was invoked at a certain index.
  *
@@ -73,12 +71,12 @@ class PHPUnit_Framework_MockObject_Matcher_InvokedAtIndex implements PHPUnit_Fra
      * Verifies that the current expectation is valid. If everything is OK the
      * code should just return, if not it must throw an exception.
      *
-     * @throws ExpectationFailedException
+     * @throws PHPUnit_Framework_ExpectationFailedException
      */
     public function verify()
     {
         if ($this->currentIndex < $this->sequenceIndex) {
-            throw new ExpectationFailedException(
+            throw new PHPUnit_Framework_ExpectationFailedException(
                 sprintf(
                     'The expected invocation at index %s was never reached.',
                     $this->sequenceIndex

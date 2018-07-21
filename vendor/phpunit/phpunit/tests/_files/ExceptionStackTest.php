@@ -1,17 +1,13 @@
 <?php
-
-use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
-use PHPUnit\Exceptions\ExpectationFailedException;
-
 class ExceptionStackTest extends PHPUnit_Framework_TestCase
 {
     public function testPrintingChildException()
     {
         try {
             $this->assertEquals([1], [2], 'message');
-        } catch (ExpectationFailedException $e) {
+        } catch (PHPUnit_Framework_ExpectationFailedException $e) {
             $message = $e->getMessage() . $e->getComparisonFailure()->getDiff();
-            throw new PHPUnit_Exceptions_Exception("Child exception\n$message", 101, $e);
+            throw new PHPUnit_Framework_Exception("Child exception\n$message", 101, $e);
         }
     }
 

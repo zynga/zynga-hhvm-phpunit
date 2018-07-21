@@ -8,8 +8,6 @@
  * file that was distributed with this source code.
  */
 
-use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
-
 /**
  * @since      File available since Release 3.7.20
  */
@@ -21,7 +19,7 @@ class Framework_TestFailureTest extends PHPUnit_Framework_TestCase
     public function testToString()
     {
         $test      = new self(__FUNCTION__);
-        $exception = new PHPUnit_Exceptions_Exception('message');
+        $exception = new PHPUnit_Framework_Exception('message');
         $failure   = new PHPUnit_Framework_TestFailure($test, $exception);
 
         $this->assertEquals(__METHOD__ . ': message', $failure->toString());

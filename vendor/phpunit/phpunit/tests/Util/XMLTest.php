@@ -8,12 +8,9 @@
  * file that was distributed with this source code.
  */
 
-use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
-use PHPUnit\Util\UtilXML;
-
 /**
  * @since      Class available since Release 3.3.0
- * @covers     UtilXML
+ * @covers     PHPUnit_Util_XML
  */
 class Util_XMLTest extends PHPUnit_Framework_TestCase
 {
@@ -24,7 +21,7 @@ class Util_XMLTest extends PHPUnit_Framework_TestCase
     {
         $e = null;
 
-        $escapedString = UtilXML::prepareString($char);
+        $escapedString = PHPUnit_Util_XML::prepareString($char);
         $xml           = "<?xml version='1.0' encoding='UTF-8' ?><tag>$escapedString</tag>";
         $dom           = new DomDocument('1.0', 'UTF-8');
 
@@ -34,7 +31,7 @@ class Util_XMLTest extends PHPUnit_Framework_TestCase
         }
 
         $this->assertNull($e, sprintf(
-            'UtilXML::prepareString("\x%02x") should not crash DomDocument',
+            'PHPUnit_Util_XML::prepareString("\x%02x") should not crash DomDocument',
             ord($char)
         ));
     }
@@ -51,29 +48,29 @@ class Util_XMLTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Exceptions_Exception
+     * @expectedException PHPUnit_Framework_Exception
      * @expectedExceptionMessage Could not load XML from empty string
      */
     public function testLoadEmptyString()
     {
-        UtilXML::load('');
+        PHPUnit_Util_XML::load('');
     }
 
     /**
-     * @expectedException PHPUnit_Exceptions_Exception
+     * @expectedException PHPUnit_Framework_Exception
      * @expectedExceptionMessage Could not load XML from array
      */
     public function testLoadArray()
     {
-        UtilXML::load([1, 2, 3]);
+        PHPUnit_Util_XML::load([1, 2, 3]);
     }
 
     /**
-     * @expectedException PHPUnit_Exceptions_Exception
+     * @expectedException PHPUnit_Framework_Exception
      * @expectedExceptionMessage Could not load XML from boolean
      */
     public function testLoadBoolean()
     {
-        UtilXML::load(false);
+        PHPUnit_Util_XML::load(false);
     }
 }

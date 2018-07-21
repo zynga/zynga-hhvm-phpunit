@@ -1,7 +1,4 @@
 <?php
-
-use PHPUnit\Exceptions\ExpectationFailedException;
-
 class Framework_MockObject_Matcher_ConsecutiveParametersTest extends PHPUnit_Framework_TestCase
 {
     public function testIntegration()
@@ -52,7 +49,7 @@ class Framework_MockObject_Matcher_ConsecutiveParametersTest extends PHPUnit_Fra
 
         $mock->foo('bar');
 
-        $this->expectException(ExpectationFailedException::class);
+        $this->expectException(PHPUnit_Framework_ExpectationFailedException::class);
 
         $mock->foo('invalid');
     }

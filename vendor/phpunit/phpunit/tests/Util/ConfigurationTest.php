@@ -8,8 +8,6 @@
  * file that was distributed with this source code.
  */
 
-use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
-
 class Util_ConfigurationTest extends PHPUnit_Framework_TestCase
 {
     /**
@@ -26,7 +24,7 @@ class Util_ConfigurationTest extends PHPUnit_Framework_TestCase
 
     /**
      * @covers PHPUnit_Util_Configuration::getInstance
-     * @expectedException PHPUnit_Exceptions_Exception
+     * @expectedException PHPUnit_Framework_Exception
      */
     public function testExceptionIsThrownForNotExistingConfigurationFile()
     {

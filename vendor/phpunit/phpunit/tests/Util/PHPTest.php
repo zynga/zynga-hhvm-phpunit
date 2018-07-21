@@ -8,8 +8,6 @@
  * file that was distributed with this source code.
  */
 
-use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
-
 /**
  * @author     Henrique Moody <henriquemoody@gmail.com>
  * @copyright  Sebastian Bergmann <sebastian@phpunit.de>
@@ -44,7 +42,7 @@ class PHPUnit_Util_PHPTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Exceptions_Exception
+     * @expectedException PHPUnit_Framework_Exception
      * @expectedExceptionMessage Argument #1 (No Value) of PHPUnit_Util_PHP::setUseStderrRedirection() must be a boolean
      */
     public function testShouldThrowsExceptionWhenStderrRedirectionVariableIsNotABoolean()

@@ -8,8 +8,6 @@
  * file that was distributed with this source code.
  */
 
-use PHPUnit\Exceptions\ExpectationFailedException;
-
 /**
  * Invocation matcher which looks for sets of specific parameters in the invocations.
  *
@@ -86,7 +84,7 @@ class PHPUnit_Framework_MockObject_Matcher_ConsecutiveParameters extends PHPUnit
      * @param PHPUnit_Framework_MockObject_Invocation $invocation
      * @param int                                     $callIndex
      *
-     * @throws ExpectationFailedException
+     * @throws PHPUnit_Framework_ExpectationFailedException
      */
     private function verifyInvocation(PHPUnit_Framework_MockObject_Invocation $invocation, $callIndex)
     {
@@ -98,13 +96,13 @@ class PHPUnit_Framework_MockObject_Matcher_ConsecutiveParameters extends PHPUnit
         }
 
         if ($invocation === null) {
-            throw new ExpectationFailedException(
+            throw new PHPUnit_Framework_ExpectationFailedException(
                 'Mocked method does not exist.'
             );
         }
 
         if (count($invocation->parameters) < count($parameters)) {
-            throw new ExpectationFailedException(
+            throw new PHPUnit_Framework_ExpectationFailedException(
                 sprintf(
                     'Parameter count for invocation %s is too low.',
                     $invocation->toString()

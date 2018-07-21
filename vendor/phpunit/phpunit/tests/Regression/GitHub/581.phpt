@@ -1,5 +1,5 @@
 --TEST--
-GH-581: UtilType::export adds extra newlines in Windows
+GH-581: PHPUnit_Util_Type::export adds extra newlines in Windows
 --FILE--
 <?php
 

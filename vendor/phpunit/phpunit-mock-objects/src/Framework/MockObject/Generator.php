@@ -8,8 +8,6 @@
  * file that was distributed with this source code.
  */
 
-use PHPUnit\Exceptions\Exception as PHPUnit_Exceptions_Exception;
-use PHPUnit\Util\UtilInvalidArgumentHelper;
 use Doctrine\Instantiator\Instantiator;
 use Doctrine\Instantiator\Exception\InvalidArgumentException as InstantiatorInvalidArgumentException;
 use Doctrine\Instantiator\Exception\UnexpectedValueException as InstantiatorUnexpectedValueException;
@@ -141,7 +139,7 @@ class PHPUnit_Framework_MockObject_Generator
      * @return PHPUnit_Framework_MockObject_MockObject
      *
      * @throws InvalidArgumentException
-     * @throws PHPUnit_Exceptions_Exception
+     * @throws PHPUnit_Framework_Exception
      * @throws PHPUnit_Framework_MockObject_RuntimeException
      *
      * @since  Method available since Release 1.0.0
@@ -149,15 +147,15 @@ class PHPUnit_Framework_MockObject_Generator
     public function getMock($type, $methods = [], array $arguments = [], $mockClassName = '', $callOriginalConstructor = true, $callOriginalClone = true, $callAutoload = true, $cloneArguments = true, $callOriginalMethods = false, $proxyTarget = null, $allowMockingUnknownTypes = true)
     {
         if (!is_array($type) && !is_string($type)) {
-            throw UtilInvalidArgumentHelper::factory(1, 'array or string');
+            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'array or string');
         }
 
         if (!is_string($mockClassName)) {
-            throw UtilInvalidArgumentHelper::factory(4, 'string');
+            throw PHPUnit_Util_InvalidArgumentHelper::factory(4, 'string');
         }
 
         if (!is_array($methods) && !is_null($methods)) {
-            throw UtilInvalidArgumentHelper::factory(2, 'array', $methods);
+            throw PHPUnit_Util_InvalidArgumentHelper::factory(2, 'array', $methods);
         }
 
         if ($type === 'Traversable' || $type === '\\Traversable') {
@@ -360,18 +358,18 @@ class PHPUnit_Framework_MockObject_Generator
      * @return PHPUnit_Framework_MockObject_MockObject
      *
      * @throws PHPUnit_Framework_MockObject_RuntimeException
-     * @throws PHPUnit_Exceptions_Exception
+     * @throws PHPUnit_Framework_Exception
      *
      * @since  Method available since Release 1.0.0
      */
     public function getMockForAbstractClass($originalClassName, array $arguments = [], $mockClassName = '', $callOriginalConstructor = true, $callOriginalClone = true, $callAutoload = true, $mockedMethods = [], $cloneArguments = true)
     {
         if (!is_string($originalClassName)) {
-            throw UtilInvalidArgumentHelper::factory(1, 'string');
+            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'string');
         }
 
         if (!is_string($mockClassName)) {
-            throw UtilInvalidArgumentHelper::factory(3, 'string');
+            throw PHPUnit_Util_InvalidArgumentHelper::factory(3, 'string');
         }
 
         if (class_exists($originalClassName, $callAutoload) ||
@@ -423,18 +421,18 @@ class PHPUnit_Framework_MockObject_Generator
      * @return PHPUnit_Framework_MockObject_MockObject
      *
      * @throws PHPUnit_Framework_MockObject_RuntimeException
-     * @throws PHPUnit_Exceptions_Exception
+     * @throws PHPUnit_Framework_Exception
      *
      * @since  Method available since Release 1.2.3
      */
     public function getMockForTrait($traitName, array $arguments = [], $mockClassName = '', $callOriginalConstructor = true, $callOriginalClone = true, $callAutoload = true, $mockedMethods = [], $cloneArguments = true)
     {
         if (!is_string($traitName)) {
-            throw UtilInvalidArgumentHelper::factory(1, 'string');
+            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'string');
         }
 
         if (!is_string($mockClassName)) {
-            throw UtilInvalidArgumentHelper::factory(3, 'string');
+            throw PHPUnit_Util_InvalidArgumentHelper::factory(3, 'string');
         }
 
         if (!trait_exists($traitName, $callAutoload)) {
@@ -487,18 +485,18 @@ class PHPUnit_Framework_MockObject_Generator
      * @return object
      *
      * @throws PHPUnit_Framework_MockObject_RuntimeException
-     * @throws PHPUnit_Exceptions_Exception
+     * @throws PHPUnit_Framework_Exception
      *
      * @since  Method available since Release 1.1.0
      */
     public function getObjectForTrait($traitName, array $arguments = [], $traitClassName = '', $callOriginalConstructor = true, $callOriginalClone = true, $callAutoload = true)
     {
         if (!is_string($traitName)) {
-            throw UtilInvalidArgumentHelper::factory(1, 'string');
+            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'string');
         }
 
         if (!is_string($traitClassName)) {
-            throw UtilInvalidArgumentHelper::factory(3, 'string');
+            throw PHPUnit_Util_InvalidArgumentHelper::factory(3, 'string');
         }
 
         if (!trait_exists($traitName, $callAutoload)) {
