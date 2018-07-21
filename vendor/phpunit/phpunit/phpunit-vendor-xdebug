@@ -42,19 +42,28 @@ if (!defined('PHPUNIT_COMPOSER_INSTALL')) {
     die(1);
 }
 
-// --
-// JEO: This whole bit is going to need work as it deps against zynga shit.
-// --
+define('ZYNGA_FRAMEWORK_ROOT', dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))))));
 
-require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/include/path.hh';
-use Zynga\CodePath;
+require_once ZYNGA_FRAMEWORK_ROOT . '/vendor/autoload.php';
 
-require_once CodePath::getRoot() . '/shared/casino-platform/include/path.php';
+use Zynga\Framework\Environment\CodePath\V1\CodePath;
+
+// This is a work around that the environment may / may not be fully up at this
+// moment, so codepath might be unititalized.
+if ( CodePath::getRoot() == '' ) {
+  CodePath::setRoot(ZYNGA_FRAMEWORK_ROOT);
+}
+
+putenv('xhprof.enable=true');
+
+use Zynga\Framework\Performance\V1\XHProfiler;
 
 // --
 // JEO: needed to be able to performance profile phpunit itself, it has a nasty startup cost.
 // --
-zyCasino_App_Performance_XHProfiler::startProfiling();
+XHProfiler::setProfileDir(CodePath::getRoot() . '/tmp/phpunit-xhprof');
+
+XHProfiler::startProfiling();
 
 require PHPUNIT_COMPOSER_INSTALL;
 
@@ -62,6 +71,6 @@ $rv = PHPUnit_TextUI_Command::main(false);
 
 $name = 'phpunit-commandline';
 
-zyCasino_App_Performance_XHProfiler::stopProfiling($name);
+XHProfiler::stopProfiling($name);
 
 exit($rv);

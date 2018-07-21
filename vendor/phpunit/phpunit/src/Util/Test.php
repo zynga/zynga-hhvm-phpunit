@@ -9,7 +9,8 @@
  */
 
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
-use Zynga\Framework\ReflectionCache\v1\ReflectionFunctions;
+use Zynga\Framework\ReflectionCache\V1\ReflectionFunctions;
+use Zynga\Framework\ReflectionCache\V1\ReflectionMethods;
 
 /**
  * Test helpers.
@@ -179,7 +180,7 @@ class PHPUnit_Util_Test
     {
         $reflector  = ReflectionClasses::getReflection($className);
         $docComment = $reflector->getDocComment();
-        $reflector  = new ReflectionMethod($className, $methodName);
+        $reflector  = ReflectionMethods::getReflection($className, $methodName);
         $docComment .= "\n" . $reflector->getDocComment();
         $requires   = [];
 
@@ -304,7 +305,7 @@ class PHPUnit_Util_Test
      */
     public static function getExpectedException($className, $methodName)
     {
-        $reflector  = new ReflectionMethod($className, $methodName);
+        $reflector  = ReflectionMethods::getReflection($className, $methodName);
         $docComment = $reflector->getDocComment();
         $docComment = substr($docComment, 3, -2);
 
@@ -392,7 +393,7 @@ class PHPUnit_Util_Test
      */
     public static function getProvidedData($className, $methodName)
     {
-        $reflector  = new ReflectionMethod($className, $methodName);
+        $reflector  = ReflectionMethods::getReflection($className, $methodName);
         $docComment = $reflector->getDocComment();
         $data       = null;
 
@@ -539,7 +540,7 @@ class PHPUnit_Util_Test
 
         if (!empty($methodName) && !isset(self::$annotationCache[$className . '::' . $methodName])) {
             try {
-              $method      = new ReflectionMethod($className, $methodName);
+              $method      = ReflectionMethods::getReflection($className, $methodName);
               $annotations = self::parseAnnotations($method->getDocComment());
             } catch (ReflectionException $e) {
               $annotations = [];
@@ -565,7 +566,7 @@ class PHPUnit_Util_Test
      */
     public static function getInlineAnnotations($className, $methodName)
     {
-        $method      = new ReflectionMethod($className, $methodName);
+        $method      = ReflectionMethods::getReflection($className, $methodName);
         $code        = file($method->getFileName());
         $lineNumber  = $method->getStartLine();
         $startLine   = $method->getStartLine() - 1;
@@ -1016,7 +1017,7 @@ class PHPUnit_Util_Test
                             );
                         }
 
-                        $codeToCoverList[] = new ReflectionMethod(
+                        $codeToCoverList[] = ReflectionMethods::getReflection(
                             $className,
                             $methodName
                         );

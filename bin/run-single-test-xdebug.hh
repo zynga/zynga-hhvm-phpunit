@@ -1,12 +1,15 @@
 #!/usr/bin/env hhvm
 <?hh
 
-function usageRunSingleTest($message) {
+function usageRunSingleTestXDebug($message) {
   echo "Error: $message\n";
   echo "\n";
-  echo "run-single-test.hh <path>Test.hh [testFunction]\n";
+  echo "run-single-test-xdebug.hh <path>Test.hh [testFunction]\n";
   echo "\n";
   echo " Runs a single test suite handles the phpunit arguments\n";
+  echo
+    " Enables xdebug in order to see performance issues within the stack.\n"
+  ;
   echo "\n";
   exit(255);
 }
@@ -36,7 +39,7 @@ if (preg_match('/\/([a-zA-Z0-9]*Test)\.hh$/', $filePath, $pregs)) {
 }
 
 $command = array();
-$command[] = $projectRoot.'/vendor/bin/phpunit';
+$command[] = $projectRoot.'/vendor/bin/phpunit-xdebug';
 $command[] = '--debug';
 
 // add filter to get only a single function
