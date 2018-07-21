@@ -9,7 +9,9 @@
   ],
   "bin": [
     "bin/phpunit",
+    "bin/phpunit-xdebug",
     "bin/run-single-test.hh",
+    "bin/run-single-test-xdebug.hh",
     "vendor/bin/hhvm-restart-wrapper",
     "vendor/phpunit/phpunit/phpunit-vendor",
     "vendor/phpunit/phpunit/phpunit-vendor-xdebug"
@@ -19,6 +21,9 @@
     "zynga/phpunit-hhi": "@dev"
   },
   "repositories": [
-    { "type": "vcs", "url":  "git@github.com:Zynga/zynga-hhvm-phpunit-hhi.git" }
+    {
+      "type": "vcs",
+      "url": "git@github.com:Zynga/zynga-hhvm-phpunit-hhi.git"
+    }
   ]
 }
