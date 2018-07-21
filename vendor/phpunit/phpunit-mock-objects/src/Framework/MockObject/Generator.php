@@ -11,6 +11,7 @@
 use Doctrine\Instantiator\Instantiator;
 use Doctrine\Instantiator\Exception\InvalidArgumentException as InstantiatorInvalidArgumentException;
 use Doctrine\Instantiator\Exception\UnexpectedValueException as InstantiatorUnexpectedValueException;
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 
 /**
  * Mock Object Code Generator
@@ -230,7 +231,7 @@ class PHPUnit_Framework_MockObject_Generator
         }
 
         if ($mockClassName != '' && class_exists($mockClassName, false)) {
-            $reflect = new ReflectionClass($mockClassName);
+            $reflect = ReflectionClasses::getReflection($mockClassName);
 
             if (!$reflect->implementsInterface('PHPUnit_Framework_MockObject_MockObject')) {
                 throw new PHPUnit_Framework_MockObject_RuntimeException(
@@ -292,7 +293,7 @@ class PHPUnit_Framework_MockObject_Generator
             if (count($arguments) == 0) {
                 $object = new $className;
             } else {
-                $class  = new ReflectionClass($className);
+                $class  = ReflectionClasses::getReflection($className);
                 $object = $class->newInstanceArgs($arguments);
             }
         } else {
@@ -319,7 +320,7 @@ class PHPUnit_Framework_MockObject_Generator
                 if (count($arguments) == 0) {
                     $proxyTarget = new $type;
                 } else {
-                    $class       = new ReflectionClass($type);
+                    $class       = ReflectionClasses::getReflection($type);
                     $proxyTarget = $class->newInstanceArgs($arguments);
                 }
             }
@@ -374,7 +375,7 @@ class PHPUnit_Framework_MockObject_Generator
 
         if (class_exists($originalClassName, $callAutoload) ||
             interface_exists($originalClassName, $callAutoload)) {
-            $reflector = new ReflectionClass($originalClassName);
+            $reflector = ReflectionClasses::getReflection($originalClassName);
             $methods   = $mockedMethods;
 
             foreach ($reflector->getMethods() as $method) {
@@ -750,7 +751,7 @@ class PHPUnit_Framework_MockObject_Generator
                 $templateDir . 'mocked_clone.tpl'
             );
         } else {
-            $class = new ReflectionClass($mockClassName['fullClassName']);
+            $class = ReflectionClasses::getReflection($mockClassName['fullClassName']);
 
             if ($class->isFinal()) {
                 throw new PHPUnit_Framework_MockObject_RuntimeException(
@@ -1256,7 +1257,7 @@ class PHPUnit_Framework_MockObject_Generator
      */
     public function getClassMethods($className)
     {
-        $class   = new ReflectionClass($className);
+        $class   = ReflectionClasses::getReflection($className);
         $methods = [];
 
         foreach ($class->getMethods() as $method) {

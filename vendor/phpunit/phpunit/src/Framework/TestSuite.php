@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+
 /**
  * A TestSuite is a composite of Tests. It runs a collection of test cases.
  *
@@ -28,7 +30,7 @@
  * <code>
  * <?php
  * $suite = new PHPUnit_Framework_TestSuite(
- *   new ReflectionClass('MathTest')
+ *   ReflectionClasses::getReflection('MathTest')
  * );
  * ?>
  * </code>
@@ -155,7 +157,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                 $name = $theClass;
             }
 
-            $theClass = new ReflectionClass($theClass);
+            $theClass = ReflectionClasses::getReflection($theClass);
         } elseif (is_string($theClass)) {
             $this->setName($theClass);
 
@@ -230,7 +232,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      */
     public function addTest(PHPUnit_Framework_Test $test, $groups = [])
     {
-        $class = new ReflectionClass($test);
+        $class = ReflectionClasses::getReflection($test);
 
         if (!$class->isAbstract()) {
             $this->tests[]  = $test;
@@ -269,7 +271,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
     public function addTestSuite($testClass)
     {
         if (is_string($testClass) && class_exists($testClass)) {
-            $testClass = new ReflectionClass($testClass);
+            $testClass = ReflectionClasses::getReflection($testClass);
         }
 
         if (!is_object($testClass)) {
@@ -362,7 +364,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
 
         foreach ($this->foundClasses as $i => $className) {
             if (preg_match($shortnameRegEx, $className)) {
-                $class = new ReflectionClass($className);
+                $class = ReflectionClasses::getReflection($className);
 
                 if ($class->getFileName() == $filename) {
                     $newClasses = [$className];
@@ -373,7 +375,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
         }
 
         foreach ($newClasses as $className) {
-            $class = new ReflectionClass($className);
+            $class = ReflectionClasses::getReflection($className);
 
             if (!$class->isAbstract()) {
                 if ($class->hasMethod(PHPUnit_Runner_BaseTestRunner::SUITE_METHODNAME)) {

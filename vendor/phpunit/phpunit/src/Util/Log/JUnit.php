@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+
 /**
  * A TestListener that generates a logfile of the test execution in XML markup.
  *
@@ -256,7 +258,7 @@ class PHPUnit_Util_Log_JUnit extends PHPUnit_Util_Printer implements PHPUnit_Fra
 
         if (class_exists($suite->getName(), false)) {
             try {
-                $class = new ReflectionClass($suite->getName());
+                $class = ReflectionClasses::getReflection($suite->getName());
 
                 $testSuite->setAttribute('file', $class->getFileName());
             } catch (ReflectionException $e) {
@@ -334,7 +336,7 @@ class PHPUnit_Util_Log_JUnit extends PHPUnit_Util_Printer implements PHPUnit_Fra
         $testCase->setAttribute('name', $test->getName());
 
         if ($test instanceof PHPUnit_Framework_TestCase) {
-            $class      = new ReflectionClass($test);
+            $class      = ReflectionClasses::getReflection($test);
             $methodName = $test->getName();
 
             if ($class->hasMethod($methodName)) {

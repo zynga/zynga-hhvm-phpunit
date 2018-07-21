@@ -42,6 +42,10 @@ if (!defined('PHPUNIT_COMPOSER_INSTALL')) {
     die(1);
 }
 
+// --
+// We need to load both vendor/*.php files
+// --
+require dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))))) . '/vendor/autoload.php';
 require PHPUNIT_COMPOSER_INSTALL;
 
 PHPUnit_TextUI_Command::main();

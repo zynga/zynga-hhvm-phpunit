@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+
 /**
  * A TestRunner for the Command Line Interface (CLI)
  * PHP SAPI Module.
@@ -796,7 +798,7 @@ class PHPUnit_TextUI_Command
         }
 
         if (class_exists($loaderClass, false)) {
-            $class = new ReflectionClass($loaderClass);
+            $class = ReflectionClasses::getReflection($loaderClass);
 
             if ($class->implementsInterface('PHPUnit_Runner_TestSuiteLoader') &&
                 $class->isInstantiable()) {
@@ -841,7 +843,7 @@ class PHPUnit_TextUI_Command
         }
 
         if (class_exists($printerClass)) {
-            $class = new ReflectionClass($printerClass);
+            $class = ReflectionClasses::getReflection($printerClass);
 
             if ($class->implementsInterface('PHPUnit_Framework_TestListener') &&
                 $class->isSubclassOf('PHPUnit_Util_Printer') &&

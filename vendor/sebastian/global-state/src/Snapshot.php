@@ -10,6 +10,8 @@
 
 namespace SebastianBergmann\GlobalState;
 
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+
 use ReflectionClass;
 use Serializable;
 
@@ -264,7 +266,7 @@ class Snapshot
     private function snapshotClasses()
     {
         foreach (array_reverse(get_declared_classes()) as $className) {
-            $class = new ReflectionClass($className);
+            $class = ReflectionClasses::getReflection($className);
 
             if (!$class->isUserDefined()) {
                 break;
@@ -282,7 +284,7 @@ class Snapshot
     private function snapshotInterfaces()
     {
         foreach (array_reverse(get_declared_interfaces()) as $interfaceName) {
-            $class = new ReflectionClass($interfaceName);
+            $class = ReflectionClasses::getReflection($interfaceName);
 
             if (!$class->isUserDefined()) {
                 break;
@@ -337,7 +339,7 @@ class Snapshot
     private function snapshotStaticAttributes()
     {
         foreach ($this->classes as $className) {
-            $class    = new ReflectionClass($className);
+            $class    = ReflectionClasses::getReflection($className);
             $snapshot = array();
 
             foreach ($class->getProperties() as $attribute) {
@@ -410,7 +412,7 @@ class Snapshot
             return true;
         }
 
-        $class = new ReflectionClass($variable);
+        $class = ReflectionClasses::getReflection($variable);
 
         do {
             if ($class->isInternal()) {

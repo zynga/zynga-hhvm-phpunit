@@ -9,6 +9,7 @@
  */
 
 use SebastianBergmann\Comparator\ComparisonFailure;
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 
 /**
  * A TestListener that generates a logfile of the test execution using the
@@ -402,7 +403,7 @@ class PHPUnit_Util_Log_TeamCity extends PHPUnit_TextUI_ResultPrinter
      */
     private static function getFileName($className)
     {
-        $reflectionClass = new ReflectionClass($className);
+        $reflectionClass = ReflectionClasses::getReflection($className);
         $fileName        = $reflectionClass->getFileName();
 
         return $fileName;

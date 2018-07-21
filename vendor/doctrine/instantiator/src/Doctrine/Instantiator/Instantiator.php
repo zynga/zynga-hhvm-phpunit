@@ -24,6 +24,7 @@ use Doctrine\Instantiator\Exception\InvalidArgumentException;
 use Doctrine\Instantiator\Exception\UnexpectedValueException;
 use Exception;
 use ReflectionClass;
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 
 /**
  * {@inheritDoc}
@@ -80,7 +81,7 @@ final class Instantiator implements InstantiatorInterface
         $factory  = self::$cachedInstantiators[$className] = $this->buildFactory($className);
         $instance = $factory();
 
-        if ($this->isSafeToClone(new ReflectionClass($instance))) {
+        if ($this->isSafeToClone(ReflectionClasses::getReflection($instance))) {
             self::$cachedCloneables[$className] = clone $instance;
         }
 
@@ -132,7 +133,7 @@ final class Instantiator implements InstantiatorInterface
             throw InvalidArgumentException::fromNonExistingClass($className);
         }
 
-        $reflection = new ReflectionClass($className);
+        $reflection = ReflectionClasses::getReflection($className);
 
         if ($reflection->isAbstract()) {
             throw InvalidArgumentException::fromAbstractClass($reflection);

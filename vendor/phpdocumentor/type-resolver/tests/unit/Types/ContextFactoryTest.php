@@ -18,7 +18,8 @@ namespace phpDocumentor\Reflection\Types {
         phpDocumentor\Reflection\DocBlock\Tag;
     use phpDocumentor;
     use \ReflectionClass; // yes, the slash is part of the test
-
+    use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+    
     /**
      * @coversDefaultClass \phpDocumentor\Reflection\Types\ContextFactory
      * @covers ::<private>
@@ -33,7 +34,7 @@ namespace phpDocumentor\Reflection\Types {
         public function testReadsNamespaceFromClassReflection()
         {
             $fixture = new ContextFactory();
-            $context = $fixture->createFromReflector(new ReflectionClass($this));
+            $context = $fixture->createFromReflector(ReflectionClasses::getReflection($this));
 
             $this->assertSame(__NAMESPACE__, $context->getNamespace());
         }
@@ -53,7 +54,7 @@ namespace phpDocumentor\Reflection\Types {
                 'phpDocumentor' => 'phpDocumentor',
                 'ReflectionClass' => 'ReflectionClass'
             ];
-            $context = $fixture->createFromReflector(new ReflectionClass($this));
+            $context = $fixture->createFromReflector(ReflectionClasses::getReflection($this));
 
             $this->assertSame($expected, $context->getNamespaceAliases());
         }
@@ -156,7 +157,7 @@ namespace phpDocumentor\Reflection\Types {
         public function testEmptyFileName()
         {
             $fixture = new ContextFactory();
-            $context = $fixture->createFromReflector(new \ReflectionClass('stdClass'));
+            $context = $fixture->createFromReflector(ReflectionClasses::getReflection('stdClass'));
 
             $this->assertSame([], $context->getNamespaceAliases());
         }
@@ -175,7 +176,7 @@ class Bar
 PHP
 );
             $fixture = new ContextFactory();
-            $context = $fixture->createFromReflector(new \ReflectionClass('Foo\Bar'));
+            $context = $fixture->createFromReflector(ReflectionClasses::getReflection('Foo\Bar'));
 
             $this->assertSame([], $context->getNamespaceAliases());
         }

@@ -17,6 +17,7 @@ use SebastianBergmann\ObjectEnumerator\Enumerator;
 use Prophecy\Exception\Prediction\PredictionException;
 use Prophecy\Prophet;
 use DeepCopy\DeepCopy;
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 
 /**
  * A TestCase defines the fixture to run multiple tests.
@@ -323,7 +324,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
     {
       $test = $this->getTest();
 
-        $class = new ReflectionClass($test);
+        $class = ReflectionClasses::getReflection($test);
 
         $buffer = sprintf(
             '%s::%s',
@@ -826,7 +827,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
             echo "Processisolation does -not- play well with resource contention in shared development environments, exiting!\n";
             exit(255);
 
-            $class = new ReflectionClass($this);
+            $class = ReflectionClasses::getReflection($this);
 
 
             $template = new Text_Template(
@@ -1116,7 +1117,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
         }
 
         try {
-            $class  = new ReflectionClass($test);
+            $class  = ReflectionClasses::getReflection($test);
             $method = $class->getMethod($test->getName(false));
         } catch (ReflectionException $e) {
             $this->fail($e->getMessage());
@@ -1144,7 +1145,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
                     $checkException = false;
                 }
 
-                $reflector = new ReflectionClass($this->expectedException);
+                $reflector = ReflectionClasses::getReflection($this->expectedException);
 
                 if ($this->expectedException == 'PHPUnit_Framework_Exception' ||
                     $reflector->isSubclassOf('PHPUnit_Framework_Exception')) {

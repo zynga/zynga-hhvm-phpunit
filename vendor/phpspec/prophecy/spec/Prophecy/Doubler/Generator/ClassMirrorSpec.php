@@ -7,6 +7,7 @@ use PhpSpec\ObjectBehavior;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionParameter;
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 
 class ClassMirrorSpec extends ObjectBehavior
 {
@@ -747,7 +748,7 @@ class ClassMirrorSpec extends ObjectBehavior
 
     function it_doesnt_fail_to_typehint_nonexistent_FQCN()
     {
-        $classNode = $this->reflect(new ReflectionClass('spec\Prophecy\Doubler\Generator\OptionalDepsClass'), array());
+        $classNode = $this->reflect(ReflectionClasses::getReflection('spec\Prophecy\Doubler\Generator\OptionalDepsClass'), array());
         $method = $classNode->getMethod('iHaveAStrangeTypeHintedArg');
         $arguments = $method->getArguments();
         $arguments[0]->getTypeHint()->shouldBe('I\Simply\Am\Nonexistent');
@@ -755,7 +756,7 @@ class ClassMirrorSpec extends ObjectBehavior
 
     function it_doesnt_fail_to_typehint_nonexistent_RQCN()
     {
-        $classNode = $this->reflect(new ReflectionClass('spec\Prophecy\Doubler\Generator\OptionalDepsClass'), array());
+        $classNode = $this->reflect(ReflectionClasses::getReflection('spec\Prophecy\Doubler\Generator\OptionalDepsClass'), array());
         $method = $classNode->getMethod('iHaveAnEvenStrangerTypeHintedArg');
         $arguments = $method->getArguments();
         $arguments[0]->getTypeHint()->shouldBe('I\Simply\Am\Not');
@@ -763,7 +764,7 @@ class ClassMirrorSpec extends ObjectBehavior
 
     function it_doesnt_use_scalar_typehints()
     {
-        $classNode = $this->reflect(new ReflectionClass('ReflectionMethod'), array());
+        $classNode = $this->reflect(ReflectionClasses::getReflection('ReflectionMethod'), array());
         $method = $classNode->getMethod('export');
         $arguments = $method->getArguments();
         $arguments[0]->getTypeHint()->shouldReturn(null);

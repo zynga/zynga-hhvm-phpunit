@@ -8,6 +8,9 @@
  * file that was distributed with this source code.
  */
 
+
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Exception as CodeCoverageException;
 use SebastianBergmann\CodeCoverage\Filter as CodeCoverageFilter;
@@ -126,21 +129,21 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
 
         if (!empty($arguments['excludeGroups'])) {
             $filterFactory->addFilter(
-                new ReflectionClass('PHPUnit_Runner_Filter_Group_Exclude'),
+                ReflectionClasses::getReflection('PHPUnit_Runner_Filter_Group_Exclude'),
                 $arguments['excludeGroups']
             );
         }
 
         if (!empty($arguments['groups'])) {
             $filterFactory->addFilter(
-                new ReflectionClass('PHPUnit_Runner_Filter_Group_Include'),
+                ReflectionClasses::getReflection('PHPUnit_Runner_Filter_Group_Include'),
                 $arguments['groups']
             );
         }
 
         if ($arguments['filter']) {
             $filterFactory->addFilter(
-                new ReflectionClass('PHPUnit_Runner_Filter_Test'),
+                ReflectionClasses::getReflection('PHPUnit_Runner_Filter_Test'),
                 $arguments['filter']
             );
         }
@@ -243,7 +246,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
                 if (isset($arguments['printer']) &&
                     is_string($arguments['printer']) &&
                     class_exists($arguments['printer'], false)) {
-                    $class = new ReflectionClass($arguments['printer']);
+                    $class = ReflectionClasses::getReflection($arguments['printer']);
 
                     if ($class->isSubclassOf('PHPUnit_TextUI_ResultPrinter')) {
                         $printerClass = $arguments['printer'];
@@ -886,7 +889,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
                     if (count($listener['arguments']) == 0) {
                         $listener = new $listener['class'];
                     } else {
-                        $listenerClass = new ReflectionClass(
+                        $listenerClass = ReflectionClasses::getReflection(
                             $listener['class']
                         );
                         $listener      = $listenerClass->newInstanceArgs(

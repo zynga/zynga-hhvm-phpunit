@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+
 /**
  * A set of assert methods.
  *
@@ -2793,7 +2795,7 @@ abstract class PHPUnit_Framework_Assert
             throw PHPUnit_Util_InvalidArgumentHelper::factory(2, 'valid attribute name');
         }
 
-        $class = new ReflectionClass($className);
+        $class = ReflectionClasses::getReflection($className);
 
         while ($class) {
             $attributes = $class->getStaticProperties();

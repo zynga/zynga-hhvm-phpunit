@@ -23,6 +23,7 @@ use Doctrine\Instantiator\Exception\UnexpectedValueException;
 use Doctrine\Instantiator\Instantiator;
 use PHPUnit_Framework_TestCase;
 use ReflectionClass;
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 
 /**
  * Tests for {@see \Doctrine\Instantiator\Instantiator}
@@ -107,7 +108,7 @@ class InstantiatorTest extends PHPUnit_Framework_TestCase
 
             $this->fail('No exception was raised');
         } catch (UnexpectedValueException $exception) {
-            $wakeUpNoticesReflection = new ReflectionClass('DoctrineTest\\InstantiatorTestAsset\\WakeUpNoticesAsset');
+            $wakeUpNoticesReflection = ReflectionClasses::getReflection('DoctrineTest\\InstantiatorTestAsset\\WakeUpNoticesAsset');
             $previous                = $exception->getPrevious();
 
             $this->assertInstanceOf('Exception', $previous);

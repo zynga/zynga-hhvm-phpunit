@@ -11,6 +11,7 @@
 
 namespace Prophecy\Doubler;
 
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 use Prophecy\Exception\Doubler\DoubleException;
 use Prophecy\Exception\Doubler\ClassNotFoundException;
 use Prophecy\Exception\Doubler\InterfaceNotFoundException;
@@ -59,7 +60,7 @@ class LazyDouble
                 throw new ClassNotFoundException(sprintf('Class %s not found.', $class), $class);
             }
 
-            $class = new ReflectionClass($class);
+            $class = ReflectionClasses::getReflection($class);
         }
 
         $this->class = $class;
@@ -89,7 +90,7 @@ class LazyDouble
                 );
             }
 
-            $interface = new ReflectionClass($interface);
+            $interface = ReflectionClasses::getReflection($interface);
         }
 
         $this->interfaces[] = $interface;

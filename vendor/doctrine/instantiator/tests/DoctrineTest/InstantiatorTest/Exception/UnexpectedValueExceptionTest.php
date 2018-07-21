@@ -23,6 +23,7 @@ use Doctrine\Instantiator\Exception\UnexpectedValueException;
 use Exception;
 use PHPUnit_Framework_TestCase;
 use ReflectionClass;
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 
 /**
  * Tests for {@see \Doctrine\Instantiator\Exception\UnexpectedValueException}
@@ -35,7 +36,7 @@ class UnexpectedValueExceptionTest extends PHPUnit_Framework_TestCase
 {
     public function testFromSerializationTriggeredException()
     {
-        $reflectionClass = new ReflectionClass($this);
+        $reflectionClass = ReflectionClasses::getReflection($this);
         $previous        = new Exception();
         $exception       = UnexpectedValueException::fromSerializationTriggeredException($reflectionClass, $previous);
 
@@ -50,7 +51,7 @@ class UnexpectedValueExceptionTest extends PHPUnit_Framework_TestCase
 
     public function testFromUncleanUnSerialization()
     {
-        $reflection = new ReflectionClass('DoctrineTest\\InstantiatorTestAsset\\AbstractClassAsset');
+        $reflection = ReflectionClasses::getReflection('DoctrineTest\\InstantiatorTestAsset\\AbstractClassAsset');
         $exception  = UnexpectedValueException::fromUncleanUnSerialization($reflection, 'foo', 123, 'bar', 456);
 
         $this->assertInstanceOf('Doctrine\\Instantiator\\Exception\\UnexpectedValueException', $exception);

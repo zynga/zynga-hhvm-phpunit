@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+
 /**
  * XML helpers.
  *
@@ -230,7 +232,7 @@ class PHPUnit_Util_XML
                         }
                     }
 
-                    $class    = new ReflectionClass($className);
+                    $class    = ReflectionClasses::getReflection($className);
                     $variable = $class->newInstanceArgs($constructorArgs);
                 } else {
                     $variable = new $className;

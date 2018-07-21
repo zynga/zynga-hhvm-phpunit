@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+
 /**
  * The standard test suite loader.
  *
@@ -47,7 +49,7 @@ class PHPUnit_Runner_StandardTestSuiteLoader implements PHPUnit_Runner_TestSuite
             $offset = 0 - strlen($suiteClassName);
 
             foreach ($loadedClasses as $loadedClass) {
-                $class = new ReflectionClass($loadedClass);
+                $class = ReflectionClasses::getReflection($loadedClass);
                 if (substr($loadedClass, $offset) === $suiteClassName &&
                     $class->getFileName() == $filename) {
                     $suiteClassName = $loadedClass;
@@ -60,7 +62,7 @@ class PHPUnit_Runner_StandardTestSuiteLoader implements PHPUnit_Runner_TestSuite
             $testCaseClass = 'PHPUnit_Framework_TestCase';
 
             foreach ($loadedClasses as $loadedClass) {
-                $class     = new ReflectionClass($loadedClass);
+                $class     = ReflectionClasses::getReflection($loadedClass);
                 $classFile = $class->getFileName();
 
                 if ($class->isSubclassOf($testCaseClass) &&
@@ -90,7 +92,7 @@ class PHPUnit_Runner_StandardTestSuiteLoader implements PHPUnit_Runner_TestSuite
         }
 
         if (class_exists($suiteClassName, false)) {
-            $class = new ReflectionClass($suiteClassName);
+            $class = ReflectionClasses::getReflection($suiteClassName);
 
             if ($class->getFileName() == realpath($suiteClassFile)) {
                 return $class;

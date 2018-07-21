@@ -22,6 +22,7 @@ namespace DoctrineTest\InstantiatorTest\Exception;
 use Doctrine\Instantiator\Exception\InvalidArgumentException;
 use PHPUnit_Framework_TestCase;
 use ReflectionClass;
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 
 /**
  * Tests for {@see \Doctrine\Instantiator\Exception\InvalidArgumentException}
@@ -71,7 +72,7 @@ class InvalidArgumentExceptionTest extends PHPUnit_Framework_TestCase
 
     public function testFromAbstractClass()
     {
-        $reflection = new ReflectionClass('DoctrineTest\\InstantiatorTestAsset\\AbstractClassAsset');
+        $reflection = ReflectionClasses::getReflection('DoctrineTest\\InstantiatorTestAsset\\AbstractClassAsset');
         $exception  = InvalidArgumentException::fromAbstractClass($reflection);
 
         $this->assertSame(

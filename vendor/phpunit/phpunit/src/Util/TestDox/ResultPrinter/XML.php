@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+
 /**
  * @since Class available since Release 5.4.0
  */
@@ -209,7 +211,7 @@ class PHPUnit_Util_TestDox_ResultPrinter_XML extends PHPUnit_Util_Printer implem
                 $steps = $this->exception->getTrace();
             }
 
-            $class = new ReflectionClass($test);
+            $class = ReflectionClasses::getReflection($test);
             $file  = $class->getFileName();
 
             foreach ($steps as $step) {

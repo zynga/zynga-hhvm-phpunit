@@ -10,6 +10,7 @@
 
 namespace SebastianBergmann\GlobalState;
 
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 use ReflectionClass;
 
 /**
@@ -126,7 +127,7 @@ class Blacklist
             }
         }
 
-        $class = new ReflectionClass($className);
+        $class = ReflectionClasses::getReflection($className);
 
         foreach ($this->parentClasses as $type) {
             if ($class->isSubclassOf($type)) {

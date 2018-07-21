@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+
 /**
  * Utility class for blacklisting PHPUnit's own source code files.
  *
@@ -92,7 +94,7 @@ class PHPUnit_Util_Blacklist
                     continue;
                 }
 
-                $reflector = new ReflectionClass($className);
+                $reflector = ReflectionClasses::getReflection($className);
                 $directory = $reflector->getFileName();
 
                 for ($i = 0; $i < $parent; $i++) {

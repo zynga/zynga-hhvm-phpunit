@@ -17,6 +17,7 @@ use Prophecy\Doubler\Generator\ClassMirror;
 use Prophecy\Doubler\Generator\ClassCreator;
 use Prophecy\Exception\InvalidArgumentException;
 use ReflectionClass;
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 
 /**
  * Cached class doubler.
@@ -103,7 +104,7 @@ class Doubler
         }
 
         $classname  = $this->createDoubleClass($class, $interfaces);
-        $reflection = new ReflectionClass($classname);
+        $reflection = ReflectionClasses::getReflection($classname);
 
         if (null !== $args) {
             return $reflection->newInstanceArgs($args);

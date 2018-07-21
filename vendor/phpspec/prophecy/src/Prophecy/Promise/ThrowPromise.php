@@ -16,6 +16,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use Prophecy\Prophecy\MethodProphecy;
 use Prophecy\Exception\InvalidArgumentException;
 use ReflectionClass;
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 
 /**
  * Throw promise.
@@ -72,7 +73,7 @@ class ThrowPromise implements PromiseInterface
     {
         if (is_string($this->exception)) {
             $classname   = $this->exception;
-            $reflection  = new ReflectionClass($classname);
+            $reflection  = ReflectionClasses::getReflection($classname);
             $constructor = $reflection->getConstructor();
 
             if ($constructor->isPublic() && 0 == $constructor->getNumberOfRequiredParameters()) {

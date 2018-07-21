@@ -8,6 +8,9 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+use Zynga\Framework\ReflectionCache\v1\ReflectionFunctions;
+
 /**
  * Test helpers.
  *
@@ -174,7 +177,7 @@ class PHPUnit_Util_Test
      */
     public static function getRequirements($className, $methodName)
     {
-        $reflector  = new ReflectionClass($className);
+        $reflector  = ReflectionClasses::getReflection($className);
         $docComment = $reflector->getDocComment();
         $reflector  = new ReflectionMethod($className, $methodName);
         $docComment .= "\n" . $reflector->getDocComment();
@@ -452,7 +455,7 @@ class PHPUnit_Util_Test
                 $dataProviderClassName = $className;
             }
 
-            $dataProviderClass  = new ReflectionClass($dataProviderClassName);
+            $dataProviderClass  = ReflectionClasses::getReflection($dataProviderClassName);
             $dataProviderMethod = $dataProviderClass->getMethod(
                 $dataProviderMethodName
             );
@@ -529,7 +532,7 @@ class PHPUnit_Util_Test
     {
 
         if (!isset(self::$annotationCache[$className])) {
-            $class                             = new ReflectionClass($className);
+            $class                             = ReflectionClasses::getReflection($className);
             self::$annotationCache[$className] = self::parseAnnotations($class->getDocComment());
         }
 
@@ -753,7 +756,7 @@ class PHPUnit_Util_Test
     {
         $groups = array_flip(self::getGroups($className, $methodName));
         $size   = self::UNKNOWN;
-        $class  = new ReflectionClass($className);
+        $class  = ReflectionClasses::getReflection($className);
 
         if (isset($groups['large']) ||
             (class_exists('PHPUnit_Extensions_Database_TestCase', false) &&
@@ -859,7 +862,7 @@ class PHPUnit_Util_Test
             self::$hookMethods[$className] = self::emptyHookMethodsArray();
 
             try {
-                $class = new ReflectionClass($className);
+                $class = ReflectionClasses::getReflection($className);
 
                 foreach ($class->getMethods() as $method) {
                     if (self::isBeforeClassMethod($method)) {
@@ -951,7 +954,7 @@ class PHPUnit_Util_Test
         $codeToCoverList = [];
 
         if (strpos($element, '\\') !== false && function_exists($element)) {
-            $codeToCoverList[] = new ReflectionFunction($element);
+            $codeToCoverList[] = ReflectionFunctions::getReflection($element);
         } elseif (strpos($element, '::') !== false) {
             list($className, $methodName) = explode('::', $element);
 
@@ -971,7 +974,7 @@ class PHPUnit_Util_Test
                         );
                     }
 
-                    $class   = new ReflectionClass($className);
+                    $class   = ReflectionClasses::getReflection($className);
                     $methods = $class->getMethods();
                     $inverse = isset($methodName[1]) && $methodName[1] == '!';
 
@@ -996,7 +999,7 @@ class PHPUnit_Util_Test
 
                 foreach ($classes as $className) {
                     if ($className == '' && function_exists($methodName)) {
-                        $codeToCoverList[] = new ReflectionFunction(
+                        $codeToCoverList[] = ReflectionFunctions::getReflection(
                             $methodName
                         );
                     } else {
@@ -1051,7 +1054,7 @@ class PHPUnit_Util_Test
                     );
                 }
 
-                $codeToCoverList[] = new ReflectionClass($className);
+                $codeToCoverList[] = ReflectionClasses::getReflection($className);
             }
         }
 
@@ -1065,7 +1068,7 @@ class PHPUnit_Util_Test
      */
     private static function resolveReflectionObjectsToLines(array $reflectors)
     {
-      
+
         $result = [];
 
         foreach ($reflectors as $reflector) {

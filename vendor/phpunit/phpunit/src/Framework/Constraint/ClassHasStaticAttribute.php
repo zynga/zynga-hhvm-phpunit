@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+
 /**
  * Constraint that asserts that the class it is evaluated for has a given
  * static attribute.
@@ -28,7 +30,7 @@ class PHPUnit_Framework_Constraint_ClassHasStaticAttribute extends PHPUnit_Frame
      */
     protected function matches($other)
     {
-        $class = new ReflectionClass($other);
+        $class = ReflectionClasses::getReflection($other);
 
         if ($class->hasProperty($this->attributeName)) {
             $attribute = $class->getProperty($this->attributeName);

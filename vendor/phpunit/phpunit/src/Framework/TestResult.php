@@ -15,6 +15,7 @@ use SebastianBergmann\CodeCoverage\MissingCoversAnnotationException;
 use SebastianBergmann\CodeCoverage\UnintentionallyCoveredCodeException;
 use SebastianBergmann\ResourceOperations\ResourceOperations;
 use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 
 /**
  * A TestResult collects the results of executing a test case.
@@ -1323,7 +1324,7 @@ class PHPUnit_Framework_TestResult implements Countable
     protected function getHierarchy($className, $asReflectionObjects = false)
     {
         if ($asReflectionObjects) {
-            $classes = [new ReflectionClass($className)];
+            $classes = [ReflectionClasses::getReflection($className)];
         } else {
             $classes = [$className];
         }
@@ -1332,11 +1333,11 @@ class PHPUnit_Framework_TestResult implements Countable
 
         while (!$done) {
             if ($asReflectionObjects) {
-                $class = new ReflectionClass(
+                $class = ReflectionClasses::getReflection(
                     $classes[count($classes) - 1]->getName()
                 );
             } else {
-                $class = new ReflectionClass($classes[count($classes) - 1]);
+                $class = ReflectionClasses::getReflection($classes[count($classes) - 1]);
             }
 
             $parent = $class->getParentClass();

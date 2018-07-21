@@ -3,6 +3,7 @@
 use phpDocumentor\Reflection\FqsenResolver;
 use phpDocumentor\Reflection\TypeResolver;
 use phpDocumentor\Reflection\Types\ContextFactory;
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 
 require '../vendor/autoload.php';
 require 'Classy.php';
@@ -11,7 +12,7 @@ $typeResolver = new TypeResolver();
 $fqsenResolver = new FqsenResolver();
 
 $contextFactory = new ContextFactory();
-$context = $contextFactory->createFromReflector(new ReflectionClass('My\\Example\\Classy'));
+$context = $contextFactory->createFromReflector(ReflectionClasses::getReflection('My\\Example\\Classy'));
 
 // Class named: \phpDocumentor\Reflection\Types\Resolver
 var_dump((string)$typeResolver->resolve('Types\Resolver', $context));

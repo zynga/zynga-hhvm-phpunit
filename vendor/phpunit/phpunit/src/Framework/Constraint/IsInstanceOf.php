@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+
 /**
  * Constraint that asserts that the object it is evaluated for is an instance
  * of a given class.
@@ -82,7 +84,7 @@ class PHPUnit_Framework_Constraint_IsInstanceOf extends PHPUnit_Framework_Constr
     private function getType()
     {
         try {
-            $reflection = new ReflectionClass($this->className);
+            $reflection = ReflectionClasses::getReflection($this->className);
             if ($reflection->isInterface()) {
                 return 'interface';
             }

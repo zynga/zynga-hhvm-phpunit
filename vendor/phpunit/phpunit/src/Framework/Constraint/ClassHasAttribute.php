@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+
 /**
  * Constraint that asserts that the class it is evaluated for has a given
  * attribute.
@@ -42,7 +44,7 @@ class PHPUnit_Framework_Constraint_ClassHasAttribute extends PHPUnit_Framework_C
      */
     protected function matches($other)
     {
-        $class = new ReflectionClass($other);
+        $class = ReflectionClasses::getReflection($other);
 
         return $class->hasProperty($this->attributeName);
     }
