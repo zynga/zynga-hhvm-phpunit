@@ -777,17 +777,16 @@ class CodeCoverage
                 }
             }
 
-            if ($this->cacheTokens) {
-                $tokens = \PHP_Token_Stream_CachingFactory::get($filename);
-            } else {
-                $tokens = new \PHP_Token_Stream($filename);
-            }
+            $tokens = \PHP_Token_Stream_CachingFactory::get($filename);
 
             $classes = array_merge($tokens->getClasses(), $tokens->getTraits());
             $tokens  = $tokens->tokens();
+            $tokenCount = count($tokens);
+            for ( $offset = 0; $offset < $tokenCount; $offset++ ) {
+              $token = $tokens[$offset];
+              $tokenClass = get_class($token);
 
-            foreach ($tokens as $token) {
-                switch (get_class($token)) {
+                switch ($tokenClass) {
                     case 'PHP_Token_COMMENT':
                     case 'PHP_Token_DOC_COMMENT':
                         $_token = trim($token);
@@ -883,6 +882,11 @@ class CodeCoverage
                         }
                         break;
 
+                    case 'PHP_Token_ENUM':
+                      for ( $i = $token->getLine(); $i <= $token->getEndLine(); $i++ ) {
+                        $this->ignoredLines[$filename][] = $i;
+                      }
+                      break;
                     case 'PHP_Token_NAMESPACE':
                         $this->ignoredLines[$filename][] = $token->getEndLine();
 
@@ -891,7 +895,12 @@ class CodeCoverage
                     case 'PHP_Token_OPEN_TAG':
                     case 'PHP_Token_CLOSE_TAG':
                     case 'PHP_Token_USE':
-                        $this->ignoredLines[$filename][] = $token->getLine();
+                        if ( $tokenClass == 'PHP_Token_USE' ) {
+                          // look ahead for the semi colon
+                          $this->_handleMultiLineUseStatement($filename, $tokens, $tokenCount, $offset);
+                        } else {
+                          $this->ignoredLines[$filename][] = $token->getLine();
+                        }
                         break;
                 }
 
@@ -918,6 +927,37 @@ class CodeCoverage
         }
 
         return $this->ignoredLines[$filename];
+    }
+
+    private function _handleMultiLineUseStatement($filename, $tokens, $tokenCount, $offset) {
+
+      $targetFound      = false;
+      $futureOffset     = $offset;
+      $useStartsOnLine  = 0;
+      $useEndsOnLine    = 0;
+
+      while($targetFound === false) {
+        $futureToken = $tokens[$futureOffset];
+        $futureTokenClassName = get_class($futureToken);
+        if ( $futureTokenClassName == 'PHP_Token_SEMICOLON') {
+          $targetFound = true;
+          $useEndsOnLine = $futureToken->getLine();
+        } else {
+          if ( $useStartsOnLine === 0 ) {
+            $useStartsOnLine = $futureToken->getLine();
+          }
+        }
+        $futureOffset++;
+      }
+
+      // echo "useStartsOnLine: $useStartsOnLine\n";
+      // echo "useEndsOnLine: $useEndsOnLine\n";
+
+      for ( $l = $useStartsOnLine; $l <= $useEndsOnLine; $l++ ) {
+        // echo "  excusingLine: $l\n";
+        $this->ignoredLines[$filename][] = $l;
+      }
+
     }
 
     /**

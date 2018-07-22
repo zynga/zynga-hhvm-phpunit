@@ -1167,7 +1167,7 @@ class PHP_Token_UNSET_CAST extends PHP_Token
 {
 }
 
-class PHP_Token_USE extends PHP_Token
+class PHP_Token_USE extends PHP_TokenWithScope
 {
 }
 
@@ -1305,7 +1305,7 @@ class PHP_Token_COMPILER_HALT_OFFSET extends PHP_Token
 {
 }
 
-class PHP_Token_ENUM extends PHP_Token
+class PHP_Token_ENUM extends PHP_TokenWithScopeAndVisibility
 {
 }
 

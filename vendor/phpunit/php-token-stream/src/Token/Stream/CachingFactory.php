@@ -26,6 +26,7 @@ class PHP_Token_Stream_CachingFactory
     public static function get($filename)
     {
         if (!isset(self::$cache[$filename])) {
+          error_log('cacheMiss=' . $filename);
             self::$cache[$filename] = new PHP_Token_Stream($filename);
         }
 

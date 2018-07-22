@@ -356,11 +356,7 @@ class File extends AbstractNode
     {
         $classStack = $functionStack = [];
 
-        if ($this->cacheTokens) {
-            $tokens = \PHP_Token_Stream_CachingFactory::get($this->getPath());
-        } else {
-            $tokens = new \PHP_Token_Stream($this->getPath());
-        }
+        $tokens = \PHP_Token_Stream_CachingFactory::get($this->getPath());
 
         $this->processClasses($tokens);
         $this->processTraits($tokens);
