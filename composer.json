@@ -20,6 +20,11 @@
     "hhvm": "^3.18",
     "zynga/phpunit-hhi": "@dev"
   },
+  "autoload": {
+    "psr-4": {
+      "Zynga\\PHPUnit\\V2\\": "src/Zynga/Framework/AutoLoader/V1/",
+    }
+  },
   "repositories": [
     {
       "type": "vcs",

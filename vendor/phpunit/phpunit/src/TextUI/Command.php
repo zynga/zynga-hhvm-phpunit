@@ -108,11 +108,19 @@ class PHPUnit_TextUI_Command
     /**
      * @param bool $exit
      */
-    public static function main($exit = true)
+    public static function main($exit = true, $argv = null)
     {
         $command = new static;
 
-        return $command->run($_SERVER['argv'], $exit);
+        if ( $argv === null || ! is_array($argv)) {
+          $argv = $_SERVER['argv'];
+        }
+
+        // JEO: We have had to debug the argument values a couple times,
+        // jic to make sure we don't forget where to add this.
+        // var_dump($argv);
+
+        return $command->run($argv, $exit);
     }
 
     /**

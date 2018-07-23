@@ -6,6 +6,9 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Zynga\\PHPUnit\\V2\\Runner' => $baseDir . '/src/Zynga/PHPUnit/V2/Runner.hh',
+    'Zynga\\PHPUnit\\V2\\RunnerPartialShim' => $baseDir . '/src/Zynga/PHPUnit/V2/RunnerPartialShim.hh',
+    'Zynga\\PHPUnit\\V2\\Version' => $baseDir . '/src/Zynga/PHPUnit/V2/Version.hh',
     'Zynga\\Source\\Cache' => $vendorDir . '/phpunit/php-source-cache/src/Source/Cache.hh',
     'Zynga\\Source\\Cache\\File' => $vendorDir . '/phpunit/php-source-cache/src/Source/Cache/File.hh',
     'Zynga\\Source\\Cache\\LocalMemcache' => $vendorDir . '/phpunit/php-source-cache/src/Source/Cache/File.hh',
