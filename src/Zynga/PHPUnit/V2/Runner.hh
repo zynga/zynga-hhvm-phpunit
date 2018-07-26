@@ -3,6 +3,8 @@
 namespace Zynga\PHPUnit\V2;
 
 use Zynga\PHPUnit\V2\RunnerPartialShim;
+use Zynga\PHPUnit\V2\Version;
+
 use \Exception;
 use \PHPUnit_TextUI_Command;
 
@@ -42,7 +44,7 @@ class Runner {
 
     try {
 
-      $this->message('Zynga-PHPUnit-Runner Version: TBD');
+      $this->message('Zynga-PHPUnit-Runner Version: ' . Version::get());
 
       $this->init();
 
