@@ -2,7 +2,7 @@
 <?php
 
 // --
-// This script cannot be hacklang due to you might be wanting to restart hhvm 
+// This script cannot be hacklang due to you might be wanting to restart hhvm
 // because of hack related strict failures, etc.
 // --
 
@@ -186,7 +186,7 @@ class Zynga_HHVM_Service extends Zynga_Base {
 
     $result = $this->_hhClientCommand->run('stop 2>/dev/null');
 
-    var_dump($result);
+    $this->message('result of previous command=' . json_encode($result));
 
     if ( $result === 0 ) {
 
@@ -317,6 +317,27 @@ class Zynga_HHVM_Service extends Zynga_Base {
 
   }
 
+  private function attemptRestartFlow() {
+    for ( $i = 0; $i < 5; $i++ ) {
+      if ( $this->stop() !== true ) {
+        sleep(1);
+        continue;
+      }
+
+      if ( $this->doCleanup() !== true ) {
+        sleep(1);
+        continue;
+      }
+
+      if ( $this->start() === true ) {
+        sleep(1);
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   public function standup() {
 
     $executingUser = $this->getExecutingUser();
@@ -337,27 +358,19 @@ class Zynga_HHVM_Service extends Zynga_Base {
       exit(255);
     }
 
-    for ( $i = 0; $i < 5; $i++ ) {
+    $wasRestartFlowSuccessful = $this->attemptRestartFlow();
+    if ($wasRestartFlowSuccessful === true) {
+      exit(0);
+    }
+    $this->message('Unable to gracefully restart, killing hh_server and trying again');
+    $this->forceStop();
+    $wasRestartFlowSuccessful = $this->attemptRestartFlow();
 
-      if ( $this->stop() !== true ) {
-        sleep(1);
-        continue;
-      }
-
-      if ( $this->doCleanup() !== true ) {
-        sleep(1);
-        continue;
-      }
-
-      if ( $this->start() === true ) {
-        sleep(1);
-        exit(0);
-      }
-
+    if ($wasRestartFlowSuccessful === true) {
+      exit(0);
     }
 
     exit(255);
-
   }
 
 }
