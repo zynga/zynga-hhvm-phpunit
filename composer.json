@@ -22,7 +22,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Zynga\\PHPUnit\\V2\\": "src/Zynga/Framework/AutoLoader/V1/",
+      "Zynga\\PHPUnit\\V2\\": "src/Zynga/PHPUnit/V2/"
     }
   },
   "repositories": [
