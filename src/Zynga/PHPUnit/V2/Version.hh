@@ -8,7 +8,7 @@ namespace Zynga\PHPUnit\V2;
 //
 // --
 class Version {
-  const string VERSION_NUMBER = "1.8.5";
+  const string VERSION_NUMBER = "1.8.6";
   const string VERSION_NAME   = "ajax";
 
   public static function get(): string {
