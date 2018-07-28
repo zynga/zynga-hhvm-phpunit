@@ -13,9 +13,9 @@ use \PHPUnit_TextUI_Command;
 // Because the eventual phpunit instanciations don't play well with it.
 // --
 class Runner {
-  private string $projectRoot;
-  private string $userName;
-  private Vector<string> $argv;
+  protected string $projectRoot;
+  protected string $userName;
+  protected Vector<string> $argv;
 
   private string $htmlDir;
 
@@ -44,7 +44,7 @@ class Runner {
 
     try {
 
-      $this->message('Zynga-PHPUnit-Runner Version: ' . Version::get());
+      $this->message('Zynga-PHPUnit-Runner Version: '.Version::get());
 
       $this->init();
 
@@ -69,22 +69,19 @@ class Runner {
       $argStack->add($programName);
     }
 
-
     // $argStack->add('--debug');
     // $argStack->add('--stop-on-failure');
     $argStack->add('--coverage-html='.$this->htmlDir);
     $argStack->add('--coverage-text');
-    $argStack->add(
-      '--configuration='.$this->projectRoot.'/phpunit.xml',
-    );
+    $argStack->add('--configuration='.$this->projectRoot.'/phpunit.xml');
 
     for ($i = 1; $i < $this->argv->count(); $i++) {
 
       $arg = $this->argv->get($i);
 
-     if (is_string($arg)) {
-       $argStack->add($arg);
-     }
+      if (is_string($arg)) {
+        $argStack->add($arg);
+      }
 
     }
 
@@ -139,8 +136,10 @@ class Runner {
       ini_set('date.timezone', 'UTC');
 
       $currentTimezone = ini_get('date.timezone');
-      if ( $currentTimezone != 'UTC' ) {
-        throw new Exception('failedTimeZoneCheck expected=UTC have=' . $currentTimezone);
+      if ($currentTimezone != 'UTC') {
+        throw new Exception(
+          'failedTimeZoneCheck expected=UTC have='.$currentTimezone,
+        );
       }
     }
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env hhvm
 <?php
+echo "FAILURE: This is a dead file, please utilize the zynga/phpunit/bin/phpunit-xdebug instead.";
+exit(255);
 /*
  * This file is part of PHPUnit.
  *

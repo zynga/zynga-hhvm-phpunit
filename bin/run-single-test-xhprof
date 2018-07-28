@@ -1,56 +1,45 @@
-#!/usr/bin/env hhvm
+!/usr/bin/env hhvm
 <?hh
-
-function usageRunSingleTestXDebug($message) {
-  echo "Error: $message\n";
-  echo "\n";
-  echo "run-single-test-xdebug.hh <path>Test.hh [testFunction]\n";
-  echo "\n";
-  echo " Runs a single test suite handles the phpunit arguments\n";
-  echo
-    " Enables xdebug in order to see performance issues within the stack.\n"
-  ;
-  echo "\n";
-  exit(255);
-}
 
 $projectRoot = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
 
-$filePath = null;
+require_once $projectRoot.'/vendor/autoload.php';
+require_once $projectRoot.'/vendor/zynga/phpunit/vendor/autoload.php';
 
-if (isset($argv[1])) {
-  $filePath = $argv[1];
+use Zynga\Framework\Environment\CodePath\V1\CodePath;
+use Zynga\PHPUnit\V2\RunSingleTestRunner;
+
+$userName = 'unknown';
+
+if (isset($_ENV['USER'])) {
+  $userName = $_ENV['USER'];
 } else {
-  usage('No test file path provided');
+  $userName = get_current_user();
 }
 
-$testFunction = '';
-
-if (isset($argv[2])) {
-  $testFunction = $argv[2];
+// This is a work around that the environment may / may not be fully up at this
+// moment, so codepath might be unititalized.
+if ( CodePath::getRoot() == '' ) {
+  CodePath::setRoot($projectRoot);
 }
 
-$testName = '';
+putenv('xhprof.enable=true');
 
-if (preg_match('/\/([a-zA-Z0-9]*Test)\.hh$/', $filePath, $pregs)) {
-  $testName = $pregs[1];
-} else {
-  usage("Expecting a path ending in <TestName>Test.hh");
-}
+use Zynga\Framework\Performance\V1\XHProfiler;
 
-$command = array();
-$command[] = $projectRoot.'/vendor/bin/phpunit-xdebug';
-$command[] = '--debug';
+// --
+// JEO: needed to be able to performance profile phpunit itself, it has a nasty startup cost.
+// --
+XHProfiler::setProfileDir(CodePath::getRoot() . '/tmp/phpunit-xhprof');
 
-// add filter to get only a single function
-if ($testFunction != '') {
-  $command[] = '--filter \'/::'.$testFunction.'$/\'';
-}
+XHProfiler::startProfiling();
 
-$command[] = $testName;
-$command[] = $filePath;
+$runner = new RunSingleTestRunner($projectRoot, $userName, $argv);
 
-$cmd = join(' ', $command);
+$runRV = $runner->run();
 
-echo "command: $cmd\n";
-passthru($cmd);
+$name = 'phpunit-commandline';
+
+XHProfiler::stopProfiling($name);
+
+exit($runRV);
