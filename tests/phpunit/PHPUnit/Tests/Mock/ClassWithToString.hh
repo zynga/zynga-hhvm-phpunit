@@ -1,4 +1,5 @@
-<?php
+<?hh // strict
+
 /*
  * This file is part of PHPUnit.
  *
@@ -8,20 +9,15 @@
  * file that was distributed with this source code.
  */
 
+namespace PHPUnit\Tests\Mock;
+
 /**
- * An author.
+ * A class with a __toString() method.
  *
  * @since      Class available since Release 3.6.0
  */
-class Author
-{
-    // the order of properties is important for testing the cycle!
-    public $books = [];
-
-    private $name = '';
-
-    public function __construct($name)
-    {
-        $this->name = $name;
-    }
+class ClassWithToString {
+  public function __toString(): string {
+    return 'string representation';
+  }
 }

@@ -142,6 +142,8 @@
  */
 class PHPUnit_Util_Configuration
 {
+  const TEST_SUITE_FILTER_SEPARATOR = ',';
+
     private static $instances = [];
 
     protected $document;
@@ -892,9 +894,10 @@ class PHPUnit_Util_Configuration
         }
 
         $fileIteratorFacade = new File_Iterator_Facade;
+        $testSuiteFilter    = $testSuiteFilter ? explode(self::TEST_SUITE_FILTER_SEPARATOR, $testSuiteFilter) : [];
 
         foreach ($testSuiteNode->getElementsByTagName('directory') as $directoryNode) {
-            if ($testSuiteFilter && $directoryNode->parentNode->getAttribute('name') != $testSuiteFilter) {
+            if (!empty($testSuiteFilter) && !in_array($directoryNode->parentNode->getAttribute('name'), $testSuiteFilter)) {
                 continue;
             }
 

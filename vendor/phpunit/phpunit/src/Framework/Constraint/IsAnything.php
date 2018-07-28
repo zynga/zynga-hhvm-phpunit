@@ -35,7 +35,7 @@ class PHPUnit_Framework_Constraint_IsAnything extends PHPUnit_Framework_Constrai
      */
     public function evaluate($other, $description = '', $returnResult = false)
     {
-        return $returnResult ? true : null;
+        return true;
     }
 
     /**
@@ -57,6 +57,6 @@ class PHPUnit_Framework_Constraint_IsAnything extends PHPUnit_Framework_Constrai
      */
     public function count()
     {
-        return 0;
+        return 1;
     }
 }

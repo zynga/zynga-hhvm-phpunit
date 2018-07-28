@@ -1,4 +1,5 @@
-<?php
+<?hh // strict
+
 /*
  * This file is part of PHPUnit.
  *
@@ -7,16 +8,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+namespace PHPUnit\Tests\Mock;
+
+use PHPUnit\Tests\Mock\Author;
 
 /**
- * A class with a __toString() method.
+ * A book.
  *
  * @since      Class available since Release 3.6.0
  */
-class ClassWithToString
-{
-    public function __toString()
-    {
-        return 'string representation';
-    }
+class Book {
+  // the order of properties is important for testing the cycle!
+  public ?Author $author = null;
 }
