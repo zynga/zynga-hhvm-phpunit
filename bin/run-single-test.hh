@@ -5,13 +5,14 @@
 // issues with handling arguments as part of #!, but will work fine if a driver
 // script handles them via hhvm <args> scriptName
 // --
+
 $projectRoot = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
 
-require_once $projectRoot . '/vendor/autoload.php';
-require_once $projectRoot . '/vendor/zynga/phpunit/vendor/autoload.php';
+require_once $projectRoot.'/vendor/autoload.php';
+require_once $projectRoot.'/vendor/zynga/phpunit/vendor/autoload.php';
 
 use Zynga\Framework\Environment\CodePath\V1\CodePath;
-use Zynga\PHPUnit\V2\Runner;
+use Zynga\PHPUnit\V2\RunSingleTestRunner;
 
 $userName = 'unknown';
 
@@ -44,18 +45,16 @@ use Zynga\Framework\Performance\V1\XHProfiler;
 // JEO: needed to be able to performance profile phpunit itself, it has a nasty startup cost.
 // --
 if ( $enableXHProf === true ) {
-
   putenv('xhprof.enable=true');
-
   XHProfiler::setProfileDir(CodePath::getRoot() . '/tmp/phpunit-xhprof');
   XHProfiler::startProfiling();
 }
 
-$runner = new Runner($projectRoot, $userName, $cleanArgv);
+$runner = new RunSingleTestRunner($projectRoot, $userName, $argv);
+
 $runRV = $runner->run();
 
 if ( $enableXHProf === true ) {
-
   $name = 'phpunit-commandline';
   XHProfiler::stopProfiling($name);
 }

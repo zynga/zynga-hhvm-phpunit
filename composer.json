@@ -13,6 +13,7 @@
     "bin/phpunit.hh",
     "bin/run-single-test",
     "bin/run-single-test-xhprof",
+    "bin/run-single-test.hh",
     "bin/hhvm-restart-wrapper"
   ],
   "require": {

@@ -631,12 +631,12 @@ class PHPUnit_TextUI_Command
         $this->handleCustomTestSuite();
 
         if (!isset($this->arguments['test'])) {
-            if (isset($this->options[1][0])) {
-                $this->arguments['test'] = $this->options[1][0];
+            if (isset($this->options[1][1])) {
+              $this->arguments['test'] = $this->options[1][1];
             }
 
-            if (isset($this->options[1][1])) {
-                $this->arguments['testFile'] = realpath($this->options[1][1]);
+            if (isset($this->options[1][2])) {
+                $this->arguments['testFile'] = realpath($this->options[1][2]);
             } else {
                 $this->arguments['testFile'] = '';
             }
