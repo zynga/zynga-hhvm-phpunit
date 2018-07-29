@@ -10,6 +10,7 @@
   "bin": [
     "bin/phpunit",
     "bin/phpunit-xhprof",
+    "bin/phpunit.hh",
     "bin/run-single-test",
     "bin/run-single-test-xhprof",
     "bin/hhvm-restart-wrapper"

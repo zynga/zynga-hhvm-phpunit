@@ -1,49 +1,20 @@
-#!/usr/bin/env hhvm -d hhvm.jit=false --define xdebug.remote_enable=1 --define xdebug.remote_autostart=1 --define xdebug.enable=On --define xdebug.remove_enable=false --define xhprof.output_dir=/tmp --define memory_limit=-1 --define log_errors=true --define hhvm.debug.server_error_message=true
-<?hh
+#!/usr/bin/env bash
 
-$projectRoot = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
+SCRIPT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd)"
+PHPUNIT_HACKFILE="${SCRIPT_DIR}/phpunit.hh";
 
-require_once $projectRoot . '/vendor/autoload.php';
-require_once $projectRoot . '/vendor/zynga/phpunit/vendor/autoload.php';
+#echo "scriptDir=$SCRIPT_DIR"
 
-use Zynga\Framework\Environment\CodePath\V1\CodePath;
-use Zynga\PHPUnit\V2\Runner;
-
-$userName = 'unknown';
-
-if (isset($_ENV['USER'])) {
-  $userName = $_ENV['USER'];
-} else {
-  $userName = get_current_user();
-}
-
-// This is a work around that the environment may / may not be fully up at this
-// moment, so codepath might be unititalized.
-if ( CodePath::getRoot() == '' ) {
-  CodePath::setRoot($projectRoot);
-}
-
-putenv('xhprof.enable=true');
-
-use Zynga\Framework\Performance\V1\XHProfiler;
-
-// --
-// JEO: needed to be able to performance profile phpunit itself, it has a nasty startup cost.
-// --
-XHProfiler::setProfileDir(CodePath::getRoot() . '/tmp/phpunit-xhprof');
-
-XHProfiler::startProfiling();
-
-$runner = new Runner($projectRoot, $userName, $argv);
-
-$name = 'phpunit-commandline';
-
-XHProfiler::stopProfiling($name);
-
-$runRV = $runner->run();
-
-$name = 'phpunit-commandline';
-
-XHProfiler::stopProfiling($name);
-
-exit($runRV);
+/usr/bin/env hhvm \
+  -d hhvm.jit=false \
+  --define xdebug.remote_enable=1 \
+  --define xdebug.remote_autostart=1 \
+  --define xdebug.enable=On \
+  --define xdebug.remove_enable=false \
+  --define xhprof.output_dir=/tmp \
+  --define memory_limit=-1 \
+  --define log_errors=true \
+  --define hhvm.debug.server_error_message=true \
+  $PHPUNIT_HACKFILE \
+  --zynga-with-xhprof \
+  $@
