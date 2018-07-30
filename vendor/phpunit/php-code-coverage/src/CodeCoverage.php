@@ -10,7 +10,7 @@
 
 namespace SebastianBergmann\CodeCoverage;
 
-use SebastianBergmann\CodeCoverage\Driver\Driver;
+use SebastianBergmann\CodeCoverage\Driver;
 use SebastianBergmann\CodeCoverage\Driver\Xdebug;
 use SebastianBergmann\CodeCoverage\Driver\HHVM;
 use SebastianBergmann\CodeCoverage\Driver\PHPDBG;

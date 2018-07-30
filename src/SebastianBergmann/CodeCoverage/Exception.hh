@@ -1,4 +1,5 @@
-<?php
+<?hh // strict
+
 /*
  * This file is part of the php-code-coverage package.
  *
@@ -10,6 +11,7 @@
 
 namespace SebastianBergmann\CodeCoverage;
 
-class RuntimeException extends \RuntimeException implements Exception
-{
-}
+/**
+ * Exception interface for php-code-coverage component.
+ */
+interface Exception {}

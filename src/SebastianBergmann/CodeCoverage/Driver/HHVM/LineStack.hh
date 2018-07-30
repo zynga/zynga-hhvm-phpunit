@@ -2,7 +2,33 @@
 
 namespace SebastianBergmann\CodeCoverage\Driver\HHVM;
 
+// --
+// TODO: let's make this utilize object references and not string comparisons.
+// --
 class LineStack {
+
+  private static Vector<string>
+    $executableTokens = Vector {
+      'PHP_Token_RETURN',
+      'PHP_Token_THROW',
+      'PHP_Token_EQUAL',
+      'PHP_Token_IF',
+      'PHP_Token_UNSET',
+      'PHP_Token_OBJECT_OPERATOR',
+      'PHP_Token_THROW',
+    };
+
+  private static Vector<string>
+    $ifTokens = Vector {'PHP_Token_IF', 'PHP_Token_ELSEIF'};
+
+  private static Vector<string>
+    $fileInclusion = Vector {
+      'PHP_Token_REQUIRE',
+      'PHP_Token_REQUIRE_ONCE',
+      'PHP_Token_INCLUDE',
+      'PHP_Token_INCLUDE_ONCE',
+    };
+
   private Vector<string> $_stack;
   private string $_text;
 
@@ -39,15 +65,15 @@ class LineStack {
     // Our version of hack doesn't support contains at this time.
     // return $this->_stack->contains($token);
     $offset = $this->_stack->linearSearch($token);
-    if ( $offset > -1 ) {
+    if ($offset > -1) {
       return true;
     }
     return false;
   }
 
   public function containsAny(Vector<string> $tokens): bool {
-    foreach ( $tokens as $token ) {
-      if ( $this->contains($token) === true ) {
+    foreach ($tokens as $token) {
+      if ($this->contains($token) === true) {
         return true;
       }
     }
@@ -58,13 +84,16 @@ class LineStack {
 
     $matchCount = 0;
 
-    foreach ( $tokens as $token ) {
-      if ( $this->contains($token) ) {
+    foreach ($tokens as $token) {
+      if ($this->contains($token)) {
         $matchCount++;
+      } else {
+        // if there's a required token, and we are missing it.. early out.
+        //return false;
       }
     }
 
-    if ( $tokens->count() == $matchCount ) {
+    if ($tokens->count() == $matchCount) {
       return true;
     }
 
@@ -73,74 +102,60 @@ class LineStack {
   }
 
   public function isAbstractFunction(): bool {
-    if ( $this->contains('PHP_Token_ABSTRACT') && $this->contains('PHP_Token_FUNCTION') ) {
+    if ($this->contains('PHP_Token_ABSTRACT') &&
+        $this->contains('PHP_Token_FUNCTION')) {
       return true;
     }
     return false;
   }
 
   public function doesContainReturn(): bool {
-    if ( $this->contains('PHP_Token_RETURN') === true ) {
+    if ($this->contains('PHP_Token_RETURN') === true) {
       return true;
     }
     return false;
   }
 
   public function doesContainSemiColon(): bool {
-    if ( $this->contains('PHP_Token_SEMICOLON') === true ) {
+    if ($this->contains('PHP_Token_SEMICOLON') === true) {
       return true;
     }
     return false;
   }
 
   public function doesContainStartingCurly(): bool {
-    if ( $this->contains('PHP_Token_OPEN_CURLY') === true ) {
+    if ($this->contains('PHP_Token_OPEN_CURLY') === true) {
       return true;
     }
     return false;
   }
 
   public function doesContainEndingCurly(): bool {
-    if ( $this->contains('PHP_Token_CLOSE_CURLY') === true ) {
+    if ($this->contains('PHP_Token_CLOSE_CURLY') === true) {
       return true;
     }
     return false;
   }
 
   public function doesContainIf(): bool {
-    $ifs = Vector {};
-    $ifs[] = 'PHP_Token_IF';
-    $ifs[] = 'PHP_Token_ELSEIF';
-    return $this->containsAny($ifs);
+    return $this->containsAny(self::$ifTokens);
   }
 
   public function isFileInclusion(): bool {
-    $fileInclusion = Vector {};
-    $fileInclusion[] = 'PHP_Token_REQUIRE';
-    $fileInclusion[] = 'PHP_Token_REQUIRE_ONCE';
-    $fileInclusion[] = 'PHP_Token_INCLUDE';
-    $fileInclusion[] = 'PHP_Token_INCLUDE_ONCE';
-    return $this->containsAny($fileInclusion);
+    return $this->containsAny(self::$fileInclusion);
   }
 
   public function isExecutable(): bool {
 
     // We don't count require_once / include_once as executable code.
-    if ( $this->isFileInclusion() === true ) {
+    if ($this->isFileInclusion() === true) {
       return false;
     }
 
     // --
     // If there is a parseable / executable token this counts as a line that 'could' be executed.
     // --
-    $executableTokens = Vector {};
-    $executableTokens[] = 'PHP_Token_RETURN';
-    $executableTokens[] = 'PHP_Token_THROW';
-    $executableTokens[] = 'PHP_Token_EQUAL';
-    $executableTokens[] = 'PHP_Token_IF';
-    $executableTokens[] = 'PHP_Token_OBJECT_OPERATOR';
-
-    return $this->containsAny($executableTokens);
+    return $this->containsAny(self::$executableTokens);
 
   }
 

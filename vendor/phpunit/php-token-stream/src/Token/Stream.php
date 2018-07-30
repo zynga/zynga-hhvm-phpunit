@@ -63,7 +63,7 @@ class PHP_Token_Stream
   /**
    * @var array
    */
-  protected $tokens = [];
+  protected Vector<PHP_Token> $tokens = Vector {};
 
   /**
    * @var int
@@ -126,11 +126,14 @@ class PHP_Token_Stream
     $this->scan($sourceCode);
   }
 
+  public function get(int $offset): ?PHP_Token {
+    return $this->tokens->get($offset);
+  }
   /**
    * Destructor.
    */
   public function __destruct() {
-    $this->tokens = [];
+    $this->tokens->clear();
   }
 
   /**
@@ -153,17 +156,22 @@ class PHP_Token_Stream
     return $this->filename;
   }
 
-  protected function resolveTokenName($tokenId) {
+  protected function resolveTokenName(int $tokenId): string {
 
-    if (self::$tokenNameCache->containsKey($tokenId)) {
-      return self::$tokenNameCache->get($tokenId);
+    $cachedTokenName = self::$tokenNameCache->get($tokenId);
+    if (is_string($cachedTokenName)) {
+      return $cachedTokenName;
     }
 
     $tokenName = token_name($tokenId);
 
+    if (!is_string($tokenName)) {
+      throw new Exception('tokenId='.$tokenId.' - is unknown to token_name');
+    }
+
     self::$tokenNameCache->set($tokenId, $tokenName);
 
-    return self::$tokenNameCache->get($tokenId);
+    return $tokenName;
 
   }
   /**
