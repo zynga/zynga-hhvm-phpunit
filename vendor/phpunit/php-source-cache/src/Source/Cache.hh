@@ -7,7 +7,7 @@ use Zynga\Source\Cache\File as Zynga_Source_Cache_File;
 // JEO: As most of this functionality is disabled at this time turning off
 // coverage until we can properly intrument and explore whats going on with the
 // caching.
-// 
+//
 // @codeCoverageIgnoreStart
 class Cache {
 
@@ -15,7 +15,7 @@ class Cache {
 
   public static function loadFile(string $fileName): Zynga_Source_Cache_File {
 
-    if ( self::$_cache->containsKey($fileName) ) {
+    if (self::$_cache->containsKey($fileName)) {
       return self::$_cache[$fileName];
     }
 
@@ -24,10 +24,10 @@ class Cache {
     // disabling this check for now.
     // --
     /*
-    if ( is_file($fileName) !== true ) {
-      return null;
-    }
-    */
+     if ( is_file($fileName) !== true ) {
+     return null;
+     }
+     */
 
     $file = new Zynga_Source_Cache_File($fileName);
     $file->load();
@@ -58,7 +58,8 @@ class Cache {
 
     $file = self::loadFile($fileName);
 
-    if ( $file instanceof Zynga_Source_Cache_File && $file->codeCoverageRaw !== null ) {
+    if ($file instanceof Zynga_Source_Cache_File &&
+        $file->codeCoverageRaw !== null) {
       return $file->codeCoverageRaw;
     }
 
@@ -66,14 +67,16 @@ class Cache {
 
   }
 
-  public static function setCodeCoverageRaw(string $fileName, mixed $raw): bool {
+  public static function setCodeCoverageRaw(
+    string $fileName,
+    mixed $raw,
+  ): bool {
 
     $file = self::loadFile($fileName);
 
-    if ( $file instanceof Zynga_Source_Cache_File ) {
+    if ($file instanceof Zynga_Source_Cache_File) {
 
       $file->codeCoverageRaw = $raw;
-      $file->saveToMemcache();
 
       return true;
 
@@ -87,7 +90,8 @@ class Cache {
 
     $file = self::loadFile($fileName);
 
-    if ( $file instanceof Zynga_Source_Cache_File && $file->ignoredLines !== null ) {
+    if ($file instanceof Zynga_Source_Cache_File &&
+        $file->ignoredLines !== null) {
       return $file->ignoredLines;
     }
 
@@ -95,13 +99,15 @@ class Cache {
 
   }
 
-  public static function setIgnoredLines(string $fileName, mixed $ignoredLines): bool {
+  public static function setIgnoredLines(
+    string $fileName,
+    mixed $ignoredLines,
+  ): bool {
     $file = self::loadFile($fileName);
 
-    if ( $file instanceof Zynga_Source_Cache_File ) {
+    if ($file instanceof Zynga_Source_Cache_File) {
 
       $file->ignoredLines = $ignoredLines;
-      $file->saveToMemcache();
 
       return true;
 
@@ -114,7 +120,10 @@ class Cache {
     return null;
   }
 
-  public static function setFileCoverageObject(string $fileName, mixed $obj): bool {
+  public static function setFileCoverageObject(
+    string $fileName,
+    mixed $obj,
+  ): bool {
     return false;
   }
 

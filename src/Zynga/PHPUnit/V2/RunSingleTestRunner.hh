@@ -43,14 +43,20 @@ class RunSingleTestRunner extends Runner {
 
     $argStack = parent::createPHPUnitArgStack();
 
-    $argStack->add('--debug');
+    echo "testName=$testName\n";
+    echo "filePath=$filePath\n";
 
-    if ($testFunction != '') {
-      $argStack->add('--filter \'/::'.$testFunction.'$/\'');
+    if ($testFunction !== '') {
+      $argStack->pop();
+      $argStack->pop();
+      $argStack->add('--debug');
+      $argStack->add('--filter='.$testFunction);
+      $argStack->add($filePath);
+    } else {
+      $argStack->add('--debug');
+      $argStack->add($testName);
+      $argStack->add($filePath);
     }
-
-    $argStack->add($testName);
-    $argStack->add($filePath);
 
     return $argStack;
 

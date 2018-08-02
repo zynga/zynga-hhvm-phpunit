@@ -5,7 +5,8 @@ Changes from vanilla phpunit here:
 1. some path scanning functionality doesn't scale well with as large of a codebase we have, so some small tweaks on number of file scans and parses of code were done.
 1. We utilize strict hhvm tests, made a change to TestSuite.php to support running non-static doBeforeClassSetup and doAfterClassSetup function instead of mixing modes between strict and non-strict code.
 1. Fixed: Multiline use statements showing up as uncovered.
-1. New: Added support for enums spanning multiple lines. 
+1. New: Added support for enums spanning multiple lines.
+1. Converted all of php-token-stream to be hack strict.
 
 # History
 

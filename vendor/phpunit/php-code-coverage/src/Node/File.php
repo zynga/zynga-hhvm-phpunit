@@ -11,6 +11,11 @@
 namespace SebastianBergmann\CodeCoverage\Node;
 
 use SebastianBergmann\CodeCoverage\InvalidArgumentException;
+use SebastianBergmann\TokenStream\Token\Stream;
+use
+  SebastianBergmann\TokenStream\Token\Stream\CachingFactory as StreamCachingFactory
+;
+use SebastianBergmann\TokenStream\Token\StreamFunctionStructure;
 
 /**
  * Represents a file in the code coverage information tree.
@@ -356,13 +361,12 @@ class File extends AbstractNode
     {
         $classStack = $functionStack = [];
 
-        $tokens = \PHP_Token_Stream_CachingFactory::get($this->getPath());
+        $tokens = StreamCachingFactory::get($this->getPath());
 
         $this->processClasses($tokens);
         $this->processTraits($tokens);
         $this->processFunctions($tokens);
         $this->linesOfCode = $tokens->getLinesOfCode();
-        unset($tokens);
 
         for ($lineNumber = 1; $lineNumber <= $this->linesOfCode['loc']; $lineNumber++) {
             if (isset($this->startLines[$lineNumber])) {
@@ -530,12 +534,11 @@ class File extends AbstractNode
     }
 
     /**
-     * @param \PHP_Token_Stream $tokens
+     * @param Stream $tokens
      */
-    protected function processClasses(\PHP_Token_Stream $tokens)
+    protected function processClasses(Stream $tokens)
     {
         $classes = $tokens->getClasses();
-        unset($tokens);
 
         $link = $this->getId() . '.html#';
 
@@ -543,35 +546,33 @@ class File extends AbstractNode
             $this->classes[$className] = [
                 'className'       => $className,
                 'methods'         => [],
-                'startLine'       => $class['startLine'],
+                'startLine'       => $class->startLine,
                 'executableLines' => 0,
                 'executedLines'   => 0,
                 'ccn'             => 0,
                 'coverage'        => 0,
                 'crap'            => 0,
-                'package'         => $class['package'],
-                'link'            => $link . $class['startLine']
+                'package'         => $class->package,
+                'link'            => $link . $class->startLine
             ];
 
-            $this->startLines[$class['startLine']] = &$this->classes[$className];
-            $this->endLines[$class['endLine']]     = &$this->classes[$className];
+            $this->startLines[$class->startLine] = &$this->classes[$className];
+            $this->endLines[$class->endLine]     = &$this->classes[$className];
 
-            foreach ($class['methods'] as $methodName => $method) {
+            foreach ($class->methods as $methodName => $method) {
                 $this->classes[$className]['methods'][$methodName] = $this->newMethod($methodName, $method, $link);
-
-                $this->startLines[$method['startLine']] = &$this->classes[$className]['methods'][$methodName];
-                $this->endLines[$method['endLine']]     = &$this->classes[$className]['methods'][$methodName];
+                $this->startLines[$method->startLine] = &$this->classes[$className]['methods'][$methodName];
+                $this->endLines[$method->endLine]     = &$this->classes[$className]['methods'][$methodName];
             }
         }
     }
 
     /**
-     * @param \PHP_Token_Stream $tokens
+     * @param Stream $tokens
      */
-    protected function processTraits(\PHP_Token_Stream $tokens)
+    protected function processTraits(Stream $tokens)
     {
         $traits = $tokens->getTraits();
-        unset($tokens);
 
         $link = $this->getId() . '.html#';
 
@@ -579,53 +580,52 @@ class File extends AbstractNode
             $this->traits[$traitName] = [
                 'traitName'       => $traitName,
                 'methods'         => [],
-                'startLine'       => $trait['startLine'],
+                'startLine'       => $trait->startLine,
                 'executableLines' => 0,
                 'executedLines'   => 0,
                 'ccn'             => 0,
                 'coverage'        => 0,
                 'crap'            => 0,
-                'package'         => $trait['package'],
-                'link'            => $link . $trait['startLine']
+                'package'         => $trait->package,
+                'link'            => $link . $trait->startLine
             ];
 
-            $this->startLines[$trait['startLine']] = &$this->traits[$traitName];
-            $this->endLines[$trait['endLine']]     = &$this->traits[$traitName];
+            $this->startLines[$trait->startLine] = &$this->traits[$traitName];
+            $this->endLines[$trait->endLine]     = &$this->traits[$traitName];
 
-            foreach ($trait['methods'] as $methodName => $method) {
+            foreach ($trait->methods as $methodName => $method) {
                 $this->traits[$traitName]['methods'][$methodName] = $this->newMethod($methodName, $method, $link);
 
-                $this->startLines[$method['startLine']] = &$this->traits[$traitName]['methods'][$methodName];
-                $this->endLines[$method['endLine']]     = &$this->traits[$traitName]['methods'][$methodName];
+                $this->startLines[$method->startLine] = &$this->traits[$traitName]['methods'][$methodName];
+                $this->endLines[$method->endLine]     = &$this->traits[$traitName]['methods'][$methodName];
             }
         }
     }
 
     /**
-     * @param \PHP_Token_Stream $tokens
+     * @param Stream $tokens
      */
-    protected function processFunctions(\PHP_Token_Stream $tokens)
+    protected function processFunctions(Stream $tokens)
     {
         $functions = $tokens->getFunctions();
-        unset($tokens);
 
         $link = $this->getId() . '.html#';
 
         foreach ($functions as $functionName => $function) {
             $this->functions[$functionName] = [
                 'functionName'    => $functionName,
-                'signature'       => $function['signature'],
-                'startLine'       => $function['startLine'],
+                'signature'       => $function->signature,
+                'startLine'       => $function->startLine,
                 'executableLines' => 0,
                 'executedLines'   => 0,
-                'ccn'             => $function['ccn'],
+                'ccn'             => $function->ccn,
                 'coverage'        => 0,
                 'crap'            => 0,
-                'link'            => $link . $function['startLine']
+                'link'            => $link . $function->startLine
             ];
 
-            $this->startLines[$function['startLine']] = &$this->functions[$functionName];
-            $this->endLines[$function['endLine']]     = &$this->functions[$functionName];
+            $this->startLines[$function->startLine] = &$this->functions[$functionName];
+            $this->endLines[$function->endLine]     = &$this->functions[$functionName];
         }
     }
 
@@ -661,20 +661,20 @@ class File extends AbstractNode
      *
      * @return array
      */
-    private function newMethod($methodName, array $method, $link)
+    private function newMethod($methodName, StreamFunctionStructure $method, $link)
     {
         return [
             'methodName'      => $methodName,
-            'visibility'      => $method['visibility'],
-            'signature'       => $method['signature'],
-            'startLine'       => $method['startLine'],
-            'endLine'         => $method['endLine'],
+            'visibility'      => $method->visibility,
+            'signature'       => $method->signature,
+            'startLine'       => $method->startLine,
+            'endLine'         => $method->endLine,
             'executableLines' => 0,
             'executedLines'   => 0,
-            'ccn'             => $method['ccn'],
+            'ccn'             => $method->ccn,
             'coverage'        => 0,
             'crap'            => 0,
-            'link'            => $link . $method['startLine'],
+            'link'            => $link . $method->startLine,
         ];
     }
 }

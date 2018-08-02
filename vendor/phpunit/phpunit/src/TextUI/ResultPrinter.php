@@ -9,6 +9,7 @@
  */
 
 use SebastianBergmann\Environment\Console;
+use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCase;
 
 /**
  * Prints the result of a TextUI TestRunner run.
@@ -556,7 +557,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements PHPUn
             $this->writeProgress('.');
         }
 
-        if ($test instanceof PHPUnit_Framework_TestCase) {
+        if ($test instanceof PHPUnit_Framework_TestCase || $test instanceof ZyngaTestCase ) {
             $this->numAssertions += $test->getNumAssertions();
         } elseif ($test instanceof PHPUnit_Extensions_PhptTestCase) {
             $this->numAssertions++;

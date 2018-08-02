@@ -766,14 +766,6 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                 break;
             }
 
-            if (($test instanceof ZyngaTestCaseBase || $test instanceof PHPUnit_Framework_TestCase )||
-                $test instanceof self) {
-                $test->setbeStrictAboutChangesToGlobalState($this->beStrictAboutChangesToGlobalState);
-                $test->setBackupGlobals($this->backupGlobals);
-                $test->setBackupStaticAttributes($this->backupStaticAttributes);
-                $test->setRunTestInSeparateProcess($this->runTestInSeparateProcess);
-            }
-
             $test->run($result);
 
         }

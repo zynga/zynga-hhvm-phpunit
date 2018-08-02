@@ -9,8 +9,9 @@ use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\AbstractBlock;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\CodeBlockInterface;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\IfBlock;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\ReturnBlock;
-
-use \PHP_Token_Stream_CachingFactory;
+use
+  SebastianBergmann\TokenStream\Token\Stream\CachingFactory as StreamCachingFactory
+;
 
 class ProcessedFile {
 
@@ -74,7 +75,7 @@ class ProcessedFile {
     // JEO: you might want to turn off this caching if you don't run a significant
     // amount of ram within your machines.
     // --
-    $tokens = PHP_Token_Stream_CachingFactory::get($this->_file);
+    $tokens = StreamCachingFactory::get($this->_file);
 
     // Loop across the tokens
     $lineStack = new LineStack();
@@ -308,8 +309,9 @@ class ProcessedFile {
             ' start='.
             $startBlock.
             ' end='.
-            $endBlock .
-            ' line=' . $line
+            $endBlock.
+            ' line='.
+            $line,
           );
           $this->setStackValue($line, Driver::LINE_EXECUTED);
         }
