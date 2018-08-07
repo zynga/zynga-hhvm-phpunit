@@ -14,8 +14,8 @@ namespace SebastianBergmann\CodeCoverage\Driver;
 use SebastianBergmann\CodeCoverage\Driver\Xdebug;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\LineStack;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\Logging as HHVM_Logging;
-use SebastianBergmann\CodeCoverage\Driver\HHVM\ProcessedFile;
-
+use SebastianBergmann\CodeCoverage\ProcessedFile\FileContainer;
+    
 /**
  * Driver for HHVM's code coverage functionality.
  *
@@ -23,13 +23,9 @@ use SebastianBergmann\CodeCoverage\Driver\HHVM\ProcessedFile;
  */
 class HHVM extends Xdebug {
 
-  private Map<string, ProcessedFile> $_processedFiles;
-
   public function __construct() {
 
     parent::__construct();
-
-    $this->_processedFiles = Map {};
 
   }
 
@@ -81,24 +77,15 @@ class HHVM extends Xdebug {
 
       HHVM_Logging::debug("file=$file");
 
-      $fileStack = $this->_processedFiles->get($file);
-
-      if ($fileStack === null) {
-
-        $fileStack = new ProcessedFile($file);
-        $fileStack->initStackForFileName();
-
-        $this->_processedFiles->set($file, $fileStack);
-
-      }
+      $fileStack = FileContainer::get($file);
 
       // --
       // HHVM xdebug reports the number of times something is executed,
       //  whereas php:xdebug just does a 0/1 state.
       // --
-      $fileStack->consumeRawExecStack($rawExecStack);
+      // $fileStack->consumeRawExecStack($rawExecStack);
 
-      $returnData->set($file, $fileStack->toArrayFormat());
+      $returnData->set($file, $fileStack->lineExecutionStatetoArrayFormat());
 
     }
 

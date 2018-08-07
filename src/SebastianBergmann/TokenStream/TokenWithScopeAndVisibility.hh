@@ -16,7 +16,7 @@ abstract class TokenWithScopeAndVisibility extends TokenWithScope {
    */
   public function getVisibility(): string {
 
-    $tokens = $this->tokenStream->tokens();
+    $tokens = $this->tokenStream()->tokens();
 
     for ($i = $this->id - 2; $i > $this->id - 7; $i -= 2) {
 
@@ -45,7 +45,7 @@ abstract class TokenWithScopeAndVisibility extends TokenWithScope {
 
     $keywords = array();
 
-    $tokens = $this->tokenStream->tokens();
+    $tokens = $this->tokenStream()->tokens();
 
     for ($i = $this->id - 2; $i > $this->id - 7; $i -= 2) {
 

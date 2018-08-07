@@ -12,6 +12,7 @@
 use Zynga\Framework\Testing\TestCase\V2\Base as TestCase;
 use Zynga\Framework\Environment\CodePath\V1\CodePath;
 use SebastianBergmann\TokenStream\Token\Stream;
+use SebastianBergmann\TokenStream\Token\Stream\CachingFactory;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Function;
 
 class ClosureTest extends TestCase {
@@ -35,7 +36,10 @@ class ClosureTest extends TestCase {
   }
 
   protected function getFunctionsForTest(): Vector<PHP_Token_Function> {
-    $ts = new Stream($this->getFilesDirectory().'closure.php');
+
+    $filename = $this->getFilesDirectory().'closure.php';
+
+    $ts = CachingFactory::get($filename);
 
     $tokens = $ts->tokens();
 

@@ -2,8 +2,10 @@
 
 namespace SebastianBergmann\TokenStream\Token;
 
+use SebastianBergmann\TokenStream\Token\StreamMethodStructure;
+
 class StreamInterfaceStructure {
-  public Map<string, StreamFunctionStructure> $methods = Map {};
+  public Map<string, StreamMethodStructure> $methods = Map {};
   public mixed $parent = false;
   public mixed $interfaces = false;
   public string $keywords = '';

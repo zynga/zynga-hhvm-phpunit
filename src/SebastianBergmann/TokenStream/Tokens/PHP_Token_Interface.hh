@@ -16,7 +16,7 @@ class PHP_Token_Interface extends TokenWithScopeAndVisibility {
    * @return string
    */
   public function getName(): string {
-    $tokens = $this->tokenStream->tokens();
+    $tokens = $this->tokenStream()->tokens();
     $nameToken = $tokens->get($this->id + 2);
     if ($nameToken instanceof PHP_Token_String) {
       return strval($nameToken);
@@ -28,7 +28,7 @@ class PHP_Token_Interface extends TokenWithScopeAndVisibility {
    * @return bool
    */
   public function hasParent(): bool {
-    $tokens = $this->tokenStream->tokens();
+    $tokens = $this->tokenStream()->tokens();
     $token = $tokens->get($this->id + 4);
     return $token instanceof PHP_Token_Extends;
   }
@@ -38,7 +38,7 @@ class PHP_Token_Interface extends TokenWithScopeAndVisibility {
    */
   public function getPackage(): Map<string, string> {
 
-    $tokens = $this->tokenStream->tokens();
+    $tokens = $this->tokenStream()->tokens();
 
     $className = $this->getName();
     $docComment = $this->getDocblock();
@@ -136,7 +136,7 @@ class PHP_Token_Interface extends TokenWithScopeAndVisibility {
     }
 
     $i = $this->id + 6;
-    $tokens = $this->tokenStream->tokens();
+    $tokens = $this->tokenStream()->tokens();
     $className = (string) $tokens[$i];
 
     for ($r = $i; $r < $tokens->count(); $r++) {
@@ -158,7 +158,7 @@ class PHP_Token_Interface extends TokenWithScopeAndVisibility {
   public function hasInterfaces(): bool {
 
     // basic: class implements X {}
-    $tokens = $this->tokenStream->tokens();
+    $tokens = $this->tokenStream()->tokens();
 
     $basicImplementsToken = $tokens->get($this->id + 4);
 
@@ -193,7 +193,7 @@ class PHP_Token_Interface extends TokenWithScopeAndVisibility {
       return false;
     }
 
-    $tokens = $this->tokenStream->tokens();
+    $tokens = $this->tokenStream()->tokens();
 
     $interfacesToken = $tokens->get($this->id + 4);
 

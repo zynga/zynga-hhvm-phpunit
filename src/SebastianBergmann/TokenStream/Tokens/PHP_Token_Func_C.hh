@@ -4,4 +4,4 @@ namespace SebastianBergmann\TokenStream\Tokens;
 
 use SebastianBergmann\TokenStream\Token;
 
-class PHP_Token_FUNC_C extends Token {}
+class PHP_Token_Func_C extends Token {}

@@ -21,6 +21,19 @@ if (isset($_ENV['USER'])) {
   $userName = get_current_user();
 }
 
+$currentTimezone = ini_get('date.timezone');
+
+if ($currentTimezone == '') {
+  ini_set('date.timezone', 'UTC');
+
+  $currentTimezone = ini_get('date.timezone');
+  if ($currentTimezone != 'UTC') {
+    throw new Exception(
+      'failedTimeZoneCheck expected=UTC have='.$currentTimezone,
+    );
+  }
+}
+
 // This is a work around that the environment may / may not be fully up at this
 // moment, so codepath might be unititalized.
 if ( CodePath::getRoot() == '' ) {

@@ -13,7 +13,7 @@ class PHP_Token_Class extends PHP_Token_Interface {
    */
   public function getName(): string {
 
-    $tokens = $this->tokenStream->tokens();
+    $tokens = $this->tokenStream()->tokens();
 
     $next = $tokens->get($this->id + 1);
 

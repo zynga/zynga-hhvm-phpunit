@@ -26,6 +26,7 @@ use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
 use
   SebastianBergmann\TokenStream\Token\Stream\CachingFactory as StreamCachingFactory
 ;
+use SebastianBergmann\CodeCoverage\ProcessedFile\FileContainer;
 
 /**
  * Provides collection functionality for PHP code coverage information.
@@ -92,13 +93,6 @@ class CodeCoverage {
   private $currentId;
 
   /**
-   * Code coverage data.
-   *
-   * @var array
-   */
-  private $data = [];
-
-  /**
    * @var array
    */
   private $ignoredLines = [];
@@ -134,6 +128,8 @@ class CodeCoverage {
    */
   private $shouldCheckForDeadAndUnused = true;
 
+  private string $target;
+
   /**
    * Constructor.
    *
@@ -142,7 +138,14 @@ class CodeCoverage {
    *
    * @throws RuntimeException
    */
-  public function __construct(?Driver $driver = null, ?Filter $filter = null) {
+  public function __construct(
+    string $target,
+    ?Driver $driver = null,
+    ?Filter $filter = null,
+  ) {
+
+    $this->target = $target;
+
     if ($driver === null) {
       $driver = $this->selectDriver();
     }
@@ -157,14 +160,18 @@ class CodeCoverage {
     $this->wizard = new Wizard();
   }
 
+  // The destination target directory for output.
+  public function getTarget(): string {
+    return $this->target;
+  }
+
   /**
    * Returns the code coverage information as a graph of node objects.
    *
    * @return Directory
    */
-  public function getReport() {
+  public function getReport(): Directory {
     $builder = new Builder();
-
     return $builder->build($this);
   }
 
@@ -174,7 +181,7 @@ class CodeCoverage {
   public function clear() {
     $this->isInitialized = false;
     $this->currentId = null;
-    $this->data = [];
+    FileContainer::clear();
     $this->tests = [];
   }
 
@@ -199,8 +206,7 @@ class CodeCoverage {
     if (!$raw && $this->addUncoveredFilesFromWhitelist) {
       $this->addUncoveredFilesFromWhitelist();
     }
-
-    return $this->data;
+    return FileContainer::getAllLineToTestData();
   }
 
   /**
@@ -209,7 +215,8 @@ class CodeCoverage {
    * @param array $data
    */
   public function setData(array $data) {
-    $this->data = $data;
+    error_log('JEO - Disabled as the filecontainer handles this now');
+    // $this->data = $data;
   }
 
   /**
@@ -307,6 +314,9 @@ class CodeCoverage {
     $linesToBeCovered = [],
     array $linesToBeUsed = [],
   ) {
+    // @TODO - JEO we are getting rid of this passing around the $data stack shit.
+    // echo "appendIsBeingDeprecated!\n";
+    return;
     if ($id === null) {
       $id = $this->currentId;
     }
@@ -316,8 +326,8 @@ class CodeCoverage {
     }
 
     $this->applyListsFilter($data);
-    $this->applyIgnoredLinesFilter($data);
-    $this->initializeFilesThatAreSeenTheFirstTime($data);
+    //$this->applyIgnoredLinesFilter($data);
+    //$this->initializeFilesThatAreSeenTheFirstTime($data);
 
     if (!$append) {
       return;
@@ -365,14 +375,15 @@ class CodeCoverage {
         continue;
       }
 
-      foreach ($lines as $k => $v) {
-        if ($v == Driver::LINE_EXECUTED) {
-          if (empty($this->data[$file][$k]) ||
-              !in_array($id, $this->data[$file][$k])) {
-            $this->data[$file][$k][] = $id;
-          }
+      $fileStack = FileContainer::get($file);
+
+      foreach ($lines as $lineNo => $lineState) {
+        if ($lineState == Driver::LINE_EXECUTED) {
+          echo "lineNo=$lineNo id=$id\n";
+          $fileStack->setLineToTest($lineNo, $id);
         }
       }
+
     }
   }
 
@@ -382,35 +393,38 @@ class CodeCoverage {
    * @param CodeCoverage $that
    */
   public function merge(CodeCoverage $that) {
-    $this->filter->setWhitelistedFiles(
-      array_merge(
-        $this->filter->getWhitelistedFiles(),
-        $that->filter()->getWhitelistedFiles(),
-      ),
-    );
 
-    foreach ($that->data as $file => $lines) {
-      if (!isset($this->data[$file])) {
-        if (!$this->filter->isFiltered($file)) {
-          $this->data[$file] = $lines;
-        }
-
-        continue;
-      }
-
-      foreach ($lines as $line => $data) {
-        if ($data !== null) {
-          if (!isset($this->data[$file][$line])) {
-            $this->data[$file][$line] = $data;
-          } else {
-            $this->data[$file][$line] =
-              array_unique(array_merge($this->data[$file][$line], $data));
-          }
-        }
-      }
-    }
-
-    $this->tests = array_merge($this->tests, $that->getTests());
+    error_log('JEO: MERGE_DISABLED, as we made file data singleton');
+    return;
+    // $this->filter->setWhitelistedFiles(
+    //   array_merge(
+    //     $this->filter->getWhitelistedFiles(),
+    //     $that->filter()->getWhitelistedFiles(),
+    //   ),
+    // );
+    //
+    // foreach ($that->data as $file => $lines) {
+    //   if (!isset($this->data[$file])) {
+    //     if (!$this->filter->isFiltered($file)) {
+    //       $this->data[$file] = $lines;
+    //     }
+    //
+    //     continue;
+    //   }
+    //
+    //   foreach ($lines as $line => $data) {
+    //     if ($data !== null) {
+    //       if (!isset($this->data[$file][$line])) {
+    //         $this->data[$file][$line] = $data;
+    //       } else {
+    //         $this->data[$file][$line] =
+    //           array_unique(array_merge($this->data[$file][$line], $data));
+    //       }
+    //     }
+    //   }
+    // }
+    //
+    // $this->tests = array_merge($this->tests, $that->getTests());
   }
 
   /**
@@ -566,7 +580,7 @@ class CodeCoverage {
    * @throws UnintentionallyCoveredCodeException
    */
   private function applyCoversAnnotationFilter(
-    array &$data,
+    array $data,
     $linesToBeCovered,
     array $linesToBeUsed,
   ) {
@@ -617,7 +631,7 @@ class CodeCoverage {
    *
    * @param array $data
    */
-  private function applyListsFilter(array &$data) {
+  private function applyListsFilter(array $data) {
     foreach (array_keys($data) as $filename) {
       if ($this->filter->isFiltered($filename)) {
         unset($data[$filename]);
@@ -630,7 +644,7 @@ class CodeCoverage {
    *
    * @param array $data
    */
-  private function applyIgnoredLinesFilter(array &$data) {
+  private function applyIgnoredLinesFilter(array $data) {
     foreach (array_keys($data) as $filename) {
       if (!$this->filter->isFile($filename)) {
         continue;
@@ -646,42 +660,41 @@ class CodeCoverage {
    * @param array $data
    */
   private function initializeFilesThatAreSeenTheFirstTime(array $data) {
-    foreach ($data as $file => $lines) {
-      if ($this->filter->isFile($file) && !isset($this->data[$file])) {
-        $this->data[$file] = [];
-
-        foreach ($lines as $k => $v) {
-          $this->data[$file][$k] = $v == -2 ? null : [];
-        }
-      }
-    }
+    // Negated by using the file container approach.
   }
 
   /**
    * Processes whitelisted files that are not covered.
    */
   private function addUncoveredFilesFromWhitelist() {
-    $data = [];
+    return;
+
+    $filesToThisPoint = FileContainer::getFileNames();
+
     $uncoveredFiles =
-      array_diff($this->filter->getWhitelist(), array_keys($this->data));
+      array_diff($this->filter->getWhitelist(), $filesToThisPoint->toArray());
 
     foreach ($uncoveredFiles as $uncoveredFile) {
+
+      echo "possibleUncovered=".$uncoveredFile."\n";
       if (!file_exists($uncoveredFile)) {
         continue;
       }
 
       if (!$this->processUncoveredFilesFromWhitelist) {
-        $data[$uncoveredFile] = [];
+        echo
+          "processingUncoveredFilesFromWhitelist=".
+          json_encode($this->processUncoveredFilesFromWhitelist).
+          "\n"
+        ;
 
-        $lines = count(file($uncoveredFile));
+        // This alone will snag the file, and setup it's intiial state with the
+        // platform as the container will run init()
+        $fileStack = FileContainer::get($uncoveredFile);
 
-        for ($i = 1; $i <= $lines; $i++) {
-          $data[$uncoveredFile][$i] = Driver::LINE_NOT_EXECUTED;
-        }
       }
     }
 
-    $this->append($data, 'UNCOVERED_FILES_FROM_WHITELIST');
   }
 
   /**
@@ -963,7 +976,7 @@ class CodeCoverage {
    * @throws UnintentionallyCoveredCodeException
    */
   private function performUnintentionallyCoveredCodeCheck(
-    array &$data,
+    array $data,
     array $linesToBeCovered,
     array $linesToBeUsed,
   ) {
@@ -998,7 +1011,7 @@ class CodeCoverage {
    * @throws CoveredCodeNotExecutedException
    */
   private function performUnexecutedCoveredCodeCheck(
-    array &$data,
+    array $data,
     array $linesToBeCovered,
     array $linesToBeUsed,
   ) {
@@ -1081,13 +1094,10 @@ class CodeCoverage {
       throw new RuntimeException('No code coverage driver available');
     }
 
-    if ($runtime->isHHVM()) {
-      return new HHVM();
-    } else if ($runtime->isPHPDBG()) {
-      return new PHPDBG();
-    } else {
-      return new Xdebug();
-    }
+    // There is no real selection moment any more as we removed all the other
+    // drivers.
+    return new HHVM();
+
   }
 
   /**
@@ -1122,42 +1132,47 @@ class CodeCoverage {
     return array_values($unintentionallyCoveredUnits);
   }
 
+  private function initalizeData_DisplayPerFileData(string $message): void {
+    // For debugging the initialization process.
+    // echo $message;
+  }
+
   /**
    * If we are processing uncovered files from whitelist,
    * we can initialize the data before we start to speed up the tests
    */
-  protected function initializeData() {
+  private function initializeData(): void {
     $this->isInitialized = true;
 
-    if ($this->processUncoveredFilesFromWhitelist) {
-      $this->shouldCheckForDeadAndUnused = false;
+    echo date('r')." - initalizeData - start\n";
 
-      $this->driver->start(true);
+    $fileCount = 0;
 
-      foreach ($this->filter->getWhitelist() as $file) {
-        if ($this->filter->isFile($file)) {
-          include_once ($file);
-        }
+    foreach ($this->filter->getWhitelist() as $file) {
+
+      $this->initalizeData_DisplayPerFileData("whiteListedFile=$file");
+
+      if ($this->filter->isFiltered($file)) {
+        $this->initalizeData_DisplayPerFileData(" - isFiltered\n");
+        continue;
       }
 
-      $data = [];
-      $coverage = $this->driver->stop();
+      $fileCount++;
 
-      foreach ($coverage as $file => $fileCoverage) {
-        if ($this->filter->isFiltered($file)) {
-          continue;
-        }
+      $this->initalizeData_DisplayPerFileData(" - initalizing: ");
 
-        foreach (array_keys($fileCoverage) as $key) {
-          if ($fileCoverage[$key] == Driver::LINE_EXECUTED) {
-            $fileCoverage[$key] = Driver::LINE_NOT_EXECUTED;
-          }
-        }
+      $fileCoverage = array();
 
-        $data[$file] = $fileCoverage;
-      }
+      $file = FileContainer::get($file);
 
-      $this->append($data, 'UNCOVERED_FILES_FROM_WHITELIST');
+      $this->initalizeData_DisplayPerFileData("done");
+
+      $this->initalizeData_DisplayPerFileData("\n");
+
     }
+
+    echo date('r')." - initalizeData - complete fileCount=$fileCount\n";
+
   }
+
 }

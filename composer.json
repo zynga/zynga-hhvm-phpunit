@@ -24,6 +24,8 @@
     "psr-4": {
       "PHPUnit\\Tests\\": "tests/phpunit/PHPUnit/Tests/",
       "SebastianBergmann\\CodeCoverage\\": "src/SebastianBergmann/CodeCoverage/",
+      "SebastianBergmann\\Environment\\": "src/SebastianBergmann/Environment/",
+      "SebastianBergmann\\TextTemplate\\": "src/SebastianBergmann/TextTemplate/",
       "SebastianBergmann\\TokenStream\\": "src/SebastianBergmann/TokenStream/",
       "SebastianBergmann\\TokenStream\\Tests": "tests/token-stream/SebastianBergmann/TokenStream/Tests/",
       "Zynga\\PHPUnit\\V2\\": "src/Zynga/PHPUnit/V2/"

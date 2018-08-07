@@ -14,6 +14,7 @@ namespace SebastianBergmann\TokenStream\Tests;
 use Zynga\Framework\Testing\TestCase\V2\Base as TestCase;
 use Zynga\Framework\Environment\CodePath\V1\CodePath;
 use SebastianBergmann\TokenStream\Token\Stream;
+use SebastianBergmann\TokenStream\Token\Stream\CachingFactory;
 
 class PHP_Token_IncludeTest extends TestCase {
 
@@ -36,7 +37,8 @@ class PHP_Token_IncludeTest extends TestCase {
   }
 
   protected function getTestStream(): Stream {
-    return new Stream($this->getFilesDirectory().'source3.php');
+    $filename = $this->getFilesDirectory().'source3.php';
+    return CachingFactory::get($filename);
   }
 
   public function testGetIncludes(): void {

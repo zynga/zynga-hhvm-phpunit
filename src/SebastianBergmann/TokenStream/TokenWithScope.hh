@@ -31,7 +31,7 @@ abstract class TokenWithScope extends Token {
    * @return string|null Returns the docblock as a string if found
    */
   public function getDocblock(): ?string {
-    $tokens = $this->tokenStream->tokens();
+    $tokens = $this->tokenStream()->tokens();
     $currentLineNumber = $tokens[$this->id]->getLine();
     $prevLineNumber = $currentLineNumber - 1;
 
@@ -79,9 +79,14 @@ abstract class TokenWithScope extends Token {
    * @return int
    */
   public function getEndTokenId(): int {
+
+    if ($this->endTokenId !== -1) {
+      return $this->endTokenId;
+    }
+
     $block = 0;
     $i = $this->id;
-    $tokens = $this->tokenStream->tokens();
+    $tokens = $this->tokenStream()->tokens();
 
     while ($this->endTokenId === -1 && $tokens->containsKey($i)) {
 
@@ -107,7 +112,7 @@ abstract class TokenWithScope extends Token {
       $i++;
     }
 
-    if ($this->endTokenId === null) {
+    if ($this->endTokenId === -1) {
       $this->endTokenId = $this->id;
     }
 
@@ -120,7 +125,7 @@ abstract class TokenWithScope extends Token {
   public function getEndLine(): int {
     $endLine = 0;
 
-    $endToken = $this->tokenStream->get($this->getEndTokenId());
+    $endToken = $this->tokenStream()->get($this->getEndTokenId());
 
     if ($endToken instanceof TokenInterface) {
       $endLine = $endToken->getLine();

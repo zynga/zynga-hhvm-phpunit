@@ -15,6 +15,7 @@ use Zynga\Source\Cache as Zynga_Source_Cache;
 use Zynga\Framework\Dynamic\V1\DynamicClassCreation;
 
 use SebastianBergmann\TokenStream\Token as PHP_Token;
+use SebastianBergmann\TokenStream\Token\Factory as TokenFactory;
 
 use SebastianBergmann\TokenStream\TokenInterface;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Class;
@@ -108,7 +109,7 @@ class Stream {
   /**
    * @var array
    */
-  protected Map<string, StreamFunctionStructure> $functions;
+  protected Map<string, StreamMethodStructure> $functions;
 
   /**
    * @var array
@@ -129,7 +130,7 @@ class Stream {
   /**
    * @var array
    */
-  protected Map<string, StreamTraitStructure> $traits;
+  protected Map<string, StreamClassStructure> $traits;
 
   /**
    * @var array
@@ -144,13 +145,14 @@ class Stream {
   private mixed $t_traitEndLine;
   private mixed $t_interface;
   private mixed $t_interfaceEndLine;
+  private int $streamId;
 
   /**
    * Constructor.
    *
    * @param string $fileName
    */
-  public function __construct(string $fileName) {
+  public function __construct(string $fileName, int $streamId = -1) {
 
     $this->didScan = false;
     $this->didParse = false;
@@ -170,12 +172,18 @@ class Stream {
     $this->t_interfaceEndLine = false;
 
     $this->filename = $fileName;
+    $this->streamId = $streamId;
 
+  }
+
+  public function getStreamId(): int {
+    return $this->streamId;
   }
 
   public function get(int $offset): ?TokenInterface {
     return $this->tokens->get($offset);
   }
+
   /**
    * Destructor.
    */
@@ -285,21 +293,34 @@ class Stream {
           $name .= ucfirst(strtolower($namePart));
         }
 
-        $tokenClass = 'SebastianBergmann\TokenStream\Tokens\PHP_Token_'.$name;
+        $tokenClass = 'PHP_Token_'.$name;
 
       } else {
         $text = $token;
-        $tokenClass =
-          'SebastianBergmann\TokenStream\Tokens\\'.
-          self::$customTokens[$token];
+        $tokenClass = self::$customTokens[$token];
       }
 
-      $tokenParams = Vector {$text, $line, $this, $id++};
-
-      $newToken = DynamicClassCreation::createClassByNameGeneric(
+      $newToken = TokenFactory::createToken(
         $tokenClass,
-        $tokenParams,
+        $text,
+        $line,
+        $this->getStreamId(),
+        $id,
       );
+
+      if ($newToken === null) {
+        // --
+        // JEO: DynamicClassCreation is actually somewhat slow with the number
+        // of ops we are asking it to do.
+        // --
+        $tokenParams = Vector {$text, $line, $this->getStreamId(), $id};
+
+        $newToken = DynamicClassCreation::createClassByNameGeneric(
+          'SebastianBergmann\TokenStream\Tokens\\'.$tokenClass,
+          $tokenParams,
+        );
+      }
+      $id++;
 
       if ($newToken instanceof TokenInterface) {
         $this->tokens->add($newToken);
@@ -332,6 +353,14 @@ class Stream {
 
   }
 
+  public function getLineCount(): int {
+    $locEntry = $this->linesOfCode->get('loc');
+    if (is_int($locEntry)) {
+      return $locEntry;
+    }
+    return -1;
+  }
+
   /**
    * @return int
    */
@@ -359,7 +388,7 @@ class Stream {
   /**
    * @return array
    */
-  public function getFunctions(): Map<string, StreamFunctionStructure> {
+  public function getFunctions(): Map<string, StreamMethodStructure> {
     $this->parse();
     return $this->functions;
   }
@@ -375,7 +404,7 @@ class Stream {
   /**
    * @return array
    */
-  public function getTraits(): Map<string, StreamTraitStructure> {
+  public function getTraits(): Map<string, StreamClassStructure> {
     $this->parse();
     return $this->traits;
   }
@@ -489,7 +518,7 @@ class Stream {
   }
 
   private function parseHandleTrait(PHP_Token_Trait $token): void {
-    $tmp = new StreamTraitStructure();
+    $tmp = new StreamClassStructure();
     $tmp->methods->clear();
     $tmp->parent = $token->getParent();
     $tmp->interfaces = $token->getInterfaces();
@@ -511,7 +540,7 @@ class Stream {
 
     $name = $token->getName();
 
-    $tmp = new StreamFunctionStructure();
+    $tmp = new StreamMethodStructure();
 
     $tmp->docblock = strval($token->getDocblock());
     $tmp->keywords = $token->getKeywords();
@@ -557,7 +586,7 @@ class Stream {
 
       $a_trait = $this->traits->get($a_traitname);
 
-      if ($a_trait instanceof StreamTraitStructure) {
+      if ($a_trait instanceof StreamClassStructure) {
 
         $a_trait->methods->set($name, $tmp);
 

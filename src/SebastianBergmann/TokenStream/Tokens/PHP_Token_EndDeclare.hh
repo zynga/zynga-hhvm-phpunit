@@ -4,4 +4,4 @@ namespace SebastianBergmann\TokenStream\Tokens;
 
 use SebastianBergmann\TokenStream\Token;
 
-class PHP_Token_EndDeclare extends Token {}
+class PHP_Token_Enddeclare extends Token {}

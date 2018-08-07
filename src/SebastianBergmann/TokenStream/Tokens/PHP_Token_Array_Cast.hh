@@ -4,4 +4,4 @@ namespace SebastianBergmann\TokenStream\Tokens;
 
 use SebastianBergmann\TokenStream\Token;
 
-class PHP_Token_ARRAY_CAST extends Token {}
+class PHP_Token_Array_Cast extends Token {}

@@ -2,7 +2,8 @@
 
 namespace SebastianBergmann\TokenStream;
 
-use SebastianBergmann\TokenStream\Token\Stream as PHP_Token_Stream;
+use SebastianBergmann\TokenStream\Token\Stream;
+use SebastianBergmann\TokenStream\Token\Stream\CachingFactory;
 use SebastianBergmann\TokenStream\TokenInterface;
 
 /**
@@ -19,10 +20,7 @@ abstract class Token implements TokenInterface {
    */
   protected int $line;
 
-  /**
-   * @var PHP_Token_Stream
-   */
-  protected PHP_Token_Stream $tokenStream;
+  private int $tokenStreamId;
 
   /**
    * @var int
@@ -32,19 +30,55 @@ abstract class Token implements TokenInterface {
   /**
    * @param string           $text
    * @param int              $line
-   * @param PHP_Token_Stream $tokenStream
+   * @param Stream $tokenStream
    * @param int              $id
    */
   public function __construct(
     string $text,
     int $line,
-    PHP_Token_Stream $tokenStream,
+    int $tokenStreamId,
     int $id,
   ) {
     $this->text = $text;
     $this->line = $line;
-    $this->tokenStream = $tokenStream;
+    $this->tokenStreamId = $tokenStreamId;
     $this->id = $id;
+  }
+
+  public function getText(): string {
+    return $this->text;
+  }
+
+  public function setText(string $text): bool {
+    $this->text = $text;
+    return true;
+  }
+
+  public function getLine(): int {
+    return $this->line;
+  }
+
+  public function setLine(int $line): bool {
+    $this->line = $line;
+    return true;
+  }
+
+  public function getTokenStreamId(): int {
+    return $this->tokenStreamId;
+  }
+
+  public function setTokenStreamId(int $tokenStreamId): bool {
+    $this->tokenStreamId = $tokenStreamId;
+    return true;
+  }
+
+  public function getId(): int {
+    return $this->id;
+  }
+
+  public function setId(int $id): bool {
+    $this->id = $id;
+    return true;
   }
 
   /**
@@ -54,10 +88,8 @@ abstract class Token implements TokenInterface {
     return $this->text;
   }
 
-  /**
-   * @return int
-   */
-  public function getLine(): int {
-    return $this->line;
+  public function tokenStream(): Stream {
+    return CachingFactory::getByStreamId($this->tokenStreamId);
   }
+
 }

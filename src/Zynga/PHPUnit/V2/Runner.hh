@@ -53,7 +53,7 @@ class Runner {
       return RunnerPartialShim::runPHPUnit(true, $argStack->toArray());
 
     } catch (Exception $e) {
-      return $this->failure($e->getMessage());
+      return $this->failure($e->getMessage() . ' backtrace=' . $e->getTraceAsString());
     }
 
     return 0;

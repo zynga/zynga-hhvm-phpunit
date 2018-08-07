@@ -24,15 +24,15 @@ if (isset($_ENV['USER'])) {
 
 // This is a work around that the environment may / may not be fully up at this
 // moment, so codepath might be unititalized.
-if ( CodePath::getRoot() == '' ) {
+if (CodePath::getRoot() == '') {
   CodePath::setRoot($projectRoot);
 }
 
 $enableXHProf = false;
 $cleanArgv = array();
 
-foreach ( $argv as $argValue ) {
-  if ( $argValue == '--zynga-with-xhprof' ) {
+foreach ($argv as $argValue) {
+  if ($argValue == '--zynga-with-xhprof') {
     $enableXHProf = true;
   } else {
     $cleanArgv[] = $argValue;
@@ -44,17 +44,17 @@ use Zynga\Framework\Performance\V1\XHProfiler;
 // --
 // JEO: needed to be able to performance profile phpunit itself, it has a nasty startup cost.
 // --
-if ( $enableXHProf === true ) {
+if ($enableXHProf === true) {
   putenv('xhprof.enable=true');
-  XHProfiler::setProfileDir(CodePath::getRoot() . '/tmp/phpunit-xhprof');
+  XHProfiler::setProfileDir(CodePath::getRoot().'/tmp/phpunit-xhprof');
   XHProfiler::startProfiling();
 }
 
-$runner = new RunSingleTestRunner($projectRoot, $userName, $argv);
+$runner = new RunSingleTestRunner($projectRoot, $userName, $cleanArgv);
 
 $runRV = $runner->run();
 
-if ( $enableXHProf === true ) {
+if ($enableXHProf === true) {
   $name = 'phpunit-commandline';
   XHProfiler::stopProfiling($name);
 }

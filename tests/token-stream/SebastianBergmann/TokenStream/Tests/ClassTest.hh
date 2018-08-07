@@ -13,6 +13,7 @@ namespace SebastianBergmann\TokenStream\Tests;
 
 use Zynga\Framework\Testing\TestCase\V2\Base as TestCase;
 use Zynga\Framework\Environment\CodePath\V1\CodePath;
+use SebastianBergmann\TokenStream\Token\Stream\CachingFactory;
 use SebastianBergmann\TokenStream\Token\Stream;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Class;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Function;
@@ -24,7 +25,8 @@ class ClassTest extends TestCase {
 
     parent::doSetUpBeforeClass();
 
-    $ts = new Stream($this->getFilesDirectory().'source2.php');
+    $filename = $this->getFilesDirectory().'source2.php';
+    $ts = CachingFactory::get($filename);
 
     $tokens = $ts->tokens();
 
@@ -111,7 +113,8 @@ class ClassTest extends TestCase {
   }
 
   public function testIssue19(): void {
-    $ts = new Stream($this->getFilesDirectory().'issue19.hh');
+    $filename = $this->getFilesDirectory().'issue19.hh';
+    $ts = CachingFactory::get($filename);
     foreach ($ts->tokens() as $token) {
       if ($token instanceof PHP_Token_Class) {
         $this->assertFalse($token->hasInterfaces());
@@ -120,8 +123,8 @@ class ClassTest extends TestCase {
   }
 
   public function testIssue30(): void {
-
-    $ts = new Stream($this->getFilesDirectory().'issue30.php');
+    $filename = $this->getFilesDirectory().'issue30.php';
+    $ts = CachingFactory::get($filename);
     $tokens = $ts->tokens();
     $classes = $ts->getClasses();
 
@@ -130,10 +133,11 @@ class ClassTest extends TestCase {
 
   public function testAnonymousClassesAreHandledCorrectly(): void {
 
-    $ts = new Stream(
+    $filename =
       $this->getFilesDirectory().
-      'class_with_method_that_declares_anonymous_class.php',
-    );
+      'class_with_method_that_declares_anonymous_class.php';
+
+    $ts = CachingFactory::get($filename);
 
     $classes = $ts->getClasses();
 
@@ -151,10 +155,11 @@ class ClassTest extends TestCase {
   // JEO: This php7 support isn't completed in the version of hhvm we are on.
   /*
    public function testAnonymousClassesAreHandledCorrectly2(): void {
-   $ts = new Stream(
+   $filename =
    $this->getFilesDirectory().
-   'class_with_method_that_declares_anonymous_class2.php',
-   );
+   'class_with_method_that_declares_anonymous_class2.php'
+   ;
+   $ts = CachingFactory::get($filename);
    $classes = $ts->getClasses();
    $this->assertEquals(['Test'], array_keys($classes->toArray()));
    $this->assertEquals(
@@ -169,9 +174,8 @@ class ClassTest extends TestCase {
    * @requires PHP 5.6
    */
   public function testImportedFunctionsAreHandledCorrectly(): void {
-    $ts = new Stream(
-      $this->getFilesDirectory().'classUsesNamespacedFunction.php',
-    );
+    $filename = $this->getFilesDirectory().'classUsesNamespacedFunction.php';
+    $ts = CachingFactory::get($filename);
     $this->assertEmpty($ts->getFunctions());
     $this->assertCount(1, $ts->getClasses());
   }

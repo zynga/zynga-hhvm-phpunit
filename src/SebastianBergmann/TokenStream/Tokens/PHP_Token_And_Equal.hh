@@ -4,4 +4,4 @@ namespace SebastianBergmann\TokenStream\Tokens;
 
 use SebastianBergmann\TokenStream\Token;
 
-class PHP_Token_AND_EQUAL extends Token {}
+class PHP_Token_And_Equal extends Token {}

@@ -12,7 +12,7 @@ class PHP_Token_Namespace extends TokenWithScope {
    */
   public function getName(): string {
 
-    $tokens = $this->tokenStream->tokens();
+    $tokens = $this->tokenStream()->tokens();
 
     $namespace = (string) $tokens[$this->id + 2];
 

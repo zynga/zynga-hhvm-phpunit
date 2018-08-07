@@ -4,4 +4,4 @@ namespace SebastianBergmann\TokenStream\Tokens;
 
 use SebastianBergmann\TokenStream\Token;
 
-class PHP_Token_BACKTICK extends Token {}
+class PHP_Token_Backtick extends Token {}

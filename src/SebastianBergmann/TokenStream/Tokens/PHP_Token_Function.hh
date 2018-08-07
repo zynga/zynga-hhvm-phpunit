@@ -40,7 +40,7 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
       return $this->arguments;
     }
 
-    $tokens = $this->tokenStream->tokens();
+    $tokens = $this->tokenStream()->tokens();
     $typeDeclaration = null;
 
     // Search for first token inside brackets
@@ -77,7 +77,7 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
       return $this->name;
     }
 
-    $tokens = $this->tokenStream->tokens();
+    $tokens = $this->tokenStream()->tokens();
 
     for ($i = $this->id + 1; $i < $tokens->count(); $i++) {
 
@@ -131,7 +131,7 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
 
     $this->ccn = 1;
     $end = $this->getEndTokenId();
-    $tokens = $this->tokenStream->tokens();
+    $tokens = $this->tokenStream()->tokens();
 
     for ($i = $this->id; $i <= $end; $i++) {
       $token = $tokens->get($i);
@@ -176,7 +176,7 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
       $i = $this->id + 2;
     }
 
-    $tokens = $this->tokenStream->tokens();
+    $tokens = $this->tokenStream()->tokens();
 
     for ($r = $i; $r < $tokens->count(); $r++) {
 

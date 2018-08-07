@@ -13,6 +13,7 @@ namespace SebastianBergmann\TokenStream\Tests;
 use Zynga\Framework\Testing\TestCase\V2\Base as TestCase;
 use Zynga\Framework\Environment\CodePath\V1\CodePath;
 use SebastianBergmann\TokenStream\Token\Stream;
+use SebastianBergmann\TokenStream\Token\Stream\CachingFactory;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Class;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Interface;
 
@@ -41,7 +42,8 @@ class InterfaceTest extends TestCase {
   protected function getTestClassAndInterfaces(
   ): (PHP_Token_Class, Vector<PHP_Token_Interface>) {
 
-    $ts = new Stream($this->getFilesDirectory().'source4.php');
+    $filename = $this->getFilesDirectory().'source4.php';
+    $ts = CachingFactory::get($filename);
 
     $tokens = $ts->tokens();
 
@@ -103,8 +105,8 @@ class InterfaceTest extends TestCase {
   }
 
   public function testGetPackageNamespace(): void {
-    $tokenStream =
-      new Stream($this->getFilesDirectory().'classInNamespace.php');
+    $filename = $this->getFilesDirectory().'classInNamespace.php';
+    $tokenStream = CachingFactory::get($filename);
     $tokens = $tokenStream->tokens();
     foreach ($tokens as $token) {
       if ($token instanceof PHP_Token_Interface) {
@@ -134,7 +136,7 @@ class InterfaceTest extends TestCase {
   public function doGetPackageNamespaceForFileWithMultipleNamespaces(
     string $filepath,
   ): void {
-    $tokenStream = new Stream($filepath);
+    $tokenStream = CachingFactory::get($filepath);
     $firstClassFound = false;
 
     $tokens = $tokenStream->tokens();
@@ -171,9 +173,8 @@ class InterfaceTest extends TestCase {
 
   public function testGetPackageNamespaceWhenExtentingFromNamespaceClass(
   ): void {
-    $tokenStream = new Stream(
-      $this->getFilesDirectory().'classExtendsNamespacedClass.php',
-    );
+    $filename = $this->getFilesDirectory().'classExtendsNamespacedClass.php';
+    $tokenStream = CachingFactory::get($filename);
     $firstClassFound = false;
     $tokens = $tokenStream->tokens();
     foreach ($tokens as $token) {

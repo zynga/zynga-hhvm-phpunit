@@ -13,6 +13,7 @@ namespace SebastianBergmann\TokenStream\Tests;
 use Zynga\Framework\Environment\CodePath\V1\CodePath;
 use Zynga\Framework\Testing\TestCase\V2\Base as TestCase;
 use SebastianBergmann\TokenStream\Token\Stream;
+use SebastianBergmann\TokenStream\Token\Stream\CachingFactory;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Function;
 
 class FunctionTest extends TestCase {
@@ -36,7 +37,8 @@ class FunctionTest extends TestCase {
   }
 
   protected function getTestFunctions(): Vector<PHP_Token_Function> {
-    $ts = new Stream($this->getFilesDirectory().'source.php');
+    $filename = $this->getFilesDirectory().'source.php';
+    $ts = CachingFactory::get($filename);
     $functions = Vector {};
 
     $tokens = $ts->tokens();
@@ -126,7 +128,8 @@ class FunctionTest extends TestCase {
 
   public function testSignature(): void {
 
-    $ts = new Stream($this->getFilesDirectory().'source5.php');
+    $filename = $this->getFilesDirectory().'source5.php';
+    $ts = CachingFactory::get($filename);
     $f = $ts->getFunctions();
     $c = $ts->getClasses();
     $i = $ts->getInterfaces();

@@ -14,6 +14,7 @@ namespace SebastianBergmann\TokenStream\Tests;
 use Zynga\Framework\Testing\TestCase\V2\Base as TestCase;
 use Zynga\Framework\Environment\CodePath\V1\CodePath;
 use SebastianBergmann\TokenStream\Token\Stream;
+use SebastianBergmann\TokenStream\Token\Stream\CachingFactory;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Namespace;
 
 class PHP_Token_NamespaceTest extends TestCase {
@@ -37,9 +38,8 @@ class PHP_Token_NamespaceTest extends TestCase {
   }
 
   public function testGetName(): void {
-    $tokenStream =
-      new Stream($this->getFilesDirectory().'classInNamespace.php');
-
+    $filename = $this->getFilesDirectory().'classInNamespace.php';
+    $tokenStream = CachingFactory::get($filename);
     $tokens = $tokenStream->tokens();
 
     foreach ($tokens as $token) {
@@ -50,8 +50,8 @@ class PHP_Token_NamespaceTest extends TestCase {
   }
 
   public function testGetStartLineWithUnscopedNamespace(): void {
-    $tokenStream =
-      new Stream($this->getFilesDirectory().'classInNamespace.php');
+    $filename = $this->getFilesDirectory().'classInNamespace.php';
+    $tokenStream = CachingFactory::get($filename);
 
     $tokens = $tokenStream->tokens();
 
@@ -63,8 +63,8 @@ class PHP_Token_NamespaceTest extends TestCase {
   }
 
   public function testGetEndLineWithUnscopedNamespace(): void {
-    $tokenStream =
-      new Stream($this->getFilesDirectory().'classInNamespace.php');
+    $filename = $this->getFilesDirectory().'classInNamespace.php';
+    $tokenStream = CachingFactory::get($filename);
 
     $tokens = $tokenStream->tokens();
     foreach ($tokens as $token) {
@@ -75,8 +75,8 @@ class PHP_Token_NamespaceTest extends TestCase {
   }
 
   public function testGetStartLineWithScopedNamespace(): void {
-    $tokenStream =
-      new Stream($this->getFilesDirectory().'classInScopedNamespace.php');
+    $filename = $this->getFilesDirectory().'classInScopedNamespace.php';
+    $tokenStream = CachingFactory::get($filename);
 
     $tokens = $tokenStream->tokens();
 
@@ -88,9 +88,8 @@ class PHP_Token_NamespaceTest extends TestCase {
   }
 
   public function testGetEndLineWithScopedNamespace(): void {
-    $tokenStream =
-      new Stream($this->getFilesDirectory().'classInScopedNamespace.php');
-
+    $filename = $this->getFilesDirectory().'classInScopedNamespace.php';
+    $tokenStream = CachingFactory::get($filename);
     $tokens = $tokenStream->tokens();
 
     foreach ($tokens as $token) {

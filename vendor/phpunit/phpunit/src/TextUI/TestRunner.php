@@ -377,7 +377,10 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
         }
 
         if ($codeCoverageReports > 0) {
+            // JEO: If we ever need to support anything other than html reports,
+            // i'll appologize now.
             $codeCoverage = new CodeCoverage(
+              $arguments['coverageHtml'],
                 null,
                 $this->codeCoverageFilter
             );
@@ -513,7 +516,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
 
             if (isset($arguments['coverageHtml'])) {
                 $this->printer->write(
-                    "\nGenerating code coverage report in HTML format ..."
+                    "\nGenerating code coverage report in HTML format\n"
                 );
 
                 try {
@@ -528,7 +531,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
 
                     $writer->process($codeCoverage, $arguments['coverageHtml']);
 
-                    $this->printer->write(" done\n");
+                    $this->printer->write("HTML generation - done\n");
                     unset($writer);
                 } catch (CodeCoverageException $e) {
                     $this->printer->write(
