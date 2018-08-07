@@ -306,7 +306,7 @@ class Zynga_HHVM_Service extends Zynga_Base {
         $tmp_hh_dir . ' -user ' . $USER . ' -type f -exec rm {} \; 2> /dev/null '
       );
       $this->_findCommand->run(
-        $tmp_hh_dir . ' -user ' . $USER . ' -type d -exec rm -r {} \; 2> /dev/null '
+        $tmp_hh_dir . ' -user ' . $USER . ' -type d -exec rmdir {} \; 2> /dev/null '
       );
       $this->_findCommand->run(
         $tmp_hh_dir . ' -user ' . $USER . ' -type l -exec unlink {} \; 2> /dev/null '
