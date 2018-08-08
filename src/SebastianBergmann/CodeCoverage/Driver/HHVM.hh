@@ -15,7 +15,8 @@ use SebastianBergmann\CodeCoverage\Driver\Xdebug;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\LineStack;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\Logging as HHVM_Logging;
 use SebastianBergmann\CodeCoverage\ProcessedFile\FileContainer;
-    
+use SebastianBergmann\TokenStream\Stream\CachingFactory;
+
 /**
  * Driver for HHVM's code coverage functionality.
  *
@@ -43,7 +44,7 @@ class HHVM extends Xdebug {
    *
    * @return array
    */
-  public function stop(): array<string, array<int, int>> {
+  public function stop(): Map<string, Map<int, int>> {
 
     $data = parent::stop();
 
@@ -70,10 +71,10 @@ class HHVM extends Xdebug {
       // JEO: This is due to our inclusion chain within legacy php code, and how
       // we track results within this function.
       // --
-      if (!preg_match('/.hh$/', $file)) {
-        unset($data[$file]);
-        continue;
-      }
+      // if (!preg_match('/.hh$/', $file)) {
+      //  unset($data[$file]);
+      //  continue;
+      //}
 
       HHVM_Logging::debug("file=$file");
 
@@ -85,11 +86,11 @@ class HHVM extends Xdebug {
       // --
       // $fileStack->consumeRawExecStack($rawExecStack);
 
-      $returnData->set($file, $fileStack->lineExecutionStatetoArrayFormat());
+      $returnData->set($file, $fileStack->getAllLineExecutionState());
 
     }
 
-    return $returnData->toArray();
+    return $returnData;
 
   }
 

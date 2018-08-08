@@ -13,6 +13,7 @@ namespace SebastianBergmann\CodeCoverage\Driver;
 
 use SebastianBergmann\CodeCoverage\Driver;
 use SebastianBergmann\CodeCoverage\RuntimeException;
+use SebastianBergmann\TokenStream\Token\Stream\CachingFactory;
 
 /**
  * Driver for Xdebug's code coverage functionality.
@@ -66,7 +67,7 @@ class Xdebug implements Driver {
    *
    * @return array
    */
-  public function stop(): array<string, array<int, int>> {
+  public function stop(): Map<string, Map<int, int>> {
     $data = xdebug_get_code_coverage();
     xdebug_stop_code_coverage();
     return $this->cleanup($data);
@@ -79,23 +80,41 @@ class Xdebug implements Driver {
    */
   public function cleanup(
     array<string, array<int, int>> $data,
-  ): array<string, array<int, int>> {
+  ): Map<string, Map<int, int>> {
 
-    foreach (array_keys($data) as $file) {
-      unset($data[$file][0]);
+    $return = Map {};
 
-      if (strpos($file, 'xdebug://debug-eval') !== 0 && file_exists($file)) {
-        $numLines = $this->getNumberOfLinesInFile($file);
+    foreach ($data as $fileName => $fileData) {
 
-        foreach (array_keys($data[$file]) as $line) {
-          if ($line > $numLines) {
-            unset($data[$file][$line]);
-          }
+      if (strpos($fileName, 'xdebug://debug-eval') !== 0 &&
+          file_exists($fileName)) {
+        // do nothing and exclude the file from the stack.
+      } else {
+
+        $fileStack = $return->get($fileName);
+
+        if (!$fileStack instanceof Map) {
+          $fileStack = Map {};
         }
+
+        $fileLinesOfCode = $this->getNumberOfLinesInFile($fileName);
+
+        foreach ($fileData as $lineNo => $lineState) {
+
+          if ($lineNo > $fileLinesOfCode) {
+            continue;
+          }
+
+          $fileStack->set($lineNo, $lineState);
+
+        }
+
       }
+
     }
 
-    return $data;
+    return $return;
+
   }
 
   /**
@@ -104,24 +123,8 @@ class Xdebug implements Driver {
    * @return int
    */
   public function getNumberOfLinesInFile(string $file): int {
-
-    $cachedLineCount = $this->cacheNumLines->containsKey($file);
-
-    if (!is_int($cachedLineCount)) {
-
-      $cachedLineCount = 0;
-
-      $buffer = file_get_contents($file);
-      $cachedLineCount = substr_count($buffer, "\n");
-
-      if (substr($buffer, -1) !== "\n") {
-        $cachedLineCount++;
-      }
-
-      $this->cacheNumLines->set($file, $cachedLineCount);
-    }
-
-    return $cachedLineCount;
-
+    $fileStream = CachingFactory::get($file);
+    $fileLinesOfCode = $fileStream->getLineCount();
+    return $fileLinesOfCode;
   }
 }

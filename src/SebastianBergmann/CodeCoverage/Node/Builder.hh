@@ -44,11 +44,22 @@ class Builder {
 
       $directoryEntry = $dirMap->get($directory);
 
-      $isNew = false;
-      if (!$directoryEntry instanceof Directory) {
-        $directoryEntry = new Directory($directory);
-        $isNew = true;
+      echo "directory=$directory\n";
+      echo "  file=$fileName\n";
+
+      // we have a existing directory entry, feel free to add the file there.
+      if ($directoryEntry instanceof Directory) {
+
+        $directoryEntry->addFileFullPath($fileName);
+
+        continue;
+
       }
+
+      // Create a new entry.
+      $directoryEntry = new Directory($directory);
+      $directoryEntry->addFileFullPath($fileName);
+      $dirMap->set($directory, $directoryEntry);
 
       // walk up the directory, to make sure all the nodes are in place for
       // directories above you.
@@ -62,15 +73,6 @@ class Builder {
           $dirMap->set($t_directory, $t_directoryEntry);
         }
 
-      }
-
-      // echo "directory=$directory\n";
-      // echo "  file=$fileName\n";
-
-      $directoryEntry->addFile($fileName);
-
-      if ($isNew === true) {
-        $dirMap->set($directory, $directoryEntry);
       }
 
     }

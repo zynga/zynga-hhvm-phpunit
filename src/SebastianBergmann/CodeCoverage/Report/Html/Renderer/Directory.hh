@@ -58,21 +58,26 @@ class Directory extends Renderer {
    */
   protected function renderItem(Node $node, bool $total = false): string {
     $data = Map {
-      'numClasses' => $node->getNumClassesAndTraits(),
-      'numTestedClasses' => $node->getNumTestedClassesAndTraits(),
-      'numMethods' => $node->getNumMethods(),
-      'numTestedMethods' => $node->getNumTestedMethods(),
-      'linesExecutedPercent' => $node->getLineExecutedPercent(false),
-      'linesExecutedPercentAsString' => $node->getLineExecutedPercent(),
-      'numExecutedLines' => $node->getNumExecutedLines(),
-      'numExecutableLines' => $node->getNumExecutableLines(),
-      'testedMethodsPercent' => $node->getTestedMethodsPercent(false),
-      'testedMethodsPercentAsString' => $node->getTestedMethodsPercent(),
-      'testedClassesPercent' => $node->getTestedClassesAndTraitsPercent(
+      'numClasses' => $node->getRecursiveNumClassesAndTraits(),
+      'numTestedClasses' => $node->getRecursiveNumTestedClassesAndTraits(),
+      'numMethods' => $node->getRecursiveNumMethods(),
+      'numTestedMethods' => $node->getRecursiveNumTestedMethods(),
+      'linesExecutedPercent' => $node->getRecursiveLineExecutedPercent(
         false,
       ),
+      'linesExecutedPercentAsString' =>
+        $node->getRecursiveLineExecutedPercent(),
+      'numExecutedLines' => $node->getRecursiveNumExecutedLines(),
+      'numExecutableLines' => $node->getRecursiveNumExecutableLines(),
+      'testedMethodsPercent' => $node->getRecursiveTestedMethodsPercent(
+        false,
+      ),
+      'testedMethodsPercentAsString' =>
+        $node->getRecursiveTestedMethodsPercent(),
+      'testedClassesPercent' =>
+        $node->getRecursiveTestedClassesAndTraitsPercent(false),
       'testedClassesPercentAsString' =>
-        $node->getTestedClassesAndTraitsPercent(),
+        $node->getRecursiveTestedClassesAndTraitsPercent(),
     };
 
     if ($total) {

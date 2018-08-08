@@ -48,6 +48,6 @@ interface Driver {
    *
    * @return array
    */
-  public function stop(): array<string, array<int, int>>;
+  public function stop(): Map<string, Map<int, int>>;
 
 }

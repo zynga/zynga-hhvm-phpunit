@@ -9,6 +9,7 @@ Changes from vanilla phpunit here:
 1. Converted all of php-token-stream to be hack strict.
 1. Moved 'most' of php-code-coverage into hack, some strict, some not.
 1. Rewrote a significant portion of how the code coverage stack is handled in order to lower memory footprint and not pass around the line status stack constantly.
+1. Made the code view use solarized dark as the default for viewing code.
 
 # History
 

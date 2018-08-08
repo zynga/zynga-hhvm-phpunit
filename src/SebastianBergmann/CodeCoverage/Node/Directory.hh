@@ -70,13 +70,23 @@ class Directory extends AbstractNode {
 
     $fileName = $this->getPath().'/'.$name;
 
-    if ( ! is_file($fileName) ) {
+    if (!is_file($fileName)) {
       return;
     }
+
     $file = null;
 
     $file = new File($name, $this);
     $this->files->add($file);
+
+  }
+
+  public function addFileFullPath(string $filePath): void {
+
+    $shortPath = str_replace(dirname($filePath), '', $filePath);
+    $shortPath = preg_replace('/^\//', '', $shortPath);
+
+    $this->addFile($shortPath);
 
   }
 

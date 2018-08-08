@@ -82,12 +82,9 @@ class File extends AbstractNode {
    *
    * @return array
    */
-  public function getCoverageData(): array<int, int> {
-    throw new Exception(
-      'getCoverageData - unsure is this is the right return format',
-    );
+  public function getCoverageData(): Map<int, int> {
     $processedFile = $this->processedFile();
-    return $processedFile->lineExecutionStatetoArrayFormat();
+    return $processedFile->getAllLineExecutionState();
   }
 
   /**

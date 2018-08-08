@@ -82,8 +82,8 @@ class ProcessedFile {
 
   }
 
-  public function lineExecutionStatetoArrayFormat(): array<int, int> {
-    return $this->_lineExecutionState->toArray();
+  public function getAllLineExecutionState(): Map<int, int> {
+    return $this->_lineExecutionState;
   }
 
   public function getLinesToTests(): Map<int, Vector<string>> {
@@ -134,7 +134,7 @@ class ProcessedFile {
     $tokens = $tokenStream->tokens();
 
     $lineNo = -1;
-    $executable = true;
+    $executable = false;
     foreach ($tokens as $token) {
 
       $nextLineNo = $token->getLine();
@@ -156,7 +156,7 @@ class ProcessedFile {
               Driver::LINE_NOT_EXECUTABLE,
             );
           }
-          $executable = true;
+          $executable = false;
         }
 
         $lineNo = $nextLineNo;

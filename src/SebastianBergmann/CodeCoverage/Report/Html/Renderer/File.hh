@@ -20,6 +20,7 @@ use SebastianBergmann\TextTemplate\Template;
 use SebastianBergmann\TokenStream\Token\StreamClassStructure;
 use SebastianBergmann\TokenStream\Token\StreamMethodStructure;
 use SebastianBergmann\TokenStream\Token\StreamInterfaceStructure;
+use Zynga\Source\Cache as Zynga_Source_Cache;
 
 /**
  * Renders a file node.
@@ -317,8 +318,6 @@ class File extends Renderer {
 
     $coverageData = $node->getCoverageData();
 
-    $testData = array();
-
     // $node->getTestData(); -- JEO need to wire in the test data.
     $codeLines = $this->loadFile($fileName);
 
@@ -461,195 +460,217 @@ class File extends Renderer {
    */
   protected function loadFile(string $file): Vector<string> {
 
-    $processedFile = FileContainer::get($file);
+    $buffer = Zynga_Source_Cache::getSource($file);
+    $tokens = Zynga_Source_Cache::getTokens($file);
 
-    $fileBuffer = Vector {};
-
-    $tokenStream = $processedFile->stream();
-    $tokens = $tokenStream->tokens();
-
-    $lineNo = -1;
-    $lineBuffer = '';
-    foreach ($tokens as $token) {
-
-      $nextLineNo = $token->getLine();
-
-      if ($lineNo != $nextLineNo) {
-        if ($lineNo === -1) {
-          // do nothing, as this is the first token on the stack.
-        } else {
-          // end of line
-          $fileBuffer->add($lineBuffer);
-          $lineBuffer = '';
-          $lineNo = $nextLineNo;
-        }
-      }
-
-      // @TODO: we need to put more logic here.
-      $escapedToken =
-        htmlspecialchars(strval($token), $this->htmlspecialcharsFlags);
-
-      // @TODO: color determination
-      $colour = 'keyword';
-      $lineBuffer .=
-        sprintf('<span class="%s">%s</span>', $colour, $escapedToken);
-
+    if (!is_array($tokens)) {
+      return Vector {};
     }
 
-    return $fileBuffer;
+    $result = new SourceFileLineBuffer();
 
-    // $htmlTemplate = Zynga_Source_Cache::getCodeCoverageRaw($file);
-    //
-    // if ($htmlTemplate !== null) {
-    //   return $htmlTemplate;
-    // }
-    //
-    // // echo "loading file=$file\n";
-    // // JEO: This should already be in the token cache if available?
-    // $buffer = Zynga_Source_Cache::getSource($file);
-    // $tokens = Zynga_Source_Cache::getTokens($file);
-    //
-    // // JEO: Original code is here, caching version above.
-    // // $buffer              = file_get_contents($file);
-    // // $tokens              = token_get_all($buffer);
-    // // -- End JEO mods
-    // $result = [''];
-    // $i = 0;
-    // $stringFlag = false;
-    // $fileEndsWithNewLine = substr($buffer, -1) == "\n";
-    //
-    // unset($buffer);
-    //
-    // foreach ($tokens as $j => $token) {
-    //   if (is_string($token)) {
-    //     if ($token === '"' && $tokens[$j - 1] !== '\\') {
-    //       $result[$i] .= sprintf(
-    //         '<span class="string">%s</span>',
-    //         htmlspecialchars($token),
-    //       );
-    //
-    //       $stringFlag = !$stringFlag;
-    //     } else {
-    //       $result[$i] .= sprintf(
-    //         '<span class="keyword">%s</span>',
-    //         htmlspecialchars($token),
-    //       );
-    //     }
-    //
-    //     continue;
-    //   }
-    //
-    //   list($token, $value) = $token;
-    //
-    //   $value = str_replace(
-    //     ["\t", ' '],
-    //     ['&nbsp;&nbsp;&nbsp;&nbsp;', '&nbsp;'],
-    //     htmlspecialchars($value, $this->htmlspecialcharsFlags),
-    //   );
-    //
-    //   if ($value === "\n") {
-    //     $result[++$i] = '';
-    //   } else {
-    //     $lines = explode("\n", $value);
-    //
-    //     foreach ($lines as $jj => $line) {
-    //       $line = trim($line);
-    //
-    //       if ($line !== '') {
-    //         if ($stringFlag) {
-    //           $colour = 'string';
-    //         } else {
-    //           switch ($token) {
-    //             case T_INLINE_HTML:
-    //               $colour = 'html';
-    //               break;
-    //
-    //             case T_COMMENT:
-    //             case T_DOC_COMMENT:
-    //               $colour = 'comment';
-    //               break;
-    //
-    //             case T_ABSTRACT:
-    //             case T_ARRAY:
-    //             case T_AS:
-    //             case T_BREAK:
-    //             case T_CALLABLE:
-    //             case T_CASE:
-    //             case T_CATCH:
-    //             case T_CLASS:
-    //             case T_CLONE:
-    //             case T_CONTINUE:
-    //             case T_DEFAULT:
-    //             case T_ECHO:
-    //             case T_ELSE:
-    //             case T_ELSEIF:
-    //             case T_EMPTY:
-    //             case T_ENDDECLARE:
-    //             case T_ENDFOR:
-    //             case T_ENDFOREACH:
-    //             case T_ENDIF:
-    //             case T_ENDSWITCH:
-    //             case T_ENDWHILE:
-    //             case T_EXIT:
-    //             case T_EXTENDS:
-    //             case T_FINAL:
-    //             case T_FINALLY:
-    //             case T_FOREACH:
-    //             case T_FUNCTION:
-    //             case T_GLOBAL:
-    //             case T_IF:
-    //             case T_IMPLEMENTS:
-    //             case T_INCLUDE:
-    //             case T_INCLUDE_ONCE:
-    //             case T_INSTANCEOF:
-    //             case T_INSTEADOF:
-    //             case T_INTERFACE:
-    //             case T_ISSET:
-    //             case T_LOGICAL_AND:
-    //             case T_LOGICAL_OR:
-    //             case T_LOGICAL_XOR:
-    //             case T_NAMESPACE:
-    //             case T_NEW:
-    //             case T_PRIVATE:
-    //             case T_PROTECTED:
-    //             case T_PUBLIC:
-    //             case T_REQUIRE:
-    //             case T_REQUIRE_ONCE:
-    //             case T_RETURN:
-    //             case T_STATIC:
-    //             case T_THROW:
-    //             case T_TRAIT:
-    //             case T_TRY:
-    //             case T_UNSET:
-    //             case T_USE:
-    //             case T_VAR:
-    //             case T_WHILE:
-    //             case T_YIELD:
-    //               $colour = 'keyword';
-    //               break;
-    //
-    //             default:
-    //               $colour = 'default';
-    //           }
-    //         }
-    //
-    //         $result[$i] .=
-    //           sprintf('<span class="%s">%s</span>', $colour, $line);
-    //       }
-    //
-    //       if (isset($lines[$jj + 1])) {
-    //         $result[++$i] = '';
-    //       }
-    //     }
-    //   }
-    // }
-    //
-    // if ($fileEndsWithNewLine) {
-    //   unset($result[count($result) - 1]);
-    // }
-    //
-    // Zynga_Source_Cache::setCodeCoverageRaw($file, $result);
-    //
-    // return $result;
+    $i = 0;
+    $stringFlag = false;
+    $fileEndsWithNewLine = substr($buffer, -1) == "\n";
+
+    foreach ($tokens as $j => $token) {
+      if (is_string($token)) {
+        if ($token === '"' && $tokens[$j - 1] !== '\\') {
+          $result->appendTo(
+            $i,
+            sprintf(
+              '<span class="string">%s</span>',
+              htmlspecialchars($token),
+            ),
+          );
+          $stringFlag = !$stringFlag;
+        } else {
+          $result->appendTo(
+            $i,
+            sprintf(
+              '<span class="keyword">%s</span>',
+              htmlspecialchars($token),
+            ),
+          );
+        }
+
+        continue;
+      }
+
+      list($token, $value) = $token;
+
+      $value = str_replace(
+        ["\t", ' '],
+        ['&nbsp;&nbsp;&nbsp;&nbsp;', '&nbsp;'],
+        htmlspecialchars($value, $this->htmlspecialcharsFlags),
+      );
+
+      if ($value === "\n") {
+        $result->set(++$i, '');
+      } else {
+        $lines = explode("\n", $value);
+
+        foreach ($lines as $jj => $line) {
+          $line = trim($line);
+
+          if ($line !== '') {
+            if ($stringFlag) {
+              $colour = 'string';
+            } else {
+              switch ($token) {
+
+                case T_VARIABLE:
+                  $colour = 'variable';
+                  break;
+
+                case T_IS_EQUAL:
+                case T_BOOLEAN_OR:
+                case T_BOOLEAN_AND:
+                  $colour = 'operator';
+                  break;
+
+                case T_CONST:
+                case T_CONSTANT_ENCAPSED_STRING:
+                  $colour = 'constant';
+                  break;
+
+                case T_STRING:
+                  $colour = 'string';
+                  break;
+
+                case T_INLINE_HTML:
+                  $colour = 'html';
+                  break;
+
+                case T_COMMENT:
+                case T_DOC_COMMENT:
+                  $colour = 'comment';
+                  break;
+
+                case T_ABSTRACT:
+                case T_ARRAY:
+                case T_AS:
+                case T_BREAK:
+                case T_CALLABLE:
+                case T_CASE:
+                case T_CATCH:
+                case T_CLASS:
+                case T_CLONE:
+                case T_CONTINUE:
+                case T_DEFAULT:
+                case T_ECHO:
+                case T_ELSE:
+                case T_ELSEIF:
+                case T_EMPTY:
+                case T_ENDDECLARE:
+                case T_ENDFOR:
+                case T_ENDFOREACH:
+                case T_ENDIF:
+                case T_ENDSWITCH:
+                case T_ENDWHILE:
+                case T_EXIT:
+                case T_EXTENDS:
+                case T_FINAL:
+                case T_FINALLY:
+                case T_FOREACH:
+                case T_FUNCTION:
+                case T_GLOBAL:
+                case T_IF:
+                case T_IMPLEMENTS:
+                case T_INCLUDE:
+                case T_INCLUDE_ONCE:
+                case T_INSTANCEOF:
+                case T_INSTEADOF:
+                case T_INTERFACE:
+                case T_ISSET:
+                case T_LOGICAL_AND:
+                case T_LOGICAL_OR:
+                case T_LOGICAL_XOR:
+                case T_NAMESPACE:
+                case T_NEW:
+                case T_PRIVATE:
+                case T_PROTECTED:
+                case T_PUBLIC:
+                case T_REQUIRE:
+                case T_REQUIRE_ONCE:
+                case T_RETURN:
+                case T_STATIC:
+                case T_THROW:
+                case T_TRAIT:
+                case T_TRY:
+                case T_UNSET:
+                case T_USE:
+                case T_VAR:
+                case T_WHILE:
+                case T_YIELD:
+                case T_OPEN_TAG:
+                case T_NS_SEPARATOR:
+                  $colour = 'keyword';
+                  break;
+
+                default:
+                  $colour = 'default';
+              }
+            }
+
+            //if ($colour == 'default') {
+            //  $line = $token.$line;
+            //}
+
+            $result->appendTo(
+              $i,
+              sprintf('<span class="%s">%s</span>', $colour, $line),
+            );
+
+          }
+
+          if (array_key_exists($jj + 1, $lines)) {
+            $result->set(++$i, '');
+          }
+        }
+      }
+    }
+
+    if ($fileEndsWithNewLine) {
+      //$result->removeKey($result->count() - 1);
+    }
+
+    return $result->toVector();
+
+  }
+}
+
+class SourceFileLineBuffer {
+  private Map<int, string> $_lines = Map {};
+
+  public function set(int $lineNo, string $value): void {
+    $this->_lines->set($lineNo, $value);
+  }
+
+  public function appendTo(int $lineNo, string $value): void {
+
+    $lineBuffer = $this->_lines->get($lineNo);
+
+    if ($lineBuffer === null) {
+      $lineBuffer = '';
+    }
+
+    $lineBuffer .= $value;
+
+    $this->_lines->set($lineNo, $lineBuffer);
+  }
+
+  public function toVector(): Vector<string> {
+
+    ksort($this->_lines);
+
+    $vecResult = Vector {};
+
+    foreach ($this->_lines as $lineNo => $line) {
+      $vecResult->add($line);
+    }
+
+    return $vecResult;
+
   }
 }

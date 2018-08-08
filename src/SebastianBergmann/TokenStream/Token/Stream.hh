@@ -542,6 +542,7 @@ class Stream {
 
     $tmp = new StreamMethodStructure();
 
+    $tmp->methodName = $token->getName();
     $tmp->docblock = strval($token->getDocblock());
     $tmp->keywords = $token->getKeywords();
     $tmp->visibility = $token->getVisibility();

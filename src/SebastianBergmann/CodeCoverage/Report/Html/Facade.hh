@@ -135,7 +135,7 @@ class Facade {
     );
 
     // Recalculate the trees stats after all the muckery we did with it earlier.
-    $root->getNumClasses(true);
+    $root->getRecursiveNumClassesAndTraits(true);
 
     // First render ourselves.
     $directory->render($root, $target.'index.html');
