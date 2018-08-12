@@ -18,11 +18,12 @@ use SebastianBergmann\CodeCoverage\Util;
 use SebastianBergmann\TextTemplate\TemplateFactory;
 use SebastianBergmann\TextTemplate\Template;
 use SebastianBergmann\TokenStream\Token\StreamClassStructure;
-use SebastianBergmann\TokenStream\Token\StreamMethodStructure;
+
 use SebastianBergmann\TokenStream\Token\StreamInterfaceStructure;
 use Zynga\Source\Cache as Zynga_Source_Cache;
 
 use Zynga\CodeBase\V1\FileFactory;
+use Zynga\CodeBase\V1\Code\Code_Method;
 
 /**
  * Renders a file node.
@@ -240,7 +241,7 @@ class File extends Renderer {
    * @return string
    */
   protected function renderFunctionItems(
-    Map<string, StreamMethodStructure> $functions,
+    Map<string, Code_Method> $functions,
     Template $template,
   ): string {
 
@@ -264,7 +265,7 @@ class File extends Renderer {
    */
   protected function renderFunctionOrMethodItem(
     Template $template,
-    StreamMethodStructure $methodObj,
+    Code_Method $methodObj,
     string $indent = '',
   ): string {
     $numTestedItems =

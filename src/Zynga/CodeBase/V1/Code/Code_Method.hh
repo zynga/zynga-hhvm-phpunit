@@ -1,13 +1,14 @@
 <?hh // strict
 
-namespace SebastianBergmann\TokenStream\Token;
+namespace Zynga\CodeBase\V1\Code;
 
 use SebastianBergmann\CodeCoverage\Driver;
 use SebastianBergmann\CodeCoverage\ProcessedFile\FileContainer;
 
 use Zynga\CodeBase\V1\FileFactory;
+use Zynga\CodeBase\V1\Code\Code_Base;
 
-class StreamMethodStructure extends StreamStructureBase {
+class Code_Method extends Code_Base {
   public string $methodName = '';
   public string $visibility = '';
   public string $signature = '';

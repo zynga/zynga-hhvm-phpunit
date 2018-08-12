@@ -14,9 +14,9 @@ namespace SebastianBergmann\CodeCoverage\Report\Html;
 use SebastianBergmann\CodeCoverage\Node\AbstractNode;
 use SebastianBergmann\CodeCoverage\Node\Directory as DirectoryNode;
 use SebastianBergmann\TokenStream\Token\StreamClassStructure;
-use SebastianBergmann\TokenStream\Token\StreamMethodStructure;
 use SebastianBergmann\TextTemplate\TemplateFactory;
 use SebastianBergmann\TextTemplate\Template;
+use Zynga\CodeBase\V1\Code\Code_Method;
 
 /**
  * Renders the dashboard for a directory node.
@@ -247,7 +247,7 @@ class Dashboard extends Renderer {
 
       if ($classObj instanceof StreamClassStructure) {
         $methodObj = $classObj->methods->get($method);
-        if ($methodObj instanceof StreamMethodStructure) {
+        if ($methodObj instanceof Code_Method) {
           $methodLink = $methodObj->link;
         }
       }
@@ -330,7 +330,7 @@ class Dashboard extends Renderer {
       $methodLink = '';
       if ($classObj instanceof StreamClassStructure) {
         $methodObj = $classObj->methods->get($method);
-        if ($methodObj instanceof StreamMethodStructure) {
+        if ($methodObj instanceof Code_Method) {
           $methodLink = $methodObj->link;
         }
       }

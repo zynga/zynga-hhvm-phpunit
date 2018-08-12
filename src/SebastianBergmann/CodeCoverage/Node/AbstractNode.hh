@@ -13,7 +13,7 @@ namespace SebastianBergmann\CodeCoverage\Node;
 
 use SebastianBergmann\CodeCoverage\Util;
 use SebastianBergmann\TokenStream\Token\StreamClassStructure;
-use SebastianBergmann\TokenStream\Token\StreamMethodStructure;
+use Zynga\CodeBase\V1\Code\Code_Method;
 
 /**
  * Base class for nodes in the code coverage information tree.
@@ -358,7 +358,7 @@ abstract class AbstractNode implements \Countable {
    *
    * @return array
    */
-  abstract public function getFunctions(): Map<string, StreamMethodStructure>;
+  abstract public function getFunctions(): Map<string, Code_Method>;
 
   /**
    * Returns the LOC/CLOC/NCLOC of this node.

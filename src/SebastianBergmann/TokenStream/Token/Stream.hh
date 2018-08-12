@@ -34,6 +34,9 @@ use SebastianBergmann\TokenStream\Tokens\PHP_Token_Trait;
 use \Exception;
 use \OutOfBoundsException;
 
+use Zynga\CodeBase\V1\FileFactory;
+use Zynga\CodeBase\V1\Code\Code_Method;
+
 /**
  * A stream of PHP tokens.
  */
@@ -109,11 +112,6 @@ class Stream {
   /**
    * @var array
    */
-  protected Map<string, StreamMethodStructure> $functions;
-
-  /**
-   * @var array
-   */
   protected Map<string, Vector<string>>
     $includes = Map {
       'require_once' => Vector {},
@@ -160,7 +158,6 @@ class Stream {
     $this->classes = Map {};
     $this->interfaces = Map {};
     $this->traits = Map {};
-    $this->functions = Map {};
     $this->lineToFunctionMap = Map {};
     $this->position = 0;
 
@@ -388,14 +385,6 @@ class Stream {
   /**
    * @return array
    */
-  public function getFunctions(): Map<string, StreamMethodStructure> {
-    $this->parse();
-    return $this->functions;
-  }
-
-  /**
-   * @return array
-   */
   public function getInterfaces(): Map<string, StreamInterfaceStructure> {
     $this->parse();
     return $this->interfaces;
@@ -538,9 +527,11 @@ class Stream {
 
   private function parseHandleFunction(PHP_Token_Function $token): void {
 
+    $codeFile = FileFactory::get($this->filename);
+
     $name = $token->getName();
 
-    $tmp = new StreamMethodStructure();
+    $tmp = new Code_Method();
 
     $tmp->methodName = $token->getName();
     $tmp->docblock = strval($token->getDocblock());
@@ -555,7 +546,8 @@ class Stream {
     if ($this->t_class->count() == 0 &&
         $this->t_trait === false &&
         $this->t_interface === false) {
-      $this->functions->set($name, $tmp);
+
+      $codeFile->functions()->add($name, $tmp);
 
       $this->addFunctionToMap($name, $tmp->startLine, $tmp->endLine);
 

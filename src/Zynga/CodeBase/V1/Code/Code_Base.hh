@@ -1,8 +1,8 @@
 <?hh // strict
 
-namespace SebastianBergmann\TokenStream\Token;
+namespace Zynga\CodeBase\V1\Code;
 
-abstract class StreamStructureBase {
+abstract class Code_Base {
   public string $file = '';
 
   public float $coverage = -1.0;

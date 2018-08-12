@@ -19,6 +19,7 @@ use SebastianBergmann\TokenStream\TokenInterface;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Variable;
 
 use Zynga\CodeBase\V1\File\Stats;
+use Zynga\CodeBase\V1\File\Functions;
 use Zynga\CodeBase\V1\File\LineExecutionState;
 
 class File {
@@ -31,6 +32,7 @@ class File {
 
   private ?Stats $_stats;
   private ?LineExecutionState $_lineExecutionState;
+  private ?Functions $_functions;
 
   public function __construct(string $file) {
     $this->_didInit = false;
@@ -68,6 +70,16 @@ class File {
     return $this->_lineExecutionState;
   }
 
+  public function functions(): Functions {
+    if ($this->_functions instanceof Functions) {
+      return $this->_functions;
+    }
+
+    $this->_functions = new Functions($this);
+
+    return $this->_functions;
+
+  }
   public function getLineToTokens(int $lineNo): Vector<TokenInterface> {
     $tokens = $this->_lineToTokens->get($lineNo);
 
@@ -210,6 +222,10 @@ class File {
   }
 
   public function init(): void {
+
+    if ($this->_didInit === true) {
+      return;
+    }
 
     $tokenStream = $this->stream();
     $tokens = $tokenStream->tokens();

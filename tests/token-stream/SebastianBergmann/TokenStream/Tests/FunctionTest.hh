@@ -15,6 +15,7 @@ use Zynga\Framework\Testing\TestCase\V2\Base as TestCase;
 use SebastianBergmann\TokenStream\Token\Stream;
 use SebastianBergmann\TokenStream\Token\Stream\CachingFactory;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Function;
+use Zynga\CodeBase\V1\FileFactory;
 
 class FunctionTest extends TestCase {
 
@@ -129,8 +130,9 @@ class FunctionTest extends TestCase {
   public function testSignature(): void {
 
     $filename = $this->getFilesDirectory().'source5.php';
+    $codeFile = FileFactory::get($filename);
     $ts = CachingFactory::get($filename);
-    $f = $ts->getFunctions();
+    $f = $codeFile->functions()->getAll();
     $c = $ts->getClasses();
     $i = $ts->getInterfaces();
 

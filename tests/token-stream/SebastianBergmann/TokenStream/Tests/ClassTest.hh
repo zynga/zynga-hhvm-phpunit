@@ -18,6 +18,8 @@ use SebastianBergmann\TokenStream\Token\Stream;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Class;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Function;
 
+use Zynga\CodeBase\V1\FileFactory;
+
 class ClassTest extends TestCase {
 
   public function getTestClassAndFunction(
@@ -176,7 +178,8 @@ class ClassTest extends TestCase {
   public function testImportedFunctionsAreHandledCorrectly(): void {
     $filename = $this->getFilesDirectory().'classUsesNamespacedFunction.php';
     $ts = CachingFactory::get($filename);
-    $this->assertEmpty($ts->getFunctions());
+    $codeFile = FileFactory::get($filename);
+    $this->assertEmpty($codeFile->functions()->getAll());
     $this->assertCount(1, $ts->getClasses());
   }
 }

@@ -16,7 +16,7 @@ class Stats {
   private int $numTestedMethods;
   private int $numFunctions;
   private int $numTestedFunctions;
-  private File $parent;
+  private File $_parent;
 
   public function __construct(File $parent) {
     $this->statsCalculated = false;
@@ -30,7 +30,7 @@ class Stats {
     $this->numTestedMethods = -1;
     $this->numFunctions = -1;
     $this->numTestedFunctions = -1;
-    $this->parent = $parent;
+    $this->_parent = $parent;
   }
 
   public function getNumExecutedableLines(bool $recalculate = false): int {
@@ -105,7 +105,7 @@ class Stats {
     $this->numFunctions = 0;
     $this->numTestedFunctions = 0;
 
-    $stream = $this->parent->stream();
+    $stream = $this->_parent->stream();
 
     foreach ($stream->getClasses() as $className => $classObj) {
 
@@ -167,7 +167,8 @@ class Stats {
 
     }
 
-    foreach ($stream->getFunctions() as $functionName => $functionObj) {
+    foreach ($this->_parent->functions()->getAll() as
+             $functionName => $functionObj) {
       $this->numFunctions++;
 
       // Calculate coverage amount

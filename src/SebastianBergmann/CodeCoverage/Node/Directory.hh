@@ -13,7 +13,7 @@ namespace SebastianBergmann\CodeCoverage\Node;
 
 use SebastianBergmann\CodeCoverage\InvalidArgumentException;
 use SebastianBergmann\TokenStream\Token\StreamClassStructure;
-use SebastianBergmann\TokenStream\Token\StreamMethodStructure;
+use Zynga\CodeBase\V1\Code\Code_Method;
 /**
  * Represents a directory in the code coverage information tree.
  */
@@ -153,7 +153,7 @@ class Directory extends AbstractNode {
    *
    * @return array
    */
-  public function getFunctions(): Map<string, StreamMethodStructure> {
+  public function getFunctions(): Map<string, Code_Method> {
     $allFunctions = Map {};
 
     foreach ($this->files as $file) {

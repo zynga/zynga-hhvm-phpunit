@@ -3,9 +3,11 @@
 namespace SebastianBergmann\TokenStream\Token;
 
 use SebastianBergmann\TokenStream\Token\StreamMethodStructure;
+use Zynga\CodeBase\V1\Code\Code_Base;
+use Zynga\CodeBase\V1\Code\Code_Method;
 
-class StreamClassStructure extends StreamStructureBase {
-  public Map<string, StreamMethodStructure> $methods = Map {};
+class StreamClassStructure extends Code_Base {
+  public Map<string, Code_Method> $methods = Map {};
 
   public int $numMethods = -1;
   public int $numTestedMethods = -1;
@@ -13,6 +15,10 @@ class StreamClassStructure extends StreamStructureBase {
   public mixed $interfaces = false;
   public Map<string, string> $package = Map {};
   public string $className = '';
+
+  public function getNumMethods(): int {
+    return $this->methods->count();
+  }
 
   public function getExecutableLines(): int {
     $executableLines = 0;
