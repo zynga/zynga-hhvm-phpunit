@@ -1,0 +1,5 @@
+<tr{{trClass}}{{popover}}>
+  <td><span class="{{lineStateCss}}">{{lineState}}</span></td>
+  <td><div align="right"><a name="{{lineNo}}"></a><a href="#{{lineNo}}">{{lineNo}}</a></div></td>
+  <td class="codeLine">{{codeLine}}</td>
+</tr>

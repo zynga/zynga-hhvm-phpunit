@@ -92,4 +92,11 @@ abstract class Token implements TokenInterface {
     return CachingFactory::getByStreamId($this->tokenStreamId);
   }
 
+  public function getShortTokenName(): string {
+    return str_replace(
+      'SebastianBergmann\TokenStream\Tokens\PHP_Token_',
+      '',
+      static::class,
+    );
+  }
 }

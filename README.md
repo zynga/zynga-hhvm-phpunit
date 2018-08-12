@@ -10,9 +10,14 @@ Changes from vanilla phpunit here:
 1. Moved 'most' of php-code-coverage into hack, some strict, some not.
 1. Rewrote a significant portion of how the code coverage stack is handled in order to lower memory footprint and not pass around the line status stack constantly.
 1. Made the code view use solarized dark as the default for viewing code.
+1. Extracted more of the html from the render to the template structure.
+1. Collapsed all of the HHVM driver code to be within the "HHVM" driver, in preparation for supporting the newer debuggers available.
+
+# TODO  
+1. PHP_Token_Function: Needs a verification that it handles marking a multi-line abastract function definition as non-executable.
 
 # History
 
-The core developer has opened tickets with the hhvm team wanting for fixes to behave like php. It's unlikely the hhvm team will
-change to support the same functionality as they have added a improvement to xdebug showing you the
+The core developer has opened tickets with the HHVM team wanting for fixes to behave like php. It's unlikely the HHVM team will
+change to support the same functionality as they have added a improvement to XDebug showing you the
 number of times that a pieces of code is executed.

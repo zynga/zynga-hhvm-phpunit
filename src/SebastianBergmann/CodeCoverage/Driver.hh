@@ -48,6 +48,6 @@ interface Driver {
    *
    * @return array
    */
-  public function stop(): Map<string, Map<int, int>>;
+  public function stop(int $testId): Map<string, Map<int, int>>;
 
 }

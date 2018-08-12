@@ -5,29 +5,61 @@ namespace SebastianBergmann\CodeCoverage\ProcessedFile;
 use SebastianBergmann\CodeCoverage\Driver;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\ExecBlock;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\Logging as HHVM_Logging;
-use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\AbstractBlock;
-use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\CodeBlockInterface;
-use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\IfBlock;
-use SebastianBergmann\CodeCoverage\Driver\HHVM\CodeBlock\ReturnBlock;
+use SebastianBergmann\CodeCoverage\ProcessedFile\ProcessedFile\Stats;
 use SebastianBergmann\TokenStream\Token\Stream;
 use SebastianBergmann\TokenStream\Token\Stream\CachingFactory;
+
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Class;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Comment;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Function;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Return;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Close_Curly;
+
+use SebastianBergmann\TokenStream\TokenInterface;
+
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Variable;
 
 class ProcessedFile {
   private bool $_didInit;
   private string $_file;
   private Map<int, int> $_lineExecutionState;
   private Map<int, Map<string, bool>> $_lineToTests;
+  private Map<int, Vector<TokenInterface>> $_lineToTokens;
   private int $_startLine;
   private int $_endLine;
+  private ?Stats $_stats;
 
   public function __construct(string $file) {
     $this->_didInit = false;
     $this->_file = $file;
     $this->_lineExecutionState = Map {};
     $this->_lineToTests = Map {};
+    $this->_lineToTokens = Map {};
     $this->_startLine = -1;
     $this->_endLine = -1;
+    $this->_stats = null;
+  }
+
+  public function stats(): Stats {
+
+    if ($this->_stats instanceof Stats) {
+      return $this->_stats;
+    }
+
+    $this->_stats = new Stats($this);
+    return $this->_stats;
+
+  }
+
+  public function getLineToTokens(int $lineNo): Vector<TokenInterface> {
+    $tokens = $this->_lineToTokens->get($lineNo);
+
+    if ($tokens instanceof Vector) {
+      return $tokens;
+    }
+
+    return Vector {};
+
   }
 
   public function getFile(): string {
@@ -57,11 +89,24 @@ class ProcessedFile {
       return;
     }
 
+    // after init is called, we don't let you go backwards to set not
+    //   exec | not executed
+    // if ($this->_didInit === true &&
+    //     ($lineState === Driver::LINE_NOT_EXECUTABLE ||
+    //      $lineState === Driver::LINE_NOT_EXECUTED)) {
+    //   return;
+    // }
+
     $currentValue = $this->_lineExecutionState->get($lineNo);
 
     if ($currentValue === null) {
       // no value at all for the stack.
       $this->_lineExecutionState->set($lineNo, $lineState);
+      return;
+    }
+
+    if ($currentValue === Driver::LINE_NOT_EXECUTABLE) {
+      // Line has been marked as non-executable.
       return;
     }
 
@@ -128,14 +173,111 @@ class ProcessedFile {
     return CachingFactory::get($this->_file);
   }
 
+  private function isTokenExecutable(TokenInterface $token): bool {
+    if ($token instanceof PHP_Token_Return) {
+      return true;
+    }
+    if ($token instanceof PHP_Token_Variable) {
+      return true;
+    }
+    return false;
+  }
+
+  private function isTokenComment(TokenInterface $token): bool {
+    return false;
+  }
+
+  private function determineLineExecutableForeachLine(
+    Vector<TokenInterface> $lineStack,
+    int $currentLine,
+  ): (bool, int) {
+
+    $isExecutable = false;
+
+    foreach ($lineStack as $token) {
+
+      if ($token instanceof PHP_Token_Class) {
+        $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
+        return tuple(false, $skipAmount);
+      }
+
+      if ($token instanceof PHP_Token_Function) {
+        $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
+        return tuple(false, $skipAmount);
+      }
+
+      if ($this->isTokenExecutable($token) === true) {
+        // we found a executable token, stop working so hard
+        $isExecutable = true;
+        break;
+      }
+
+      if ($this->isTokenComment($token) === true) {
+        // everything to the right of this token is useless
+        break;
+      }
+
+    }
+
+    return tuple($isExecutable, 0);
+
+  }
+
+  private function determineLineExecutable(
+    Vector<TokenInterface> $lineStack,
+    int $currentLine,
+  ): int {
+
+    // echo "execFile=".$this->_file." currentLine=$currentLine\n";
+
+    $isExecutable = false;
+    $skipAmount = 0;
+
+    if ($lineStack->count() == 0) {
+      // empty stack therefor noop
+    } else if ($lineStack->count() == 1) {
+      // if it's a trailing } from either a control structure it's a non-op
+      $token = $lineStack->get(0);
+      if ($token instanceof PHP_Token_Close_Curly) {
+        $isExecutable = false;
+      }
+    } else {
+      // Loop across the line looking for more complex patterns.
+      list($isExecutable, $skipAmount) =
+        $this->determineLineExecutableForeachLine($lineStack, $currentLine);
+    }
+
+    // mark the line up with the state.
+    if ($isExecutable === true) {
+      // echo " lineIsExecutable=".$currentLine."\n";
+      $this->setLineExecutionState($currentLine, Driver::LINE_NOT_EXECUTED);
+    } else {
+      $this->setLineExecutionState($currentLine, Driver::LINE_NOT_EXECUTABLE);
+    }
+
+    return $skipAmount;
+
+  }
+
   public function init(): void {
 
     $tokenStream = $this->stream();
     $tokens = $tokenStream->tokens();
 
     $lineNo = -1;
-    $executable = false;
-    foreach ($tokens as $token) {
+
+    $tokenCount = $tokens->count();
+    $lineStack = Vector {};
+    $skipAmount = 0;
+
+    for ($tokenOffset = 0; $tokenOffset < $tokenCount; $tokenOffset++) {
+
+      $token = $tokens->get($tokenOffset);
+
+      // not a token, prevent overrun jic we are stupid.
+      if (!$token instanceof TokenInterface) {
+        continue;
+      }
 
       $nextLineNo = $token->getLine();
 
@@ -145,24 +287,29 @@ class ProcessedFile {
           // do nothing
           $this->_startLine = $nextLineNo;
         } else {
-          if ($executable === true) {
-            $this->setLineExecutionState(
-              ($lineNo - 1),
-              Driver::LINE_NOT_EXECUTED,
-            );
+
+          if ($skipAmount > 0) {
+            $skipAmount--;
           } else {
-            $this->setLineExecutionState(
-              ($lineNo - 1),
-              Driver::LINE_NOT_EXECUTABLE,
-            );
+            $skipAmount = $this->determineLineExecutable($lineStack, $lineNo);
           }
-          $executable = false;
+
         }
+
+        $this->_lineToTokens->set($lineNo, $lineStack);
+
+        $lineStack = Vector {};
 
         $lineNo = $nextLineNo;
 
       }
 
+      $lineStack->add($token);
+
+    }
+
+    if ($lineStack->count() !== 0) {
+      $this->determineLineExecutable($lineStack, $lineNo);
     }
 
     $this->_endLine = $lineNo;
@@ -176,177 +323,6 @@ class ProcessedFile {
 
   public function getEndLine(): int {
     return $this->_endLine;
-  }
-
-  private bool $statsCalculated = false;
-
-  private int $numExecutableLines = -1;
-  private int $numExecutedLines = -1;
-
-  private int $numTraits = -1;
-  private int $numTestedTraits = -1;
-
-  private int $numClasses = -1;
-  private int $numTestedClasses = -1;
-
-  private int $numMethods = -1;
-  private int $numTestedMethods = -1;
-
-  private int $numFunctions = -1;
-  private int $numTestedFunctions = -1;
-
-  public function getNumExecutedableLines(bool $recalculate = false): int {
-    $this->calculateStatistics($recalculate);
-    return $this->numExecutableLines;
-  }
-
-  public function getNumExecutedLines(bool $recalculate = false): int {
-    $this->calculateStatistics($recalculate);
-    return $this->numExecutedLines;
-  }
-
-  public function getNumTraits(bool $recalculate = false): int {
-    $this->calculateStatistics($recalculate);
-    return $this->numTraits;
-  }
-
-  public function getNumTestedTraits(bool $recalculate = false): int {
-    $this->calculateStatistics($recalculate);
-    return $this->numTestedTraits;
-  }
-
-  public function getNumClasses(bool $recalculate = false): int {
-    $this->calculateStatistics($recalculate);
-    return $this->numClasses;
-  }
-
-  public function getNumTestedClasses(bool $recalculate = false): int {
-    $this->calculateStatistics($recalculate);
-    return $this->numTestedClasses;
-  }
-
-  public function getNumMethods(bool $recalculate = false): int {
-    $this->calculateStatistics($recalculate);
-    return $this->numMethods;
-  }
-
-  public function getNumTestedMethods(bool $recalculate = false): int {
-    $this->calculateStatistics($recalculate);
-    return $this->numTestedMethods;
-  }
-
-  public function getNumFunctions(bool $recalculate = false): int {
-    $this->calculateStatistics($recalculate);
-    return $this->numFunctions;
-  }
-
-  public function getNumTestedFunctions(bool $recalculate = false): int {
-    $this->calculateStatistics($recalculate);
-    return $this->numTestedFunctions;
-  }
-
-  public function calculateStatistics(bool $recalculate = false): void {
-
-    // if we have already calculated the stats, don't bother running them again.
-    if ($this->statsCalculated === true && $recalculate === false) {
-      return;
-    }
-
-    $this->numExecutableLines = 0;
-    $this->numExecutedLines = 0;
-
-    $this->numTraits = 0;
-    $this->numTestedTraits = 0;
-
-    $this->numClasses = 0;
-    $this->numTestedClasses = 0;
-
-    $this->numMethods = 0;
-    $this->numTestedMethods = 0;
-
-    $this->numFunctions = 0;
-    $this->numTestedFunctions = 0;
-
-    $stream = $this->stream();
-
-    foreach ($stream->getClasses() as $className => $classObj) {
-
-      $this->numClasses++;
-      $this->numExecutableLines += $classObj->executableLines;
-      $this->numExecutedLines += $classObj->executedLines;
-
-      $classObj->numMethods = 0;
-      $classObj->numTestedMethods = 0;
-
-      $classObj->calculateCoverage();
-
-      foreach ($classObj->methods as $methodObj) {
-
-        $this->numMethods++;
-        $classObj->numMethods++;
-
-        // this is a fully covered function
-        if ($methodObj->coverage == 100) {
-          $this->numTestedMethods++;
-          $classObj->numTestedMethods++;
-        }
-
-      }
-
-      if ($classObj->coverage == 100) {
-        $this->numTestedClasses++;
-      }
-
-    }
-
-    foreach ($stream->getTraits() as $traitName => $traitObj) {
-
-      $this->numTraits++;
-      $this->numExecutableLines += $traitObj->executableLines;
-      $this->numExecutedLines += $traitObj->executedLines;
-
-      $traitObj->numMethods = 0;
-      $traitObj->numTestedMethods = 0;
-
-      $traitObj->calculateCoverage();
-
-      foreach ($traitObj->methods as $methodObj) {
-
-        $this->numMethods++;
-        $traitObj->numMethods++;
-
-        // this is a fully covered function
-        if ($methodObj->coverage == 100) {
-          $this->numTestedMethods++;
-          $traitObj->numTestedMethods++;
-        }
-
-      }
-
-      if ($traitObj->coverage == 100) {
-        $this->numTestedClasses++;
-      }
-
-    }
-
-    foreach ($stream->getFunctions() as $functionName => $functionObj) {
-      $this->numFunctions++;
-
-      // Calculate coverage amount
-      $functionObj->calculateCoverage();
-
-      // this is a fully covered function
-      if ($functionObj->coverage == 100) {
-        $this->numTestedFunctions++;
-      }
-
-      $this->numExecutableLines += $functionObj->executableLines;
-      $this->numExecutedLines += $functionObj->executedLines;
-
-    }
-
-    $this->statsCalculated = true;
-
   }
 
 }

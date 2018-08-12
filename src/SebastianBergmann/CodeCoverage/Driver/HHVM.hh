@@ -11,23 +11,36 @@
 
 namespace SebastianBergmann\CodeCoverage\Driver;
 
+use SebastianBergmann\CodeCoverage\Driver;
 use SebastianBergmann\CodeCoverage\Driver\Xdebug;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\LineStack;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\Logging as HHVM_Logging;
+use SebastianBergmann\CodeCoverage\ProcessedFile\ProcessedFile;
 use SebastianBergmann\CodeCoverage\ProcessedFile\FileContainer;
 use SebastianBergmann\TokenStream\Stream\CachingFactory;
+
+use \RuntimeException;
 
 /**
  * Driver for HHVM's code coverage functionality.
  *
- * @codeCoverageIgnore
  */
-class HHVM extends Xdebug {
+class HHVM {
 
+  /**
+   * Constructor.
+   */
   public function __construct() {
+    if (!extension_loaded('xdebug')) {
+      throw new RuntimeException('This driver requires Xdebug');
+    }
 
-    parent::__construct();
-
+    if (version_compare(phpversion('xdebug'), '2.2.1', '>=') &&
+        !ini_get('xdebug.coverage_enable')) {
+      throw new RuntimeException(
+        'xdebug.coverage_enable=On has to be set in php.ini',
+      );
+    }
   }
 
   /**
@@ -44,53 +57,31 @@ class HHVM extends Xdebug {
    *
    * @return array
    */
-  public function stop(): Map<string, Map<int, int>> {
+  public function stop(string $testId): void {
 
-    $data = parent::stop();
+    $data = xdebug_get_code_coverage();
 
-    // --
-    // JEO: We overload the stop function to enable us to fill in the data that
-    //   is currently missing within hhvm's xdebug.
-    // --
-    // --
-    // If there is more than one executionary pass, mark it as ran.
-    // --
+    xdebug_stop_code_coverage();
 
-    $returnData = Map {};
+    foreach ($data as $fileName => $execStatuses) {
 
-    foreach ($data as $file => $rawExecStack) {
+      $processedFile = FileContainer::get($fileName);
 
-      // only process real files.
-      if (!file_exists($file)) {
-        echo "nonExistant file=$file\n";
-        continue;
+      echo "caputuring fileName=$fileName\n";
+      foreach ($execStatuses as $lineNo => $lineState) {
+        $processedFile->setLineToTest($lineNo, $testId);
+        if ($lineState >= Driver::LINE_EXECUTED) {
+          echo "captured $lineNo : executed\n";
+          $processedFile->setLineExecutionState(
+            $lineNo,
+            Driver::LINE_EXECUTED,
+          );
+        } else {
+          $processedFile->setLineExecutionState($lineNo, $lineState);
+        }
       }
 
-      // exclude any files that aren't hack related.
-      // --
-      // JEO: This is due to our inclusion chain within legacy php code, and how
-      // we track results within this function.
-      // --
-      // if (!preg_match('/.hh$/', $file)) {
-      //  unset($data[$file]);
-      //  continue;
-      //}
-
-      HHVM_Logging::debug("file=$file");
-
-      $fileStack = FileContainer::get($file);
-
-      // --
-      // HHVM xdebug reports the number of times something is executed,
-      //  whereas php:xdebug just does a 0/1 state.
-      // --
-      // $fileStack->consumeRawExecStack($rawExecStack);
-
-      $returnData->set($file, $fileStack->getAllLineExecutionState());
-
     }
-
-    return $returnData;
 
   }
 

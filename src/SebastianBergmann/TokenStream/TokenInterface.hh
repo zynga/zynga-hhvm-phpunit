@@ -11,5 +11,6 @@ interface TokenInterface {
   public function setTokenStreamId(int $streamId): bool;
   public function getId(): int;
   public function setId(int $id): bool;
+  public function getShortTokenName(): string;
   public function __toString(): string;
 }

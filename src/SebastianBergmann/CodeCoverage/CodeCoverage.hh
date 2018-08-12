@@ -274,75 +274,51 @@ class CodeCoverage {
    *
    * @throws InvalidArgumentException
    */
-  public function stop(
-    $append = true,
-    $linesToBeCovered = [],
-    array $linesToBeUsed = [],
-  ) {
-    if (!is_bool($append)) {
-      throw InvalidArgumentException::create(1, 'boolean');
-    }
+  public function stop(): void {
 
-    if (!is_array($linesToBeCovered) && $linesToBeCovered !== false) {
-      throw InvalidArgumentException::create(2, 'array or false');
-    }
+    // --
+    // @TODO: $this->currentId can be null, and possibly not a test.
+    // --
+    $testId = get_class($this->currentId).'::'.$this->currentId->getName();
 
-    $data = $this->driver->stop();
+    $data = $this->driver->stop($testId);
 
-    $this->append($data, null, $append, $linesToBeCovered, $linesToBeUsed);
+    $this->append($data);
 
     $this->currentId = null;
 
-    return $data;
   }
 
   /**
    * Appends code coverage data.
    *
    * @param array $data
-   * @param mixed $id
-   * @param bool  $append
-   * @param mixed $linesToBeCovered
-   * @param array $linesToBeUsed
    *
    * @throws RuntimeException
    */
-  public function append(
-    array $data,
-    $id = null,
-    $append = true,
-    $linesToBeCovered = [],
-    array $linesToBeUsed = [],
-  ) {
-    // @TODO - JEO we are getting rid of this passing around the $data stack shit.
-    // echo "appendIsBeingDeprecated!\n";
-    return;
-    if ($id === null) {
-      $id = $this->currentId;
-    }
+  public function append(Map<string, Map<int, int>> $data) {
+
+    $id = $this->currentId;
 
     if ($id === null) {
       throw new RuntimeException();
     }
 
-    $this->applyListsFilter($data);
+    //$this->applyListsFilter($data);
     //$this->applyIgnoredLinesFilter($data);
     //$this->initializeFilesThatAreSeenTheFirstTime($data);
 
-    if (!$append) {
-      return;
-    }
-
     if ($id != 'UNCOVERED_FILES_FROM_WHITELIST') {
-      $this->applyCoversAnnotationFilter(
-        $data,
-        $linesToBeCovered,
-        $linesToBeUsed,
-      );
-    }
-
-    if (empty($data)) {
-      return;
+      // --
+      // @TODO: unsure if this is needed anymore as i replaced a lot of the
+      // uncovered functionality.
+      // --
+      error_log("JEO @TODO UNCOVERED_FILES_FROM_WHITELIST @".__LINE__);
+      // $this->applyCoversAnnotationFilter(
+      //   $data,
+      //   $linesToBeCovered,
+      //   $linesToBeUsed,
+      // );
     }
 
     $size = 'unknown';
@@ -385,6 +361,7 @@ class CodeCoverage {
       }
 
     }
+
   }
 
   /**

@@ -34,7 +34,7 @@ body {
 }
 
 .table tbody tr.covered-by-large-tests, li.covered-by-large-tests, tr.success, td.success, li.success, span.success {
- background-color: #dff0d8;
+ background-color: #9bd684;
 }
 
 .table tbody tr.covered-by-medium-tests, li.covered-by-medium-tests {

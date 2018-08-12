@@ -11,6 +11,7 @@
 
 namespace SebastianBergmann\CodeCoverage\Report\Html\Renderer;
 
+use SebastianBergmann\CodeCoverage\Driver;
 use SebastianBergmann\CodeCoverage\Node\File as FileNode;
 use SebastianBergmann\CodeCoverage\ProcessedFile\FileContainer;
 use SebastianBergmann\CodeCoverage\Report\Html\Renderer;
@@ -316,10 +317,21 @@ class File extends Renderer {
       return 'invalid fileName provided';
     }
 
+    $rowTemplate =
+      TemplateFactory::get($this->templatePath.'code_row.html', '{{', '}}');
+
+    $tokenTemplate = TemplateFactory::get(
+      $this->templatePath.'code_tokens.html',
+      '{{',
+      '}}',
+    );
+
     $coverageData = $node->getCoverageData();
 
     // $node->getTestData(); -- JEO need to wire in the test data.
     $codeLines = $this->loadFile($fileName);
+
+    $processedFile = FileContainer::get($fileName);
 
     $lines = '';
 
@@ -329,22 +341,55 @@ class File extends Renderer {
 
       $lineNo++;
 
+      $lineStateValue = $coverageData->get($lineNo);
+
       // @TODO: move all the tr creation into it's own function
       // @TODO: move popover creation into it's own function
       $trClass = '';
       $popover = '';
 
-      $lines .=
-        sprintf(
-          '     <tr%s%s><td><div align="right"><a name="%d"></a><a href="#%d">%d</a></div></td><td class="codeLine">%s</td></tr>'.
-          "\n",
-          $trClass,
-          $popover,
-          $lineNo,
-          $lineNo,
-          $lineNo,
-          $codeLine,
-        );
+      $lineStateCss = '';
+      $lineState = '';
+
+      if ($lineStateValue == Driver::LINE_EXECUTED) {
+        $lineStateCss = 'success';
+        $lineState = '&check;';
+      } else if ($lineStateValue == Driver::LINE_NOT_EXECUTED) {
+        $lineStateCss = 'danger';
+        $lineState = '&otimes;';
+      } else if ($lineStateValue == Driver::LINE_NOT_EXECUTABLE) {
+        $lineStateCss = 'info';
+        $lineState = '&nbsp;';
+      }
+
+      $lines .= $rowTemplate->render(
+        Map {
+          'trClass' => $trClass,
+          'popover' => $popover,
+          'lineNo' => $lineNo,
+          'codeLine' => $codeLine,
+          'lineState' => $lineState,
+          'lineStateCss' => $lineStateCss,
+        },
+      );
+
+      // if we are debugging tokens and what it means for the rendering.
+      $tokensForLine = '';
+
+      $tokens = $processedFile->getLineToTokens($lineNo);
+
+      foreach ($tokens as $token) {
+        if ($tokensForLine != '') {
+          $tokensForLine .= ', ';
+        }
+        $tokensForLine .= $token->getShortTokenName();
+        $tokensForLine .= '['.$token->getId().']';
+      }
+      implode(", ", $processedFile->getLineToTokens($lineNo));
+
+      $lines .= $tokenTemplate->render(
+        Map {'tokensForLine' => $tokensForLine, 'lineNo' => $lineNo},
+      );
 
     }
 
@@ -460,6 +505,9 @@ class File extends Renderer {
    */
   protected function loadFile(string $file): Vector<string> {
 
+    $lineTemplate =
+      TemplateFactory::get($this->templatePath.'code_line.html', '{{', '}}');
+
     $buffer = Zynga_Source_Cache::getSource($file);
     $tokens = Zynga_Source_Cache::getTokens($file);
 
@@ -478,18 +526,24 @@ class File extends Renderer {
         if ($token === '"' && $tokens[$j - 1] !== '\\') {
           $result->appendTo(
             $i,
-            sprintf(
-              '<span class="string">%s</span>',
-              htmlspecialchars($token),
+            $lineTemplate->render(
+              Map {
+                'code_class' => 'string',
+                'code' => htmlspecialchars($token),
+              },
+              true,
             ),
           );
           $stringFlag = !$stringFlag;
         } else {
           $result->appendTo(
             $i,
-            sprintf(
-              '<span class="keyword">%s</span>',
-              htmlspecialchars($token),
+            $lineTemplate->render(
+              Map {
+                'code_class' => 'keyword',
+                'code' => htmlspecialchars($token),
+              },
+              true,
             ),
           );
         }
@@ -619,7 +673,10 @@ class File extends Renderer {
 
             $result->appendTo(
               $i,
-              sprintf('<span class="%s">%s</span>', $colour, $line),
+              $lineTemplate->render(
+                Map {'code_class' => $colour, 'code' => $line},
+                true,
+              ),
             );
 
           }

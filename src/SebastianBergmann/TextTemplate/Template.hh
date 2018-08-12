@@ -84,7 +84,10 @@ class Template {
    *
    * @return string
    */
-  public function render(Map<string, mixed> $values): string {
+  public function render(
+    Map<string, mixed> $values,
+    bool $trimTemplate = false,
+  ): string {
 
     // we run the template through strval to force the reference break.
     $rendered = strval($this->template);
@@ -97,6 +100,10 @@ class Template {
 
       $rendered = str_replace($templateKey, $a_value, $rendered);
 
+    }
+
+    if ($trimTemplate === true) {
+      return trim($rendered);
     }
 
     return $rendered;

@@ -2376,52 +2376,61 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
         $this->outputBufferingLevel  = ob_get_level();
     }
 
-    private function snapshotGlobalState()
-    {
-        $backupGlobals = $this->backupGlobals === null || $this->backupGlobals === true;
-
-        if ($this->runTestInSeparateProcess || $this->inIsolation ||
-            (!$backupGlobals && !$this->backupStaticAttributes)) {
-            return;
-        }
-
-        $this->snapshot = $this->createGlobalStateSnapshot($backupGlobals);
+    private function snapshotGlobalState() {
+      // --
+      // JEO:
+      // Snapshoting global state is a massive performance penalty as it snapshots
+      // all of the state of the coverage environment too, we removed this.
+      // --
+      //  $backupGlobals = $this->backupGlobals === null || $this->backupGlobals === true;
+      //
+      //  if ($this->runTestInSeparateProcess || $this->inIsolation ||
+      //      (!$backupGlobals && !$this->backupStaticAttributes)) {
+      //      return;
+      //  }
+      //
+      //  $this->snapshot = $this->createGlobalStateSnapshot($backupGlobals);
     }
 
     private function restoreGlobalState()
     {
-        if (!$this->snapshot instanceof Snapshot) {
-            return;
-        }
-
-        $backupGlobals = $this->backupGlobals === null || $this->backupGlobals === true;
-
-        if ($this->beStrictAboutChangesToGlobalState) {
-            try {
-                $this->compareGlobalStateSnapshots(
-                    $this->snapshot,
-                    $this->createGlobalStateSnapshot($backupGlobals)
-                );
-            } catch (PHPUnit_Framework_RiskyTestError $rte) {
-                // Intentionally left empty
-            }
-        }
-
-        $restorer = new Restorer;
-
-        if ($backupGlobals) {
-            $restorer->restoreGlobalVariables($this->snapshot);
-        }
-
-        if ($this->backupStaticAttributes) {
-            $restorer->restoreStaticAttributes($this->snapshot);
-        }
-
-        $this->snapshot = null;
-
-        if (isset($rte)) {
-            throw $rte;
-        }
+      // --
+      // JEO:
+      // Snapshoting global state is a massive performance penalty as it snapshots
+      // all of the state of the coverage environment too, we removed this.
+      // --
+      //  if (!$this->snapshot instanceof Snapshot) {
+      //      return;
+      //  }
+      //
+      //  $backupGlobals = $this->backupGlobals === null || $this->backupGlobals === true;
+      //
+      //  if ($this->beStrictAboutChangesToGlobalState) {
+      //      try {
+      //          $this->compareGlobalStateSnapshots(
+      //              $this->snapshot,
+      //              $this->createGlobalStateSnapshot($backupGlobals)
+      //          );
+      //      } catch (PHPUnit_Framework_RiskyTestError $rte) {
+      //          // Intentionally left empty
+      //      }
+      //  }
+      //
+      //  $restorer = new Restorer;
+      //
+      //  if ($backupGlobals) {
+      //      $restorer->restoreGlobalVariables($this->snapshot);
+      //  }
+      //
+      //  if ($this->backupStaticAttributes) {
+      //      $restorer->restoreStaticAttributes($this->snapshot);
+      //  }
+      //
+      //  $this->snapshot = null;
+      //
+      //  if (isset($rte)) {
+      //      throw $rte;
+      //  }
     }
 
     /**
@@ -2431,42 +2440,47 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
      */
     private function createGlobalStateSnapshot($backupGlobals)
     {
-        $blacklist = new Blacklist;
-
-        foreach ($this->backupGlobalsBlacklist as $globalVariable) {
-            $blacklist->addGlobalVariable($globalVariable);
-        }
-
-        if (!defined('PHPUNIT_TESTSUITE')) {
-            $blacklist->addClassNamePrefix('PHPUnit');
-            $blacklist->addClassNamePrefix('File_Iterator');
-            $blacklist->addClassNamePrefix('SebastianBergmann\CodeCoverage');
-            $blacklist->addClassNamePrefix('PHP_Invoker');
-            $blacklist->addClassNamePrefix('PHP_Timer');
-            $blacklist->addClassNamePrefix('PHP_Token');
-            $blacklist->addClassNamePrefix('Symfony');
-            $blacklist->addClassNamePrefix('Text_Template');
-            $blacklist->addClassNamePrefix('Doctrine\Instantiator');
-
-            foreach ($this->backupStaticAttributesBlacklist as $class => $attributes) {
-                foreach ($attributes as $attribute) {
-                    $blacklist->addStaticAttribute($class, $attribute);
-                }
-            }
-        }
-
-        return new Snapshot(
-            $blacklist,
-            $backupGlobals,
-            $this->backupStaticAttributes,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false
-        );
+      // --
+      // JEO:
+      // Snapshoting global state is a massive performance penalty as it snapshots
+      // all of the state of the coverage environment too, we removed this.
+      // --
+      //  $blacklist = new Blacklist;
+      //
+      //  foreach ($this->backupGlobalsBlacklist as $globalVariable) {
+      //      $blacklist->addGlobalVariable($globalVariable);
+      //  }
+      //
+      //  if (!defined('PHPUNIT_TESTSUITE')) {
+      //      $blacklist->addClassNamePrefix('PHPUnit');
+      //      $blacklist->addClassNamePrefix('File_Iterator');
+      //      $blacklist->addClassNamePrefix('SebastianBergmann\CodeCoverage');
+      //      $blacklist->addClassNamePrefix('PHP_Invoker');
+      //      $blacklist->addClassNamePrefix('PHP_Timer');
+      //      $blacklist->addClassNamePrefix('PHP_Token');
+      //      $blacklist->addClassNamePrefix('Symfony');
+      //      $blacklist->addClassNamePrefix('Text_Template');
+      //      $blacklist->addClassNamePrefix('Doctrine\Instantiator');
+      //
+      //      foreach ($this->backupStaticAttributesBlacklist as $class => $attributes) {
+      //          foreach ($attributes as $attribute) {
+      //              $blacklist->addStaticAttribute($class, $attribute);
+      //          }
+      //      }
+      //  }
+      //
+      //  return new Snapshot(
+      //      $blacklist,
+      //      $backupGlobals,
+      //      $this->backupStaticAttributes,
+      //      false,
+      //      false,
+      //      false,
+      //      false,
+      //      false,
+      //      false,
+      //      false
+      //  );
     }
 
     /**
@@ -2477,6 +2491,8 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
      */
     private function compareGlobalStateSnapshots(Snapshot $before, Snapshot $after)
     {
+      // JEO: Disabled.
+      /*
         $backupGlobals = $this->backupGlobals === null || $this->backupGlobals === true;
 
         if ($backupGlobals) {
@@ -2500,6 +2516,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
                 "--- Static attributes before the test\n+++ Static attributes after the test\n"
             );
         }
+      */
     }
 
     /**
@@ -2511,6 +2528,8 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
      */
     private function compareGlobalStateSnapshotPart(array $before, array $after, $header)
     {
+      // JEO: Disabled.
+      /*
         if ($before != $after) {
             $differ   = new Differ($header);
             $exporter = new Exporter;
@@ -2524,6 +2543,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
                 $diff
             );
         }
+       */
     }
 
     /**

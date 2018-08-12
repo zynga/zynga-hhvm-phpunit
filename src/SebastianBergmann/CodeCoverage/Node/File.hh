@@ -134,7 +134,7 @@ class File extends AbstractNode {
    */
   public function getNumExecutableLines(bool $recalculate = false): int {
     $processedFile = $this->processedFile();
-    return $processedFile->getNumExecutedLines($recalculate);
+    return $processedFile->stats()->getNumExecutedLines($recalculate);
   }
 
   /**
@@ -144,7 +144,7 @@ class File extends AbstractNode {
    */
   public function getNumExecutedLines(bool $recalculate = false): int {
     $processedFile = $this->processedFile();
-    return $processedFile->getNumExecutedLines($recalculate);
+    return $processedFile->stats()->getNumExecutedLines($recalculate);
   }
 
   /**
@@ -154,7 +154,7 @@ class File extends AbstractNode {
    */
   public function getNumClasses(bool $recalculate = false): int {
     $processedFile = $this->processedFile();
-    return $processedFile->getNumClasses($recalculate);
+    return $processedFile->stats()->getNumClasses($recalculate);
   }
 
   /**
@@ -164,7 +164,7 @@ class File extends AbstractNode {
    */
   public function getNumTestedClasses(bool $recalculate = false): int {
     $processedFile = $this->processedFile();
-    return $processedFile->getNumTestedClasses($recalculate);
+    return $processedFile->stats()->getNumTestedClasses($recalculate);
   }
 
   /**
@@ -174,7 +174,7 @@ class File extends AbstractNode {
    */
   public function getNumTraits(bool $recalculate = false): int {
     $processedFile = $this->processedFile();
-    return $processedFile->getNumTraits($recalculate);
+    return $processedFile->stats()->getNumTraits($recalculate);
   }
 
   /**
@@ -184,7 +184,7 @@ class File extends AbstractNode {
    */
   public function getNumTestedTraits(bool $recalculate = false): int {
     $processedFile = $this->processedFile();
-    return $processedFile->getNumTestedTraits($recalculate);
+    return $processedFile->stats()->getNumTestedTraits($recalculate);
   }
 
   /**
@@ -194,7 +194,7 @@ class File extends AbstractNode {
    */
   public function getNumMethods(bool $recalculate = false): int {
     $processedFile = $this->processedFile();
-    return $processedFile->getNumMethods($recalculate);
+    return $processedFile->stats()->getNumMethods($recalculate);
   }
 
   /**
@@ -204,7 +204,7 @@ class File extends AbstractNode {
    */
   public function getNumTestedMethods(bool $recalculate = false): int {
     $processedFile = $this->processedFile();
-    return $processedFile->getNumTestedMethods($recalculate);
+    return $processedFile->stats()->getNumTestedMethods($recalculate);
   }
 
   /**
@@ -214,7 +214,7 @@ class File extends AbstractNode {
    */
   public function getNumFunctions(bool $recalculate = false): int {
     $processedFile = $this->processedFile();
-    return $processedFile->getNumFunctions($recalculate);
+    return $processedFile->stats()->getNumFunctions($recalculate);
   }
 
   /**
@@ -224,7 +224,7 @@ class File extends AbstractNode {
    */
   public function getNumTestedFunctions(bool $recalculate = false): int {
     $processedFile = $this->processedFile();
-    return $processedFile->getNumFunctions($recalculate);
+    return $processedFile->stats()->getNumFunctions($recalculate);
   }
 
   /**
