@@ -13,7 +13,6 @@ namespace SebastianBergmann\CodeCoverage\Report\Html\Renderer;
 
 use SebastianBergmann\CodeCoverage\Driver;
 use SebastianBergmann\CodeCoverage\Node\File as FileNode;
-use SebastianBergmann\CodeCoverage\ProcessedFile\FileContainer;
 use SebastianBergmann\CodeCoverage\Report\Html\Renderer;
 use SebastianBergmann\CodeCoverage\Util;
 use SebastianBergmann\TextTemplate\TemplateFactory;
@@ -22,6 +21,8 @@ use SebastianBergmann\TokenStream\Token\StreamClassStructure;
 use SebastianBergmann\TokenStream\Token\StreamMethodStructure;
 use SebastianBergmann\TokenStream\Token\StreamInterfaceStructure;
 use Zynga\Source\Cache as Zynga_Source_Cache;
+
+use Zynga\CodeBase\V1\FileFactory;
 
 /**
  * Renders a file node.
@@ -185,17 +186,17 @@ class File extends Renderer {
           'numMethods' => $numMethods,
           'numTestedMethods' => $numTestedMethods,
           'linesExecutedPercent' => Util::percent(
-            $classObj->executedLines,
-            $classObj->executableLines,
+            $classObj->getExecutedLines(),
+            $classObj->getExecutableLines(),
             false,
           ),
           'linesExecutedPercentAsString' => Util::percent(
-            $classObj->executedLines,
-            $classObj->executableLines,
+            $classObj->getExecutedLines(),
+            $classObj->getExecutableLines(),
             true,
           ),
-          'numExecutedLines' => $classObj->executedLines,
-          'numExecutableLines' => $classObj->executableLines,
+          'numExecutedLines' => $classObj->getExecutedLines(),
+          'numExecutableLines' => $classObj->getExecutableLines(),
           'testedMethodsPercent' => Util::percent(
             $numTestedMethods,
             $numMethods,
@@ -267,7 +268,9 @@ class File extends Renderer {
     string $indent = '',
   ): string {
     $numTestedItems =
-      $methodObj->executedLines == $methodObj->executableLines ? 1 : 0;
+      $methodObj->getExecutedLines() == $methodObj->getExecutableLines()
+        ? 1
+        : 0;
 
     return $this->renderItemTemplate(
       $template,
@@ -282,17 +285,17 @@ class File extends Renderer {
         'numMethods' => 1,
         'numTestedMethods' => $numTestedItems,
         'linesExecutedPercent' => Util::percent(
-          $methodObj->executedLines,
-          $methodObj->executableLines,
+          $methodObj->getExecutedLines(),
+          $methodObj->getExecutableLines(),
           false,
         ),
         'linesExecutedPercentAsString' => Util::percent(
-          $methodObj->executedLines,
-          $methodObj->executableLines,
+          $methodObj->getExecutedLines(),
+          $methodObj->getExecutableLines(),
           true,
         ),
-        'numExecutedLines' => $methodObj->executedLines,
-        'numExecutableLines' => $methodObj->executableLines,
+        'numExecutedLines' => $methodObj->getExecutedLines(),
+        'numExecutableLines' => $methodObj->getExecutableLines(),
         'testedMethodsPercent' => Util::percent($numTestedItems, 1, false),
         'testedMethodsPercentAsString' => Util::percent(
           $numTestedItems,
@@ -331,7 +334,7 @@ class File extends Renderer {
     // $node->getTestData(); -- JEO need to wire in the test data.
     $codeLines = $this->loadFile($fileName);
 
-    $processedFile = FileContainer::get($fileName);
+    $processedFile = FileFactory::get($fileName);
 
     $lines = '';
 

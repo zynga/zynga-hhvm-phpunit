@@ -1,11 +1,10 @@
 <?hh // strict
 
-namespace SebastianBergmann\CodeCoverage\ProcessedFile;
+namespace Zynga\CodeBase\V1;
 
 use SebastianBergmann\CodeCoverage\Driver;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\ExecBlock;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\Logging as HHVM_Logging;
-use SebastianBergmann\CodeCoverage\ProcessedFile\ProcessedFile\Stats;
 use SebastianBergmann\TokenStream\Token\Stream;
 use SebastianBergmann\TokenStream\Token\Stream\CachingFactory;
 
@@ -19,25 +18,35 @@ use SebastianBergmann\TokenStream\TokenInterface;
 
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Variable;
 
-class ProcessedFile {
+use Zynga\CodeBase\V1\File\Stats;
+use Zynga\CodeBase\V1\File\LineExecutionState;
+
+class File {
   private bool $_didInit;
   private string $_file;
-  private Map<int, int> $_lineExecutionState;
   private Map<int, Map<string, bool>> $_lineToTests;
   private Map<int, Vector<TokenInterface>> $_lineToTokens;
   private int $_startLine;
   private int $_endLine;
+
   private ?Stats $_stats;
+  private ?LineExecutionState $_lineExecutionState;
 
   public function __construct(string $file) {
     $this->_didInit = false;
     $this->_file = $file;
-    $this->_lineExecutionState = Map {};
     $this->_lineToTests = Map {};
     $this->_lineToTokens = Map {};
     $this->_startLine = -1;
     $this->_endLine = -1;
+
     $this->_stats = null;
+    $this->_lineExecutionState = null;
+
+  }
+
+  public function getFile(): string {
+    return $this->_file;
   }
 
   public function stats(): Stats {
@@ -51,6 +60,14 @@ class ProcessedFile {
 
   }
 
+  public function lineExecutionState(): LineExecutionState {
+    if ($this->_lineExecutionState instanceof LineExecutionState) {
+      return $this->_lineExecutionState;
+    }
+    $this->_lineExecutionState = new LineExecutionState($this);
+    return $this->_lineExecutionState;
+  }
+
   public function getLineToTokens(int $lineNo): Vector<TokenInterface> {
     $tokens = $this->_lineToTokens->get($lineNo);
 
@@ -60,75 +77,6 @@ class ProcessedFile {
 
     return Vector {};
 
-  }
-
-  public function getFile(): string {
-    return $this->_file;
-  }
-
-  public function getLineExecutionState(int $lineNo): ?int {
-    return $this->getLineExecutionState($lineNo);
-  }
-
-  public function setLineExecutionState(int $lineNo, int $lineState): void {
-
-    if ($lineState !== Driver::LINE_NOT_EXECUTABLE &&
-        $lineState !== Driver::LINE_NOT_EXECUTED &&
-        $lineState !== Driver::LINE_EXECUTED) {
-      /*
-       Logging::debug(
-       'WARNING-INVALID-LINE_STATE '.
-       'file='.
-       $this->_file.
-       'lineNo='.
-       $lineNo.
-       ' lineState='.
-       $lineState,
-       );
-       */
-      return;
-    }
-
-    // after init is called, we don't let you go backwards to set not
-    //   exec | not executed
-    // if ($this->_didInit === true &&
-    //     ($lineState === Driver::LINE_NOT_EXECUTABLE ||
-    //      $lineState === Driver::LINE_NOT_EXECUTED)) {
-    //   return;
-    // }
-
-    $currentValue = $this->_lineExecutionState->get($lineNo);
-
-    if ($currentValue === null) {
-      // no value at all for the stack.
-      $this->_lineExecutionState->set($lineNo, $lineState);
-      return;
-    }
-
-    if ($currentValue === Driver::LINE_NOT_EXECUTABLE) {
-      // Line has been marked as non-executable.
-      return;
-    }
-
-    if ($currentValue > $lineState) {
-      error_log(
-        sprintf(
-          'ccFileWarning-attemptLineStateDegredation file=%s line=%d currentValue=%d lineState=%d',
-          $this->_file,
-          $lineNo,
-          $currentValue,
-          $lineState,
-        ),
-      );
-      return;
-    }
-
-    $this->_lineExecutionState->set($lineNo, $lineState);
-
-  }
-
-  public function getAllLineExecutionState(): Map<int, int> {
-    return $this->_lineExecutionState;
   }
 
   public function getLinesToTests(): Map<int, Vector<string>> {
@@ -250,9 +198,11 @@ class ProcessedFile {
     // mark the line up with the state.
     if ($isExecutable === true) {
       // echo " lineIsExecutable=".$currentLine."\n";
-      $this->setLineExecutionState($currentLine, Driver::LINE_NOT_EXECUTED);
+      $this->lineExecutionState()
+        ->set($currentLine, Driver::LINE_NOT_EXECUTED);
     } else {
-      $this->setLineExecutionState($currentLine, Driver::LINE_NOT_EXECUTABLE);
+      $this->lineExecutionState()
+        ->set($currentLine, Driver::LINE_NOT_EXECUTABLE);
     }
 
     return $skipAmount;

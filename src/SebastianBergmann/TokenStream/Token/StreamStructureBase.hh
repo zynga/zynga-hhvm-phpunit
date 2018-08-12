@@ -4,8 +4,7 @@ namespace SebastianBergmann\TokenStream\Token;
 
 abstract class StreamStructureBase {
   public string $file = '';
-  public int $executableLines = -1;
-  public int $executedLines = -1;
+
   public float $coverage = -1.0;
   public int $ccn = -1;
   public float $crap = -1.0;
@@ -16,6 +15,9 @@ abstract class StreamStructureBase {
   public string $docblock = '';
 
   abstract public function calculateCoverage(): void;
+
+  abstract public function getExecutableLines(): int;
+  abstract public function getExecutedLines(): int;
 
   /**
    * Calculates the Change Risk Anti-Patterns (CRAP) index for a unit of code

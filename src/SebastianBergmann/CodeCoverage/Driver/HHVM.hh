@@ -15,8 +15,7 @@ use SebastianBergmann\CodeCoverage\Driver;
 use SebastianBergmann\CodeCoverage\Driver\Xdebug;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\LineStack;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\Logging as HHVM_Logging;
-use SebastianBergmann\CodeCoverage\ProcessedFile\ProcessedFile;
-use SebastianBergmann\CodeCoverage\ProcessedFile\FileContainer;
+use Zynga\CodeBase\V1\FileFactory;
 use SebastianBergmann\TokenStream\Stream\CachingFactory;
 
 use \RuntimeException;
@@ -65,19 +64,17 @@ class HHVM {
 
     foreach ($data as $fileName => $execStatuses) {
 
-      $processedFile = FileContainer::get($fileName);
+      $processedFile = FileFactory::get($fileName);
 
       echo "caputuring fileName=$fileName\n";
       foreach ($execStatuses as $lineNo => $lineState) {
         $processedFile->setLineToTest($lineNo, $testId);
         if ($lineState >= Driver::LINE_EXECUTED) {
           echo "captured $lineNo : executed\n";
-          $processedFile->setLineExecutionState(
-            $lineNo,
-            Driver::LINE_EXECUTED,
-          );
+          $processedFile->lineExecutionState()
+            ->set($lineNo, Driver::LINE_EXECUTED);
         } else {
-          $processedFile->setLineExecutionState($lineNo, $lineState);
+          $processedFile->lineExecutionState()->set($lineNo, $lineState);
         }
       }
 

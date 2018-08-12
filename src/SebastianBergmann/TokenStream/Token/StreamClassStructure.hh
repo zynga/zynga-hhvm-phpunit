@@ -6,6 +6,7 @@ use SebastianBergmann\TokenStream\Token\StreamMethodStructure;
 
 class StreamClassStructure extends StreamStructureBase {
   public Map<string, StreamMethodStructure> $methods = Map {};
+
   public int $numMethods = -1;
   public int $numTestedMethods = -1;
   public mixed $parent = false;
@@ -13,20 +14,32 @@ class StreamClassStructure extends StreamStructureBase {
   public Map<string, string> $package = Map {};
   public string $className = '';
 
+  public function getExecutableLines(): int {
+    $executableLines = 0;
+    foreach ($this->methods as $methodName => $methodObj) {
+      $executableLines += $methodObj->getExecutableLines();
+    }
+    return $executableLines;
+  }
+
+  public function getExecutedLines(): int {
+    $executedLines = 0;
+    foreach ($this->methods as $methodName => $methodObj) {
+      $executedLines += $methodObj->getExecutedLines();
+    }
+    return $executedLines;
+  }
+
   public function calculateCoverage(): void {
 
     if ($this->coverage != -1) {
       return;
     }
 
-    foreach ($this->methods as $methodName => $methodObj) {
-      $this->executableLines += $methodObj->executableLines;
-      $this->executedLines += $methodObj->executedLines;
-    }
-
-    if ($this->executableLines > 0) {
-      $this->coverage =
-        floatval(($this->executedLines / $this->executableLines) * 100);
+    if ($this->getExecutableLines() > 0) {
+      $this->coverage = floatval(
+        ($this->getExecutedLines() / $this->getExecutableLines()) * 100,
+      );
     } else {
       $this->coverage = 100.0;
     }

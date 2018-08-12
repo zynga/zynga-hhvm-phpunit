@@ -14,7 +14,9 @@ Changes from vanilla phpunit here:
 1. Collapsed all of the HHVM driver code to be within the "HHVM" driver, in preparation for supporting the newer debuggers available.
 
 # TODO  
+1. SebastianBergmann\TokenStream\Token\StreamMethodStructure->methodSignature isn't working correctly, needs fixing. Might be only multi-line function signatures that are broken - TBD.
 1. PHP_Token_Function: Needs a verification that it handles marking a multi-line abastract function definition as non-executable.
+1. LineToTokens should be moved into stream functionality.
 
 # History
 

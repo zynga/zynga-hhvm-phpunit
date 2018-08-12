@@ -12,7 +12,7 @@
 namespace SebastianBergmann\CodeCoverage\Node;
 
 use SebastianBergmann\CodeCoverage\CodeCoverage;
-use SebastianBergmann\CodeCoverage\ProcessedFile\FileContainer;
+use Zynga\CodeBase\V1\FileFactory;
 
 class Builder {
   private static ?Directory $_root = null;
@@ -28,7 +28,7 @@ class Builder {
       return self::$_root;
     }
 
-    $fileNames = FileContainer::getFileNames();
+    $fileNames = FileFactory::getFileNames();
 
     $dirMap = Map {};
 

@@ -170,13 +170,13 @@ class Text {
         $classMethods = 0;
 
         foreach ($class->methods as $method) {
-          if ($method->executableLines == 0) {
+          if ($method->getExecutableLines() == 0) {
             continue;
           }
 
           $classMethods++;
-          $classStatements += $method->executableLines;
-          $coveredClassStatements += $method->executedLines;
+          $classStatements += $method->getExecutableLines();
+          $coveredClassStatements += $method->getExecutedLines();
           if ($method->coverage == 100) {
             $coveredMethods++;
           }

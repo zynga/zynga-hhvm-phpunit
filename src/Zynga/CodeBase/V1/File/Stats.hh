@@ -1,8 +1,8 @@
 <?hh // strict
 
-namespace SebastianBergmann\CodeCoverage\ProcessedFile\ProcessedFile;
+namespace Zynga\CodeBase\V1\File;
 
-use SebastianBergmann\CodeCoverage\ProcessedFile\ProcessedFile;
+use Zynga\CodeBase\V1\File;
 
 class Stats {
   private bool $statsCalculated;
@@ -16,9 +16,9 @@ class Stats {
   private int $numTestedMethods;
   private int $numFunctions;
   private int $numTestedFunctions;
-  private ProcessedFile $parent;
+  private File $parent;
 
-  public function __construct(ProcessedFile $parent) {
+  public function __construct(File $parent) {
     $this->statsCalculated = false;
     $this->numExecutableLines = -1;
     $this->numExecutedLines = -1;
@@ -110,8 +110,8 @@ class Stats {
     foreach ($stream->getClasses() as $className => $classObj) {
 
       $this->numClasses++;
-      $this->numExecutableLines += $classObj->executableLines;
-      $this->numExecutedLines += $classObj->executedLines;
+      $this->numExecutableLines += $classObj->getExecutableLines();
+      $this->numExecutedLines += $classObj->getExecutedLines();
 
       $classObj->numMethods = 0;
       $classObj->numTestedMethods = 0;
@@ -140,8 +140,8 @@ class Stats {
     foreach ($stream->getTraits() as $traitName => $traitObj) {
 
       $this->numTraits++;
-      $this->numExecutableLines += $traitObj->executableLines;
-      $this->numExecutedLines += $traitObj->executedLines;
+      $this->numExecutableLines += $traitObj->getExecutableLines();
+      $this->numExecutedLines += $traitObj->getExecutedLines();
 
       $traitObj->numMethods = 0;
       $traitObj->numTestedMethods = 0;
@@ -178,8 +178,8 @@ class Stats {
         $this->numTestedFunctions++;
       }
 
-      $this->numExecutableLines += $functionObj->executableLines;
-      $this->numExecutedLines += $functionObj->executedLines;
+      $this->numExecutableLines += $functionObj->getExecutableLines();
+      $this->numExecutedLines += $functionObj->getExecutedLines();
 
     }
 

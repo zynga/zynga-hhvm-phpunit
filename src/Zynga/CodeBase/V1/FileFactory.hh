@@ -1,30 +1,30 @@
 <?hh // strict
 
-namespace SebastianBergmann\CodeCoverage\ProcessedFile;
+namespace Zynga\CodeBase\V1;
 
-use SebastianBergmann\CodeCoverage\ProcessedFile\ProcessedFile;
+use Zynga\CodeBase\V1\File;
 use \Exception;
 
-class FileContainer {
-  private static Map<string, ProcessedFile> $files = Map {};
+class FileFactory {
+  private static Map<string, File> $files = Map {};
 
   public static function clear(): void {
     self::$files->clear();
   }
 
-  public static function get(string $filename): ProcessedFile {
+  public static function get(string $filename): File {
 
     $file = self::$files->get($filename);
 
-    if ($file instanceof ProcessedFile) {
+    if ($file instanceof File) {
       return $file;
     }
 
-    if ( ! is_file($filename) ) {
-      throw new Exception('NOT_A_FILE=' . $filename);
+    if (!is_file($filename)) {
+      throw new Exception('NOT_A_FILE='.$filename);
     }
 
-    $file = new ProcessedFile($filename);
+    $file = new File($filename);
     $file->init();
 
     self::$files->set($filename, $file);

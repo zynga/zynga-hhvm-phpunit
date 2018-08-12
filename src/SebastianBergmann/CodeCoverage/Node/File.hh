@@ -14,8 +14,8 @@ namespace SebastianBergmann\CodeCoverage\Node;
 use SebastianBergmann\CodeCoverage\InvalidArgumentException;
 use SebastianBergmann\TokenStream\Token\Stream;
 
-use SebastianBergmann\CodeCoverage\ProcessedFile\FileContainer;
-use SebastianBergmann\CodeCoverage\ProcessedFile\ProcessedFile;
+use Zynga\CodeBase\V1\FileFactory;
+use Zynga\CodeBase\V1\File as CodeBaseFile;
 
 use
   SebastianBergmann\TokenStream\Token\Stream\CachingFactory as StreamCachingFactory
@@ -57,12 +57,12 @@ class File extends AbstractNode {
     throw new Exception('stream() called with invalid fileName set');
   }
 
-  public function processedFile(): ProcessedFile {
+  public function processedFile(): CodeBaseFile {
 
     $fileName = $this->getPath();
 
     if (is_string($fileName)) {
-      return FileContainer::get($fileName);
+      return FileFactory::get($fileName);
     }
 
     throw new Exception('processedFile() called with invalid fileName set');
@@ -84,7 +84,7 @@ class File extends AbstractNode {
    */
   public function getCoverageData(): Map<int, int> {
     $processedFile = $this->processedFile();
-    return $processedFile->getAllLineExecutionState();
+    return $processedFile->lineExecutionState()->getAll();
   }
 
   /**

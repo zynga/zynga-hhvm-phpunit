@@ -28,6 +28,7 @@
       "SebastianBergmann\\TextTemplate\\": "src/SebastianBergmann/TextTemplate/",
       "SebastianBergmann\\TokenStream\\": "src/SebastianBergmann/TokenStream/",
       "SebastianBergmann\\TokenStream\\Tests": "tests/token-stream/SebastianBergmann/TokenStream/Tests/",
+      "Zynga\\CodeBase\\V1\\": "src/Zynga/CodeBase/V1/",
       "Zynga\\PHPUnit\\V2\\": "src/Zynga/PHPUnit/V2/"
     }
   },

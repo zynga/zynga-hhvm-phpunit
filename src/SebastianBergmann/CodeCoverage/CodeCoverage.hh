@@ -26,7 +26,7 @@ use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
 use
   SebastianBergmann\TokenStream\Token\Stream\CachingFactory as StreamCachingFactory
 ;
-use SebastianBergmann\CodeCoverage\ProcessedFile\FileContainer;
+use Zynga\CodeBase\V1\FileFactory;
 
 /**
  * Provides collection functionality for PHP code coverage information.
@@ -181,7 +181,7 @@ class CodeCoverage {
   public function clear() {
     $this->isInitialized = false;
     $this->currentId = null;
-    FileContainer::clear();
+    FileFactory::clear();
     $this->tests = [];
   }
 
@@ -206,7 +206,7 @@ class CodeCoverage {
     if (!$raw && $this->addUncoveredFilesFromWhitelist) {
       $this->addUncoveredFilesFromWhitelist();
     }
-    return FileContainer::getAllLineToTestData();
+    return FileFactory::getAllLineToTestData();
   }
 
   /**
@@ -351,7 +351,7 @@ class CodeCoverage {
         continue;
       }
 
-      $fileStack = FileContainer::get($file);
+      $fileStack = FileFactory::get($file);
 
       foreach ($lines as $lineNo => $lineState) {
         if ($lineState == Driver::LINE_EXECUTED) {
@@ -646,7 +646,7 @@ class CodeCoverage {
   private function addUncoveredFilesFromWhitelist() {
     return;
 
-    $filesToThisPoint = FileContainer::getFileNames();
+    $filesToThisPoint = FileFactory::getFileNames();
 
     $uncoveredFiles =
       array_diff($this->filter->getWhitelist(), $filesToThisPoint->toArray());
@@ -667,7 +667,7 @@ class CodeCoverage {
 
         // This alone will snag the file, and setup it's intiial state with the
         // platform as the container will run init()
-        $fileStack = FileContainer::get($uncoveredFile);
+        $fileStack = FileFactory::get($uncoveredFile);
 
       }
     }
@@ -1140,7 +1140,7 @@ class CodeCoverage {
 
       $fileCoverage = array();
 
-      $file = FileContainer::get($file);
+      $file = FileFactory::get($file);
 
       $this->initalizeData_DisplayPerFileData("done");
 
