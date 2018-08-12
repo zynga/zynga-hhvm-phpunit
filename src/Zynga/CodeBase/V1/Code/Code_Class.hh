@@ -1,12 +1,11 @@
 <?hh // strict
 
-namespace SebastianBergmann\TokenStream\Token;
+namespace Zynga\CodeBase\V1\Code;
 
-use SebastianBergmann\TokenStream\Token\StreamMethodStructure;
 use Zynga\CodeBase\V1\Code\Code_Base;
 use Zynga\CodeBase\V1\Code\Code_Method;
 
-class StreamClassStructure extends Code_Base {
+class Code_Class extends Code_Base {
   public Map<string, Code_Method> $methods = Map {};
 
   public int $numMethods = -1;

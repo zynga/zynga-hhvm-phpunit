@@ -18,9 +18,11 @@ use SebastianBergmann\TokenStream\TokenInterface;
 
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Variable;
 
-use Zynga\CodeBase\V1\File\Stats;
+use Zynga\CodeBase\V1\File\Classes;
 use Zynga\CodeBase\V1\File\Functions;
 use Zynga\CodeBase\V1\File\LineExecutionState;
+use Zynga\CodeBase\V1\File\Stats;
+use Zynga\CodeBase\V1\File\Traits;
 
 class File {
   private bool $_didInit;
@@ -30,9 +32,11 @@ class File {
   private int $_startLine;
   private int $_endLine;
 
-  private ?Stats $_stats;
-  private ?LineExecutionState $_lineExecutionState;
+  private ?Classes $_classes;
   private ?Functions $_functions;
+  private ?LineExecutionState $_lineExecutionState;
+  private ?Stats $_stats;
+  private ?Traits $_traits;
 
   public function __construct(string $file) {
     $this->_didInit = false;
@@ -42,8 +46,11 @@ class File {
     $this->_startLine = -1;
     $this->_endLine = -1;
 
-    $this->_stats = null;
+    $this->_classes = null;
+    $this->_functions = null;
     $this->_lineExecutionState = null;
+    $this->_stats = null;
+    $this->_traits = null;
 
   }
 
@@ -80,6 +87,23 @@ class File {
     return $this->_functions;
 
   }
+
+  public function classes(): Classes {
+    if ($this->_classes instanceof Classes) {
+      return $this->_classes;
+    }
+    $this->_classes = new Classes($this);
+    return $this->_classes;
+  }
+
+  public function traits(): Traits {
+    if ($this->_traits instanceof Traits) {
+      return $this->_traits;
+    }
+    $this->_traits = new Traits($this);
+    return $this->_traits;
+  }
+
   public function getLineToTokens(int $lineNo): Vector<TokenInterface> {
     $tokens = $this->_lineToTokens->get($lineNo);
 

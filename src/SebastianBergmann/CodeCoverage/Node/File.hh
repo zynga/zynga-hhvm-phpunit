@@ -16,13 +16,12 @@ use SebastianBergmann\TokenStream\Token\Stream;
 
 use Zynga\CodeBase\V1\FileFactory;
 use Zynga\CodeBase\V1\File as CodeBaseFile;
+use Zynga\CodeBase\V1\Code\Code_Class;
 use Zynga\CodeBase\V1\Code\Code_Method;
 
 use
   SebastianBergmann\TokenStream\Token\Stream\CachingFactory as StreamCachingFactory
 ;
-
-use SebastianBergmann\TokenStream\Token\StreamClassStructure;
 
 use \Exception;
 
@@ -91,9 +90,9 @@ class File extends AbstractNode {
    *
    * @return array
    */
-  public function getClasses(): Map<string, StreamClassStructure> {
+  public function getClasses(): Map<string, Code_Class> {
     $processedFile = $this->processedFile();
-    return $processedFile->stream()->getClasses();
+    return $processedFile->classes()->getAll();
   }
 
   /**
@@ -101,9 +100,9 @@ class File extends AbstractNode {
    *
    * @return array
    */
-  public function getTraits(): Map<string, StreamClassStructure> {
+  public function getTraits(): Map<string, Code_Class> {
     $processedFile = $this->processedFile();
-    return $processedFile->stream()->getTraits();
+    return $processedFile->traits()->getAll();
   }
 
   /**

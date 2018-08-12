@@ -35,6 +35,7 @@ use \Exception;
 use \OutOfBoundsException;
 
 use Zynga\CodeBase\V1\FileFactory;
+use Zynga\CodeBase\V1\Code\Code_Class;
 use Zynga\CodeBase\V1\Code\Code_Method;
 
 /**
@@ -107,11 +108,6 @@ class Stream {
   /**
    * @var array
    */
-  protected Map<string, StreamClassStructure> $classes;
-
-  /**
-   * @var array
-   */
   protected Map<string, Vector<string>>
     $includes = Map {
       'require_once' => Vector {},
@@ -124,11 +120,6 @@ class Stream {
    * @var array
    */
   protected Map<string, StreamInterfaceStructure> $interfaces;
-
-  /**
-   * @var array
-   */
-  protected Map<string, StreamClassStructure> $traits;
 
   /**
    * @var array
@@ -155,9 +146,7 @@ class Stream {
     $this->didScan = false;
     $this->didParse = false;
     $this->tokens = Vector {};
-    $this->classes = Map {};
     $this->interfaces = Map {};
-    $this->traits = Map {};
     $this->lineToFunctionMap = Map {};
     $this->position = 0;
 
@@ -377,25 +366,9 @@ class Stream {
   /**
    * @return array
    */
-  public function getClasses(): Map<string, StreamClassStructure> {
-    $this->parse();
-    return $this->classes;
-  }
-
-  /**
-   * @return array
-   */
   public function getInterfaces(): Map<string, StreamInterfaceStructure> {
     $this->parse();
     return $this->interfaces;
-  }
-
-  /**
-   * @return array
-   */
-  public function getTraits(): Map<string, StreamClassStructure> {
-    $this->parse();
-    return $this->traits;
   }
 
   /**
@@ -483,7 +456,9 @@ class Stream {
 
   private function parseHandleClass(PHP_Token_Class $token): void {
 
-    $tmp = new StreamClassStructure();
+    $codeFile = FileFactory::get($this->filename);
+
+    $tmp = new Code_Class();
     $tmp->methods->clear();
     $tmp->parent = $token->getParent();
     $tmp->interfaces = $token->getInterfaces();
@@ -501,13 +476,15 @@ class Stream {
     $previousClass = $this->t_class->get($this->t_class->count() - 1);
 
     if (is_string($previousClass) && $previousClass != 'anonymous class') {
-      $this->classes->set($previousClass, $tmp);
+      $codeFile->classes()->add($previousClass, $tmp);
     }
 
   }
 
   private function parseHandleTrait(PHP_Token_Trait $token): void {
-    $tmp = new StreamClassStructure();
+
+    $codeFile = FileFactory::get($this->filename);
+    $tmp = new Code_Class();
     $tmp->methods->clear();
     $tmp->parent = $token->getParent();
     $tmp->interfaces = $token->getInterfaces();
@@ -521,7 +498,7 @@ class Stream {
     $this->t_trait = $token->getName();
     $this->t_traitEndLine = $token->getEndLine();
 
-    $this->traits->set($token->getName(), $tmp);
+    $codeFile->traits()->add($token->getName(), $tmp);
 
   }
 
@@ -558,10 +535,10 @@ class Stream {
 
       $a_class = null;
       if (is_string($a_className)) {
-        $a_class = $this->classes->get($a_className);
+        $a_class = $codeFile->classes()->get($a_className);
       }
 
-      if ($a_class instanceof StreamClassStructure) {
+      if ($a_class instanceof Code_Class) {
         $a_class->methods->set($name, $tmp);
 
         $this->addFunctionToMap(
@@ -577,9 +554,9 @@ class Stream {
       $a_traitname = strval($this->t_trait);
       $a_trait = null;
 
-      $a_trait = $this->traits->get($a_traitname);
+      $a_trait = $codeFile->traits()->get($a_traitname);
 
-      if ($a_trait instanceof StreamClassStructure) {
+      if ($a_trait instanceof Code_Class) {
 
         $a_trait->methods->set($name, $tmp);
 

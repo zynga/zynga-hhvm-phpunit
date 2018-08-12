@@ -13,9 +13,9 @@ namespace SebastianBergmann\CodeCoverage\Report\Html;
 
 use SebastianBergmann\CodeCoverage\Node\AbstractNode;
 use SebastianBergmann\CodeCoverage\Node\Directory as DirectoryNode;
-use SebastianBergmann\TokenStream\Token\StreamClassStructure;
 use SebastianBergmann\TextTemplate\TemplateFactory;
 use SebastianBergmann\TextTemplate\Template;
+use Zynga\CodeBase\V1\Code\Code_Class;
 use Zynga\CodeBase\V1\Code\Code_Method;
 
 /**
@@ -74,7 +74,7 @@ class Dashboard extends Renderer {
    * @return array
    */
   protected function complexity(
-    Map<string, StreamClassStructure> $classes,
+    Map<string, Code_Class> $classes,
     string $baseLink,
   ): array<string, string> {
     $result = ['class' => [], 'method' => []];
@@ -122,7 +122,7 @@ class Dashboard extends Renderer {
    * @return array
    */
   protected function coverageDistribution(
-    Map<string, StreamClassStructure> $classes,
+    Map<string, Code_Class> $classes,
   ): array<string, array<string, float>> {
     $result = [
       'class' => [
@@ -194,7 +194,7 @@ class Dashboard extends Renderer {
    * @return array
    */
   protected function insufficientCoverage(
-    Map<string, StreamClassStructure> $classes,
+    Map<string, Code_Class> $classes,
     string $baseLink,
   ): array<string, string> {
     $leastTestedClasses = [];
@@ -225,7 +225,7 @@ class Dashboard extends Renderer {
     foreach ($leastTestedClasses as $className => $coverage) {
       $classLink = '';
       $class = $classes->get($className);
-      if ($class instanceof StreamClassStructure) {
+      if ($class instanceof Code_Class) {
         $classLink = $class->link;
       }
       $result['class'] .=
@@ -245,7 +245,7 @@ class Dashboard extends Renderer {
       $classObj = $classes->get($class);
       $methodLink = '';
 
-      if ($classObj instanceof StreamClassStructure) {
+      if ($classObj instanceof Code_Class) {
         $methodObj = $classObj->methods->get($method);
         if ($methodObj instanceof Code_Method) {
           $methodLink = $methodObj->link;
@@ -274,7 +274,7 @@ class Dashboard extends Renderer {
    * @return array
    */
   protected function projectRisks(
-    Map<string, StreamClassStructure> $classes,
+    Map<string, Code_Class> $classes,
     string $baseLink,
   ): array<string, string> {
     $classRisks = [];
@@ -308,7 +308,7 @@ class Dashboard extends Renderer {
       $classObj = $classes->get($className);
 
       $classLink = '';
-      if ($classObj instanceof StreamClassStructure) {
+      if ($classObj instanceof Code_Class) {
         $classLink = $classObj->link;
       }
 
@@ -328,7 +328,7 @@ class Dashboard extends Renderer {
       $classObj = $classes->get($class);
 
       $methodLink = '';
-      if ($classObj instanceof StreamClassStructure) {
+      if ($classObj instanceof Code_Class) {
         $methodObj = $classObj->methods->get($method);
         if ($methodObj instanceof Code_Method) {
           $methodLink = $methodObj->link;

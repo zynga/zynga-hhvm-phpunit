@@ -12,7 +12,7 @@
 namespace SebastianBergmann\CodeCoverage\Node;
 
 use SebastianBergmann\CodeCoverage\Util;
-use SebastianBergmann\TokenStream\Token\StreamClassStructure;
+use Zynga\CodeBase\V1\Code\Code_Class;
 use Zynga\CodeBase\V1\Code\Code_Method;
 
 /**
@@ -328,7 +328,7 @@ abstract class AbstractNode implements \Countable {
    *
    * @return array
    */
-  public function getClassesAndTraits(): Map<string, StreamClassStructure> {
+  public function getClassesAndTraits(): Map<string, Code_Class> {
     $combined = Map {};
     foreach ($this->getClasses() as $className => $classObj) {
       $combined->set($className, $classObj);
@@ -344,14 +344,14 @@ abstract class AbstractNode implements \Countable {
    *
    * @return array
    */
-  abstract public function getClasses(): Map<string, StreamClassStructure>;
+  abstract public function getClasses(): Map<string, Code_Class>;
 
   /**
    * Returns the traits of this node.
    *
    * @return array
    */
-  abstract public function getTraits(): Map<string, StreamClassStructure>;
+  abstract public function getTraits(): Map<string, Code_Class>;
 
   /**
    * Returns the functions of this node.

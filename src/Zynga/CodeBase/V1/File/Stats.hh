@@ -105,9 +105,7 @@ class Stats {
     $this->numFunctions = 0;
     $this->numTestedFunctions = 0;
 
-    $stream = $this->_parent->stream();
-
-    foreach ($stream->getClasses() as $className => $classObj) {
+    foreach ($this->_parent->classes()->getAll() as $className => $classObj) {
 
       $this->numClasses++;
       $this->numExecutableLines += $classObj->getExecutableLines();
@@ -137,7 +135,7 @@ class Stats {
 
     }
 
-    foreach ($stream->getTraits() as $traitName => $traitObj) {
+    foreach ($this->_parent->traits()->getAll() as $traitName => $traitObj) {
 
       $this->numTraits++;
       $this->numExecutableLines += $traitObj->getExecutableLines();

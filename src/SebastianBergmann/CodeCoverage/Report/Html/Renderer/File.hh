@@ -17,12 +17,12 @@ use SebastianBergmann\CodeCoverage\Report\Html\Renderer;
 use SebastianBergmann\CodeCoverage\Util;
 use SebastianBergmann\TextTemplate\TemplateFactory;
 use SebastianBergmann\TextTemplate\Template;
-use SebastianBergmann\TokenStream\Token\StreamClassStructure;
 
 use SebastianBergmann\TokenStream\Token\StreamInterfaceStructure;
 use Zynga\Source\Cache as Zynga_Source_Cache;
 
 use Zynga\CodeBase\V1\FileFactory;
+use Zynga\CodeBase\V1\Code\Code_Class;
 use Zynga\CodeBase\V1\Code\Code_Method;
 
 /**
@@ -162,7 +162,7 @@ class File extends Renderer {
    * @return string
    */
   protected function renderTraitOrClassItems(
-    Map<string, StreamClassStructure> $items,
+    Map<string, Code_Class> $items,
     Template $template,
     Template $methodItemTemplate,
   ): string {

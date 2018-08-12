@@ -125,12 +125,12 @@ class ClassTest extends TestCase {
   }
 
   public function testIssue30(): void {
-    $filename = $this->getFilesDirectory().'issue30.php';
-    $ts = CachingFactory::get($filename);
-    $tokens = $ts->tokens();
-    $classes = $ts->getClasses();
 
-    $this->assertCount(1, $ts->getClasses());
+    $filename = $this->getFilesDirectory().'issue30.php';
+
+    $codeFile = FileFactory::get($filename);
+    $this->assertCount(1, $codeFile->classes()->getAll());
+
   }
 
   public function testAnonymousClassesAreHandledCorrectly(): void {
@@ -139,9 +139,9 @@ class ClassTest extends TestCase {
       $this->getFilesDirectory().
       'class_with_method_that_declares_anonymous_class.php';
 
-    $ts = CachingFactory::get($filename);
+    $codeFile = FileFactory::get($filename);
 
-    $classes = $ts->getClasses();
+    $classes = $codeFile->classes()->getAll();
 
     $this->assertTrue(
       $classes->containsKey(
@@ -177,9 +177,8 @@ class ClassTest extends TestCase {
    */
   public function testImportedFunctionsAreHandledCorrectly(): void {
     $filename = $this->getFilesDirectory().'classUsesNamespacedFunction.php';
-    $ts = CachingFactory::get($filename);
     $codeFile = FileFactory::get($filename);
     $this->assertEmpty($codeFile->functions()->getAll());
-    $this->assertCount(1, $ts->getClasses());
+    $this->assertCount(1, $codeFile->classes()->getAll());
   }
 }

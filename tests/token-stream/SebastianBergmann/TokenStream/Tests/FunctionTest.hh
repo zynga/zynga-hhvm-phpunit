@@ -133,7 +133,7 @@ class FunctionTest extends TestCase {
     $codeFile = FileFactory::get($filename);
     $ts = CachingFactory::get($filename);
     $f = $codeFile->functions()->getAll();
-    $c = $ts->getClasses();
+    $c = $codeFile->classes()->getAll();
     $i = $ts->getInterfaces();
 
     $this->assertEquals(

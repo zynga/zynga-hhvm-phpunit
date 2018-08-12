@@ -719,11 +719,12 @@ class CodeCoverage {
         }
       }
 
+      $codeFile = FileFactory::get($filename);
       $tokens = StreamCachingFactory::get($filename);
 
       $classes = array_merge(
-        $tokens->getClasses()->toArray(),
-        $tokens->getTraits()->toArray(),
+        $codeFile->classes()->getAll()->toArray(),
+        $codeFile->traits()->getAll()->toArray(),
       );
 
       $tokens = $tokens->tokens();
