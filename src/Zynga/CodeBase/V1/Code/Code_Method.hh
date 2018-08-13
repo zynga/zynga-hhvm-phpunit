@@ -16,6 +16,16 @@ class Code_Method extends Code_Base {
   private int $_linesExecuted = -1;
   private int $_linesExecutable = -1;
 
+  public function getExecutableLines(): int {
+    $this->_calculateStats();
+    return $this->_linesExecutable;
+  }
+
+  public function getExecutedLines(): int {
+    $this->_calculateStats();
+    return $this->_linesExecuted;
+  }
+
   private function _calculateStats(): void {
 
     if ($this->_linesExecuted != -1) {
@@ -39,20 +49,14 @@ class Code_Method extends Code_Base {
 
   }
 
-  public function getExecutableLines(): int {
-    $this->_calculateStats();
-    return $this->_linesExecutable;
-  }
-
-  public function getExecutedLines(): int {
-    $this->_calculateStats();
-    return $this->_linesExecuted;
-  }
-
   public function calculateCoverage(): void {
+
+    $this->_calculateStats();
+
     if ($this->coverage != -1.0) {
       return;
     }
+
     if ($this->getExecutableLines() > 0) {
       $this->coverage = floatval(
         ($this->getExecutedLines() / $this->getExecutableLines()) * 100,
@@ -60,6 +64,8 @@ class Code_Method extends Code_Base {
     } else {
       $this->coverage = 100.0;
     }
+
     $this->calculateCrap();
+
   }
 }

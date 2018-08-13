@@ -87,7 +87,7 @@ class Dashboard extends Renderer {
 
         $result['method'][] = [
           $method->coverage,
-          $method->ccn,
+          $method->getCcn(),
           sprintf(
             '<a href="%s">%s</a>',
             str_replace($baseLink, '', $method->link),
@@ -98,7 +98,7 @@ class Dashboard extends Renderer {
 
       $result['class'][] = [
         $class->coverage,
-        $class->ccn,
+        $class->getCcn(),
         sprintf(
           '<a href="%s">%s</a>',
           str_replace($baseLink, '', $class->link),
@@ -283,20 +283,21 @@ class Dashboard extends Renderer {
 
     foreach ($classes as $className => $class) {
       foreach ($class->methods as $methodName => $method) {
-        if ($method->coverage < $this->highLowerBound && $method->ccn > 1) {
+        if ($method->coverage < $this->highLowerBound &&
+            $method->getCcn() > 1) {
           if ($className != '*') {
             $key = $className.'::'.$methodName;
           } else {
             $key = $methodName;
           }
 
-          $methodRisks[$key] = $method->crap;
+          $methodRisks[$key] = $method->getCrap();
         }
       }
 
       if ($class->coverage < $this->highLowerBound &&
-          $class->ccn > $class->methods->count()) {
-        $classRisks[$className] = $class->crap;
+          $class->getCcn() > $class->methods->count()) {
+        $classRisks[$className] = $class->getCrap();
       }
     }
 

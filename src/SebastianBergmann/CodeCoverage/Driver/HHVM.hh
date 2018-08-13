@@ -66,11 +66,11 @@ class HHVM {
 
       $processedFile = FileFactory::get($fileName);
 
-      echo "caputuring fileName=$fileName\n";
+      //echo "caputuring fileName=$fileName\n";
       foreach ($execStatuses as $lineNo => $lineState) {
         $processedFile->setLineToTest($lineNo, $testId);
         if ($lineState >= Driver::LINE_EXECUTED) {
-          echo "captured $lineNo : executed\n";
+          //echo "captured $lineNo : executed\n";
           $processedFile->lineExecutionState()
             ->set($lineNo, Driver::LINE_EXECUTED);
         } else {

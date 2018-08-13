@@ -8,8 +8,6 @@ use Zynga\CodeBase\V1\Code\Code_Method;
 class Code_Class extends Code_Base {
   public Map<string, Code_Method> $methods = Map {};
 
-  public int $numMethods = -1;
-  public int $numTestedMethods = -1;
   public mixed $parent = false;
   public mixed $interfaces = false;
   public Map<string, string> $package = Map {};
@@ -17,6 +15,17 @@ class Code_Class extends Code_Base {
 
   public function getNumMethods(): int {
     return $this->methods->count();
+  }
+
+  public function getNumTestedMethods(): int {
+    $numTested = 0;
+    foreach ($this->methods as $methodName => $methodObj) {
+      $methodObj->calculateCoverage();
+      if ($methodObj->coverage == 100) {
+        $numTested++;
+      }
+    }
+    return $numTested;
   }
 
   public function getExecutableLines(): int {
@@ -41,10 +50,11 @@ class Code_Class extends Code_Base {
       return;
     }
 
-    if ($this->getExecutableLines() > 0) {
-      $this->coverage = floatval(
-        ($this->getExecutedLines() / $this->getExecutableLines()) * 100,
-      );
+    $executableLines = $this->getExecutableLines();
+    $executedLines = $this->getExecutedLines();
+
+    if ($executableLines > 0) {
+      $this->coverage = floatval(($executedLines / $executableLines) * 100);
     } else {
       $this->coverage = 100.0;
     }

@@ -183,11 +183,25 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
     }
 
     $this->ccn = 1;
+    $start = $this->id;
     $end = $this->getEndTokenId();
     $tokens = $this->tokenStream()->tokens();
 
-    for ($i = $this->id; $i <= $end; $i++) {
+    $startLine = $tokens[$start]->getLine();
+    $endLine = $tokens[$end]->getLine();
+
+    // error_log(
+    //   "getCCN file=".
+    //   $this->tokenStream()->getFilename().
+    //   " function=".
+    //   $this->getName().
+    //   " start=$start startLine=$startLine end=$end endLine=$endLine",
+    // );
+
+    for ($i = $start; $i <= $end; $i++) {
       $token = $tokens->get($i);
+
+      //echo "token=".get_class($token)."[$i] ccn=".$this->ccn."\n";
 
       if ($token instanceof PHP_Token_If ||
           $token instanceof PHP_Token_Elseif ||
@@ -202,7 +216,7 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
           $token instanceof PHP_Token_Logical_Or ||
           $token instanceof PHP_Token_Question_Mark) {
         $this->ccn++;
-        break;
+        continue;
       }
 
     }

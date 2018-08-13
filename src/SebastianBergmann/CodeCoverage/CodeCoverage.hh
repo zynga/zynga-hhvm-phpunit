@@ -283,7 +283,7 @@ class CodeCoverage {
 
     $data = $this->driver->stop($testId);
 
-    $this->append($data);
+    //$this->append($data);
 
     $this->currentId = null;
 
@@ -304,6 +304,7 @@ class CodeCoverage {
       throw new RuntimeException();
     }
 
+    // @TODO:
     //$this->applyListsFilter($data);
     //$this->applyIgnoredLinesFilter($data);
     //$this->initializeFilesThatAreSeenTheFirstTime($data);
@@ -371,6 +372,7 @@ class CodeCoverage {
    */
   public function merge(CodeCoverage $that) {
 
+    // @TODO: is this merge function needed anymore, probably not.
     error_log('JEO: MERGE_DISABLED, as we made file data singleton');
     return;
     // $this->filter->setWhitelistedFiles(

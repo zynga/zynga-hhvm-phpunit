@@ -180,7 +180,7 @@ class Parser {
     $tmp->signature = $token->getSignature();
     $tmp->startLine = $token->getLine();
     $tmp->endLine = $token->getEndLine();
-    $tmp->ccn = $token->getCCN();
+    $tmp->setCcn($token->getCCN());
     $tmp->file = $codeFile->getFile();
 
     if ($this->t_class->count() == 0 &&

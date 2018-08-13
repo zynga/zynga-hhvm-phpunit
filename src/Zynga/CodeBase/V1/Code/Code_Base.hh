@@ -3,21 +3,45 @@
 namespace Zynga\CodeBase\V1\Code;
 
 abstract class Code_Base {
-  public string $file = '';
+  public string $file;
+  public float $coverage;
 
-  public float $coverage = -1.0;
-  public int $ccn = -1;
-  public float $crap = -1.0;
-  public string $link = '';
-  public int $startLine = -1;
-  public int $endLine = -1;
-  public string $keywords = '';
-  public string $docblock = '';
+  private int $_ccn;
+  private float $_crap;
 
-  abstract public function calculateCoverage(): void;
+  public string $link;
+  public int $startLine;
+  public int $endLine;
+  public string $keywords;
+  public string $docblock;
+
+  public function __construct() {
+    $this->file = '';
+    $this->coverage = -1.0;
+    $this->_ccn = -1;
+    $this->_crap = -1.0;
+    $this->link = '';
+    $this->startLine = -1;
+    $this->endLine = -1;
+    $this->keywords = '';
+    $this->docblock = '';
+  }
 
   abstract public function getExecutableLines(): int;
   abstract public function getExecutedLines(): int;
+  abstract public function calculateCoverage(): void;
+
+  public function getCcn(): int {
+    return $this->_ccn;
+  }
+
+  public function setCcn(int $ccn): void {
+    $this->_ccn = $ccn;
+  }
+
+  public function getCrap(): float {
+    return $this->_crap;
+  }
 
   /**
    * Calculates the Change Risk Anti-Patterns (CRAP) index for a unit of code
@@ -29,16 +53,32 @@ abstract class Code_Base {
    * @return string
    */
   protected function calculateCrap(): void {
-    if ($this->coverage == 0) {
-      $this->crap = (pow($this->ccn, 2) + $this->ccn);
+
+    if ($this->_crap != -1) {
+      return;
     }
 
-    if ($this->coverage >= 95) {
-      $this->crap = floatval($this->ccn);
+    $ccn = $this->getCcn();
+    $coverage = $this->coverage;
+
+    // For some reason this item's ccn has never been calculated or accounted
+    // for, ignore it.
+    if ($ccn == -1) {
+      return;
     }
 
-    $this->crap =
-      pow($this->ccn, 2) * pow(1 - $this->coverage / 100, 3) + $this->ccn;
+    if ($coverage == 0) {
+      $this->_crap = floatval(pow($ccn, 2) + $ccn);
+      return;
+    }
+
+    if ($coverage >= 95) {
+      $this->_crap = floatval($ccn);
+      return;
+    }
+
+    $this->_crap = pow($ccn, 2) * pow(1 - $coverage / 100, 3) + $ccn;
+
   }
 
 }

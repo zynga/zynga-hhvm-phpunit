@@ -158,4 +158,18 @@ class FunctionTest extends TestCase {
       $i['i']->methods['m']->signature,
     );
   }
+
+  public function testCcn(): void {
+
+    $filename = $this->getFilesDirectory().'source6.php';
+    $codeFile = FileFactory::get($filename);
+
+    $c = $codeFile->classes()->getAll();
+
+    $this->assertEquals(1, $c['testCCN']->methods['noBody']->getCcn());
+    $this->assertEquals(2, $c['testCCN']->methods['hasIf']->getCcn());
+    $this->assertEquals(8, $c['testCCN']->methods['ifOnIf']->getCcn());
+
+  }
+
 }

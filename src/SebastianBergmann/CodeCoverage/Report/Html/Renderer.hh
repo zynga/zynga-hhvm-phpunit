@@ -155,6 +155,7 @@ abstract class Renderer {
           : '',
       'classes_level' => $classesLevel,
       'classes_number' => $classesNumber,
+      'ccn' => $data->containsKey('ccn') ? $data['ccn'] : '',
     };
 
     return $template->render($templateVariables);

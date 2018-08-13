@@ -44,8 +44,8 @@ class Builder {
 
       $directoryEntry = $dirMap->get($directory);
 
-      echo "directory=$directory\n";
-      echo "  file=$fileName\n";
+      //echo "directory=$directory\n";
+      //echo "  file=$fileName\n";
 
       // we have a existing directory entry, feel free to add the file there.
       if ($directoryEntry instanceof Directory) {

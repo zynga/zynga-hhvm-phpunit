@@ -110,30 +110,36 @@ class File extends Renderer {
       '}}',
     );
 
-    $items =
-      $this->renderItemTemplate(
-        $template,
-        Map {
-          'name' => 'Total',
-          'numClasses' => $node->getNumClassesAndTraits(),
-          'numTestedClasses' => $node->getNumTestedClassesAndTraits(),
-          'numMethods' => $node->getNumMethods(),
-          'numTestedMethods' => $node->getNumTestedMethods(),
-          'linesExecutedPercent' => $node->getLineExecutedPercent(false),
-          'linesExecutedPercentAsString' => $node->getLineExecutedPercent(),
-          'numExecutedLines' => $node->getNumExecutedLines(),
-          'numExecutableLines' => $node->getNumExecutableLines(),
-          'testedMethodsPercent' => $node->getTestedMethodsPercent(false),
-          'testedMethodsPercentAsString' =>
-            $node->getTestedMethodsPercent(),
-          'testedClassesPercent' =>
-            $node->getTestedClassesAndTraitsPercent(false),
-          'testedClassesPercentAsString' =>
-            $node->getTestedClassesAndTraitsPercent(),
-          'crap' =>
-            '<abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr>',
-        },
-      );
+    $templateMap = Map {
+      'name' => 'Total',
+      'numClasses' => $node->getNumClassesAndTraits(),
+      'numTestedClasses' => $node->getNumTestedClassesAndTraits(),
+      'numMethods' => $node->getNumMethods(),
+      'numTestedMethods' => $node->getNumTestedMethods(),
+      'linesExecutedPercent' => $node->getLineExecutedPercent(false),
+      'linesExecutedPercentAsString' => $node->getLineExecutedPercent(),
+      'numExecutedLines' => $node->getNumExecutedLines(),
+      'numExecutableLines' => $node->getNumExecutableLines(),
+      'testedMethodsPercent' => $node->getTestedMethodsPercent(false),
+      'testedMethodsPercentAsString' => $node->getTestedMethodsPercent(),
+      'testedClassesPercent' => $node->getTestedClassesAndTraitsPercent(
+        false,
+      ),
+      'testedClassesPercentAsString' =>
+        $node->getTestedClassesAndTraitsPercent(),
+    };
+
+    $templateMap->set(
+      'crap',
+      '<abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr>',
+    );
+
+    $templateMap->set(
+      'ccn',
+      '<abbr title="Cyclomatic Complexity Number (CCN)">CCN</abbr>',
+    );
+
+    $items = $this->renderItemTemplate($template, $templateMap);
 
     $items .=
       $this->renderFunctionItems($node->getFunctions(), $methodItemTemplate);
@@ -174,8 +180,10 @@ class File extends Renderer {
 
     foreach ($items as $name => $classObj) {
 
-      $numMethods = $classObj->numMethods;
-      $numTestedMethods = $classObj->numTestedMethods;
+      $classObj->calculateCoverage();
+
+      $numMethods = $classObj->getNumMethods();
+      $numTestedMethods = $classObj->getNumTestedMethods();
 
       $buffer .= $this->renderItemTemplate(
         $template,
@@ -217,7 +225,8 @@ class File extends Renderer {
             1,
             true,
           ),
-          'crap' => $classObj->crap,
+          'ccn' => '',
+          'crap' => '',
         },
       );
 
@@ -267,10 +276,13 @@ class File extends Renderer {
     Code_Method $methodObj,
     string $indent = '',
   ): string {
+
     $numTestedItems =
       $methodObj->getExecutedLines() == $methodObj->getExecutableLines()
         ? 1
         : 0;
+
+    $methodObj->calculateCoverage();
 
     return $this->renderItemTemplate(
       $template,
@@ -302,7 +314,8 @@ class File extends Renderer {
           1,
           true,
         ),
-        'crap' => $methodObj->crap,
+        'ccn' => $methodObj->getCcn(),
+        'crap' => sprintf('%01.2f', $methodObj->getCrap()),
       },
     );
   }

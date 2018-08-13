@@ -111,20 +111,15 @@ class Stats {
       $this->numExecutableLines += $classObj->getExecutableLines();
       $this->numExecutedLines += $classObj->getExecutedLines();
 
-      $classObj->numMethods = 0;
-      $classObj->numTestedMethods = 0;
-
       $classObj->calculateCoverage();
 
       foreach ($classObj->methods as $methodObj) {
 
         $this->numMethods++;
-        $classObj->numMethods++;
 
         // this is a fully covered function
         if ($methodObj->coverage == 100) {
           $this->numTestedMethods++;
-          $classObj->numTestedMethods++;
         }
 
       }
@@ -141,20 +136,15 @@ class Stats {
       $this->numExecutableLines += $traitObj->getExecutableLines();
       $this->numExecutedLines += $traitObj->getExecutedLines();
 
-      $traitObj->numMethods = 0;
-      $traitObj->numTestedMethods = 0;
-
       $traitObj->calculateCoverage();
 
       foreach ($traitObj->methods as $methodObj) {
 
         $this->numMethods++;
-        $traitObj->numMethods++;
 
         // this is a fully covered function
         if ($methodObj->coverage == 100) {
           $this->numTestedMethods++;
-          $traitObj->numTestedMethods++;
         }
 
       }
