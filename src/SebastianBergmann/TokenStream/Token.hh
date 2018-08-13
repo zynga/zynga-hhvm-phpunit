@@ -5,26 +5,16 @@ namespace SebastianBergmann\TokenStream;
 use SebastianBergmann\TokenStream\Token\Stream;
 use SebastianBergmann\TokenStream\Token\Stream\CachingFactory;
 use SebastianBergmann\TokenStream\TokenInterface;
+use Zynga\CodeBase\V1\File;
 
 /**
  * A PHP token.
  */
 abstract class Token implements TokenInterface {
-  /**
-   * @var string
-   */
+
   protected string $text;
-
-  /**
-   * @var int
-   */
   protected int $line;
-
-  private int $tokenStreamId;
-
-  /**
-   * @var int
-   */
+  private File $_parent;
   protected int $id;
 
   /**
@@ -33,16 +23,15 @@ abstract class Token implements TokenInterface {
    * @param Stream $tokenStream
    * @param int              $id
    */
-  public function __construct(
-    string $text,
-    int $line,
-    int $tokenStreamId,
-    int $id,
-  ) {
+  public function __construct(string $text, int $line, File $parent, int $id) {
     $this->text = $text;
     $this->line = $line;
-    $this->tokenStreamId = $tokenStreamId;
+    $this->_parent = $parent;
     $this->id = $id;
+  }
+
+  public function parent(): File {
+    return $this->_parent;
   }
 
   public function getText(): string {
@@ -63,15 +52,6 @@ abstract class Token implements TokenInterface {
     return true;
   }
 
-  public function getTokenStreamId(): int {
-    return $this->tokenStreamId;
-  }
-
-  public function setTokenStreamId(int $tokenStreamId): bool {
-    $this->tokenStreamId = $tokenStreamId;
-    return true;
-  }
-
   public function getId(): int {
     return $this->id;
   }
@@ -89,7 +69,7 @@ abstract class Token implements TokenInterface {
   }
 
   public function tokenStream(): Stream {
-    return CachingFactory::getByStreamId($this->tokenStreamId);
+    return $this->_parent->stream();
   }
 
   public function getShortTokenName(): string {

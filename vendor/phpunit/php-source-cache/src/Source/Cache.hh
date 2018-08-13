@@ -3,6 +3,7 @@
 namespace Zynga\Source;
 
 use Zynga\Source\Cache\File as Zynga_Source_Cache_File;
+use \Exception;
 
 // JEO: As most of this functionality is disabled at this time turning off
 // coverage until we can properly intrument and explore whats going on with the
@@ -14,6 +15,8 @@ class Cache {
   private static Map<string, Zynga_Source_Cache_File> $_cache = Map {};
 
   public static function loadFile(string $fileName): Zynga_Source_Cache_File {
+
+    throw new Exception('This is deprecated');
 
     if (self::$_cache->containsKey($fileName)) {
       return self::$_cache[$fileName];

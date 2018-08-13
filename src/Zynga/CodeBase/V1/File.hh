@@ -6,6 +6,8 @@ use SebastianBergmann\CodeCoverage\Driver;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\ExecBlock;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\Logging as HHVM_Logging;
 use SebastianBergmann\TokenStream\Token\Stream;
+use SebastianBergmann\TokenStream\Token\Stream\Scanner as StreamScanner;
+use SebastianBergmann\TokenStream\Token\Stream\Parser as StreamParser;
 use SebastianBergmann\TokenStream\Token\Stream\CachingFactory;
 
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Class;
@@ -20,7 +22,11 @@ use SebastianBergmann\TokenStream\Tokens\PHP_Token_Variable;
 
 use Zynga\CodeBase\V1\File\Classes;
 use Zynga\CodeBase\V1\File\Functions;
+use Zynga\CodeBase\V1\File\Inclusions;
+use Zynga\CodeBase\V1\File\Interfaces;
 use Zynga\CodeBase\V1\File\LineExecutionState;
+use Zynga\CodeBase\V1\File\RawTokens;
+use Zynga\CodeBase\V1\File\Source;
 use Zynga\CodeBase\V1\File\Stats;
 use Zynga\CodeBase\V1\File\Traits;
 
@@ -34,8 +40,13 @@ class File {
 
   private ?Classes $_classes;
   private ?Functions $_functions;
+  private ?Inclusions $_inclusions;
+  private ?Interfaces $_interfaces;
   private ?LineExecutionState $_lineExecutionState;
+  private ?RawTokens $_rawTokens;
+  private ?Source $_source;
   private ?Stats $_stats;
+  private ?Stream $_stream;
   private ?Traits $_traits;
 
   public function __construct(string $file) {
@@ -48,14 +59,39 @@ class File {
 
     $this->_classes = null;
     $this->_functions = null;
+    $this->_inclusions = null;
+    $this->_interfaces = null;
     $this->_lineExecutionState = null;
+    $this->_rawTokens = null;
+    $this->_source = null;
     $this->_stats = null;
+    $this->_stream = null;
     $this->_traits = null;
 
   }
 
   public function getFile(): string {
     return $this->_file;
+  }
+
+  public function source(): Source {
+    if ($this->_source instanceof Source) {
+      return $this->_source;
+    }
+
+    $this->_source = new Source($this);
+    return $this->_source;
+
+  }
+
+  public function rawTokens(): RawTokens {
+    if ($this->_rawTokens instanceof RawTokens) {
+      return $this->_rawTokens;
+    }
+
+    $this->_rawTokens = new RawTokens($this);
+    return $this->_rawTokens;
+
   }
 
   public function stats(): Stats {
@@ -70,14 +106,20 @@ class File {
   }
 
   public function lineExecutionState(): LineExecutionState {
+
+    // We can only call this -after- stream has already populated.
     if ($this->_lineExecutionState instanceof LineExecutionState) {
       return $this->_lineExecutionState;
     }
+
     $this->_lineExecutionState = new LineExecutionState($this);
+
     return $this->_lineExecutionState;
+
   }
 
   public function functions(): Functions {
+
     if ($this->_functions instanceof Functions) {
       return $this->_functions;
     }
@@ -89,19 +131,51 @@ class File {
   }
 
   public function classes(): Classes {
+
     if ($this->_classes instanceof Classes) {
       return $this->_classes;
     }
+
     $this->_classes = new Classes($this);
+
     return $this->_classes;
+
   }
 
   public function traits(): Traits {
+
     if ($this->_traits instanceof Traits) {
       return $this->_traits;
     }
+
     $this->_traits = new Traits($this);
+
     return $this->_traits;
+
+  }
+
+  public function interfaces(): Interfaces {
+
+    if ($this->_interfaces instanceof Interfaces) {
+      return $this->_interfaces;
+    }
+
+    $this->_interfaces = new Interfaces($this);
+
+    return $this->_interfaces;
+
+  }
+
+  public function inclusions(): Inclusions {
+
+    if ($this->_inclusions instanceof Inclusions) {
+      return $this->_inclusions;
+    }
+
+    $this->_inclusions = new Inclusions($this);
+
+    return $this->_inclusions;
+
   }
 
   public function getLineToTokens(int $lineNo): Vector<TokenInterface> {
@@ -154,7 +228,23 @@ class File {
   }
 
   public function stream(): Stream {
-    return CachingFactory::get($this->_file);
+
+    if ($this->_stream instanceof Stream) {
+      return $this->_stream;
+    }
+
+    $stream = new Stream($this);
+
+    $scanner = new StreamScanner();
+    $scanner->scan($this, $stream);
+    $this->_stream = $stream;
+
+    $parser = new StreamParser();
+    $parser->parse($this, $stream);
+
+    $this->_stream = $stream;
+    return $this->_stream;
+
   }
 
   private function isTokenExecutable(TokenInterface $token): bool {

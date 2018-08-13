@@ -50,7 +50,8 @@ class File extends AbstractNode {
   public function stream(): Stream {
     $fileName = $this->getPath();
     if (is_string($fileName)) {
-      return StreamCachingFactory::get($fileName);
+      $processedFile = FileFactory::get($fileName);
+      return $processedFile->stream();
     }
     throw new Exception('stream() called with invalid fileName set');
   }

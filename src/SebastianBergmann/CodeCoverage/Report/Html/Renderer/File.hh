@@ -19,7 +19,6 @@ use SebastianBergmann\TextTemplate\TemplateFactory;
 use SebastianBergmann\TextTemplate\Template;
 
 use SebastianBergmann\TokenStream\Token\StreamInterfaceStructure;
-use Zynga\Source\Cache as Zynga_Source_Cache;
 
 use Zynga\CodeBase\V1\FileFactory;
 use Zynga\CodeBase\V1\Code\Code_Class;
@@ -332,7 +331,6 @@ class File extends Renderer {
 
     $coverageData = $node->getCoverageData();
 
-    // $node->getTestData(); -- JEO need to wire in the test data.
     $codeLines = $this->loadFile($fileName);
 
     $processedFile = FileFactory::get($fileName);
@@ -512,12 +510,10 @@ class File extends Renderer {
     $lineTemplate =
       TemplateFactory::get($this->templatePath.'code_line.html', '{{', '}}');
 
-    $buffer = Zynga_Source_Cache::getSource($file);
-    $tokens = Zynga_Source_Cache::getTokens($file);
+    $processedFile = FileFactory::get($file);
 
-    if (!is_array($tokens)) {
-      return Vector {};
-    }
+    $buffer = $processedFile->source()->get();
+    $tokens = $processedFile->rawTokens()->get();
 
     $result = new SourceFileLineBuffer();
 
@@ -526,6 +522,7 @@ class File extends Renderer {
     $fileEndsWithNewLine = substr($buffer, -1) == "\n";
 
     foreach ($tokens as $j => $token) {
+
       if (is_string($token)) {
         if ($token === '"' && $tokens[$j - 1] !== '\\') {
           $result->appendTo(
@@ -555,7 +552,8 @@ class File extends Renderer {
         continue;
       }
 
-      list($token, $value) = $token;
+      $tokenId = $token->getTokenId();
+      $value = $token->getText();
 
       $value = str_replace(
         ["\t", ' '],
@@ -575,7 +573,7 @@ class File extends Renderer {
             if ($stringFlag) {
               $colour = 'string';
             } else {
-              switch ($token) {
+              switch ($tokenId) {
 
                 case T_VARIABLE:
                   $colour = 'variable';

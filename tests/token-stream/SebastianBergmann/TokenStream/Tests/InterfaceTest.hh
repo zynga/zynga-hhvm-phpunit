@@ -16,6 +16,7 @@ use SebastianBergmann\TokenStream\Token\Stream;
 use SebastianBergmann\TokenStream\Token\Stream\CachingFactory;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Class;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Interface;
+use Zynga\CodeBase\V1\FileFactory;
 
 use \Exception;
 
@@ -43,9 +44,11 @@ class InterfaceTest extends TestCase {
   ): (PHP_Token_Class, Vector<PHP_Token_Interface>) {
 
     $filename = $this->getFilesDirectory().'source4.php';
-    $ts = CachingFactory::get($filename);
 
-    $tokens = $ts->tokens();
+    $codeFile = FileFactory::get($filename);
+    $tokenStream = $codeFile->stream();
+
+    $tokens = $tokenStream->tokens();
 
     $class = null;
     $interfaces = Vector {};
@@ -106,7 +109,10 @@ class InterfaceTest extends TestCase {
 
   public function testGetPackageNamespace(): void {
     $filename = $this->getFilesDirectory().'classInNamespace.php';
-    $tokenStream = CachingFactory::get($filename);
+
+    $codeFile = FileFactory::get($filename);
+    $tokenStream = $codeFile->stream();
+
     $tokens = $tokenStream->tokens();
     foreach ($tokens as $token) {
       if ($token instanceof PHP_Token_Interface) {
@@ -136,7 +142,10 @@ class InterfaceTest extends TestCase {
   public function doGetPackageNamespaceForFileWithMultipleNamespaces(
     string $filepath,
   ): void {
-    $tokenStream = CachingFactory::get($filepath);
+
+    $codeFile = FileFactory::get($filepath);
+    $tokenStream = $codeFile->stream();
+
     $firstClassFound = false;
 
     $tokens = $tokenStream->tokens();
@@ -174,7 +183,10 @@ class InterfaceTest extends TestCase {
   public function testGetPackageNamespaceWhenExtentingFromNamespaceClass(
   ): void {
     $filename = $this->getFilesDirectory().'classExtendsNamespacedClass.php';
-    $tokenStream = CachingFactory::get($filename);
+
+    $codeFile = FileFactory::get($filename);
+    $tokenStream = $codeFile->stream();
+
     $firstClassFound = false;
     $tokens = $tokenStream->tokens();
     foreach ($tokens as $token) {

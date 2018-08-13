@@ -39,10 +39,11 @@ class FunctionTest extends TestCase {
 
   protected function getTestFunctions(): Vector<PHP_Token_Function> {
     $filename = $this->getFilesDirectory().'source.php';
-    $ts = CachingFactory::get($filename);
+    $codeFile = FileFactory::get($filename);
+    $tokenStream = $codeFile->stream();
     $functions = Vector {};
 
-    $tokens = $ts->tokens();
+    $tokens = $tokenStream->tokens();
 
     foreach ($tokens as $token) {
       if ($token instanceof PHP_Token_Function) {
@@ -131,10 +132,9 @@ class FunctionTest extends TestCase {
 
     $filename = $this->getFilesDirectory().'source5.php';
     $codeFile = FileFactory::get($filename);
-    $ts = CachingFactory::get($filename);
     $f = $codeFile->functions()->getAll();
     $c = $codeFile->classes()->getAll();
-    $i = $ts->getInterfaces();
+    $i = $codeFile->interfaces()->getAll();
 
     $this->assertEquals(
       'foo($a, array $b, array $c = array())',

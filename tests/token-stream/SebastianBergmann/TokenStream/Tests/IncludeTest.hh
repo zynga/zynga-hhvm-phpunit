@@ -14,7 +14,8 @@ namespace SebastianBergmann\TokenStream\Tests;
 use Zynga\Framework\Testing\TestCase\V2\Base as TestCase;
 use Zynga\Framework\Environment\CodePath\V1\CodePath;
 use SebastianBergmann\TokenStream\Token\Stream;
-use SebastianBergmann\TokenStream\Token\Stream\CachingFactory;
+use Zynga\CodeBase\V1\FileFactory;
+use Zynga\CodeBase\V1\File;
 
 class PHP_Token_IncludeTest extends TestCase {
 
@@ -36,16 +37,16 @@ class PHP_Token_IncludeTest extends TestCase {
       DIRECTORY_SEPARATOR;
   }
 
-  protected function getTestStream(): Stream {
+  protected function getTestFile(): File {
     $filename = $this->getFilesDirectory().'source3.php';
-    return CachingFactory::get($filename);
+    return FileFactory::get($filename);
   }
 
   public function testGetIncludes(): void {
 
-    $ts = $this->getTestStream();
+    $codeFile = $this->getTestFile();
 
-    $includes = $ts->getIncludes();
+    $includes = $codeFile->inclusions()->getAll();
 
     if ($includes instanceof Vector) {
       $this->assertSame(
@@ -58,9 +59,9 @@ class PHP_Token_IncludeTest extends TestCase {
 
   public function testGetIncludesCategorized(): void {
 
-    $ts = $this->getTestStream();
+    $codeFile = $this->getTestFile();
 
-    $includes = $ts->getIncludes(true);
+    $includes = $codeFile->inclusions()->getAllAsMap();
 
     if ($includes instanceof Map) {
 
@@ -88,9 +89,9 @@ class PHP_Token_IncludeTest extends TestCase {
 
   public function testGetIncludesCategory(): void {
 
-    $ts = $this->getTestStream();
+    $codeFile = $this->getTestFile();
 
-    $includes = $ts->getIncludes(true, 'require_once');
+    $includes = $codeFile->inclusions()->getSpecificType('require_once');
 
     if ($includes instanceof Vector) {
       $this->assertSame(['test4.php'], $includes->toArray());

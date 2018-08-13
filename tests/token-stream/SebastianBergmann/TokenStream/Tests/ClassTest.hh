@@ -28,9 +28,10 @@ class ClassTest extends TestCase {
     parent::doSetUpBeforeClass();
 
     $filename = $this->getFilesDirectory().'source2.php';
-    $ts = CachingFactory::get($filename);
+    $codeFile = FileFactory::get($filename);
+    $tokenStream = $codeFile->stream();
 
-    $tokens = $ts->tokens();
+    $tokens = $tokenStream->tokens();
 
     $classToken = null;
     $functionToken = null;
@@ -116,8 +117,9 @@ class ClassTest extends TestCase {
 
   public function testIssue19(): void {
     $filename = $this->getFilesDirectory().'issue19.hh';
-    $ts = CachingFactory::get($filename);
-    foreach ($ts->tokens() as $token) {
+    $codeFile = FileFactory::get($filename);
+    $tokenStream = $codeFile->stream();
+    foreach ($tokenStream->tokens() as $token) {
       if ($token instanceof PHP_Token_Class) {
         $this->assertFalse($token->hasInterfaces());
       }

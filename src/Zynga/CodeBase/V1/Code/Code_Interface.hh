@@ -1,11 +1,11 @@
 <?hh // strict
 
-namespace SebastianBergmann\TokenStream\Token;
+namespace Zynga\CodeBase\V1\Code;
 
 use SebastianBergmann\TokenStream\Token\StreamMethodStructure;
 use Zynga\CodeBase\V1\Code\Code_Method;
 
-class StreamInterfaceStructure {
+class Code_Interface {
   public Map<string, Code_Method> $methods = Map {};
   public mixed $parent = false;
   public mixed $interfaces = false;
