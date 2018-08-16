@@ -33,7 +33,7 @@ class Stats {
     $this->_parent = $parent;
   }
 
-  public function getNumExecutedableLines(bool $recalculate = false): int {
+  public function getNumExecutableLines(bool $recalculate = false): int {
     $this->calculateStatistics($recalculate);
     return $this->numExecutableLines;
   }
@@ -108,12 +108,10 @@ class Stats {
     foreach ($this->_parent->classes()->getAll() as $className => $classObj) {
 
       $this->numClasses++;
-      $this->numExecutableLines += $classObj->getExecutableLines();
-      $this->numExecutedLines += $classObj->getExecutedLines();
-
-      $classObj->calculateCoverage();
 
       foreach ($classObj->methods as $methodObj) {
+
+        $methodObj->calculateCoverage();
 
         $this->numMethods++;
 
@@ -123,6 +121,11 @@ class Stats {
         }
 
       }
+
+      $classObj->calculateCoverage();
+
+      $this->numExecutableLines += $classObj->getExecutableLines();
+      $this->numExecutedLines += $classObj->getExecutedLines();
 
       if ($classObj->coverage == 100) {
         $this->numTestedClasses++;
@@ -133,12 +136,10 @@ class Stats {
     foreach ($this->_parent->traits()->getAll() as $traitName => $traitObj) {
 
       $this->numTraits++;
-      $this->numExecutableLines += $traitObj->getExecutableLines();
-      $this->numExecutedLines += $traitObj->getExecutedLines();
-
-      $traitObj->calculateCoverage();
 
       foreach ($traitObj->methods as $methodObj) {
+
+        $methodObj->calculateCoverage();
 
         $this->numMethods++;
 
@@ -148,6 +149,11 @@ class Stats {
         }
 
       }
+
+      $traitObj->calculateCoverage();
+
+      $this->numExecutableLines += $traitObj->getExecutableLines();
+      $this->numExecutedLines += $traitObj->getExecutedLines();
 
       if ($traitObj->coverage == 100) {
         $this->numTestedClasses++;

@@ -133,7 +133,7 @@ class File extends AbstractNode {
    */
   public function getNumExecutableLines(bool $recalculate = false): int {
     $processedFile = $this->processedFile();
-    return $processedFile->stats()->getNumExecutedLines($recalculate);
+    return $processedFile->stats()->getNumExecutableLines($recalculate);
   }
 
   /**

@@ -12,6 +12,7 @@ Changes from vanilla phpunit here:
 1. Made the code view use solarized dark as the default for viewing code.
 1. Extracted more of the html from the render to the template structure.
 1. Collapsed all of the HHVM driver code to be within the "HHVM" driver, in preparation for supporting the newer debuggers available.
+1. Changed ordering of classes, functions, lines to be consistent throughout the UI. 
 
 # TODO  
 1. SebastianBergmann\TokenStream\Token\StreamMethodStructure->methodSignature isn't working correctly, needs fixing. Might be only multi-line function signatures that are broken - TBD.
