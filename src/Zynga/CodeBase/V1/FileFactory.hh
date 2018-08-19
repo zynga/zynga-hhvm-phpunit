@@ -12,6 +12,13 @@ class FileFactory {
     self::$files->clear();
   }
 
+  public static function isFileRegistered(string $filename): bool {
+    if (self::$files->containsKey($filename) === true) {
+      return true;
+    }
+    return false;
+  }
+
   public static function get(string $filename): File {
 
     $file = self::$files->get($filename);

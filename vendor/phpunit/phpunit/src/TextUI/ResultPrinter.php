@@ -538,7 +538,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer implements PHPUn
         if ($this->debug) {
             $this->write(
                 sprintf(
-                    "\nStarting test '%s'.\n",
+                    "\n" . date('r') . " - Starting test '%s'.\n",
                     PHPUnit_Util_Test::describe($test)
                 )
             );

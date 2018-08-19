@@ -108,10 +108,9 @@ class Scanner {
         if ($lastNonWhitespaceTokenWasDoubleColon && $name == 'CLASS') {
           $name = 'CLASS_NAME_CONSTANT';
         } else if ($name == 'USE' &&
-                   array_key_exists($i + 2, $tokens) &&
-                   is_array($tokens[$i + 2]) &&
+                   $tokens->containsKey($i + 2) &&
                    $tokens[$i + 2]->getTokenId() == T_FUNCTION) {
-          $name = 'USE_FUNCTION';
+          $name = 'Use_Function';
           $skip = 2;
         }
 

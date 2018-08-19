@@ -117,6 +117,7 @@ abstract class AbstractNode implements \Countable {
    */
   public function getPathAsArray(): array<AbstractNode> {
     if ($this->pathArray === null) {
+
       if ($this->parent === null) {
         $this->pathArray = [];
       } else {
@@ -124,6 +125,7 @@ abstract class AbstractNode implements \Countable {
       }
 
       $this->pathArray[] = $this;
+
     }
 
     return $this->pathArray;
@@ -190,17 +192,6 @@ abstract class AbstractNode implements \Countable {
     );
   }
 
-  public function getRecursiveTestedClassesAndTraitsPercent(
-    bool $asString = true,
-    bool $recalculate = false,
-  ): mixed {
-    return Util::percent(
-      $this->getRecursiveNumTestedClassesAndTraits($recalculate),
-      $this->getRecursiveNumClassesAndTraits($recalculate),
-      $asString,
-    );
-  }
-
   /**
    * Returns the percentage of methods that has been tested.
    *
@@ -215,17 +206,6 @@ abstract class AbstractNode implements \Countable {
     return Util::percent(
       $this->getNumTestedMethods($recalculate),
       $this->getNumMethods($recalculate),
-      $asString,
-    );
-  }
-
-  public function getRecursiveTestedMethodsPercent(
-    bool $asString = true,
-    bool $recalculate = false,
-  ): mixed {
-    return Util::percent(
-      $this->getRecursiveNumTestedMethods($recalculate),
-      $this->getRecursiveNumMethods($recalculate),
       $asString,
     );
   }
@@ -248,17 +228,6 @@ abstract class AbstractNode implements \Countable {
     );
   }
 
-  public function getRecursiveLineExecutedPercent(
-    bool $asString = true,
-    bool $recalculate = false,
-  ): mixed {
-    return Util::percent(
-      $this->getRecursiveNumExecutedLines($recalculate),
-      $this->getRecursiveNumExecutableLines($recalculate),
-      $asString,
-    );
-  }
-
   /**
    * Returns the number of classes and traits.
    *
@@ -267,26 +236,6 @@ abstract class AbstractNode implements \Countable {
   public function getNumClassesAndTraits(bool $recalculate = false): int {
     return
       $this->getNumClasses($recalculate) + $this->getNumTraits($recalculate);
-  }
-
-  public function getRecursiveNumClassesAndTraits(
-    bool $recalculate = false,
-  ): int {
-    $total = 0;
-
-    $total += $this->getNumClasses($recalculate);
-    $total += $this->getNumTraits(false);
-
-    if ($this instanceof Directory) {
-      foreach ($this->getDirectories() as $childDirectory) {
-        $total +=
-          $childDirectory->getRecursiveNumClassesAndTraits($recalculate);
-      }
-    }
-
-    // echo " grandTotal=$total\n";
-    return $total;
-
   }
 
   /**
@@ -300,27 +249,6 @@ abstract class AbstractNode implements \Countable {
     return
       $this->getNumTestedClasses($recalculate) +
       $this->getNumTestedTraits($recalculate);
-  }
-
-  public function getRecursiveNumTestedClassesAndTraits(
-    bool $recalculate = false,
-  ): int {
-    $total = 0;
-
-    $total += $this->getNumTestedClassesAndTraits($recalculate);
-
-    if ($this instanceof Directory) {
-
-      foreach ($this->getDirectories() as $childDirectory) {
-        $total += $childDirectory->getRecursiveNumTestedClassesAndTraits(
-          $recalculate,
-        );
-      }
-
-    }
-
-    // echo " grandTotal=$total\n";
-    return $total;
   }
 
   /**
@@ -376,22 +304,6 @@ abstract class AbstractNode implements \Countable {
     bool $recalculate = false,
   ): int;
 
-  public function getRecursiveNumExecutableLines(
-    bool $recalculate = false,
-  ): int {
-    $total = 0;
-
-    $total += $this->getNumExecutableLines($recalculate);
-
-    if ($this instanceof Directory) {
-      foreach ($this->getDirectories() as $childDirectory) {
-        $total += $childDirectory->getNumExecutableLines($recalculate);
-      }
-    }
-
-    return $total;
-  }
-
   /**
    * Returns the number of executed lines.
    *
@@ -400,21 +312,6 @@ abstract class AbstractNode implements \Countable {
   abstract public function getNumExecutedLines(
     bool $recalculate = false,
   ): int;
-  public function getRecursiveNumExecutedLines(
-    bool $recalculate = false,
-  ): int {
-    $total = 0;
-
-    $total += $this->getNumExecutedLines($recalculate);
-
-    if ($this instanceof Directory) {
-      foreach ($this->getDirectories() as $childDirectory) {
-        $total += $childDirectory->getNumExecutedLines($recalculate);
-      }
-    }
-
-    return $total;
-  }
 
   /**
    * Returns the number of classes.
@@ -453,20 +350,6 @@ abstract class AbstractNode implements \Countable {
    */
   abstract public function getNumMethods(bool $recalculate = false): int;
 
-  public function getRecursiveNumMethods(bool $recalculate = false): int {
-    $total = 0;
-
-    $total += $this->getNumMethods($recalculate);
-
-    if ($this instanceof Directory) {
-      foreach ($this->getDirectories() as $childDirectory) {
-        $total += $childDirectory->getNumMethods($recalculate);
-      }
-    }
-
-    return $total;
-  }
-
   /**
    * Returns the number of tested methods.
    *
@@ -475,21 +358,6 @@ abstract class AbstractNode implements \Countable {
   abstract public function getNumTestedMethods(
     bool $recalculate = false,
   ): int;
-  public function getRecursiveNumTestedMethods(
-    bool $recalculate = false,
-  ): int {
-    $total = 0;
-
-    $total += $this->getNumTestedMethods($recalculate);
-
-    if ($this instanceof Directory) {
-      foreach ($this->getDirectories() as $childDirectory) {
-        $total += $childDirectory->getNumTestedMethods($recalculate);
-      }
-    }
-
-    return $total;
-  }
 
   /**
    * Returns the number of functions.

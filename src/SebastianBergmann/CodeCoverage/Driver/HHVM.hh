@@ -15,8 +15,9 @@ use SebastianBergmann\CodeCoverage\Driver;
 use SebastianBergmann\CodeCoverage\Driver\Xdebug;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\LineStack;
 use SebastianBergmann\CodeCoverage\Driver\HHVM\Logging as HHVM_Logging;
-use Zynga\CodeBase\V1\FileFactory;
 use SebastianBergmann\TokenStream\Stream\CachingFactory;
+use Zynga\CodeBase\V1\FileFactory;
+use Zynga\CodeBase\V1\File\ExecutableRange;
 
 use \RuntimeException;
 
@@ -64,6 +65,21 @@ class HHVM {
 
     foreach ($data as $fileName => $execStatuses) {
 
+      // --
+      // JEO: Optimization, som eof the files that get pulled in through xdebug
+      // are not part of the source base under test.
+      //
+      // We purposely filter these out as we don't want to read/process them.
+      //
+      // --
+      if (FileFactory::isFileRegistered($fileName) === false) {
+        // --
+        // If we need to debug what files we skip for coverage analysis:
+        // echo "file=$fileName is not registered for coverage control.\n";
+        // --
+        continue;
+      }
+
       $processedFile = FileFactory::get($fileName);
 
       //echo "caputuring fileName=$fileName\n";
@@ -73,6 +89,27 @@ class HHVM {
           //echo "captured $lineNo : executed\n";
           $processedFile->lineExecutionState()
             ->set($lineNo, Driver::LINE_EXECUTED);
+
+          if ($processedFile->lineExecutionState()->isLineWithinExecutableRange(
+                $lineNo,
+              ) ===
+              true) {
+            $executableRange =
+              $processedFile->lineExecutionState()
+                ->getExecutableRange($lineNo);
+
+            if ($executableRange instanceof ExecutableRange) {
+              for (
+                $innerRange = $executableRange->getStart();
+                $innerRange <= $executableRange->getEnd();
+                $innerRange++
+              ) {
+                $processedFile->lineExecutionState()
+                  ->set($innerRange, Driver::LINE_EXECUTED);
+              }
+            }
+
+          }
         } else {
           $processedFile->lineExecutionState()->set($lineNo, $lineState);
         }

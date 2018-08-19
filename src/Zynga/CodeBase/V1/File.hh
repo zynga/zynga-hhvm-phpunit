@@ -11,14 +11,14 @@ use SebastianBergmann\TokenStream\Token\Stream\Parser as StreamParser;
 use SebastianBergmann\TokenStream\Token\Stream\CachingFactory;
 
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Class;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Close_Curly;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Comment;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Function;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Return;
-use SebastianBergmann\TokenStream\Tokens\PHP_Token_Close_Curly;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Throw;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Variable;
 
 use SebastianBergmann\TokenStream\TokenInterface;
-
-use SebastianBergmann\TokenStream\Tokens\PHP_Token_Variable;
 
 use Zynga\CodeBase\V1\File\Classes;
 use Zynga\CodeBase\V1\File\Functions;
@@ -247,14 +247,27 @@ class File {
 
   }
 
-  private function isTokenExecutable(TokenInterface $token): bool {
+  private function isTokenExecutable(
+    TokenInterface $token,
+    int $currentLine,
+  ): (bool, int, string) {
     if ($token instanceof PHP_Token_Return) {
-      return true;
+      $skipAmount = 0; // JEO: @TODO: I think there might be a issue for multi line return.
+      return tuple(true, $skipAmount, 'return');
     }
     if ($token instanceof PHP_Token_Variable) {
-      return true;
+      $skipAmount = 0;
+      return tuple(true, $skipAmount, 'variable');
     }
-    return false;
+
+    if ($token instanceof PHP_Token_Throw) {
+      $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
+      return tuple(true, $skipAmount, 'throw');
+    }
+
+    $skipAmount = 0;
+    return tuple(false, $skipAmount, '');
+
   }
 
   private function isTokenComment(TokenInterface $token): bool {
@@ -264,7 +277,7 @@ class File {
   private function determineLineExecutableForeachLine(
     Vector<TokenInterface> $lineStack,
     int $currentLine,
-  ): (bool, int) {
+  ): (bool, int, string) {
 
     $isExecutable = false;
 
@@ -272,18 +285,20 @@ class File {
 
       if ($token instanceof PHP_Token_Class) {
         $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
-        return tuple(false, $skipAmount);
+        return tuple(false, $skipAmount, 'class');
       }
 
       if ($token instanceof PHP_Token_Function) {
         $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
-        return tuple(false, $skipAmount);
+        return tuple(false, $skipAmount, 'function');
       }
 
-      if ($this->isTokenExecutable($token) === true) {
+      list($isExecutable, $skipAmount, $reason) =
+        $this->isTokenExecutable($token, $currentLine);
+
+      if ($isExecutable === true) {
         // we found a executable token, stop working so hard
-        $isExecutable = true;
-        break;
+        return tuple($isExecutable, $skipAmount, $reason);
       }
 
       if ($this->isTokenComment($token) === true) {
@@ -293,7 +308,7 @@ class File {
 
     }
 
-    return tuple($isExecutable, 0);
+    return tuple($isExecutable, 0, '');
 
   }
 
@@ -306,6 +321,7 @@ class File {
 
     $isExecutable = false;
     $skipAmount = 0;
+    $reason = '';
 
     if ($lineStack->count() == 0) {
       // empty stack therefor noop
@@ -317,15 +333,27 @@ class File {
       }
     } else {
       // Loop across the line looking for more complex patterns.
-      list($isExecutable, $skipAmount) =
+      list($isExecutable, $skipAmount, $reason) =
         $this->determineLineExecutableForeachLine($lineStack, $currentLine);
     }
 
     // mark the line up with the state.
     if ($isExecutable === true) {
       // echo " lineIsExecutable=".$currentLine."\n";
-      $this->lineExecutionState()
-        ->set($currentLine, Driver::LINE_NOT_EXECUTED);
+      if ($skipAmount > 0) {
+        for ($s = 0; $s < $skipAmount; $s++) {
+          $this->lineExecutionState()
+            ->set(($currentLine + $s), Driver::LINE_NOT_EXECUTED);
+        }
+        $this->lineExecutionState()->addExecutableRange(
+          $reason,
+          $currentLine,
+          $currentLine + $skipAmount,
+        );
+      } else {
+        $this->lineExecutionState()
+          ->set($currentLine, Driver::LINE_NOT_EXECUTED);
+      }
     } else {
       $this->lineExecutionState()
         ->set($currentLine, Driver::LINE_NOT_EXECUTABLE);

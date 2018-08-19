@@ -350,13 +350,15 @@ class Dashboard extends Renderer {
     return $result;
   }
 
-  protected function getActiveBreadcrumb(AbstractNode $node): string {
-    return sprintf(
-      '        <li><a href="index.html">%s</a></li>'.
-      "\n".
-      '        <li class="active">(Dashboard)</li>'.
-      "\n",
-      $node->getName(),
-    );
-  }
+  /*
+   protected function getActiveBreadcrumb(AbstractNode $node): string {
+   return sprintf(
+   '        <li><a href="index.html">%s</a></li>'.
+   "\n".
+   '        <li class="active">(Dashboard)</li>'.
+   "\n",
+   $node->getName(),
+   );
+   }
+   */
 }

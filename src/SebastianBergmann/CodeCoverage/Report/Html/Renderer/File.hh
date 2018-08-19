@@ -19,10 +19,14 @@ use SebastianBergmann\TextTemplate\TemplateFactory;
 use SebastianBergmann\TextTemplate\Template;
 
 use SebastianBergmann\TokenStream\Token\StreamInterfaceStructure;
+use
+  SebastianBergmann\CodeCoverage\Report\Html\Renderer\SourcreFileLineBuffer
+;
 
 use Zynga\CodeBase\V1\FileFactory;
 use Zynga\CodeBase\V1\Code\Code_Class;
 use Zynga\CodeBase\V1\Code\Code_Method;
+use SebastianBergmann\CodeCoverage\Node\Directory as DirectoryNode;
 
 /**
  * Renders a file node.
@@ -48,6 +52,7 @@ class File extends Renderer {
     string $date,
     int $lowUpperBound,
     int $highLowerBound,
+    DirectoryNode $root,
   ) {
     parent::__construct(
       $templatePath,
@@ -55,6 +60,7 @@ class File extends Renderer {
       $date,
       $lowUpperBound,
       $highLowerBound,
+      $root,
     );
 
     $this->htmlspecialcharsFlags = 0;
@@ -523,6 +529,12 @@ class File extends Renderer {
     $lineTemplate =
       TemplateFactory::get($this->templatePath.'code_line.html', '{{', '}}');
 
+    if (FileFactory::isFileRegistered($file) !== true) {
+      error_log(
+        "WARNING: file=$file was not registered, having to load at report time\n",
+      );
+    }
+
     $processedFile = FileFactory::get($file);
 
     $buffer = $processedFile->source()->get();
@@ -708,41 +720,6 @@ class File extends Renderer {
     }
 
     return $result->toVector();
-
-  }
-}
-
-class SourceFileLineBuffer {
-  private Map<int, string> $_lines = Map {};
-
-  public function set(int $lineNo, string $value): void {
-    $this->_lines->set($lineNo, $value);
-  }
-
-  public function appendTo(int $lineNo, string $value): void {
-
-    $lineBuffer = $this->_lines->get($lineNo);
-
-    if ($lineBuffer === null) {
-      $lineBuffer = '';
-    }
-
-    $lineBuffer .= $value;
-
-    $this->_lines->set($lineNo, $lineBuffer);
-  }
-
-  public function toVector(): Vector<string> {
-
-    ksort($this->_lines);
-
-    $vecResult = Vector {};
-
-    foreach ($this->_lines as $lineNo => $line) {
-      $vecResult->add($line);
-    }
-
-    return $vecResult;
 
   }
 }

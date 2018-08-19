@@ -2,16 +2,42 @@
 
 namespace Zynga\CodeBase\V1\File;
 
-use Zynga\CodeBase\V1\File;
 use SebastianBergmann\CodeCoverage\Driver;
+use Zynga\CodeBase\V1\File;
+use Zynga\CodeBase\V1\File\ExecutableRange;
 
 class LineExecutionState {
   private File $_parent;
   private Map<int, int> $_lineExecutionState;
+  private Map<int, ExecutableRange> $_executableRanges;
 
   public function __construct(File $parent) {
     $this->_parent = $parent;
     $this->_lineExecutionState = Map {};
+    $this->_executableRanges = Map {};
+  }
+
+  public function isLineWithinExecutableRange(int $lineNo): bool {
+    if ($this->_executableRanges->containsKey($lineNo) === true) {
+      return true;
+    }
+    return false;
+  }
+
+  public function getExecutableRange(int $lineNo): ?ExecutableRange {
+    return $this->_executableRanges->get($lineNo);
+  }
+
+  public function addExecutableRange(
+    string $reason,
+    int $startLine,
+    int $endLine,
+  ): bool {
+    $executableRange = new ExecutableRange($reason, $startLine, $endLine);
+    for ($lineNo = $startLine; $lineNo <= $endLine; $lineNo++) {
+      $this->_executableRanges->set($lineNo, $executableRange);
+    }
+    return true;
   }
 
   public function get(int $lineNo): ?int {

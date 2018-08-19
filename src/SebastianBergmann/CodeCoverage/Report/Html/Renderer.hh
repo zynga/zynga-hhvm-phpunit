@@ -53,6 +53,8 @@ abstract class Renderer {
    */
   protected string $version;
 
+  protected DirectoryNode $root;
+
   /**
    * Constructor.
    *
@@ -68,6 +70,7 @@ abstract class Renderer {
     string $date,
     int $lowUpperBound,
     int $highLowerBound,
+    DirectoryNode $root,
   ) {
     $this->templatePath = $templatePath;
     $this->generator = $generator;
@@ -75,6 +78,7 @@ abstract class Renderer {
     $this->lowUpperBound = $lowUpperBound;
     $this->highLowerBound = $highLowerBound;
     $this->version = Version::get();
+    $this->root = $root;
   }
 
   /**
@@ -184,64 +188,116 @@ abstract class Renderer {
   }
 
   protected function getBreadcrumbs(AbstractNode $node): string {
-    $breadcrumbs = '';
-    $path = $node->getPathAsArray();
-    $pathToRoot = [];
-    $max = count($path);
+
+    $longFormPath = $node->getPath();
+
+    $dirName = '';
+    $fileName = '';
+
+    $rootPath = $this->root->getPath();
 
     if ($node instanceof FileNode) {
-      $max--;
+      // this is a file therefor the path needs to be striped of the filename.
+      $dirName = dirname($longFormPath);
+      $fileName =
+        str_replace($dirName.DIRECTORY_SEPARATOR, '', $longFormPath);
+    } else {
+      $dirName = $longFormPath;
     }
 
-    for ($i = 0; $i < $max; $i++) {
-      $pathToRoot[] = str_repeat('../', $i);
+    $dirName = str_replace($rootPath, '', $dirName);
+
+    $breadcrumbs = '';
+
+    // okay let's make some directory path crumbs
+    $dirCrumbs = explode("/", $dirName);
+    $dirCrumbCount = count($dirCrumbs);
+    $lastCrumb = '';
+    if ($dirCrumbCount > 1) {
+      $lastCrumb = $dirCrumbs[$dirCrumbCount - 1];
     }
 
-    foreach ($path as $step) {
-      if ($step !== $node) {
-        $breadcrumbs .=
-          $this->getInactiveBreadcrumb($step, array_pop($pathToRoot));
-      } else {
-        $breadcrumbs .= $this->getActiveBreadcrumb($step);
+    if ($dirCrumbCount > 0) {
+
+      $offset = 0;
+      foreach ($dirCrumbs as $dirCrumb) {
+
+        $shortPath = implode("/", array_slice($dirCrumbs, 0, $offset))."/";
+
+        // ensure that all our paths have a starting slash and ending slash.
+        if (preg_match('/^\//', $shortPath) != true) {
+          $shortPath = '/'.$shortPath;
+        }
+        if (preg_match('/\/$/', $shortPath) != true) {
+          $shortPath = $shortPath.'/';
+        }
+
+        if ($fileName === '' && $lastCrumb == $dirCrumb) {
+          $breadcrumbs .= $this->getActiveBreadcrumb($shortPath, $dirCrumb);
+          $breadcrumbs .= '<li>(<a href="dashboard.html">Dashboard</a>)</li>';
+        } else {
+          $breadcrumbs .= $this->getInactiveBreadcrumb($shortPath, $dirCrumb);
+        }
+        $offset++;
       }
+
+    }
+
+    if ($fileName !== '') {
+      $shortPath = '';
+      $breadcrumbs .= $this->getActiveBreadcrumb($shortPath, $fileName);
     }
 
     return $breadcrumbs;
+
+    //
+    // $path = $node->getPathAsArray();
+    // $pathToRoot = [];
+    // $max = count($path);
+    //
+    // if ($max > 1) {
+    //   var_dump($path);
+    //   var_dump($breadcrumbs);
+    //   exit();
+    // }
+    //
+    // if ($node instanceof FileNode) {
+    //   $max--;
+    // }
+    //
+    // for ($i = 0; $i < $max; $i++) {
+    //   $pathToRoot[] = str_repeat('../', $i);
+    // }
+    //
+    // foreach ($path as $step) {
+    //   if ($step !== $node) {
+    //     $breadcrumbs .=
+    //       $this->getInactiveBreadcrumb($step, array_pop($pathToRoot));
+    //   } else {
+    //     $breadcrumbs .= $this->getActiveBreadcrumb($step);
+    //   }
+    // }
+    //
+    // return $breadcrumbs;
   }
 
-  protected function getActiveBreadcrumb(AbstractNode $node): string {
-    $buffer =
-      sprintf('        <li class="active">%s</li>'."\n", $node->getName());
-
-    if ($node instanceof DirectoryNode) {
-      $buffer .=
-        '        <li>(<a href="dashboard.html">Dashboard</a>)</li>'."\n";
-    }
-
-    return $buffer;
+  protected function getActiveBreadcrumb(
+    string $shortPath,
+    string $crumb,
+  ): string {
+    return sprintf('<li class="active">%s</li>', $crumb);
   }
 
   protected function getInactiveBreadcrumb(
-    AbstractNode $node,
-    string $pathToRoot,
+    string $shortPath,
+    string $crumb,
   ): string {
-    return sprintf(
-      '        <li><a href="%sindex.html">%s</a></li>'."\n",
-      $pathToRoot,
-      $node->getName(),
-    );
+    return
+      sprintf('<li><a href="%sindex.html">%s</a></li>', $shortPath, $crumb);
   }
 
   protected function getPathToRoot(AbstractNode $node): string {
     return '/';
-    /*
-     $id = $node->getId();
-     $depth = substr_count($id, '/');
-     if ($id != 'index' && $node instanceof DirectoryNode) {
-     $depth++;
-     }
-     return str_repeat('../', $depth);
-     */
   }
 
   protected function getCoverageBar(float $percent): string {

@@ -180,7 +180,7 @@ class ClassTest extends TestCase {
   public function testImportedFunctionsAreHandledCorrectly(): void {
     $filename = $this->getFilesDirectory().'classUsesNamespacedFunction.php';
     $codeFile = FileFactory::get($filename);
-    $this->assertEmpty($codeFile->functions()->getAll());
+    $this->assertCount(0, $codeFile->functions()->getAll());
     $this->assertCount(1, $codeFile->classes()->getAll());
   }
 }

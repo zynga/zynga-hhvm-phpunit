@@ -89,18 +89,19 @@ class Template {
     bool $trimTemplate = false,
   ): string {
 
-    // we run the template through strval to force the reference break.
-    $rendered = strval($this->template);
+    $searchStrings = array();
+    $replaceValues = array();
 
     foreach ($values as $key => $value) {
 
       $templateKey = $this->openDelimiter.$key.$this->closeDelimiter;
 
-      $a_value = strval($value);
-
-      $rendered = str_replace($templateKey, $a_value, $rendered);
+      $searchStrings[] = $templateKey;
+      $replaceValues[] = $value;
 
     }
+
+    $rendered = str_replace($searchStrings, $replaceValues, $this->template);
 
     if ($trimTemplate === true) {
       return trim($rendered);

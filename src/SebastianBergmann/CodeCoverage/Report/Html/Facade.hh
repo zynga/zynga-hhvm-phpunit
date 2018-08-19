@@ -116,6 +116,7 @@ class Facade {
       $date,
       $this->lowUpperBound,
       $this->highLowerBound,
+      $root,
     );
 
     $directory = new Directory(
@@ -124,6 +125,7 @@ class Facade {
       $date,
       $this->lowUpperBound,
       $this->highLowerBound,
+      $root,
     );
 
     $file = new File(
@@ -132,14 +134,22 @@ class Facade {
       $date,
       $this->lowUpperBound,
       $this->highLowerBound,
+      $root,
     );
 
     // Recalculate the trees stats after all the muckery we did with it earlier.
-    $root->getRecursiveNumClassesAndTraits(true);
+    //echo date('r')." - getRecursiveNumClassesAndTraits - start\n";
+    $root->getNumClassesAndTraits(true);
+    //echo date('r')." - getRecursiveNumClassesAndTraits - complete\n";
 
     // First render ourselves.
+    //echo date('r')." - render index.html - start\n";
     $directory->render($root, $target.'index.html');
+    //echo date('r')." - render index.html - complete\n";
+
+    //echo date('r')." - render dashboard.html - start\n";
     $dashboard->render($root, $target.'dashboard.html');
+    //echo date('r')." - render dashboard.html - complete\n";
 
     $this->_renderDirectory($target, $root, $directory, $dashboard, $file);
 
@@ -172,11 +182,17 @@ class Facade {
         mkdir($renderDir, 0755, true);
       }
 
+      // Each directory is currently taking a hard second to render.
+      //echo date('r').' - render directory='.$renderDir.' - start'."\n";
       $directory->render($node, $this->_joinPath($renderDir, 'index.html'));
+      //echo date('r').' - render directory='.$renderDir.' - complete'."\n";
+
+      //echo date('r').' - render dashboard='.$renderDir.' - start'."\n";
       $dashboard->render(
         $node,
         $this->_joinPath($renderDir, 'dashboard.html'),
       );
+      //echo date('r').' - render dashboard='.$renderDir.' - complete'."\n";
 
       $this->_renderDirectory(
         $renderDir,
@@ -234,11 +250,11 @@ class Facade {
   private function copyFiles(string $target): void {
 
     if ($this->_needsTemplateCopy($target) === false) {
-      echo "  copyFiles: skipping shared html components.\n";
+      echo date('r')." - copyFiles: skipping shared html components.\n";
       return;
     }
 
-    echo "  copyFiles: copying shared html components\n";
+    echo date('r')." - copyFiles: copying shared html components\n";
 
     $root = $this->getDirectory($target);
 
@@ -282,6 +298,11 @@ class Facade {
     copy($this->templatePath.'js/jquery.min.js', $dir.'jquery.min.js');
     copy($this->templatePath.'js/nv.d3.min.js', $dir.'nv.d3.min.js');
     copy($this->templatePath.'js/respond.min.js', $dir.'respond.min.js');
+
+    echo
+      date('r')." - copyFiles: copying shared html components - complete\n"
+    ;
+
   }
 
   /**
