@@ -18,7 +18,9 @@ abstract class TokenWithScopeAndVisibility extends TokenWithScope {
 
     $tokens = $this->tokenStream()->tokens();
 
-    for ($i = $this->id - 2; $i > $this->id - 7; $i -= 2) {
+    $id = $this->getId();
+
+    for ($i = $id - 2; $i > $id - 7; $i -= 2) {
 
       $token = $tokens->get($i);
 
@@ -47,7 +49,8 @@ abstract class TokenWithScopeAndVisibility extends TokenWithScope {
 
     $tokens = $this->tokenStream()->tokens();
 
-    for ($i = $this->id - 2; $i > $this->id - 7; $i -= 2) {
+    $id = $this->getId();
+    for ($i = $id - 2; $i > $id - 7; $i -= 2) {
 
       $token = $tokens->get($i);
 

@@ -204,706 +204,12 @@ use SebastianBergmann\TokenStream\Tokens\PHP_Token_Yield;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Yield_From;
 
 use Zynga\CodeBase\V1\File;
+use \ReflectionClass;
+use \Exception;
 
 class Factory {
 
-  private static function createToken_A(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_Abstract':
-        return new PHP_Token_Abstract($text, $line, $parent, $id);
-      case 'PHP_Token_Ampersand':
-        return new PHP_Token_Ampersand($text, $line, $parent, $id);
-      case 'PHP_Token_And_Equal':
-        return new PHP_Token_And_Equal($text, $line, $parent, $id);
-      case 'PHP_Token_Array':
-        return new PHP_Token_Array($text, $line, $parent, $id);
-      case 'PHP_Token_Array_Cast':
-        return new PHP_Token_Array_Cast($text, $line, $parent, $id);
-      case 'PHP_Token_As':
-        return new PHP_Token_As($text, $line, $parent, $id);
-      case 'PHP_Token_Async':
-        return new PHP_Token_Async($text, $line, $parent, $id);
-      case 'PHP_Token_At':
-        return new PHP_Token_At($text, $line, $parent, $id);
-      case 'PHP_Token_Await':
-        return new PHP_Token_Await($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_B(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_Backtick':
-        return new PHP_Token_Backtick($text, $line, $parent, $id);
-      case 'PHP_Token_Bad_Character':
-        return new PHP_Token_Bad_Character($text, $line, $parent, $id);
-      case 'PHP_Token_Bool_Cast':
-        return new PHP_Token_Bool_Cast($text, $line, $parent, $id);
-      case 'PHP_Token_Boolean_And':
-        return new PHP_Token_Boolean_And($text, $line, $parent, $id);
-      case 'PHP_Token_Boolean_Or':
-        return new PHP_Token_Boolean_Or($text, $line, $parent, $id);
-      case 'PHP_Token_Break':
-        return new PHP_Token_Break($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_C(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-
-    switch ($name) {
-      case 'PHP_Token_Callable':
-        return new PHP_Token_Callable($text, $line, $parent, $id);
-      case 'PHP_Token_Caret':
-        return new PHP_Token_Caret($text, $line, $parent, $id);
-      case 'PHP_Token_Case':
-        return new PHP_Token_Case($text, $line, $parent, $id);
-      case 'PHP_Token_Catch':
-        return new PHP_Token_Catch($text, $line, $parent, $id);
-      case 'PHP_Token_Character':
-        return new PHP_Token_Character($text, $line, $parent, $id);
-      case 'PHP_Token_Class':
-        return new PHP_Token_Class($text, $line, $parent, $id);
-      case 'PHP_Token_Class_C':
-        return new PHP_Token_Class_C($text, $line, $parent, $id);
-      case 'PHP_Token_Class_Name_Constant':
-        return new PHP_Token_Class_Name_Constant($text, $line, $parent, $id);
-      case 'PHP_Token_Clone':
-        return new PHP_Token_Clone($text, $line, $parent, $id);
-      case 'PHP_Token_Close_Bracket':
-        return new PHP_Token_Close_Bracket($text, $line, $parent, $id);
-      case 'PHP_Token_Close_Curly':
-        return new PHP_Token_Close_Curly($text, $line, $parent, $id);
-      case 'PHP_Token_Close_Square':
-        return new PHP_Token_Close_Square($text, $line, $parent, $id);
-      case 'PHP_Token_Close_Tag':
-        return new PHP_Token_Close_Tag($text, $line, $parent, $id);
-      case 'PHP_Token_Coalesce':
-        return new PHP_Token_Coalesce($text, $line, $parent, $id);
-      case 'PHP_Token_Colon':
-        return new PHP_Token_Colon($text, $line, $parent, $id);
-      case 'PHP_Token_Comma':
-        return new PHP_Token_Comma($text, $line, $parent, $id);
-      case 'PHP_Token_Comment':
-        return new PHP_Token_Comment($text, $line, $parent, $id);
-      case 'PHP_Token_Compiler_Halt_Offset':
-        return new PHP_Token_Compiler_Halt_Offset($text, $line, $parent, $id);
-      case 'PHP_Token_Concat_Equal':
-        return new PHP_Token_Concat_Equal($text, $line, $parent, $id);
-      case 'PHP_Token_Const':
-        return new PHP_Token_Const($text, $line, $parent, $id);
-      case 'PHP_Token_Constant_Encapsed_String':
-        return
-          new PHP_Token_Constant_Encapsed_String($text, $line, $parent, $id);
-      case 'PHP_Token_Continue':
-        return new PHP_Token_Continue($text, $line, $parent, $id);
-      case 'PHP_Token_Curly_Open':
-        return new PHP_Token_Curly_Open($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_D(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_Dec':
-        return new PHP_Token_Dec($text, $line, $parent, $id);
-      case 'PHP_Token_Declare':
-        return new PHP_Token_Declare($text, $line, $parent, $id);
-      case 'PHP_Token_Default':
-        return new PHP_Token_Default($text, $line, $parent, $id);
-      case 'PHP_Token_Dir':
-        return new PHP_Token_Dir($text, $line, $parent, $id);
-      case 'PHP_Token_Div':
-        return new PHP_Token_Div($text, $line, $parent, $id);
-      case 'PHP_Token_Div_Equal':
-        return new PHP_Token_Div_Equal($text, $line, $parent, $id);
-      case 'PHP_Token_Dnumber':
-        return new PHP_Token_Dnumber($text, $line, $parent, $id);
-      case 'PHP_Token_Do':
-        return new PHP_Token_Do($text, $line, $parent, $id);
-      case 'PHP_Token_Doc_Comment':
-        return new PHP_Token_Doc_Comment($text, $line, $parent, $id);
-      case 'PHP_Token_Dollar':
-        return new PHP_Token_Dollar($text, $line, $parent, $id);
-      case 'PHP_Token_Dollar_Open_Curly_Braces':
-        return
-          new PHP_Token_Dollar_Open_Curly_Braces($text, $line, $parent, $id);
-      case 'PHP_Token_Dot':
-        return new PHP_Token_Dot($text, $line, $parent, $id);
-      case 'PHP_Token_Double_Arrow':
-        return new PHP_Token_Double_Arrow($text, $line, $parent, $id);
-      case 'PHP_Token_Double_Cast':
-        return new PHP_Token_Double_Cast($text, $line, $parent, $id);
-      case 'PHP_Token_Double_Colon':
-        return new PHP_Token_Double_Colon($text, $line, $parent, $id);
-      case 'PHP_Token_Double_Quotes':
-        return new PHP_Token_Double_Quotes($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_E(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_Echo':
-        return new PHP_Token_Echo($text, $line, $parent, $id);
-      case 'PHP_Token_Ellipsis':
-        return new PHP_Token_Ellipsis($text, $line, $parent, $id);
-      case 'PHP_Token_Else':
-        return new PHP_Token_Else($text, $line, $parent, $id);
-      case 'PHP_Token_Elseif':
-        return new PHP_Token_Elseif($text, $line, $parent, $id);
-      case 'PHP_Token_Empty':
-        return new PHP_Token_Empty($text, $line, $parent, $id);
-      case 'PHP_Token_Encapsed_And_Whitespace':
-        return
-          new PHP_Token_Encapsed_And_Whitespace($text, $line, $parent, $id);
-      case 'PHP_Token_Enddeclare':
-        return new PHP_Token_Enddeclare($text, $line, $parent, $id);
-      case 'PHP_Token_Endfor':
-        return new PHP_Token_Endfor($text, $line, $parent, $id);
-      case 'PHP_Token_Endforeach':
-        return new PHP_Token_Endforeach($text, $line, $parent, $id);
-      case 'PHP_Token_Endif':
-        return new PHP_Token_Endif($text, $line, $parent, $id);
-      case 'PHP_Token_Endswitch':
-        return new PHP_Token_Endswitch($text, $line, $parent, $id);
-      case 'PHP_Token_Endwhile':
-        return new PHP_Token_Endwhile($text, $line, $parent, $id);
-      case 'PHP_Token_End_HereDoc':
-        return new PHP_Token_End_Heredoc($text, $line, $parent, $id);
-      case 'PHP_Token_Enum':
-        return new PHP_Token_Enum($text, $line, $parent, $id);
-      case 'PHP_Token_Equal':
-        return new PHP_Token_Equal($text, $line, $parent, $id);
-      case 'PHP_Token_Equals':
-        return new PHP_Token_Equals($text, $line, $parent, $id);
-      case 'PHP_Token_Eval':
-        return new PHP_Token_Eval($text, $line, $parent, $id);
-      case 'PHP_Token_Exclamation_Mark':
-        return new PHP_Token_Exclamation_Mark($text, $line, $parent, $id);
-      case 'PHP_Token_Exit':
-        return new PHP_Token_Exit($text, $line, $parent, $id);
-      case 'PHP_Token_Extends':
-        return new PHP_Token_Extends($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_F(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_File':
-        return new PHP_Token_File($text, $line, $parent, $id);
-      case 'PHP_Token_Final':
-        return new PHP_Token_Final($text, $line, $parent, $id);
-      case 'PHP_Token_Finally':
-        return new PHP_Token_Finally($text, $line, $parent, $id);
-      case 'PHP_Token_For':
-        return new PHP_Token_For($text, $line, $parent, $id);
-      case 'PHP_Token_Foreach':
-        return new PHP_Token_Foreach($text, $line, $parent, $id);
-      case 'PHP_Token_Func_C':
-        return new PHP_Token_Func_C($text, $line, $parent, $id);
-      case 'PHP_Token_Function':
-        return new PHP_Token_Function($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_G(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_Global':
-        return new PHP_Token_Global($text, $line, $parent, $id);
-      case 'PHP_Token_Goto':
-        return new PHP_Token_Goto($text, $line, $parent, $id);
-      case 'PHP_Token_Gt':
-        return new PHP_Token_Gt($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_H(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    if ($name == 'PHP_Token_Halt_Compiler') {
-      return new PHP_Token_Halt_Compiler($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_I(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_If':
-        return new PHP_Token_If($text, $line, $parent, $id);
-      case 'PHP_Token_Implements':
-        return new PHP_Token_Implements($text, $line, $parent, $id);
-      case 'PHP_Token_In':
-        return new PHP_Token_In($text, $line, $parent, $id);
-      case 'PHP_Token_Inc':
-        return new PHP_Token_Inc($text, $line, $parent, $id);
-      case 'PHP_Token_Include':
-        return new PHP_Token_Include($text, $line, $parent, $id);
-      case 'PHP_Token_Include_Once':
-        return new PHP_Token_Include_Once($text, $line, $parent, $id);
-      case 'PHP_Token_Inline_Html':
-        return new PHP_Token_Inline_Html($text, $line, $parent, $id);
-      case 'PHP_Token_Instanceof':
-        return new PHP_Token_Instanceof($text, $line, $parent, $id);
-      case 'PHP_Token_Insteadof':
-        return new PHP_Token_Insteadof($text, $line, $parent, $id);
-      case 'PHP_Token_Int_Cast':
-        return new PHP_Token_Int_Cast($text, $line, $parent, $id);
-      case 'PHP_Token_Interface':
-        return new PHP_Token_Interface($text, $line, $parent, $id);
-      case 'PHP_Token_Is_Equal':
-        return new PHP_Token_Is_Equal($text, $line, $parent, $id);
-      case 'PHP_Token_Is_Greater_Or_Equal':
-        return new PHP_Token_Is_Greater_Or_Equal($text, $line, $parent, $id);
-      case 'PHP_Token_Is_Identical':
-        return new PHP_Token_Is_Identical($text, $line, $parent, $id);
-      case 'PHP_Token_Is_Not_Equal':
-        return new PHP_Token_Is_Not_Equal($text, $line, $parent, $id);
-      case 'PHP_Token_Is_Not_Identical':
-        return new PHP_Token_Is_Not_Identical($text, $line, $parent, $id);
-      case 'PHP_Token_Is_Smaller_Or_Equal':
-        return new PHP_Token_Is_Smaller_Or_Equal($text, $line, $parent, $id);
-      case 'PHP_Token_Isset':
-        return new PHP_Token_Isset($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_J(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_Join':
-        return new PHP_Token_Join($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_K(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    return null; // No K tokens atm.
-  }
-
-  private static function createToken_L(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_Lambda_Arrow':
-        return new PHP_Token_Lambda_Arrow($text, $line, $parent, $id);
-      case 'PHP_Token_Lambda_Cp':
-        return new PHP_Token_Lambda_Cp($text, $line, $parent, $id);
-      case 'PHP_Token_Lambda_Op':
-        return new PHP_Token_Lambda_Op($text, $line, $parent, $id);
-      case 'PHP_Token_Line':
-        return new PHP_Token_Line($text, $line, $parent, $id);
-      case 'PHP_Token_List':
-        return new PHP_Token_List($text, $line, $parent, $id);
-      case 'PHP_Token_Lnumber':
-        return new PHP_Token_Lnumber($text, $line, $parent, $id);
-      case 'PHP_Token_Logical_Or':
-        return new PHP_Token_Logical_Or($text, $line, $parent, $id);
-      case 'PHP_Token_Logical_Xor':
-        return new PHP_Token_Logical_Xor($text, $line, $parent, $id);
-      case 'PHP_Token_Logicial_And':
-        return new PHP_Token_Logical_And($text, $line, $parent, $id);
-      case 'PHP_Token_Lt':
-        return new PHP_Token_Lt($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_M(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_Method_C':
-        return new PHP_Token_Method_C($text, $line, $parent, $id);
-      case 'PHP_Token_Minus':
-        return new PHP_Token_Minus($text, $line, $parent, $id);
-      case 'PHP_Token_Minus_Equal':
-        return new PHP_Token_Minus_Equal($text, $line, $parent, $id);
-      case 'PHP_Token_Mod_Equal':
-        return new PHP_Token_Mod_Equal($text, $line, $parent, $id);
-      case 'PHP_Token_Mul_Equal':
-        return new PHP_Token_Mul_Equal($text, $line, $parent, $id);
-      case 'PHP_Token_Mult':
-        return new PHP_Token_Mult($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_N(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_Namespace':
-        return new PHP_Token_Namespace($text, $line, $parent, $id);
-      case 'PHP_Token_New':
-        return new PHP_Token_New($text, $line, $parent, $id);
-      case 'PHP_Token_Ns_C':
-        return new PHP_Token_Ns_C($text, $line, $parent, $id);
-      case 'PHP_Token_Ns_Separator':
-        return new PHP_Token_Ns_Separator($text, $line, $parent, $id);
-      case 'PHP_Token_Nullsafe_Object_Operator':
-        return
-          new PHP_Token_Nullsafe_Object_Operator($text, $line, $parent, $id);
-      case 'PHP_Token_Num_String':
-        return new PHP_Token_Num_String($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_O(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_Object_Cast':
-        return new PHP_Token_Object_Cast($text, $line, $parent, $id);
-      case 'PHP_Token_Object_Operator':
-        return new PHP_Token_Object_Operator($text, $line, $parent, $id);
-      case 'PHP_Token_Onumber':
-        return new PHP_Token_Onumber($text, $line, $parent, $id);
-      case 'PHP_Token_Open_Bracket':
-        return new PHP_Token_Open_Bracket($text, $line, $parent, $id);
-      case 'PHP_Token_Open_Curly':
-        return new PHP_Token_Open_Curly($text, $line, $parent, $id);
-      case 'PHP_Token_Open_Square':
-        return new PHP_Token_Open_Square($text, $line, $parent, $id);
-      case 'PHP_Token_Open_Tag':
-        return new PHP_Token_Open_Tag($text, $line, $parent, $id);
-      case 'PHP_Token_Open_Tag_With_Echo':
-        return new PHP_Token_Open_Tag_With_Echo($text, $line, $parent, $id);
-      case 'PHP_Token_Or_Equal':
-        return new PHP_Token_Or_Equal($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_P(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_Paamayim_Nekudotayim':
-        return new PHP_Token_Paamayim_Nekudotayim($text, $line, $parent, $id);
-      case 'PHP_Token_Percent':
-        return new PHP_Token_Percent($text, $line, $parent, $id);
-      case 'PHP_Token_Pipe':
-        return new PHP_Token_Pipe($text, $line, $parent, $id);
-      case 'PHP_Token_Plus':
-        return new PHP_Token_Plus($text, $line, $parent, $id);
-      case 'PHP_Token_Plus_Equal':
-        return new PHP_Token_Plus_Equal($text, $line, $parent, $id);
-      case 'PHP_Token_Pow':
-        return new PHP_Token_Pow($text, $line, $parent, $id);
-      case 'PHP_Token_Pow_Equal':
-        return new PHP_Token_Pow_Equal($text, $line, $parent, $id);
-      case 'PHP_Token_Print':
-        return new PHP_Token_Print($text, $line, $parent, $id);
-      case 'PHP_Token_Private':
-        return new PHP_Token_Private($text, $line, $parent, $id);
-      case 'PHP_Token_Protected':
-        return new PHP_Token_Protected($text, $line, $parent, $id);
-      case 'PHP_Token_Public':
-        return new PHP_Token_Public($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_Q(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_Question_Mark':
-        return new PHP_Token_Question_Mark($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_R(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_Require':
-        return new PHP_Token_Require($text, $line, $parent, $id);
-      case 'PHP_Token_Require_Once':
-        return new PHP_Token_Require_Once($text, $line, $parent, $id);
-      case 'PHP_Token_Return':
-        return new PHP_Token_Return($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_S(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_Semicolon':
-        return new PHP_Token_Semicolon($text, $line, $parent, $id);
-      case 'PHP_Token_Shape':
-        return new PHP_Token_Shape($text, $line, $parent, $id);
-      case 'PHP_Token_Sl':
-        return new PHP_Token_Sl($text, $line, $parent, $id);
-      case 'PHP_Token_Sl_Equal':
-        return new PHP_Token_Sl_Equal($text, $line, $parent, $id);
-      case 'PHP_Token_Spaceship':
-        return new PHP_Token_Spaceship($text, $line, $parent, $id);
-      case 'PHP_Token_Sr':
-        return new PHP_Token_Sr($text, $line, $parent, $id);
-      case 'PHP_Token_Sr_Equal':
-        return new PHP_Token_Sr_Equal($text, $line, $parent, $id);
-      case 'PHP_Token_Start_Heredoc':
-        return new PHP_Token_Start_Heredoc($text, $line, $parent, $id);
-      case 'PHP_Token_Static':
-        return new PHP_Token_Static($text, $line, $parent, $id);
-      case 'PHP_Token_String':
-        return new PHP_Token_String($text, $line, $parent, $id);
-      case 'PHP_Token_String_Cast':
-        return new PHP_Token_String_Cast($text, $line, $parent, $id);
-      case 'PHP_Token_String_Varname':
-        return new PHP_Token_String_Varname($text, $line, $parent, $id);
-      case 'PHP_Token_Super':
-        return new PHP_Token_Super($text, $line, $parent, $id);
-      case 'PHP_Token_Switch':
-        return new PHP_Token_Switch($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_T(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_Throw':
-        return new PHP_Token_Throw($text, $line, $parent, $id);
-      case 'PHP_Token_Tilde':
-        return new PHP_Token_Tilde($text, $line, $parent, $id);
-      case 'PHP_Token_Trait':
-        return new PHP_Token_Trait($text, $line, $parent, $id);
-      case 'PHP_Token_Trait_C':
-        return new PHP_Token_Trait_C($text, $line, $parent, $id);
-      case 'PHP_Token_Try':
-        return new PHP_Token_Try($text, $line, $parent, $id);
-      case 'PHP_Token_Tuple':
-        return new PHP_Token_Tuple($text, $line, $parent, $id);
-      case 'PHP_Token_Type':
-        return new PHP_Token_Type($text, $line, $parent, $id);
-      case 'PHP_Token_Typelist_Gt':
-        return new PHP_Token_Typelist_Gt($text, $line, $parent, $id);
-      case 'PHP_Token_Typelist_Lt':
-        return new PHP_Token_Typelist_Lt($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_U(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_Unset':
-        return new PHP_Token_Unset($text, $line, $parent, $id);
-      case 'PHP_Token_Unset_Cast':
-        return new PHP_Token_Unset_Cast($text, $line, $parent, $id);
-      case 'PHP_Token_Use':
-        return new PHP_Token_Use($text, $line, $parent, $id);
-      case 'PHP_Token_Use_Function':
-        return new PHP_Token_Use_Function($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_V(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_Var':
-        return new PHP_Token_Var($text, $line, $parent, $id);
-      case 'PHP_Token_Variable':
-        return new PHP_Token_Variable($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_W(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_Where':
-        return new PHP_Token_Where($text, $line, $parent, $id);
-      case 'PHP_Token_While':
-        return new PHP_Token_While($text, $line, $parent, $id);
-      case 'PHP_Token_Whitespace':
-        return new PHP_Token_Whitespace($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_X(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_Xhp_Attribute':
-        return new PHP_Token_Xhp_Attribute($text, $line, $parent, $id);
-      case 'PHP_Token_Xhp_Category':
-        return new PHP_Token_Xhp_Category($text, $line, $parent, $id);
-      case 'PHP_Token_Xhp_Category_Label':
-        return new PHP_Token_Xhp_Category_Label($text, $line, $parent, $id);
-      case 'PHP_Token_Xhp_Children':
-        return new PHP_Token_Xhp_Children($text, $line, $parent, $id);
-      case 'PHP_Token_Xhp_Label':
-        return new PHP_Token_Xhp_Label($text, $line, $parent, $id);
-      case 'PHP_Token_Xhp_Required':
-        return new PHP_Token_Xhp_Required($text, $line, $parent, $id);
-      case 'PHP_Token_Xhp_Tag_Gt':
-        return new PHP_Token_Xhp_Tag_Gt($text, $line, $parent, $id);
-      case 'PHP_Token_Xhp_Tag_Lt':
-        return new PHP_Token_Xhp_Tag_Lt($text, $line, $parent, $id);
-      case 'PHP_Token_Xhp_Text':
-        return new PHP_Token_Xhp_Text($text, $line, $parent, $id);
-      case 'PHP_Token_Xor_Equal':
-        return new PHP_Token_Xor_Equal($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_Y(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    switch ($name) {
-      case 'PHP_Token_Yield':
-        return new PHP_Token_Yield($text, $line, $parent, $id);
-    }
-    return null;
-  }
-
-  private static function createToken_Z(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
-  ): ?TokenInterface {
-    return null; // no Z based tokens atm.
-  }
+  private static Map<string, TokenInterface> $_tokenTemplateCache = Map {};
 
   public static function createToken(
     string $name,
@@ -912,65 +218,1131 @@ class Factory {
     File $parent,
     int $id,
   ): ?TokenInterface {
+
+    // --
+    // Multi-pass token creation:
+    // 1) Stats generated if statements
+    // 2) Clone cache based implementation
+    // --
+    $token = self::createTokenFromStats($name);
+
+    if ($token instanceof TokenInterface) {
+      $token->setAllAttributes($text, $line, $parent, $id);
+      return $token;
+    }
+
+    $templateToken = self::$_tokenTemplateCache->get($name);
+
+    if (!$templateToken instanceof TokenInterface) {
+      $templateToken = self::createTokenFromName($name);
+      if ($templateToken instanceof TokenInterface) {
+        self::$_tokenTemplateCache->set($name, $templateToken);
+      }
+    }
+
+    if ($templateToken instanceof TokenInterface) {
+      $token = clone $templateToken;
+      $token->setAllAttributes($text, $line, $parent, $id);
+      return $token;
+    }
+
+    return null;
+
+  }
+
+  private static function createTokenFromStats(string $name): ?TokenInterface {
+
+    // --
+    // JEO: To do this optimization:
+    //
+    // 1) first remove all the if statements below and turn on the error_log
+    //    statement.
+    //
+    // 2) Now run some tests against your codebase.
+    //
+    // 3) Take a look at the token frequency via:
+    //   <repo>/bin/token_count.sh | less # It will be sorted most used to least
+    //
+    // 4) Now generate some hack code to replace the ifs you removed.
+    //   <repo>/bin/token_optimize.sh
+    //
+    // 5) Turn off the error_log and re-run your tests.
+    // --
+
+    // --
+    // Autogenerated code starts here, remove the below to begin optimizing.
+    // --
+    if ($name == "PHP_Token_Whitespace") {
+      // 38491 PHP_Token_Whitespace
+      $token = new PHP_Token_Whitespace();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_String") {
+      // 23227 PHP_Token_String
+      $token = new PHP_Token_String();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Ns_Separator") {
+      // 8333 PHP_Token_Ns_Separator
+      $token = new PHP_Token_Ns_Separator();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Variable") {
+      // 7616 PHP_Token_Variable
+      $token = new PHP_Token_Variable();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Semicolon") {
+      // 6559 PHP_Token_Semicolon
+      $token = new PHP_Token_Semicolon();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Open_Bracket") {
+      // 5391 PHP_Token_Open_Bracket
+      $token = new PHP_Token_Open_Bracket();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Close_Bracket") {
+      // 5391 PHP_Token_Close_Bracket
+      $token = new PHP_Token_Close_Bracket();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Equal") {
+      // 3538 PHP_Token_Equal
+      $token = new PHP_Token_Equal();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Function") {
+      // 3400 PHP_Token_Function
+      $token = new PHP_Token_Function();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Public") {
+      // 3324 PHP_Token_Public
+      $token = new PHP_Token_Public();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Colon") {
+      // 3128 PHP_Token_Colon
+      $token = new PHP_Token_Colon();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Open_Curly") {
+      // 3001 PHP_Token_Open_Curly
+      $token = new PHP_Token_Open_Curly();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Close_Curly") {
+      // 3001 PHP_Token_Close_Curly
+      $token = new PHP_Token_Close_Curly();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Comma") {
+      // 2882 PHP_Token_Comma
+      $token = new PHP_Token_Comma();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Return") {
+      // 2754 PHP_Token_Return
+      $token = new PHP_Token_Return();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Object_Operator") {
+      // 2656 PHP_Token_Object_Operator
+      $token = new PHP_Token_Object_Operator();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Use") {
+      // 2630 PHP_Token_Use
+      $token = new PHP_Token_Use();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Comment") {
+      // 2148 PHP_Token_Comment
+      $token = new PHP_Token_Comment();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Constant_Encapsed_String") {
+      // 1968 PHP_Token_Constant_Encapsed_String
+      $token = new PHP_Token_Constant_Encapsed_String();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_If") {
+      // 1282 PHP_Token_If
+      $token = new PHP_Token_If();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Double_Colon") {
+      // 1266 PHP_Token_Double_Colon
+      $token = new PHP_Token_Double_Colon();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Class") {
+      // 954 PHP_Token_Class
+      $token = new PHP_Token_Class();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Open_Tag") {
+      // 930 PHP_Token_Open_Tag
+      $token = new PHP_Token_Open_Tag();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_New") {
+      // 928 PHP_Token_New
+      $token = new PHP_Token_New();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Namespace") {
+      // 928 PHP_Token_Namespace
+      $token = new PHP_Token_Namespace();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_As") {
+      // 822 PHP_Token_As
+      $token = new PHP_Token_As();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Dot") {
+      // 820 PHP_Token_Dot
+      $token = new PHP_Token_Dot();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Doc_Comment") {
+      // 740 PHP_Token_Doc_Comment
+      $token = new PHP_Token_Doc_Comment();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Typelist_Lt") {
+      // 680 PHP_Token_Typelist_Lt
+      $token = new PHP_Token_Typelist_Lt();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Typelist_Gt") {
+      // 680 PHP_Token_Typelist_Gt
+      $token = new PHP_Token_Typelist_Gt();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Lnumber") {
+      // 666 PHP_Token_Lnumber
+      $token = new PHP_Token_Lnumber();
+      return $token;
+    }
+
+    if ($name == "PHP_Token_Extends") {
+      // 620 PHP_Token_Extends
+      $token = new PHP_Token_Extends();
+      return $token;
+    } else if ($name == "PHP_Token_Throw") {
+      // 558 PHP_Token_Throw
+      $token = new PHP_Token_Throw();
+      return $token;
+    } else if ($name == "PHP_Token_Private") {
+      // 516 PHP_Token_Private
+      $token = new PHP_Token_Private();
+      return $token;
+    } else if ($name == "PHP_Token_Is_Identical") {
+      // 484 PHP_Token_Is_Identical
+      $token = new PHP_Token_Is_Identical();
+      return $token;
+    } else if ($name == "PHP_Token_Static") {
+      // 386 PHP_Token_Static
+      $token = new PHP_Token_Static();
+      return $token;
+    } else if ($name == "PHP_Token_Question_Mark") {
+      // 306 PHP_Token_Question_Mark
+      $token = new PHP_Token_Question_Mark();
+      return $token;
+    } else if ($name == "PHP_Token_Open_Square") {
+      // 306 PHP_Token_Open_Square
+      $token = new PHP_Token_Open_Square();
+      return $token;
+    } else if ($name == "PHP_Token_Concat_Equal") {
+      // 306 PHP_Token_Concat_Equal
+      $token = new PHP_Token_Concat_Equal();
+      return $token;
+    } else if ($name == "PHP_Token_Close_Square") {
+      // 306 PHP_Token_Close_Square
+      $token = new PHP_Token_Close_Square();
+      return $token;
+    } else if ($name == "PHP_Token_Sr") {
+      // 298 PHP_Token_Sr
+      $token = new PHP_Token_Sr();
+      return $token;
+    } else if ($name == "PHP_Token_Sl") {
+      // 298 PHP_Token_Sl
+      $token = new PHP_Token_Sl();
+      return $token;
+    } else if ($name == "PHP_Token_Protected") {
+      // 282 PHP_Token_Protected
+      $token = new PHP_Token_Protected();
+      return $token;
+    } else if ($name == "PHP_Token_Is_Not_Identical") {
+      // 242 PHP_Token_Is_Not_Identical
+      $token = new PHP_Token_Is_Not_Identical();
+      return $token;
+    } else if ($name == "PHP_Token_Catch") {
+      // 236 PHP_Token_Catch
+      $token = new PHP_Token_Catch();
+      return $token;
+    } else if ($name == "PHP_Token_Try") {
+      // 216 PHP_Token_Try
+      $token = new PHP_Token_Try();
+      return $token;
+    } else if ($name == "PHP_Token_Const") {
+      // 206 PHP_Token_Const
+      $token = new PHP_Token_Const();
+      return $token;
+    } else if ($name == "PHP_Token_Dnumber") {
+      // 184 PHP_Token_Dnumber
+      $token = new PHP_Token_Dnumber();
+      return $token;
+    } else if ($name == "PHP_Token_Foreach") {
+      // 180 PHP_Token_Foreach
+      $token = new PHP_Token_Foreach();
+      return $token;
+    } else if ($name == "PHP_Token_Implements") {
+      // 172 PHP_Token_Implements
+      $token = new PHP_Token_Implements();
+      return $token;
+    } else if ($name == "PHP_Token_Abstract") {
+      // 162 PHP_Token_Abstract
+      $token = new PHP_Token_Abstract();
+      return $token;
+    } else if ($name == "PHP_Token_Instanceof") {
+      // 160 PHP_Token_Instanceof
+      $token = new PHP_Token_Instanceof();
+      return $token;
+    } else if ($name == "PHP_Token_Else") {
+      // 136 PHP_Token_Else
+      $token = new PHP_Token_Else();
+      return $token;
+    } else if ($name == "PHP_Token_Boolean_And") {
+      // 134 PHP_Token_Boolean_And
+      $token = new PHP_Token_Boolean_And();
+      return $token;
+    } else if ($name == "PHP_Token_Exclamation_Mark") {
+      // 126 PHP_Token_Exclamation_Mark
+      $token = new PHP_Token_Exclamation_Mark();
+      return $token;
+    } else if ($name == "PHP_Token_Is_Equal") {
+      // 122 PHP_Token_Is_Equal
+      $token = new PHP_Token_Is_Equal();
+      return $token;
+    } else if ($name == "PHP_Token_Array") {
+      // 104 PHP_Token_Array
+      $token = new PHP_Token_Array();
+      return $token;
+    } else if ($name == "PHP_Token_Interface") {
+      // 102 PHP_Token_Interface
+      $token = new PHP_Token_Interface();
+      return $token;
+    } else if ($name == "PHP_Token_Double_Arrow") {
+      // 86 PHP_Token_Double_Arrow
+      $token = new PHP_Token_Double_Arrow();
+      return $token;
+    } else if ($name == "PHP_Token_Minus") {
+      // 84 PHP_Token_Minus
+      $token = new PHP_Token_Minus();
+      return $token;
+    } else if ($name == "PHP_Token_Double_Quotes") {
+      // 80 PHP_Token_Double_Quotes
+      $token = new PHP_Token_Double_Quotes();
+      return $token;
+    } else if ($name == "PHP_Token_Boolean_Or") {
+      // 80 PHP_Token_Boolean_Or
+      $token = new PHP_Token_Boolean_Or();
+      return $token;
+    } else if ($name == "PHP_Token_Encapsed_And_Whitespace") {
+      // 64 PHP_Token_Encapsed_And_Whitespace
+      $token = new PHP_Token_Encapsed_And_Whitespace();
+      return $token;
+    } else if ($name == "PHP_Token_Gt") {
+      // 54 PHP_Token_Gt
+      $token = new PHP_Token_Gt();
+      return $token;
+    } else if ($name == "PHP_Token_Is_Not_Equal") {
+      // 52 PHP_Token_Is_Not_Equal
+      $token = new PHP_Token_Is_Not_Equal();
+      return $token;
+    } else if ($name == "PHP_Token_Final") {
+      // 50 PHP_Token_Final
+      $token = new PHP_Token_Final();
+      return $token;
+    } else if ($name == "PHP_Token_Inc") {
+      // 36 PHP_Token_Inc
+      $token = new PHP_Token_Inc();
+      return $token;
+    } else if ($name == "PHP_Token_Continue") {
+      // 36 PHP_Token_Continue
+      $token = new PHP_Token_Continue();
+      return $token;
+    } else if ($name == "PHP_Token_Plus") {
+      // 34 PHP_Token_Plus
+      $token = new PHP_Token_Plus();
+      return $token;
+    } else if ($name == "PHP_Token_List") {
+      // 32 PHP_Token_List
+      $token = new PHP_Token_List();
+      return $token;
+    } else if ($name == "PHP_Token_Is_Smaller_Or_Equal") {
+      // 30 PHP_Token_Is_Smaller_Or_Equal
+      $token = new PHP_Token_Is_Smaller_Or_Equal();
+      return $token;
+    } else if ($name == "PHP_Token_Lt") {
+      // 22 PHP_Token_Lt
+      $token = new PHP_Token_Lt();
+      return $token;
+    } else if ($name == "PHP_Token_Is_Greater_Or_Equal") {
+      // 20 PHP_Token_Is_Greater_Or_Equal
+      $token = new PHP_Token_Is_Greater_Or_Equal();
+      return $token;
+    } else if ($name == "PHP_Token_For") {
+      // 14 PHP_Token_For
+      $token = new PHP_Token_For();
+      return $token;
+    } else if ($name == "PHP_Token_Case") {
+      // 14 PHP_Token_Case
+      $token = new PHP_Token_Case();
+      return $token;
+    } else if ($name == "PHP_Token_Enum") {
+      // 12 PHP_Token_Enum
+      $token = new PHP_Token_Enum();
+      return $token;
+    } else if ($name == "PHP_Token_While") {
+      // 10 PHP_Token_While
+      $token = new PHP_Token_While();
+      return $token;
+    } else if ($name == "PHP_Token_Unset") {
+      // 10 PHP_Token_Unset
+      $token = new PHP_Token_Unset();
+      return $token;
+    } else if ($name == "PHP_Token_Div") {
+      // 10 PHP_Token_Div
+      $token = new PHP_Token_Div();
+      return $token;
+    } else if ($name == "PHP_Token_Mult") {
+      // 8 PHP_Token_Mult
+      $token = new PHP_Token_Mult();
+      return $token;
+    } else if ($name == "PHP_Token_Method_C") {
+      // 8 PHP_Token_Method_C
+      $token = new PHP_Token_Method_C();
+      return $token;
+    } else if ($name == "PHP_Token_Echo") {
+      // 8 PHP_Token_Echo
+      $token = new PHP_Token_Echo();
+      return $token;
+    } else if ($name == "PHP_Token_Require_Once") {
+      // 6 PHP_Token_Require_Once
+      $token = new PHP_Token_Require_Once();
+      return $token;
+    } else if ($name == "PHP_Token_Plus_Equal") {
+      // 6 PHP_Token_Plus_Equal
+      $token = new PHP_Token_Plus_Equal();
+      return $token;
+    } else if ($name == "PHP_Token_Pipe") {
+      // 6 PHP_Token_Pipe
+      $token = new PHP_Token_Pipe();
+      return $token;
+    } else if ($name == "PHP_Token_String_Cast") {
+      // 4 PHP_Token_String_Cast
+      $token = new PHP_Token_String_Cast();
+      return $token;
+    } else if ($name == "PHP_Token_Percent") {
+      // 4 PHP_Token_Percent
+      $token = new PHP_Token_Percent();
+      return $token;
+    } else if ($name == "PHP_Token_Int_Cast") {
+      // 4 PHP_Token_Int_Cast
+      $token = new PHP_Token_Int_Cast();
+      return $token;
+    } else if ($name == "PHP_Token_File") {
+      // 4 PHP_Token_File
+      $token = new PHP_Token_File();
+      return $token;
+    } else if ($name == "PHP_Token_And_Equal") {
+      // 4 PHP_Token_And_Equal
+      $token = new PHP_Token_And_Equal();
+      return $token;
+    } else if ($name == "PHP_Token_Ampersand") {
+      // 4 PHP_Token_Ampersand
+      $token = new PHP_Token_Ampersand();
+      return $token;
+    } else if ($name == "PHP_Token_Tilde") {
+      // 2 PHP_Token_Tilde
+      $token = new PHP_Token_Tilde();
+      return $token;
+    } else if ($name == "PHP_Token_Switch") {
+      // 2 PHP_Token_Switch
+      $token = new PHP_Token_Switch();
+      return $token;
+    } else if ($name == "PHP_Token_Super") {
+      // 2 PHP_Token_Super
+      $token = new PHP_Token_Super();
+      return $token;
+    } else if ($name == "PHP_Token_Or_Equal") {
+      // 2 PHP_Token_Or_Equal
+      $token = new PHP_Token_Or_Equal();
+      return $token;
+    } else if ($name == "PHP_Token_Double_Cast") {
+      // 2 PHP_Token_Double_Cast
+      $token = new PHP_Token_Double_Cast();
+      return $token;
+    } else if ($name == "PHP_Token_Do") {
+      // 2 PHP_Token_Do
+      $token = new PHP_Token_Do();
+      return $token;
+    } else if ($name == "PHP_Token_Caret") {
+      // 2 PHP_Token_Caret
+      $token = new PHP_Token_Caret();
+      return $token;
+    }
+    // --
+    // Autogenerated code ends here.
+    // --
+    // This is the error_log we want to turn on when testing for optimization.
+    // error_log($name."\n", 3, '/tmp/token.log');
+    return null;
+
+  }
+
+  private static function createTokenFromName(string $name): ?TokenInterface {
     $token = null;
 
     $firstChar = substr($name, 10, 1);
 
     if ($firstChar == 'A') {
-      $token = self::createToken_A($name, $text, $line, $parent, $id);
+      $token = self::createToken_A($name);
     } else if ($firstChar == 'B') {
-      $token = self::createToken_B($name, $text, $line, $parent, $id);
+      $token = self::createToken_B($name);
     } else if ($firstChar == 'C') {
-      $token = self::createToken_C($name, $text, $line, $parent, $id);
+      $token = self::createToken_C($name);
     } else if ($firstChar == 'D') {
-      $token = self::createToken_D($name, $text, $line, $parent, $id);
+      $token = self::createToken_D($name);
     } else if ($firstChar == 'E') {
-      $token = self::createToken_E($name, $text, $line, $parent, $id);
+      $token = self::createToken_E($name);
     } else if ($firstChar == 'F') {
-      $token = self::createToken_F($name, $text, $line, $parent, $id);
+      $token = self::createToken_F($name);
     } else if ($firstChar == 'G') {
-      $token = self::createToken_G($name, $text, $line, $parent, $id);
+      $token = self::createToken_G($name);
     } else if ($firstChar == 'H') {
-      $token = self::createToken_H($name, $text, $line, $parent, $id);
+      $token = self::createToken_H($name);
     } else if ($firstChar == 'I') {
-      $token = self::createToken_I($name, $text, $line, $parent, $id);
+      $token = self::createToken_I($name);
     } else if ($firstChar == 'J') {
-      $token = self::createToken_J($name, $text, $line, $parent, $id);
+      $token = self::createToken_J($name);
     } else if ($firstChar == 'K') {
-      $token = self::createToken_K($name, $text, $line, $parent, $id);
+      $token = self::createToken_K($name);
     } else if ($firstChar == 'L') {
-      $token = self::createToken_L($name, $text, $line, $parent, $id);
+      $token = self::createToken_L($name);
     } else if ($firstChar == 'M') {
-      $token = self::createToken_M($name, $text, $line, $parent, $id);
+      $token = self::createToken_M($name);
     } else if ($firstChar == 'N') {
-      $token = self::createToken_N($name, $text, $line, $parent, $id);
+      $token = self::createToken_N($name);
     } else if ($firstChar == 'O') {
-      $token = self::createToken_O($name, $text, $line, $parent, $id);
+      $token = self::createToken_O($name);
     } else if ($firstChar == 'P') {
-      $token = self::createToken_P($name, $text, $line, $parent, $id);
+      $token = self::createToken_P($name);
     } else if ($firstChar == 'Q') {
-      $token = self::createToken_Q($name, $text, $line, $parent, $id);
+      $token = self::createToken_Q($name);
     } else if ($firstChar == 'R') {
-      $token = self::createToken_R($name, $text, $line, $parent, $id);
+      $token = self::createToken_R($name);
     } else if ($firstChar == 'S') {
-      $token = self::createToken_S($name, $text, $line, $parent, $id);
+      $token = self::createToken_S($name);
     } else if ($firstChar == 'T') {
-      $token = self::createToken_T($name, $text, $line, $parent, $id);
+      $token = self::createToken_T($name);
     } else if ($firstChar == 'U') {
-      $token = self::createToken_U($name, $text, $line, $parent, $id);
+      $token = self::createToken_U($name);
     } else if ($firstChar == 'V') {
-      $token = self::createToken_V($name, $text, $line, $parent, $id);
+      $token = self::createToken_V($name);
     } else if ($firstChar == 'W') {
-      $token = self::createToken_W($name, $text, $line, $parent, $id);
+      $token = self::createToken_W($name);
     } else if ($firstChar == 'X') {
-      $token = self::createToken_X($name, $text, $line, $parent, $id);
+      $token = self::createToken_X($name);
     } else if ($firstChar == 'Y') {
-      $token = self::createToken_Y($name, $text, $line, $parent, $id);
+      $token = self::createToken_Y($name);
     } else if ($firstChar == 'Z') {
-      $token = self::createToken_Z($name, $text, $line, $parent, $id);
+      $token = self::createToken_Z($name);
+    }
+    return $token;
+  }
+
+  private static function createToken_A(string $name): ?TokenInterface {
+    switch ($name) {
+      case 'PHP_Token_Abstract':
+        return new PHP_Token_Abstract();
+      case 'PHP_Token_Ampersand':
+        return new PHP_Token_Ampersand();
+      case 'PHP_Token_And_Equal':
+        return new PHP_Token_And_Equal();
+      case 'PHP_Token_Array':
+        return new PHP_Token_Array();
+      case 'PHP_Token_Array_Cast':
+        return new PHP_Token_Array_Cast();
+      case 'PHP_Token_As':
+        return new PHP_Token_As();
+      case 'PHP_Token_Async':
+        return new PHP_Token_Async();
+      case 'PHP_Token_At':
+        return new PHP_Token_At();
+      case 'PHP_Token_Await':
+        return new PHP_Token_Await();
+    }
+    return null;
+  }
+
+  private static function createToken_B(string $name): ?TokenInterface {
+    switch ($name) {
+      case 'PHP_Token_Backtick':
+        return new PHP_Token_Backtick();
+      case 'PHP_Token_Bad_Character':
+        return new PHP_Token_Bad_Character();
+      case 'PHP_Token_Bool_Cast':
+        return new PHP_Token_Bool_Cast();
+      case 'PHP_Token_Boolean_And':
+        return new PHP_Token_Boolean_And();
+      case 'PHP_Token_Boolean_Or':
+        return new PHP_Token_Boolean_Or();
+      case 'PHP_Token_Break':
+        return new PHP_Token_Break();
+    }
+    return null;
+  }
+
+  private static function createToken_C(string $name): ?TokenInterface {
+
+    switch ($name) {
+      case 'PHP_Token_Callable':
+        return new PHP_Token_Callable();
+      case 'PHP_Token_Caret':
+        return new PHP_Token_Caret();
+      case 'PHP_Token_Case':
+        return new PHP_Token_Case();
+      case 'PHP_Token_Catch':
+        return new PHP_Token_Catch();
+      case 'PHP_Token_Character':
+        return new PHP_Token_Character();
+      case 'PHP_Token_Class':
+        return new PHP_Token_Class();
+      case 'PHP_Token_Class_C':
+        return new PHP_Token_Class_C();
+      case 'PHP_Token_Class_Name_Constant':
+        return new PHP_Token_Class_Name_Constant();
+      case 'PHP_Token_Clone':
+        return new PHP_Token_Clone();
+      case 'PHP_Token_Close_Bracket':
+        return new PHP_Token_Close_Bracket();
+      case 'PHP_Token_Close_Curly':
+        return new PHP_Token_Close_Curly();
+      case 'PHP_Token_Close_Square':
+        return new PHP_Token_Close_Square();
+      case 'PHP_Token_Close_Tag':
+        return new PHP_Token_Close_Tag();
+      case 'PHP_Token_Coalesce':
+        return new PHP_Token_Coalesce();
+      case 'PHP_Token_Colon':
+        return new PHP_Token_Colon();
+      case 'PHP_Token_Comma':
+        return new PHP_Token_Comma();
+      case 'PHP_Token_Comment':
+        return new PHP_Token_Comment();
+      case 'PHP_Token_Compiler_Halt_Offset':
+        return new PHP_Token_Compiler_Halt_Offset();
+      case 'PHP_Token_Concat_Equal':
+        return new PHP_Token_Concat_Equal();
+      case 'PHP_Token_Const':
+        return new PHP_Token_Const();
+      case 'PHP_Token_Constant_Encapsed_String':
+        return new PHP_Token_Constant_Encapsed_String();
+      case 'PHP_Token_Continue':
+        return new PHP_Token_Continue();
+      case 'PHP_Token_Curly_Open':
+        return new PHP_Token_Curly_Open();
+    }
+    return null;
+  }
+
+  private static function createToken_D(string $name): ?TokenInterface {
+    switch ($name) {
+      case 'PHP_Token_Dec':
+        return new PHP_Token_Dec();
+      case 'PHP_Token_Declare':
+        return new PHP_Token_Declare();
+      case 'PHP_Token_Default':
+        return new PHP_Token_Default();
+      case 'PHP_Token_Dir':
+        return new PHP_Token_Dir();
+      case 'PHP_Token_Div':
+        return new PHP_Token_Div();
+      case 'PHP_Token_Div_Equal':
+        return new PHP_Token_Div_Equal();
+      case 'PHP_Token_Dnumber':
+        return new PHP_Token_Dnumber();
+      case 'PHP_Token_Do':
+        return new PHP_Token_Do();
+      case 'PHP_Token_Doc_Comment':
+        return new PHP_Token_Doc_Comment();
+      case 'PHP_Token_Dollar':
+        return new PHP_Token_Dollar();
+      case 'PHP_Token_Dollar_Open_Curly_Braces':
+        return new PHP_Token_Dollar_Open_Curly_Braces();
+      case 'PHP_Token_Dot':
+        return new PHP_Token_Dot();
+      case 'PHP_Token_Double_Arrow':
+        return new PHP_Token_Double_Arrow();
+      case 'PHP_Token_Double_Cast':
+        return new PHP_Token_Double_Cast();
+      case 'PHP_Token_Double_Colon':
+        return new PHP_Token_Double_Colon();
+      case 'PHP_Token_Double_Quotes':
+        return new PHP_Token_Double_Quotes();
+    }
+    return null;
+  }
+
+  private static function createToken_E(string $name): ?TokenInterface {
+    switch ($name) {
+      case 'PHP_Token_Echo':
+        return new PHP_Token_Echo();
+      case 'PHP_Token_Ellipsis':
+        return new PHP_Token_Ellipsis();
+      case 'PHP_Token_Else':
+        return new PHP_Token_Else();
+      case 'PHP_Token_Elseif':
+        return new PHP_Token_Elseif();
+      case 'PHP_Token_Empty':
+        return new PHP_Token_Empty();
+      case 'PHP_Token_Encapsed_And_Whitespace':
+        return new PHP_Token_Encapsed_And_Whitespace();
+      case 'PHP_Token_Enddeclare':
+        return new PHP_Token_Enddeclare();
+      case 'PHP_Token_Endfor':
+        return new PHP_Token_Endfor();
+      case 'PHP_Token_Endforeach':
+        return new PHP_Token_Endforeach();
+      case 'PHP_Token_Endif':
+        return new PHP_Token_Endif();
+      case 'PHP_Token_Endswitch':
+        return new PHP_Token_Endswitch();
+      case 'PHP_Token_Endwhile':
+        return new PHP_Token_Endwhile();
+      case 'PHP_Token_End_HereDoc':
+        return new PHP_Token_End_Heredoc();
+      case 'PHP_Token_Enum':
+        return new PHP_Token_Enum();
+      case 'PHP_Token_Equal':
+        return new PHP_Token_Equal();
+      case 'PHP_Token_Equals':
+        return new PHP_Token_Equals();
+      case 'PHP_Token_Eval':
+        return new PHP_Token_Eval();
+      case 'PHP_Token_Exclamation_Mark':
+        return new PHP_Token_Exclamation_Mark();
+      case 'PHP_Token_Exit':
+        return new PHP_Token_Exit();
+      case 'PHP_Token_Extends':
+        return new PHP_Token_Extends();
+    }
+    return null;
+  }
+
+  private static function createToken_F(string $name): ?TokenInterface {
+    switch ($name) {
+      case 'PHP_Token_File':
+        return new PHP_Token_File();
+      case 'PHP_Token_Final':
+        return new PHP_Token_Final();
+      case 'PHP_Token_Finally':
+        return new PHP_Token_Finally();
+      case 'PHP_Token_For':
+        return new PHP_Token_For();
+      case 'PHP_Token_Foreach':
+        return new PHP_Token_Foreach();
+      case 'PHP_Token_Func_C':
+        return new PHP_Token_Func_C();
+      case 'PHP_Token_Function':
+        return new PHP_Token_Function();
+    }
+    return null;
+  }
+
+  private static function createToken_G(string $name): ?TokenInterface {
+    switch ($name) {
+      case 'PHP_Token_Global':
+        return new PHP_Token_Global();
+      case 'PHP_Token_Goto':
+        return new PHP_Token_Goto();
+      case 'PHP_Token_Gt':
+        return new PHP_Token_Gt();
+    }
+    return null;
+  }
+
+  private static function createToken_H(string $name): ?TokenInterface {
+    if ($name == 'PHP_Token_Halt_Compiler') {
+      return new PHP_Token_Halt_Compiler();
+    }
+    return null;
+  }
+
+  private static function createToken_I(string $name): ?TokenInterface {
+    switch ($name) {
+      case 'PHP_Token_If':
+        return new PHP_Token_If();
+      case 'PHP_Token_Implements':
+        return new PHP_Token_Implements();
+      case 'PHP_Token_In':
+        return new PHP_Token_In();
+      case 'PHP_Token_Inc':
+        return new PHP_Token_Inc();
+      case 'PHP_Token_Include':
+        return new PHP_Token_Include();
+      case 'PHP_Token_Include_Once':
+        return new PHP_Token_Include_Once();
+      case 'PHP_Token_Inline_Html':
+        return new PHP_Token_Inline_Html();
+      case 'PHP_Token_Instanceof':
+        return new PHP_Token_Instanceof();
+      case 'PHP_Token_Insteadof':
+        return new PHP_Token_Insteadof();
+      case 'PHP_Token_Int_Cast':
+        return new PHP_Token_Int_Cast();
+      case 'PHP_Token_Interface':
+        return new PHP_Token_Interface();
+      case 'PHP_Token_Is_Equal':
+        return new PHP_Token_Is_Equal();
+      case 'PHP_Token_Is_Greater_Or_Equal':
+        return new PHP_Token_Is_Greater_Or_Equal();
+      case 'PHP_Token_Is_Identical':
+        return new PHP_Token_Is_Identical();
+      case 'PHP_Token_Is_Not_Equal':
+        return new PHP_Token_Is_Not_Equal();
+      case 'PHP_Token_Is_Not_Identical':
+        return new PHP_Token_Is_Not_Identical();
+      case 'PHP_Token_Is_Smaller_Or_Equal':
+        return new PHP_Token_Is_Smaller_Or_Equal();
+      case 'PHP_Token_Isset':
+        return new PHP_Token_Isset();
+    }
+    return null;
+  }
+
+  private static function createToken_J(string $name): ?TokenInterface {
+    switch ($name) {
+      case 'PHP_Token_Join':
+        return new PHP_Token_Join();
+    }
+    return null;
+  }
+
+  private static function createToken_K(string $name): ?TokenInterface {
+    return null; // No K tokens atm.
+  }
+
+  private static function createToken_L(string $name): ?TokenInterface {
+    switch ($name) {
+      case 'PHP_Token_Lambda_Arrow':
+        return new PHP_Token_Lambda_Arrow();
+      case 'PHP_Token_Lambda_Cp':
+        return new PHP_Token_Lambda_Cp();
+      case 'PHP_Token_Lambda_Op':
+        return new PHP_Token_Lambda_Op();
+      case 'PHP_Token_Line':
+        return new PHP_Token_Line();
+      case 'PHP_Token_List':
+        return new PHP_Token_List();
+      case 'PHP_Token_Lnumber':
+        return new PHP_Token_Lnumber();
+      case 'PHP_Token_Logical_Or':
+        return new PHP_Token_Logical_Or();
+      case 'PHP_Token_Logical_Xor':
+        return new PHP_Token_Logical_Xor();
+      case 'PHP_Token_Logicial_And':
+        return new PHP_Token_Logical_And();
+      case 'PHP_Token_Lt':
+        return new PHP_Token_Lt();
+    }
+    return null;
+  }
+
+  private static function createToken_M(string $name): ?TokenInterface {
+    switch ($name) {
+      case 'PHP_Token_Method_C':
+        return new PHP_Token_Method_C();
+      case 'PHP_Token_Minus':
+        return new PHP_Token_Minus();
+      case 'PHP_Token_Minus_Equal':
+        return new PHP_Token_Minus_Equal();
+      case 'PHP_Token_Mod_Equal':
+        return new PHP_Token_Mod_Equal();
+      case 'PHP_Token_Mul_Equal':
+        return new PHP_Token_Mul_Equal();
+      case 'PHP_Token_Mult':
+        return new PHP_Token_Mult();
+    }
+    return null;
+  }
+
+  private static function createToken_N(string $name): ?TokenInterface {
+    switch ($name) {
+      case 'PHP_Token_Namespace':
+        return new PHP_Token_Namespace();
+      case 'PHP_Token_New':
+        return new PHP_Token_New();
+      case 'PHP_Token_Ns_C':
+        return new PHP_Token_Ns_C();
+      case 'PHP_Token_Ns_Separator':
+        return new PHP_Token_Ns_Separator();
+      case 'PHP_Token_Nullsafe_Object_Operator':
+        return new PHP_Token_Nullsafe_Object_Operator();
+      case 'PHP_Token_Num_String':
+        return new PHP_Token_Num_String();
+    }
+    return null;
+  }
+
+  private static function createToken_O(string $name): ?TokenInterface {
+    switch ($name) {
+      case 'PHP_Token_Object_Cast':
+        return new PHP_Token_Object_Cast();
+      case 'PHP_Token_Object_Operator':
+        return new PHP_Token_Object_Operator();
+      case 'PHP_Token_Onumber':
+        return new PHP_Token_Onumber();
+      case 'PHP_Token_Open_Bracket':
+        return new PHP_Token_Open_Bracket();
+      case 'PHP_Token_Open_Curly':
+        return new PHP_Token_Open_Curly();
+      case 'PHP_Token_Open_Square':
+        return new PHP_Token_Open_Square();
+      case 'PHP_Token_Open_Tag':
+        return new PHP_Token_Open_Tag();
+      case 'PHP_Token_Open_Tag_With_Echo':
+        return new PHP_Token_Open_Tag_With_Echo();
+      case 'PHP_Token_Or_Equal':
+        return new PHP_Token_Or_Equal();
+    }
+    return null;
+  }
+
+  private static function createToken_P(string $name): ?TokenInterface {
+    switch ($name) {
+      case 'PHP_Token_Paamayim_Nekudotayim':
+        return new PHP_Token_Paamayim_Nekudotayim();
+      case 'PHP_Token_Percent':
+        return new PHP_Token_Percent();
+      case 'PHP_Token_Pipe':
+        return new PHP_Token_Pipe();
+      case 'PHP_Token_Plus':
+        return new PHP_Token_Plus();
+      case 'PHP_Token_Plus_Equal':
+        return new PHP_Token_Plus_Equal();
+      case 'PHP_Token_Pow':
+        return new PHP_Token_Pow();
+      case 'PHP_Token_Pow_Equal':
+        return new PHP_Token_Pow_Equal();
+      case 'PHP_Token_Print':
+        return new PHP_Token_Print();
+      case 'PHP_Token_Private':
+        return new PHP_Token_Private();
+      case 'PHP_Token_Protected':
+        return new PHP_Token_Protected();
+      case 'PHP_Token_Public':
+        return new PHP_Token_Public();
+    }
+    return null;
+  }
+
+  private static function createToken_Q(string $name): ?TokenInterface {
+    switch ($name) {
+      case 'PHP_Token_Question_Mark':
+        return new PHP_Token_Question_Mark();
+    }
+    return null;
+  }
+
+  private static function createToken_R(string $name): ?TokenInterface {
+    switch ($name) {
+      case 'PHP_Token_Require':
+        return new PHP_Token_Require();
+      case 'PHP_Token_Require_Once':
+        return new PHP_Token_Require_Once();
+      case 'PHP_Token_Return':
+        return new PHP_Token_Return();
+    }
+    return null;
+  }
+
+  private static function createToken_S(string $name): ?TokenInterface {
+    switch ($name) {
+      case 'PHP_Token_Semicolon':
+        return new PHP_Token_Semicolon();
+      case 'PHP_Token_Shape':
+        return new PHP_Token_Shape();
+      case 'PHP_Token_Sl':
+        return new PHP_Token_Sl();
+      case 'PHP_Token_Sl_Equal':
+        return new PHP_Token_Sl_Equal();
+      case 'PHP_Token_Spaceship':
+        return new PHP_Token_Spaceship();
+      case 'PHP_Token_Sr':
+        return new PHP_Token_Sr();
+      case 'PHP_Token_Sr_Equal':
+        return new PHP_Token_Sr_Equal();
+      case 'PHP_Token_Start_Heredoc':
+        return new PHP_Token_Start_Heredoc();
+      case 'PHP_Token_Static':
+        return new PHP_Token_Static();
+      case 'PHP_Token_String':
+        return new PHP_Token_String();
+      case 'PHP_Token_String_Cast':
+        return new PHP_Token_String_Cast();
+      case 'PHP_Token_String_Varname':
+        return new PHP_Token_String_Varname();
+      case 'PHP_Token_Super':
+        return new PHP_Token_Super();
+      case 'PHP_Token_Switch':
+        return new PHP_Token_Switch();
+    }
+    return null;
+  }
+
+  private static function createToken_T(string $name): ?TokenInterface {
+    switch ($name) {
+      case 'PHP_Token_Throw':
+        return new PHP_Token_Throw();
+      case 'PHP_Token_Tilde':
+        return new PHP_Token_Tilde();
+      case 'PHP_Token_Trait':
+        return new PHP_Token_Trait();
+      case 'PHP_Token_Trait_C':
+        return new PHP_Token_Trait_C();
+      case 'PHP_Token_Try':
+        return new PHP_Token_Try();
+      case 'PHP_Token_Tuple':
+        return new PHP_Token_Tuple();
+      case 'PHP_Token_Type':
+        return new PHP_Token_Type();
+      case 'PHP_Token_Typelist_Gt':
+        return new PHP_Token_Typelist_Gt();
+      case 'PHP_Token_Typelist_Lt':
+        return new PHP_Token_Typelist_Lt();
+    }
+    return null;
+  }
+
+  private static function createToken_U(string $name): ?TokenInterface {
+    switch ($name) {
+      case 'PHP_Token_Unset':
+        return new PHP_Token_Unset();
+      case 'PHP_Token_Unset_Cast':
+        return new PHP_Token_Unset_Cast();
+      case 'PHP_Token_Use':
+        return new PHP_Token_Use();
+      case 'PHP_Token_Use_Function':
+        return new PHP_Token_Use_Function();
+    }
+    return null;
+  }
+
+  private static function createToken_V(string $name): ?TokenInterface {
+    switch ($name) {
+      case 'PHP_Token_Var':
+        return new PHP_Token_Var();
+      case 'PHP_Token_Variable':
+        return new PHP_Token_Variable();
+    }
+    return null;
+  }
+
+  private static function new_PHP_Token_Whitespace(
+    string $name,
+  ): TokenInterface {
+    return new PHP_Token_Whitespace();
+  }
+
+  private static function createToken_W(string $name): ?TokenInterface {
+
+    if ($name == 'PHP_Token_Whitespace') {
+      return new PHP_Token_Whitespace();
     }
 
-    return $token;
+    if ($name == 'PHP_Token_Where') {
+      return new PHP_Token_Where();
+    }
+
+    if ($name == 'PHP_Token_While') {
+      return new PHP_Token_While();
+    }
+
+    return null;
+  }
+
+  private static function createToken_X(string $name): ?TokenInterface {
+    switch ($name) {
+      case 'PHP_Token_Xhp_Attribute':
+        return new PHP_Token_Xhp_Attribute();
+      case 'PHP_Token_Xhp_Category':
+        return new PHP_Token_Xhp_Category();
+      case 'PHP_Token_Xhp_Category_Label':
+        return new PHP_Token_Xhp_Category_Label();
+      case 'PHP_Token_Xhp_Children':
+        return new PHP_Token_Xhp_Children();
+      case 'PHP_Token_Xhp_Label':
+        return new PHP_Token_Xhp_Label();
+      case 'PHP_Token_Xhp_Required':
+        return new PHP_Token_Xhp_Required();
+      case 'PHP_Token_Xhp_Tag_Gt':
+        return new PHP_Token_Xhp_Tag_Gt();
+      case 'PHP_Token_Xhp_Tag_Lt':
+        return new PHP_Token_Xhp_Tag_Lt();
+      case 'PHP_Token_Xhp_Text':
+        return new PHP_Token_Xhp_Text();
+      case 'PHP_Token_Xor_Equal':
+        return new PHP_Token_Xor_Equal();
+    }
+    return null;
+  }
+
+  private static function createToken_Y(string $name): ?TokenInterface {
+    if ($name == 'PHP_Token_Yield') {
+      return new PHP_Token_Yield();
+    }
+    return null;
+  }
+
+  private static function createToken_Z(string $name): ?TokenInterface {
+    return null; // no Z based tokens atm.
   }
 
 }

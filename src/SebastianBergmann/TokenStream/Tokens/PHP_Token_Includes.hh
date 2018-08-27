@@ -45,9 +45,10 @@ abstract class PHP_Token_Includes extends PHP_Token {
   private function process(): void {
 
     $tokens = $this->tokenStream()->tokens();
-    $token = $tokens->get($this->id);
+    $id = $this->getId();
+    $token = $tokens->get($id);
 
-    $tokenOffset = $this->tokenStream()->get($this->id + 2);
+    $tokenOffset = $this->tokenStream()->get($id + 2);
 
     if ($tokenOffset instanceof PHP_Token_Constant_Encapsed_String) {
       $this->name = trim(strval($tokenOffset), "'\"");

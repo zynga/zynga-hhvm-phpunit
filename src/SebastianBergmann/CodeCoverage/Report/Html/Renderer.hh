@@ -14,9 +14,13 @@ namespace SebastianBergmann\CodeCoverage\Report\Html;
 use SebastianBergmann\CodeCoverage\Node\AbstractNode;
 use SebastianBergmann\CodeCoverage\Node\File as FileNode;
 use SebastianBergmann\CodeCoverage\Node\Directory as DirectoryNode;
+use
+  SebastianBergmann\CodeCoverage\Report\Html\Renderer\CommonTemplateVariables
+;
+
 use SebastianBergmann\Environment\Runtime;
 use SebastianBergmann\TextTemplate\Template;
-use SebastianBergmann\TextTemplate\TemplateFactory;
+use SebastianBergmann\CodeCoverage\Report\Html\Renderer\Template\CoverageBar;
 use Zynga\PHPUnit\V2\Version;
 
 /**
@@ -87,83 +91,6 @@ abstract class Renderer {
    *
    * @return string
    */
-  protected function renderItemTemplate(
-    Template $template,
-    Map<string, mixed> $data,
-  ): string {
-    $numSeparator = '&nbsp;/&nbsp;';
-
-    $numClasses = intval($data->get('numClasses'));
-    $numTestedClasses = intval($data->get('numTestedClasses'));
-
-    if ($numClasses > 0) {
-      $classesLevel =
-        $this->getColorLevel(floatval($data['testedClassesPercent']));
-      $classesNumber = $numTestedClasses.$numSeparator.$numClasses;
-      $classesBar =
-        $this->getCoverageBar(floatval($data['testedClassesPercent']));
-    } else {
-      $classesLevel = 'success';
-      $classesNumber = '0'.$numSeparator.'0';
-      $classesBar = $this->getCoverageBar(100.00);
-    }
-
-    $numMethods = intval($data->get('numMethods'));
-    $numTestedMethods = intval($data->get('numTestedMethods'));
-
-    if ($numMethods > 0) {
-      $methodsLevel =
-        $this->getColorLevel(floatval($data['testedMethodsPercent']));
-      $methodsNumber = $numTestedMethods.$numSeparator.$numMethods;
-      $methodsBar =
-        $this->getCoverageBar(floatval($data['testedMethodsPercent']));
-    } else {
-      $methodsLevel = 'success';
-      $methodsNumber = '0'.$numSeparator.'0';
-      $methodsBar = $this->getCoverageBar(100.00);
-      $data['testedMethodsPercentAsString'] = '100.00%';
-    }
-
-    $numExecutableLines = intval($data->get('numExecutableLines'));
-    $numExecutedLines = intval($data->get('numExecutedLines'));
-
-    if ($numExecutableLines > 0) {
-      $linesLevel =
-        $this->getColorLevel(floatval($data['linesExecutedPercent']));
-      $linesNumber = $numExecutedLines.$numSeparator.$numExecutableLines;
-      $linesBar =
-        $this->getCoverageBar(floatval($data['linesExecutedPercent']));
-    } else {
-      $linesLevel = 'success';
-      $linesNumber = '0'.$numSeparator.'0';
-      $linesBar = $this->getCoverageBar(100.00);
-      $data['linesExecutedPercentAsString'] = '100.00%';
-    }
-
-    $templateVariables = Map {
-      'icon' => $data->containsKey('icon') ? $data['icon'] : '',
-      'crap' => $data->containsKey('crap') ? $data['crap'] : '',
-      'name' => $data['name'],
-      'lines_bar' => $linesBar,
-      'lines_executed_percent' => $data['linesExecutedPercentAsString'],
-      'lines_level' => $linesLevel,
-      'lines_number' => $linesNumber,
-      'methods_bar' => $methodsBar,
-      'methods_tested_percent' => $data['testedMethodsPercentAsString'],
-      'methods_level' => $methodsLevel,
-      'methods_number' => $methodsNumber,
-      'classes_bar' => $classesBar,
-      'classes_tested_percent' =>
-        $data->containsKey('testedClassesPercentAsString')
-          ? $data['testedClassesPercentAsString']
-          : '',
-      'classes_level' => $classesLevel,
-      'classes_number' => $classesNumber,
-      'ccn' => $data->containsKey('ccn') ? $data['ccn'] : '',
-    };
-
-    return $template->render($templateVariables);
-  }
 
   /**
    * @param \Text_Template $template
@@ -171,20 +98,22 @@ abstract class Renderer {
    */
   protected function getCommonTemplateVariables(
     AbstractNode $node,
-  ): Map<string, mixed> {
-    $templateVars = Map {
-      'id' => $node->getId(),
-      'full_path' => $node->getPath(),
-      'path_to_root' => $this->getPathToRoot($node),
-      'breadcrumbs' => $this->getBreadcrumbs($node),
-      'date' => $this->date,
-      'version' => $this->version,
-      'runtime' => $this->getRuntimeString(),
-      'generator' => $this->generator,
-      'low_upper_bound' => $this->lowUpperBound,
-      'high_lower_bound' => $this->highLowerBound,
-    };
-    return $templateVars;
+  ): CommonTemplateVariables {
+
+    $commonTemplateVariables = new CommonTemplateVariables();
+    $commonTemplateVariables->id = strval($node->getId());
+    $commonTemplateVariables->full_path = strval($node->getPath());
+    $commonTemplateVariables->path_to_root = $this->getPathToRoot($node);
+    $commonTemplateVariables->breadcrumbs = $this->getBreadcrumbs($node);
+    $commonTemplateVariables->date = $this->date;
+    $commonTemplateVariables->version = $this->version;
+    $commonTemplateVariables->runtime = $this->getRuntimeString();
+    $commonTemplateVariables->generator = $this->generator;
+    $commonTemplateVariables->low_upper_bound = strval($this->lowUpperBound);
+    $commonTemplateVariables->high_lower_bound =
+      strval($this->highLowerBound);
+
+    return $commonTemplateVariables;
   }
 
   protected function getBreadcrumbs(AbstractNode $node): string {
@@ -302,20 +231,7 @@ abstract class Renderer {
 
   protected function getCoverageBar(float $percent): string {
     $level = $this->getColorLevel($percent);
-
-    $template = TemplateFactory::get(
-      $this->templatePath.'coverage_bar.html',
-      '{{',
-      '}}',
-    );
-
-    $templateVariables = Map {
-      'level' => $level,
-      'percent' => sprintf('%.2F', $percent),
-    };
-
-    return $template->render($templateVariables);
-
+    return CoverageBar::render($level, sprintf('%.2F', $percent));
   }
 
   /**

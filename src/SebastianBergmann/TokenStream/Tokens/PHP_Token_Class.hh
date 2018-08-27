@@ -56,14 +56,15 @@ class PHP_Token_Class extends PHP_Token_Interface {
 
     $tokens = $this->tokenStream()->tokens();
 
-    $next = $tokens->get($this->id + 1);
+    $id = $this->getId();
+    $next = $tokens->get($id + 1);
 
     if ($next instanceof PHP_Token_String) {
       return strval($next);
     }
 
     if ($next instanceof PHP_Token_Whitespace) {
-      $nextNext = $tokens->get($this->id + 2);
+      $nextNext = $tokens->get($id + 2);
       if ($nextNext instanceof PHP_Token_String) {
         return strval($nextNext);
       }

@@ -16,7 +16,9 @@ use SebastianBergmann\CodeCoverage\Node\Directory as DirectoryNode;
 use SebastianBergmann\CodeCoverage\Report\Html\Renderer;
 use SebastianBergmann\TextTemplate\TemplateFactory;
 use SebastianBergmann\TextTempalte\Template as Text_Template;
-
+use
+  SebastianBergmann\CodeCoverage\Report\Html\Renderer\Template\DirectoryItem
+;
 /**
  * Renders a directory node.
  */
@@ -32,6 +34,7 @@ class Directory extends Renderer {
       TemplateFactory::get($this->templatePath.'directory.html', '{{', '}}');
 
     $templateVariables = $this->getCommonTemplateVariables($node);
+    $templateVariableMap = $templateVariables->asMap();
 
     $items = $this->renderItem($node, true);
 
@@ -43,10 +46,10 @@ class Directory extends Renderer {
       $items .= $this->renderItem($item);
     }
 
-    $templateVariables->set('id', $node->getId());
-    $templateVariables->set('items', $items);
+    $templateVariableMap->set('id', $node->getId());
+    $templateVariableMap->set('items', $items);
 
-    $template->renderTo($file, $templateVariables);
+    $template->renderTo($file, $templateVariableMap);
 
   }
 
@@ -58,50 +61,95 @@ class Directory extends Renderer {
    */
   protected function renderItem(Node $node, bool $total = false): string {
 
-    $data = Map {
-      'numClasses' => $node->getNumClassesAndTraits(),
-      'numTestedClasses' => $node->getNumTestedClassesAndTraits(),
-      'numMethods' => $node->getNumMethods(),
-      'numTestedMethods' => $node->getNumTestedMethods(),
-      'linesExecutedPercent' => $node->getLineExecutedPercent(false),
-      'linesExecutedPercentAsString' => $node->getLineExecutedPercent(),
-      'numExecutedLines' => $node->getNumExecutedLines(),
-      'numExecutableLines' => $node->getNumExecutableLines(),
-      'testedMethodsPercent' => $node->getTestedMethodsPercent(false),
-      'testedMethodsPercentAsString' => $node->getTestedMethodsPercent(),
-      'testedClassesPercent' => $node->getTestedClassesAndTraitsPercent(
-        false,
-      ),
-      'testedClassesPercentAsString' =>
-        $node->getTestedClassesAndTraitsPercent(),
-    };
+    $name = '';
+    $icon = '';
+    $crap = '';
 
-    if ($total) {
-      $data['name'] = 'Total';
+    if ($total === true) {
+      $name = 'Total';
     } else {
       if ($node instanceof DirectoryNode) {
-        $data['name'] = sprintf(
+        $name = sprintf(
           '<a href="%s/index.html">%s</a>',
           $node->getId(),
           $node->getId(),
         );
 
-        $data['icon'] =
-          '<span class="glyphicon glyphicon-folder-open"></span> ';
+        $icon = '<span class="glyphicon glyphicon-folder-open"></span> ';
+        $crap = $node->getCrapAsString();
       } else {
-        $data['name'] =
+        $name =
           sprintf('<a href="%s.html">%s</a>', $node->getId(), $node->getId());
 
-        $data['icon'] = '<span class="glyphicon glyphicon-file"></span> ';
+        $icon = '<span class="glyphicon glyphicon-file"></span> ';
       }
     }
 
-    $template = TemplateFactory::get(
-      $this->templatePath.'directory_item.html',
-      '{{',
-      '}}',
+    $numSeparator = '&nbsp;/&nbsp;';
+
+    $numClasses = $node->getNumClassesAndTraits();
+    $numTestedClasses = $node->getNumTestedClassesAndTraits();
+    $numMethods = $node->getNumMethods();
+    $numTestedMethods = $node->getNumTestedMethods();
+    $linesExecutedPercent = $node->getLineExecutedPercent();
+    $linesExecutedPercentAsString = $node->getLineExecutedPercentAsString();
+    $numExecutedLines = $node->getNumExecutedLines();
+    $numExecutableLines = $node->getNumExecutableLines();
+    $testedMethodsPercent = $node->getTestedMethodsPercent();
+    $testedMethodsPercentAsString = $node->getTestedMethodsPercentAsString();
+    $testedClassesPercent = $node->getTestedClassesAndTraitsPercent();
+    $testedClassesPercentAsString =
+      $node->getTestedClassesAndTraitsPercentAsString();
+
+    if ($numClasses > 0) {
+      $classesLevel = $this->getColorLevel($testedClassesPercent);
+      $classesNumber = $numTestedClasses.$numSeparator.$numClasses;
+      $classesBar = $this->getCoverageBar($testedClassesPercent);
+    } else {
+      $classesLevel = 'success';
+      $classesNumber = '0'.$numSeparator.'0';
+      $classesBar = $this->getCoverageBar(100.00);
+    }
+
+    if ($numMethods > 0) {
+      $methodsLevel = $this->getColorLevel($testedMethodsPercent);
+      $methodsNumber = $numTestedMethods.$numSeparator.$numMethods;
+      $methodsBar = $this->getCoverageBar($testedMethodsPercent);
+    } else {
+      $methodsLevel = 'success';
+      $methodsNumber = '0'.$numSeparator.'0';
+      $methodsBar = $this->getCoverageBar(100.00);
+      $testedMethodsPercentAsString = '100.00%';
+    }
+
+    if ($numExecutableLines > 0) {
+      $linesLevel = $this->getColorLevel($linesExecutedPercent);
+      $linesNumber = $numExecutedLines.$numSeparator.$numExecutableLines;
+      $linesBar = $this->getCoverageBar($linesExecutedPercent);
+    } else {
+      $linesLevel = 'success';
+      $linesNumber = '0'.$numSeparator.'0';
+      $linesBar = $this->getCoverageBar(100.00);
+      $linesExecutedPercentAsString = '100.00%';
+    }
+
+    return DirectoryItem::render(
+      $icon,
+      $name,
+      $numClasses,
+      $classesLevel,
+      $testedClassesPercentAsString,
+      $classesBar,
+      $numMethods,
+      $methodsLevel,
+      $testedMethodsPercentAsString,
+      $methodsBar,
+      $linesNumber,
+      $linesLevel,
+      $linesExecutedPercentAsString,
+      $linesBar,
     );
 
-    return $this->renderItemTemplate($template, $data);
   }
+
 }

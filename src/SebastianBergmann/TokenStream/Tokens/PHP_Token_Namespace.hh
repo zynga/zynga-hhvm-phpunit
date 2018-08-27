@@ -12,11 +12,13 @@ class PHP_Token_Namespace extends TokenWithScope {
    */
   public function getName(): string {
 
+    $id = $this->getId();
+
     $tokens = $this->tokenStream()->tokens();
 
-    $namespace = (string) $tokens[$this->id + 2];
+    $namespace = (string) $tokens[$id + 2];
 
-    for ($i = $this->id + 3; ; $i += 2) {
+    for ($i = $id + 3; ; $i += 2) {
       if ($tokens->containsKey($i) &&
           $tokens[$i] instanceof PHP_Token_Ns_Separator) {
         $namespace .= '\\'.$tokens[$i + 1];

@@ -383,10 +383,12 @@ class Directory extends AbstractNode {
     foreach ($this->files as $file) {
       $this->_numTestedTraits += $file->getNumTestedTraits($recalculate);
     }
+
     foreach ($this->getDirectories() as $childDirectory) {
       $this->_numTestedTraits +=
         $childDirectory->getNumTestedTraits($recalculate);
     }
+
     return $this->_numTestedTraits;
   }
 

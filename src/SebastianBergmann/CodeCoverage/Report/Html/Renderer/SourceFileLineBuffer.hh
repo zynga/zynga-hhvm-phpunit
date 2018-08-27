@@ -21,9 +21,8 @@ class SourceFileLineBuffer {
     $this->_lines[$lineNo] .= $value;
   }
 
-  public function toVector(): Vector<string> {
-    $vecResult = Vector {};
-    $vecResult->addAll($this->_lines);
-    return $vecResult;
+  public function get(): array<string> {
+    return $this->_lines;
   }
+
 }

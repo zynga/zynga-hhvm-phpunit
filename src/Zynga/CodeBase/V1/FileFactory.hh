@@ -32,9 +32,7 @@ class FileFactory {
     }
 
     $file = new File($filename);
-    $file->source()->load();
-    $file->rawTokens()->load();
-    $file->stream();
+
     $file->init();
 
     self::$files->set($filename, $file);

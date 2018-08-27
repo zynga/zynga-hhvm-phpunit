@@ -66,7 +66,7 @@ class Template {
       $this->template = file_get_contents($distFile);
     } else {
       throw new InvalidArgumentException(
-        'Template file could not be loaded.',
+        'Template file could not be loaded. file='.$file,
       );
     }
   }

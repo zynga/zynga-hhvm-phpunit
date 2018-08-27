@@ -14,9 +14,14 @@ namespace SebastianBergmann\CodeCoverage\Report\Html\Renderer;
 use SebastianBergmann\CodeCoverage\Driver;
 use SebastianBergmann\CodeCoverage\Node\File as FileNode;
 use SebastianBergmann\CodeCoverage\Report\Html\Renderer;
+use SebastianBergmann\CodeCoverage\Report\Html\Renderer\Template\CodeFile;
+use
+  SebastianBergmann\CodeCoverage\Report\Html\Renderer\Template\CodeFileItem
+;
+use SebastianBergmann\CodeCoverage\Report\Html\Renderer\Template\CodeLine;
+use SebastianBergmann\CodeCoverage\Report\Html\Renderer\Template\CodeRow;
+use SebastianBergmann\CodeCoverage\Report\Html\Renderer\Template\CodeTokens;
 use SebastianBergmann\CodeCoverage\Util;
-use SebastianBergmann\TextTemplate\TemplateFactory;
-use SebastianBergmann\TextTemplate\Template;
 
 use SebastianBergmann\TokenStream\Token\StreamInterfaceStructure;
 use
@@ -89,15 +94,14 @@ class File extends Renderer {
    */
   public function render(FileNode $node, string $file): void {
 
-    $template =
-      TemplateFactory::get($this->templatePath.'file.html', '{{', '}}');
-
     $templateVariables = $this->getCommonTemplateVariables($node);
 
-    $templateVariables->set('items', $this->renderItems($node));
-    $templateVariables->set('lines', $this->renderSource($node));
-
-    $template->renderTo($file, $templateVariables);
+    CodeFile::renderTo(
+      $file,
+      $templateVariables,
+      $this->renderItems($node),
+      $this->renderSource($node),
+    );
 
   }
 
@@ -107,60 +111,32 @@ class File extends Renderer {
    * @return string
    */
   protected function renderItems(FileNode $node): string {
-    $template =
-      TemplateFactory::get($this->templatePath.'file_item.html', '{{', '}}');
 
-    $methodItemTemplate = TemplateFactory::get(
-      $this->templatePath.'method_item.html',
-      '{{',
-      '}}',
+    $name = 'Total';
+
+    $items = $this->renderFileItemTemplate(
+      $name,
+      $node->getNumClassesAndTraits(),
+      $node->getNumTestedClassesAndTraits(),
+      $node->getTestedClassesAndTraitsPercent(),
+      $node->getTestedClassesAndTraitsPercentAsString(),
+      $node->getNumMethods(),
+      $node->getNumTestedMethods(),
+      $node->getTestedMethodsPercent(),
+      $node->getTestedMethodsPercentAsString(),
+      $node->getNumExecutableLines(),
+      $node->getNumExecutedLines(),
+      $node->getLineExecutedPercent(),
+      $node->getLineExecutedPercentAsString(),
+      $node->getCcnAsString(),
+      $node->getCrapAsString(),
     );
 
-    $templateMap = Map {
-      'name' => 'Total',
-      'numClasses' => $node->getNumClassesAndTraits(),
-      'numTestedClasses' => $node->getNumTestedClassesAndTraits(),
-      'numMethods' => $node->getNumMethods(),
-      'numTestedMethods' => $node->getNumTestedMethods(),
-      'linesExecutedPercent' => $node->getLineExecutedPercent(false),
-      'linesExecutedPercentAsString' => $node->getLineExecutedPercent(),
-      'numExecutedLines' => $node->getNumExecutedLines(),
-      'numExecutableLines' => $node->getNumExecutableLines(),
-      'testedMethodsPercent' => $node->getTestedMethodsPercent(false),
-      'testedMethodsPercentAsString' => $node->getTestedMethodsPercent(),
-      'testedClassesPercent' => $node->getTestedClassesAndTraitsPercent(
-        false,
-      ),
-      'testedClassesPercentAsString' =>
-        $node->getTestedClassesAndTraitsPercent(),
-    };
+    $items .= $this->renderFunctionItems($node->getFunctions());
 
-    $templateMap->set(
-      'crap',
-      '<abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr>',
-    );
+    $items .= $this->renderTraitOrClassItems($node->getTraits());
 
-    $templateMap->set(
-      'ccn',
-      '<abbr title="Cyclomatic Complexity Number (CCN)">CCN</abbr>',
-    );
-
-    $items = $this->renderItemTemplate($template, $templateMap);
-
-    $items .=
-      $this->renderFunctionItems($node->getFunctions(), $methodItemTemplate);
-
-    $items .= $this->renderTraitOrClassItems(
-      $node->getTraits(),
-      $template,
-      $methodItemTemplate,
-    );
-
-    $items .= $this->renderTraitOrClassItems(
-      $node->getClasses(),
-      $template,
-      $methodItemTemplate,
-    );
+    $items .= $this->renderTraitOrClassItems($node->getClasses());
 
     return $items;
   }
@@ -174,8 +150,6 @@ class File extends Renderer {
    */
   protected function renderTraitOrClassItems(
     Map<string, Code_Class> $items,
-    Template $template,
-    Template $methodItemTemplate,
   ): string {
 
     if ($items->count() == 0) {
@@ -188,60 +162,50 @@ class File extends Renderer {
 
       $classObj->calculateCoverage();
 
+      $numClasses = 1;
       $numMethods = $classObj->getNumMethods();
       $numTestedMethods = $classObj->getNumTestedMethods();
+      $numTestedClasses = $numTestedMethods == $numMethods ? 1 : 0;
+      $testedClassesPercent = Util::percent($numTestedMethods, $numMethods);
+      $testedMethodsPercent = Util::percent($numTestedMethods, $numMethods);
+      $testedMethodsPercentAsString =
+        Util::percentAsString($numTestedMethods, $numMethods);
+      $executableLines = $classObj->getExecutableLines();
+      $executedLines = $classObj->getExecutedLines();
+      $linesExecutedPercent = Util::percent(
+        $classObj->getExecutedLines(),
+        $classObj->getExecutableLines(),
+      );
+      $testedClassesPercentAsString = Util::percentAsString(
+        $numTestedMethods == $numMethods ? 1 : 0,
+        1,
+        true,
+      );
+      $linesExecutedPercentAsString = Util::percentAsString(
+        $classObj->getExecutedLines(),
+        $classObj->getExecutableLines(),
+      );
 
-      $buffer .= $this->renderItemTemplate(
-        $template,
-        Map {
-          'name' => $name,
-          'numClasses' => 1,
-          'numTestedClasses' => $numTestedMethods == $numMethods ? 1 : 0,
-          'numMethods' => $numMethods,
-          'numTestedMethods' => $numTestedMethods,
-          'linesExecutedPercent' => Util::percent(
-            $classObj->getExecutedLines(),
-            $classObj->getExecutableLines(),
-            false,
-          ),
-          'linesExecutedPercentAsString' => Util::percent(
-            $classObj->getExecutedLines(),
-            $classObj->getExecutableLines(),
-            true,
-          ),
-          'numExecutedLines' => $classObj->getExecutedLines(),
-          'numExecutableLines' => $classObj->getExecutableLines(),
-          'testedMethodsPercent' => Util::percent(
-            $numTestedMethods,
-            $numMethods,
-            false,
-          ),
-          'testedMethodsPercentAsString' => Util::percent(
-            $numTestedMethods,
-            $numMethods,
-            true,
-          ),
-          'testedClassesPercent' => Util::percent(
-            $numTestedMethods == $numMethods ? 1 : 0,
-            1,
-            false,
-          ),
-          'testedClassesPercentAsString' => Util::percent(
-            $numTestedMethods == $numMethods ? 1 : 0,
-            1,
-            true,
-          ),
-          'ccn' => '',
-          'crap' => '',
-        },
+      $buffer .= $this->renderFileItemTemplate(
+        $name, // name
+        $numClasses, // numClasses
+        $numTestedClasses, // numTestedClasses
+        $testedClassesPercent, // testedClassesPercent
+        $testedClassesPercentAsString, // testedClassesPercentAsString
+        $numMethods, // numMethods
+        $numTestedMethods, // numTestedMethods
+        $testedMethodsPercent, // testedMethodsPercent
+        $testedMethodsPercentAsString, // testedMethodsPercentAsString
+        $executableLines, // executableLines
+        $executedLines, // executedLines
+        $linesExecutedPercent, // linesExecutedPercent
+        $linesExecutedPercentAsString,
+        $classObj->getCcnAsString(),
+        $classObj->getCrapAsString(),
       );
 
       foreach ($classObj->methods as $method) {
-        $buffer .= $this->renderFunctionOrMethodItem(
-          $methodItemTemplate,
-          $method,
-          '&nbsp;',
-        );
+        $buffer .= $this->renderFunctionOrMethodItem($method, '&nbsp;');
       }
     }
 
@@ -256,7 +220,6 @@ class File extends Renderer {
    */
   protected function renderFunctionItems(
     Map<string, Code_Method> $functions,
-    Template $template,
   ): string {
 
     if ($functions->count() == 0) {
@@ -266,7 +229,7 @@ class File extends Renderer {
     $buffer = '';
 
     foreach ($functions as $function) {
-      $buffer .= $this->renderFunctionOrMethodItem($template, $function);
+      $buffer .= $this->renderFunctionOrMethodItem($function);
     }
 
     return $buffer;
@@ -278,7 +241,6 @@ class File extends Renderer {
    * @return string
    */
   protected function renderFunctionOrMethodItem(
-    Template $template,
     Code_Method $methodObj,
     string $indent = '',
   ): string {
@@ -290,41 +252,48 @@ class File extends Renderer {
 
     $methodObj->calculateCoverage();
 
-    return $this->renderItemTemplate(
-      $template,
-      Map {
-        'name' => sprintf(
-          '%s<a href="#%d"><abbr title="%s">%s</abbr></a>',
-          $indent,
-          $methodObj->startLine,
-          htmlspecialchars($methodObj->signature),
-          $methodObj->methodName,
-        ),
-        'numMethods' => 1,
-        'numTestedMethods' => $numTestedItems,
-        'linesExecutedPercent' => Util::percent(
-          $methodObj->getExecutedLines(),
-          $methodObj->getExecutableLines(),
-          false,
-        ),
-        'linesExecutedPercentAsString' => Util::percent(
-          $methodObj->getExecutedLines(),
-          $methodObj->getExecutableLines(),
-          true,
-        ),
-        'numExecutedLines' => $methodObj->getExecutedLines(),
-        'numExecutableLines' => $methodObj->getExecutableLines(),
-        'testedMethodsPercent' => Util::percent($numTestedItems, 1, false),
-        'testedMethodsPercentAsString' => Util::percent(
-          $numTestedItems,
-          1,
-          true,
-        ),
-        'ccn' => $methodObj->getCcn(),
-        'crap' => sprintf('%01.2f', $methodObj->getCrap()),
-      },
+    $name = sprintf(
+      '%s<a href="#%d"><abbr title="%s">%s</abbr></a>',
+      $indent,
+      $methodObj->startLine,
+      htmlspecialchars($methodObj->signature),
+      $methodObj->methodName,
+    );
+
+    $testedMethodsPercent = Util::percent($numTestedItems, 1);
+    $testedMethodsPercentAsString = Util::percentAsString($numTestedItems, 1);
+
+    $linesExecutedPercent = Util::percent(
+      $methodObj->getExecutedLines(),
+      $methodObj->getExecutableLines(),
+      false,
+    );
+
+    $linesExecutedPercentAsString = Util::percentAsString(
+      $methodObj->getExecutedLines(),
+      $methodObj->getExecutableLines(),
+    );
+
+    return $this->renderFileItemTemplate(
+      $name, // name
+      0, // numClasses
+      0, // numTestedClasses
+      0.0, // testedClassesPercent
+      '', // testedClassesPercentAsString
+      1, // numMethods
+      $numTestedItems, // numTestedMethods
+      $testedMethodsPercent, // testedMethodsPercent
+      $testedMethodsPercentAsString, // testedMethodsPercentAsString
+      $methodObj->getExecutableLines(), // numExecutableLines
+      $methodObj->getExecutedLines(), // numExecutedLines
+      $linesExecutedPercent, // linesExecutedPercent
+      $linesExecutedPercentAsString,
+      $methodObj->getCcnAsString(),
+      $methodObj->getCrapAsString(),
     );
   }
+
+  const DEBUG_TOKENS = false;
 
   /**
    * @param FileNode $node
@@ -338,15 +307,6 @@ class File extends Renderer {
     if (!is_string($fileName)) {
       return 'invalid fileName provided';
     }
-
-    $rowTemplate =
-      TemplateFactory::get($this->templatePath.'code_row.html', '{{', '}}');
-
-    $tokenTemplate = TemplateFactory::get(
-      $this->templatePath.'code_tokens.html',
-      '{{',
-      '}}',
-    );
 
     $coverageData = $node->getCoverageData();
 
@@ -383,34 +343,32 @@ class File extends Renderer {
         $lineState = '&nbsp;';
       }
 
-      $lines .= $rowTemplate->render(
-        Map {
-          'trClass' => $trClass,
-          'popover' => $popover,
-          'lineNo' => $lineNo,
-          'codeLine' => $codeLine,
-          'lineState' => $lineState,
-          'lineStateCss' => $lineStateCss,
-        },
+      $lines .= CodeRow::render(
+        $lineNo,
+        $trClass,
+        $popover,
+        $lineStateCss,
+        $lineState,
+        $codeLine,
       );
 
       // if we are debugging tokens and what it means for the rendering.
-      $tokensForLine = '';
+      if (self::DEBUG_TOKENS === true) {
+        $tokensForLine = '';
 
-      $tokens = $processedFile->getLineToTokens($lineNo);
+        $tokens = $processedFile->getLineToTokens($lineNo);
 
-      foreach ($tokens as $token) {
-        if ($tokensForLine != '') {
-          $tokensForLine .= ', ';
+        foreach ($tokens as $token) {
+          if ($tokensForLine != '') {
+            $tokensForLine .= ', ';
+          }
+          $tokensForLine .= $token->getShortTokenName();
+          $tokensForLine .= '['.$token->getId().']';
         }
-        $tokensForLine .= $token->getShortTokenName();
-        $tokensForLine .= '['.$token->getId().']';
-      }
-      implode(", ", $processedFile->getLineToTokens($lineNo));
+        implode(", ", $processedFile->getLineToTokens($lineNo));
 
-      $lines .= $tokenTemplate->render(
-        Map {'tokensForLine' => $tokensForLine, 'lineNo' => $lineNo},
-      );
+        $lines .= CodeTokens::render($lineNo, $tokensForLine);
+      }
 
     }
 
@@ -524,10 +482,7 @@ class File extends Renderer {
    *
    * @return array
    */
-  protected function loadFile(string $file): Vector<string> {
-
-    $lineTemplate =
-      TemplateFactory::get($this->templatePath.'code_line.html', '{{', '}}');
+  protected function loadFile(string $file): array<string> {
 
     if (FileFactory::isFileRegistered($file) !== true) {
       error_log(
@@ -552,25 +507,13 @@ class File extends Renderer {
         if ($token === '"' && $tokens[$j - 1] !== '\\') {
           $result->appendTo(
             $i,
-            $lineTemplate->render(
-              Map {
-                'code_class' => 'string',
-                'code' => htmlspecialchars($token),
-              },
-              true,
-            ),
+            CodeLine::render('string', htmlspecialchars($token)),
           );
           $stringFlag = !$stringFlag;
         } else {
           $result->appendTo(
             $i,
-            $lineTemplate->render(
-              Map {
-                'code_class' => 'keyword',
-                'code' => htmlspecialchars($token),
-              },
-              true,
-            ),
+            CodeLine::render('keyword', htmlspecialchars($token)),
           );
         }
 
@@ -597,12 +540,11 @@ class File extends Renderer {
           if ($line !== '') {
             if ($stringFlag) {
               $colour = 'string';
+            } else if ($tokenId == T_VARIABLE) {
+              $colour = 'variable';
+              break;
             } else {
               switch ($tokenId) {
-
-                case T_VARIABLE:
-                  $colour = 'variable';
-                  break;
 
                 case T_IS_EQUAL:
                 case T_BOOLEAN_OR:
@@ -698,13 +640,7 @@ class File extends Renderer {
             //  $line = $token.$line;
             //}
 
-            $result->appendTo(
-              $i,
-              $lineTemplate->render(
-                Map {'code_class' => $colour, 'code' => $line},
-                true,
-              ),
-            );
+            $result->appendTo($i, CodeLine::render($colour, $line));
 
           }
 
@@ -719,7 +655,80 @@ class File extends Renderer {
       //$result->removeKey($result->count() - 1);
     }
 
-    return $result->toVector();
+    return $result->get();
 
   }
+
+  protected function renderFileItemTemplate(
+    string $name,
+    int $numClasses,
+    int $numTestedClasses,
+    float $testedClassesPercent,
+    string $classesPercentAsString,
+    int $numMethods,
+    int $numTestedMethods,
+    float $testedMethodsPercent,
+    string $methodsPercentAsString,
+    int $numExecutableLines,
+    int $numExecutedLines,
+    float $linesExecutedPercent,
+    string $linesExecutedPercentAsString,
+    string $ccn,
+    string $crap,
+  ): string {
+
+    $numSeparator = '&nbsp;/&nbsp;';
+
+    if ($numClasses > 0) {
+      $classesLevel = $this->getColorLevel($testedClassesPercent);
+      $classesNumber = $numTestedClasses.$numSeparator.$numClasses;
+      $classesBar = $this->getCoverageBar($testedClassesPercent);
+    } else {
+      $classesLevel = 'success';
+      $classesNumber = '0'.$numSeparator.'0';
+      $classesBar = $this->getCoverageBar(100.00);
+    }
+
+    if ($numMethods > 0) {
+      $methodsLevel = $this->getColorLevel($testedMethodsPercent);
+      $methodsNumber = $numTestedMethods.$numSeparator.$numMethods;
+      $methodsBar = $this->getCoverageBar($testedMethodsPercent);
+    } else {
+      $methodsLevel = 'success';
+      $methodsNumber = '0'.$numSeparator.'0';
+      $methodsBar = $this->getCoverageBar(100.00);
+      $methodsPercentAsString = '100.00%';
+    }
+
+    if ($numExecutableLines > 0) {
+      $linesLevel = $this->getColorLevel($linesExecutedPercent);
+      $linesNumber = $numExecutedLines.$numSeparator.$numExecutableLines;
+      $linesBar = $this->getCoverageBar($linesExecutedPercent);
+    } else {
+      $linesLevel = 'success';
+      $linesNumber = '0'.$numSeparator.'0';
+      $linesBar = $this->getCoverageBar(100.00);
+      $linesExecutedPercentAsString = '100.00%';
+    }
+
+    return CodeFileItem::render(
+      $name,
+      $classesNumber,
+      $classesLevel,
+      $classesPercentAsString,
+      $classesBar,
+      $methodsNumber,
+      $methodsLevel,
+      $methodsPercentAsString,
+      $methodsBar,
+      $linesNumber,
+      $linesLevel,
+      $linesExecutedPercentAsString,
+      $linesBar,
+      $ccn,
+      $crap,
+    );
+
+  }
+
 }

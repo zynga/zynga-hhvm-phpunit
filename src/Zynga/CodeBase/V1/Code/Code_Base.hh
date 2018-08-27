@@ -28,11 +28,20 @@ abstract class Code_Base {
   }
 
   abstract public function getExecutableLines(): int;
+
   abstract public function getExecutedLines(): int;
+
   abstract public function calculateCoverage(): void;
 
   public function getCcn(): int {
     return $this->_ccn;
+  }
+
+  public function getCcnAsString(): string {
+    if ($this->_ccn == 0) {
+      return '';
+    }
+    return strval($this->_ccn);
   }
 
   public function setCcn(int $ccn): void {
@@ -41,6 +50,13 @@ abstract class Code_Base {
 
   public function getCrap(): float {
     return $this->_crap;
+  }
+
+  public function getCrapAsString(): string {
+    if ($this->_crap == -1.0) {
+      return '';
+    }
+    return sprintf('%01.2f', $this->_crap);
   }
 
   /**

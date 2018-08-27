@@ -13,12 +13,14 @@ Changes from vanilla phpunit here:
 1. Extracted more of the html from the render to the template structure.
 1. Collapsed all of the HHVM driver code to be within the "HHVM" driver, in preparation for supporting the newer debuggers available.
 1. Changed ordering of classes, functions, lines to be consistent throughout the UI.
+1. Removed / reduced the usage of TextTemplate usage within the html template, as we have a very large code base the amount of str_replace overhead catches up with you.
 
 # TODO  
 1. SebastianBergmann\TokenStream\Token\StreamMethodStructure->methodSignature isn't working correctly, needs fixing. Might be only multi-line function signatures that are broken - TBD.
 1. PHP_Token_Function: Needs a verification that it handles marking a multi-line abstract function definition as non-executable.
 1. LineToTokens should be moved into stream functionality.
 1. Need to repair the dashboard functionality, as it's fully broken right now.
+1. Performance profiling for the report generation needs to continue.
 
 # History
 

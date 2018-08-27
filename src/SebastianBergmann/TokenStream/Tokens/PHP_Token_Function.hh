@@ -97,7 +97,7 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
     $typeDeclaration = null;
 
     // Search for first token inside brackets
-    $i = $this->id + 2;
+    $i = $this->getId() + 2;
 
     while (!$tokens[$i - 1] instanceof PHP_Token_Open_Bracket) {
       $i++;
@@ -132,7 +132,7 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
 
     $tokens = $this->tokenStream()->tokens();
 
-    for ($i = $this->id + 1; $i < $tokens->count(); $i++) {
+    for ($i = $this->getId() + 1; $i < $tokens->count(); $i++) {
 
       $token = $tokens->get($i);
       $nextToken = $tokens->get($i + 1);
@@ -151,23 +151,25 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
 
     }
 
-    if ($this->name != 'anonymous function') {
-      for ($i = $this->id; $i; --$i) {
-
-        $token = $tokens->get($i);
-
-        if ($token instanceof PHP_Token_Namespace) {
-          $this->name = $token->getName().'\\'.$this->name;
-          break;
-        }
-
-        if ($token instanceof PHP_Token_Interface) {
-          break;
-        }
-
-      }
-
-    }
+    // Handling php6/7 anon functions bs.
+    // JEO: disabling for now.
+    // if ($this->name != 'anonymous function') {
+    //   for ($i = $this->id; $i; --$i) {
+    //
+    //     $token = $tokens->get($i);
+    //
+    //     if ($token instanceof PHP_Token_Namespace) {
+    //       $this->name = $token->getName().'\\'.$this->name;
+    //       break;
+    //     }
+    //
+    //     if ($token instanceof PHP_Token_Interface) {
+    //       break;
+    //     }
+    //
+    //   }
+    //
+    // }
 
     $this->didName = true;
     return $this->name;
@@ -183,7 +185,7 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
     }
 
     $this->ccn = 1;
-    $start = $this->id;
+    $start = $this->getId();
     $end = $this->getEndTokenId();
     $tokens = $this->tokenStream()->tokens();
 
@@ -234,13 +236,13 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
     }
 
     $i = 0;
-
+    $id = $this->getId();
     if ($this->getName() == 'anonymous function') {
       $this->signature = 'anonymous function';
-      $i = $this->id + 1;
+      $i = $id + 1;
     } else {
       $this->signature = '';
-      $i = $this->id + 2;
+      $i = $id + 2;
     }
 
     $tokens = $this->tokenStream()->tokens();

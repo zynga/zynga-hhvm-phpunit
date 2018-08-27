@@ -369,6 +369,10 @@ class File {
       return;
     }
 
+    $this->source()->load();
+    $this->rawTokens()->load();
+    // $this->stream();
+
     $tokenStream = $this->stream();
     $tokens = $tokenStream->tokens();
 

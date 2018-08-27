@@ -33,6 +33,7 @@ class Dashboard extends Renderer {
       TemplateFactory::get($this->templatePath.'dashboard.html', '{{', '}}');
 
     $templateVariables = $this->getCommonTemplateVariables($node);
+    $templateVariablesMap = $templateVariables->asMap();
 
     $baseLink = $node->getId().'/';
     $complexity = $this->complexity($classes, $baseLink);
@@ -40,28 +41,34 @@ class Dashboard extends Renderer {
     $insufficientCoverage = $this->insufficientCoverage($classes, $baseLink);
     $projectRisks = $this->projectRisks($classes, $baseLink);
 
-    $templateVariables->set(
+    $templateVariablesMap->set(
       'insufficient_coverage_classes',
       $insufficientCoverage['class'],
     );
-    $templateVariables->set(
+    $templateVariablesMap->set(
       'insufficient_coverage_methods',
       $insufficientCoverage['method'],
     );
-    $templateVariables->set('project_risks_classes', $projectRisks['class']);
-    $templateVariables->set('project_risks_methods', $projectRisks['method']);
-    $templateVariables->set('complexity_class', $complexity['class']);
-    $templateVariables->set('complexity_method', $complexity['method']);
-    $templateVariables->set(
+    $templateVariablesMap->set(
+      'project_risks_classes',
+      $projectRisks['class'],
+    );
+    $templateVariablesMap->set(
+      'project_risks_methods',
+      $projectRisks['method'],
+    );
+    $templateVariablesMap->set('complexity_class', $complexity['class']);
+    $templateVariablesMap->set('complexity_method', $complexity['method']);
+    $templateVariablesMap->set(
       'class_coverage_distribution',
       $coverageDistribution['class'],
     );
-    $templateVariables->set(
+    $templateVariablesMap->set(
       'method_coverage_distribution',
       $coverageDistribution['method'],
     );
 
-    $template->renderTo($file, $templateVariables);
+    $template->renderTo($file, $templateVariablesMap);
 
   }
 

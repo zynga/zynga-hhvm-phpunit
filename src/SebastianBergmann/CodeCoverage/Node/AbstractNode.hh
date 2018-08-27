@@ -44,6 +44,14 @@ abstract class AbstractNode implements \Countable {
    */
   private ?string $id;
 
+  private int $_numClassesAndTraits;
+  private int $_numTestedClassesAndTraits;
+
+  private float $_testedClassesPercent;
+  private float $_testedTraitsPercent;
+  private float $_testedClassesAndTraitsPercent;
+  private float $_testedMethodsPercent;
+
   /**
    * Constructor.
    *
@@ -62,6 +70,14 @@ abstract class AbstractNode implements \Countable {
     $this->pathArray = null;
     $this->path = null;
     $this->id = null;
+
+    $this->_numClassesAndTraits = -1;
+    $this->_numTestedClassesAndTraits = -1;
+
+    $this->_testedClassesPercent = -1.0;
+    $this->_testedTraitsPercent = -1.0;
+    $this->_testedClassesAndTraitsPercent = -1.0;
+    $this->_testedMethodsPercent = -1.0;
 
   }
 
@@ -145,15 +161,19 @@ abstract class AbstractNode implements \Countable {
    *
    * @return int|string
    */
-  public function getTestedClassesPercent(
-    bool $asString = true,
-    bool $recalculate = false,
-  ): mixed {
-    return Util::percent(
+  public function getTestedClassesPercent(bool $recalculate = false): mixed {
+
+    if ($this->_testedClassesPercent != -1.0 && $recalculate == false) {
+      return $this->_testedClassesPercent;
+    }
+
+    $this->_testedClassesPercent = Util::percent(
       $this->getNumTestedClasses($recalculate),
       $this->getNumClasses($recalculate),
-      $asString,
     );
+
+    return $this->_testedClassesPercent;
+
   }
 
   /**
@@ -163,15 +183,19 @@ abstract class AbstractNode implements \Countable {
    *
    * @return int|string
    */
-  public function getTestedTraitsPercent(
-    bool $asString = true,
-    bool $recalculate = false,
-  ): mixed {
-    return Util::percent(
+  public function getTestedTraitsPercent(bool $recalculate = false): float {
+
+    if ($this->_testedTraitsPercent != -1.0 && $recalculate == false) {
+      return $this->_testedTraitsPercent;
+    }
+
+    $this->_testedTraitsPercent = Util::percent(
       $this->getNumTestedTraits($recalculate),
       $this->getNumTraits($recalculate),
-      $asString,
     );
+
+    return $this->_testedTraitsPercent;
+
   }
 
   /**
@@ -182,13 +206,29 @@ abstract class AbstractNode implements \Countable {
    * @return int|string
    */
   public function getTestedClassesAndTraitsPercent(
-    bool $asString = true,
     bool $recalculate = false,
-  ): mixed {
-    return Util::percent(
+  ): float {
+
+    if ($this->_testedClassesAndTraitsPercent != -1.0 &&
+        $recalculate == false) {
+      return $this->_testedClassesAndTraitsPercent;
+    }
+
+    $this->_testedClassesAndTraitsPercent = Util::percent(
       $this->getNumTestedClassesAndTraits($recalculate),
       $this->getNumClassesAndTraits($recalculate),
-      $asString,
+    );
+
+    return $this->_testedClassesAndTraitsPercent;
+
+  }
+
+  public function getTestedClassesAndTraitsPercentAsString(
+    bool $recalculate = false,
+  ): string {
+    return Util::percentAsString(
+      $this->getNumTestedClassesAndTraits($recalculate),
+      $this->getNumClassesAndTraits($recalculate),
     );
   }
 
@@ -199,14 +239,27 @@ abstract class AbstractNode implements \Countable {
    *
    * @return int|string
    */
-  public function getTestedMethodsPercent(
-    bool $asString = true,
-    bool $recalculate = false,
-  ): mixed {
-    return Util::percent(
+  public function getTestedMethodsPercent(bool $recalculate = false): float {
+
+    if ($this->_testedMethodsPercent != -1.0 && $recalculate == false) {
+      return $this->_testedMethodsPercent;
+    }
+
+    $this->_testedMethodsPercent = Util::percent(
       $this->getNumTestedMethods($recalculate),
       $this->getNumMethods($recalculate),
-      $asString,
+    );
+
+    return $this->_testedMethodsPercent;
+
+  }
+
+  public function getTestedMethodsPercentAsString(
+    bool $recalculate = false,
+  ): string {
+    return Util::percentAsString(
+      $this->getNumTestedMethods($recalculate),
+      $this->getNumMethods($recalculate),
     );
   }
 
@@ -217,14 +270,19 @@ abstract class AbstractNode implements \Countable {
    *
    * @return int
    */
-  public function getLineExecutedPercent(
-    bool $asString = true,
-    bool $recalculate = false,
-  ): mixed {
+  public function getLineExecutedPercent(bool $recalculate = false): float {
     return Util::percent(
       $this->getNumExecutedLines($recalculate),
       $this->getNumExecutableLines($recalculate),
-      $asString,
+    );
+  }
+
+  public function getLineExecutedPercentAsString(
+    bool $recalculate = false,
+  ): string {
+    return Util::percentAsString(
+      $this->getNumExecutedLines($recalculate),
+      $this->getNumExecutableLines($recalculate),
     );
   }
 
@@ -234,8 +292,13 @@ abstract class AbstractNode implements \Countable {
    * @return int
    */
   public function getNumClassesAndTraits(bool $recalculate = false): int {
-    return
+    if ($this->_numClassesAndTraits != -1 && $recalculate == false) {
+      return $this->_numClassesAndTraits;
+    }
+    $this->_numClassesAndTraits = 0;
+    $this->_numClassesAndTraits =
       $this->getNumClasses($recalculate) + $this->getNumTraits($recalculate);
+    return $this->_numClassesAndTraits;
   }
 
   /**
@@ -246,9 +309,17 @@ abstract class AbstractNode implements \Countable {
   public function getNumTestedClassesAndTraits(
     bool $recalculate = false,
   ): int {
-    return
+    if ($this->_numTestedClassesAndTraits != -1 && $recalculate == false) {
+      return $this->_numTestedClassesAndTraits;
+    }
+
+    $this->_numTestedClassesAndTraits = 0;
+    $this->_numTestedClassesAndTraits =
       $this->getNumTestedClasses($recalculate) +
       $this->getNumTestedTraits($recalculate);
+
+    return $this->_numTestedClassesAndTraits;
+
   }
 
   /**
@@ -374,5 +445,13 @@ abstract class AbstractNode implements \Countable {
   abstract public function getNumTestedFunctions(
     bool $recalculate = false,
   ): int;
+
+  public function getCcnAsString(): string {
+    return '<abbr title="Cyclomatic Complexity Number (CCN)">CCN</abbr>';
+  }
+
+  public function getCrapAsString(): string {
+    return '<abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr>';
+  }
 
 }

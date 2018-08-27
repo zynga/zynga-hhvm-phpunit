@@ -6,58 +6,72 @@ use SebastianBergmann\TokenStream\Token\Stream;
 use SebastianBergmann\TokenStream\Token\Stream\CachingFactory;
 use SebastianBergmann\TokenStream\TokenInterface;
 use Zynga\CodeBase\V1\File;
+use \Exception;
 
 /**
  * A PHP token.
  */
 abstract class Token implements TokenInterface {
 
-  protected string $text;
-  protected int $line;
-  private File $_parent;
-  protected int $id;
+  private string $_text = '';
+  private int $_line = -1;
+  private ?File $_file = null;
+  private int $_id = -1;
 
-  /**
-   * @param string           $text
-   * @param int              $line
-   * @param Stream $tokenStream
-   * @param int              $id
-   */
-  public function __construct(string $text, int $line, File $parent, int $id) {
-    $this->text = $text;
-    $this->line = $line;
-    $this->_parent = $parent;
-    $this->id = $id;
+  // --
+  // Do not add a __constructor here. We've proven that the constructor overhead
+  // will double instanciation time.
+  //
+  // Take a look at the simple test within:
+  //   tests/performance/constructor
+  //
+  // --
+
+  public function setAllAttributes(
+    string $text,
+    int $line,
+    File $file,
+    int $id,
+  ): void {
+    $this->_text = $text;
+    $this->_line = $line;
+    $this->_file = $file;
+    $this->_id = $id;
   }
 
-  public function parent(): File {
-    return $this->_parent;
+  public function getFile(): ?File {
+    return $this->_file;
+  }
+
+  public function setFile(File $file): bool {
+    $this->_file = $file;
+    return true;
   }
 
   public function getText(): string {
-    return $this->text;
+    return $this->_text;
   }
 
   public function setText(string $text): bool {
-    $this->text = $text;
+    $this->_text = $text;
     return true;
   }
 
   public function getLine(): int {
-    return $this->line;
+    return $this->_line;
   }
 
   public function setLine(int $line): bool {
-    $this->line = $line;
+    $this->_line = $line;
     return true;
   }
 
   public function getId(): int {
-    return $this->id;
+    return $this->_id;
   }
 
   public function setId(int $id): bool {
-    $this->id = $id;
+    $this->_id = $id;
     return true;
   }
 
@@ -65,11 +79,17 @@ abstract class Token implements TokenInterface {
    * @return string
    */
   public function __toString(): string {
-    return $this->text;
+    return strval($this->_text);
   }
 
   public function tokenStream(): Stream {
-    return $this->_parent->stream();
+    $file = $this->getFile();
+    if ($file instanceof File) {
+      return $file->stream();
+    }
+    throw new Exception(
+      'tokenStream called on a token with no file use setFile()',
+    );
   }
 
   public function getShortTokenName(): string {

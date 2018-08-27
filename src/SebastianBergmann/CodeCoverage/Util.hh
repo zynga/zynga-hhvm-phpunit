@@ -14,6 +14,26 @@ namespace SebastianBergmann\CodeCoverage;
  * Utility methods.
  */
 class Util {
+
+  public static function percentAsString(
+    int $a,
+    int $b,
+    bool $fixedWidth = false,
+  ): string {
+
+    if ($b == 0) {
+      return '';
+    }
+
+    $percent = self::percent($a, $b);
+
+    if ($fixedWidth) {
+      return sprintf('%6.2F%%', floatval($percent));
+    }
+
+    return sprintf('%01.2F%%', floatval($percent));
+
+  }
   /**
    * @param float $a
    * @param float $b
@@ -27,25 +47,16 @@ class Util {
     int $b,
     bool $asString = false,
     bool $fixedWidth = false,
-  ): mixed {
-    if ($asString && $b == 0) {
-      return '';
-    }
+  ): float {
 
     if ($b > 0) {
       $percent = ($a / $b) * 100;
     } else {
-      $percent = 100;
+      $percent = 100.0;
     }
 
-    if ($asString === true) {
-      if ($fixedWidth) {
-        return sprintf('%6.2F%%', floatval($percent));
-      }
+    return floatval($percent);
 
-      return sprintf('%01.2F%%', floatval($percent));
-    } else {
-      return $percent;
-    }
   }
+
 }

@@ -16,8 +16,9 @@ class PHP_Token_Interface extends TokenWithScopeAndVisibility {
    * @return string
    */
   public function getName(): string {
+    $id = $this->getId();
     $tokens = $this->tokenStream()->tokens();
-    $nameToken = $tokens->get($this->id + 2);
+    $nameToken = $tokens->get($id + 2);
     if ($nameToken instanceof PHP_Token_String) {
       return strval($nameToken);
     }
@@ -28,8 +29,9 @@ class PHP_Token_Interface extends TokenWithScopeAndVisibility {
    * @return bool
    */
   public function hasParent(): bool {
+    $id = $this->getId();
     $tokens = $this->tokenStream()->tokens();
-    $token = $tokens->get($this->id + 4);
+    $token = $tokens->get($id + 4);
     return $token instanceof PHP_Token_Extends;
   }
 
@@ -51,7 +53,7 @@ class PHP_Token_Interface extends TokenWithScopeAndVisibility {
       'subpackage' => '',
     };
 
-    for ($i = $this->id; $i; --$i) {
+    for ($i = $this->getId(); $i; --$i) {
       $token = $tokens->get($i);
       if ($token instanceof PHP_Token_Namespace) {
         $result->set('namespace', $token->getName());
@@ -135,7 +137,7 @@ class PHP_Token_Interface extends TokenWithScopeAndVisibility {
       return false;
     }
 
-    $i = $this->id + 6;
+    $i = $this->getId() + 6;
     $tokens = $this->tokenStream()->tokens();
     $className = (string) $tokens[$i];
 
@@ -157,16 +159,18 @@ class PHP_Token_Interface extends TokenWithScopeAndVisibility {
    */
   public function hasInterfaces(): bool {
 
+    $id = $this->getId();
+
     // basic: class implements X {}
     $tokens = $this->tokenStream()->tokens();
 
-    $basicImplementsToken = $tokens->get($this->id + 4);
+    $basicImplementsToken = $tokens->get($id + 4);
 
     if ($basicImplementsToken instanceof PHP_Token_Implements) {
       return true;
     }
 
-    $deeperPokeToken = $tokens->get($this->id + 8);
+    $deeperPokeToken = $tokens->get($id + 8);
 
     if ($deeperPokeToken instanceof PHP_Token_Implements) {
       return true;
@@ -193,16 +197,18 @@ class PHP_Token_Interface extends TokenWithScopeAndVisibility {
       return false;
     }
 
+    $id = $this->getId();
+
     $tokens = $this->tokenStream()->tokens();
 
-    $interfacesToken = $tokens->get($this->id + 4);
+    $interfacesToken = $tokens->get($id + 4);
 
     $i = 0;
 
     if ($interfacesToken instanceof PHP_Token_Implements) {
-      $i = $this->id + 3;
+      $i = $id + 3;
     } else {
-      $i = $this->id + 7;
+      $i = $id + 7;
     }
 
     for ($r = $i; $r < $tokens->count(); $r++) {

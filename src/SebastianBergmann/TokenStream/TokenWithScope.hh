@@ -31,11 +31,12 @@ abstract class TokenWithScope extends Token {
    * @return string|null Returns the docblock as a string if found
    */
   public function getDocblock(): ?string {
+    $id = $this->getId();
     $tokens = $this->tokenStream()->tokens();
-    $currentLineNumber = $tokens[$this->id]->getLine();
+    $currentLineNumber = $tokens[$id]->getLine();
     $prevLineNumber = $currentLineNumber - 1;
 
-    for ($i = $this->id - 1; $i; $i--) {
+    for ($i = $id - 1; $i; $i--) {
 
       if (!$tokens->containsKey($i)) {
         return null;
@@ -85,12 +86,16 @@ abstract class TokenWithScope extends Token {
     }
 
     $block = 0;
-    $i = $this->id;
+    $i = $this->getId();
     $tokens = $this->tokenStream()->tokens();
 
-    while ($this->endTokenId === -1 && $tokens->containsKey($i)) {
+    while ($this->endTokenId === -1) {
 
       $token = $tokens->get($i);
+
+      if ($token === null) {
+        break;
+      }
 
       if ($token instanceof PHP_Token_Open_Curly ||
           $token instanceof PHP_Token_Curly_Open) {
@@ -113,7 +118,7 @@ abstract class TokenWithScope extends Token {
     }
 
     if ($this->endTokenId === -1) {
-      $this->endTokenId = $this->id;
+      $this->endTokenId = $this->getId();
     }
 
     return $this->endTokenId;
