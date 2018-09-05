@@ -3,11 +3,11 @@
 namespace Zynga\CodeBase\V1\File;
 
 class RawToken {
-  private int $_tokenId;
-  private string $_text;
-  private int $_lineNo;
+  private int $_tokenId = -1;
+  private string $_text = '';
+  private int $_lineNo = -1;
 
-  public function __construct(int $tokenId, string $text, int $lineNo) {
+  public function setAll(int $tokenId, string $text, int $lineNo): void {
     $this->_tokenId = $tokenId;
     $this->_text = $text;
     $this->_lineNo = $lineNo;

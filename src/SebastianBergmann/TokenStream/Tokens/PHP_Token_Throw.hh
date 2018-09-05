@@ -4,6 +4,7 @@ namespace SebastianBergmann\TokenStream\Tokens;
 
 use SebastianBergmann\TokenStream\Token;
 use SebastianBergmann\TokenStream\TokenInterface;
+use SebastianBergmann\TokenStream\Token\Types;
 
 class PHP_Token_Throw extends Token {
   protected int $endOfDefinitionId = -1;
@@ -44,6 +45,10 @@ class PHP_Token_Throw extends Token {
 
     return $endOfDefinitionToken;
 
+  }
+
+  public function getTokenType(): string {
+    return Types::T_KEYWORD;
   }
 
 }

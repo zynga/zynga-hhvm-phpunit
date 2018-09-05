@@ -3,6 +3,7 @@
 namespace SebastianBergmann\TokenStream\Tokens;
 
 use SebastianBergmann\TokenStream\Token as PHP_Token;
+use SebastianBergmann\TokenStream\Token\Types;
 
 abstract class PHP_Token_Includes extends PHP_Token {
 
@@ -63,6 +64,10 @@ abstract class PHP_Token_Includes extends PHP_Token {
 
     $this->didProcess = true;
 
+  }
+
+  public function getTokenType(): string {
+    return Types::T_KEYWORD;
   }
 
 }

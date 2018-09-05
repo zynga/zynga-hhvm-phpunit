@@ -10,6 +10,7 @@ use SebastianBergmann\TokenStream\TokenInterface;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Comment;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Doc_Comment;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Halt_Compiler;
+use SebastianBergmann\TokenStream\Token\CustomTokens;
 
 use Zynga\CodeBase\V1\File;
 use Zynga\CodeBase\V1\File\RawToken;
@@ -17,43 +18,6 @@ use Zynga\CodeBase\V1\File\RawToken;
 use \Exception;
 
 class Scanner {
-
-  protected static Map<int, string> $tokenNameCache = Map {};
-
-  /**
-   * @var array
-   */
-  protected static Map<string, string>
-    $customTokens = Map {
-      '(' => 'PHP_Token_Open_Bracket',
-      ')' => 'PHP_Token_Close_Bracket',
-      '[' => 'PHP_Token_Open_Square',
-      ']' => 'PHP_Token_Close_Square',
-      '{' => 'PHP_Token_Open_Curly',
-      '}' => 'PHP_Token_Close_Curly',
-      ';' => 'PHP_Token_Semicolon',
-      '.' => 'PHP_Token_Dot',
-      ',' => 'PHP_Token_Comma',
-      '=' => 'PHP_Token_Equal',
-      '<' => 'PHP_Token_Lt',
-      '>' => 'PHP_Token_Gt',
-      '+' => 'PHP_Token_Plus',
-      '-' => 'PHP_Token_Minus',
-      '*' => 'PHP_Token_Mult',
-      '/' => 'PHP_Token_Div',
-      '?' => 'PHP_Token_Question_Mark',
-      '!' => 'PHP_Token_Exclamation_Mark',
-      ':' => 'PHP_Token_Colon',
-      '"' => 'PHP_Token_Double_Quotes',
-      '@' => 'PHP_Token_At',
-      '&' => 'PHP_Token_Ampersand',
-      '%' => 'PHP_Token_Percent',
-      '|' => 'PHP_Token_Pipe',
-      '$' => 'PHP_Token_Dollar',
-      '^' => 'PHP_Token_Caret',
-      '~' => 'PHP_Token_Tilde',
-      '`' => 'PHP_Token_Backtick',
-    };
 
   /**
    * Scans the source for sequences of characters and converts them into a
@@ -75,13 +39,12 @@ class Scanner {
     $numTokens = $tokens->count();
 
     $lastNonWhitespaceTokenWasDoubleColon = false;
-    $name = '';
 
     for ($i = 0; $i < $numTokens; ++$i) {
 
       $token = $tokens->get($i);
 
-      $tokenClass = '';
+      $newToken = null;
       $text = '';
       $skip = 0;
 
@@ -89,65 +52,64 @@ class Scanner {
         continue;
       }
 
-      if ($token->getTokenId() === -1) {
-        $text = $token->getText();
-        $t_tokenClass = self::$customTokens->get($text);
+      $text = $token->getText();
+      $tokenId = $token->getTokenId();
 
-        if (is_string($t_tokenClass)) {
-          $tokenClass = $t_tokenClass;
+      // first look up our custom tokens, as this is a unresolved token.
+      if ($token->getLineNo() == -1) {
+
+        $t_tokenName = CustomTokens::getTokenClassNameFromId($tokenId);
+
+        if ($t_tokenName !== null) {
+          $newToken = TokenFactory::createTokenFromName($t_tokenName);
         }
 
       }
 
-      if ($tokenClass == '') {
+      if ($newToken == null) {
 
-        $name = substr($this->resolveTokenName($token->getTokenId()), 2);
-
-        $text = $token->getText();
-
-        if ($lastNonWhitespaceTokenWasDoubleColon && $name == 'CLASS') {
-          $name = 'CLASS_NAME_CONSTANT';
-        } else if ($name == 'USE' &&
+        if ($lastNonWhitespaceTokenWasDoubleColon && $tokenId == T_CLASS) {
+          $tokenClass = 'PHP_Token_Class_Name_Constant';
+          $newToken = TokenFactory::createTokenFromName($tokenClass);
+        } else if ($tokenId == T_USE &&
                    $tokens->containsKey($i + 2) &&
                    $tokens[$i + 2]->getTokenId() == T_FUNCTION) {
-          $name = 'Use_Function';
+          $tokenClass = 'PHP_Token_Use_Function';
+          $newToken = TokenFactory::createTokenFromName($tokenClass);
           $skip = 2;
-        }
+        } else {
+          // First attempt to pull the token out of the factory.
+          $newToken = TokenFactory::createTokenFromTokenId($tokenId);
 
-        // convert the raw token name into a class name
-        $nameParts = explode("_", $name);
-
-        $name = '';
-        foreach ($nameParts as $namePart) {
-          if ($name != '') {
-            $name .= '_';
+          if ($newToken == null) {
+            // convert the raw token name into a class name
+            $shortName = $this->resolveTokenIdToShortName($tokenId);
+            $tokenClass = 'PHP_Token_'.$shortName;
+            $newToken = TokenFactory::createTokenFromName($tokenClass);
           }
-          $name .= ucfirst(strtolower($namePart));
+
         }
 
-        $tokenClass = 'PHP_Token_'.$name;
-
       }
 
-      $newToken =
-        TokenFactory::createToken($tokenClass, $text, $line, $codeFile, $id);
+      // if ($newToken === null) {
+      //   // --
+      //   // JEO: DynamicClassCreation is actually somewhat slow with the number
+      //   // of ops we are asking it to do.
+      //   // --
+      //   $tokenParams = Vector {};
+      //
+      //   $newToken = DynamicClassCreation::createClassByNameGeneric(
+      //     'SebastianBergmann\TokenStream\Tokens\\'.$tokenClass,
+      //     $tokenParams,
+      //   );
+      //
+      // }
 
-      if ($newToken === null) {
-        // --
-        // JEO: DynamicClassCreation is actually somewhat slow with the number
-        // of ops we are asking it to do.
-        // --
-        $tokenParams = Vector {$text, $line, $codeFile, $id};
-
-        $newToken = DynamicClassCreation::createClassByNameGeneric(
-          'SebastianBergmann\TokenStream\Tokens\\'.$tokenClass,
-          $tokenParams,
-        );
-
-      }
       $id++;
 
       if ($newToken instanceof TokenInterface) {
+        $newToken->setAllAttributes($text, $line, $codeFile, $id);
         $stream->tokens()->add($newToken);
       }
 
@@ -156,44 +118,53 @@ class Scanner {
 
       if ($newToken instanceof PHP_Token_Halt_Compiler) {
         break;
-      } else if ($newToken instanceof PHP_Token_Comment ||
-                 $newToken instanceof PHP_Token_Doc_Comment) {
-        // @TODO: This should move up to the parent file structure anyways.
-        //        $this->linesOfCode['cloc'] += $lines + 1;
       }
 
-      if ($name == 'DOUBLE_COLON') {
+      if ($tokenId == T_DOUBLE_COLON) {
         $lastNonWhitespaceTokenWasDoubleColon = true;
-      } else if ($name != 'WHITESPACE') {
+      } else if ($tokenId != T_WHITESPACE) {
         $lastNonWhitespaceTokenWasDoubleColon = false;
       }
 
       $i += $skip;
     }
 
-    // @TODO, these should move up to the file structure anywasy.
-    //    $this->linesOfCode['loc'] = substr_count($sourceCode, "\n");
-    //    $this->linesOfCode['ncloc'] =
-    //      $this->linesOfCode['loc'] - $this->linesOfCode['cloc'];
+  }
+
+  private Map<int, string> $_tokenIdToShortName = Map {};
+
+  protected function resolveTokenIdToShortName(int $tokenId): string {
+
+    $shortName = $this->_tokenIdToShortName->get($tokenId);
+
+    if ($shortName !== null) {
+      return $shortName;
+    }
+
+    // strip the T_ off the token name before proceeding.
+    $tokenName = substr($this->resolveTokenName($tokenId), 2);
+
+    // explode the name into chunks
+    $nameParts = explode("_", $tokenName);
+
+    // make up a short name using the chunks provided
+    $shortName = '';
+    foreach ($nameParts as $namePart) {
+      if ($shortName != '') {
+        $shortName .= '_';
+      }
+      $shortName .= ucfirst(strtolower($namePart));
+    }
+
+    $this->_tokenIdToShortName->set($tokenId, $shortName);
+
+    return $shortName;
 
   }
 
   protected function resolveTokenName(int $tokenId): string {
-
-    $cachedTokenName = self::$tokenNameCache->get($tokenId);
-
-    if (is_string($cachedTokenName)) {
-      return $cachedTokenName;
-    }
-
+    // resolve using the built in token_name function.
     $tokenName = token_name($tokenId);
-
-    if (!is_string($tokenName)) {
-      throw new Exception('tokenId='.$tokenId.' - is unknown to token_name');
-    }
-
-    self::$tokenNameCache->set($tokenId, $tokenName);
-
     return $tokenName;
 
   }

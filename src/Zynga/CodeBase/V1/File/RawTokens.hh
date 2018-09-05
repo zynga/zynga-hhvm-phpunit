@@ -4,6 +4,7 @@ namespace Zynga\CodeBase\V1\File;
 
 use Zynga\CodeBase\V1\File;
 use Zynga\CodeBase\V1\File\RawToken;
+use SebastianBergmann\TokenStream\Token\CustomTokens;
 
 class RawTokens {
   private File $_parent;
@@ -35,14 +36,28 @@ class RawTokens {
       return false;
     }
 
+    $rawToken = new RawToken();
+
     foreach ($dirtyTokens as $dirtyToken) {
 
       $token = null;
 
-      if (is_array($dirtyToken) && count($dirtyToken) == 3) {
-        $token = new RawToken($dirtyToken[0], $dirtyToken[1], $dirtyToken[2]);
-      } else if (is_string($dirtyToken)) {
-        $token = new RawToken(-1, $dirtyToken, -1);
+      if (is_array($dirtyToken)) {
+        $token = clone $rawToken;
+        $token->setAll($dirtyToken[0], $dirtyToken[1], $dirtyToken[2]);
+      } else {
+
+        $customTokenId = CustomTokens::getTokenIdFromString($dirtyToken);
+
+        $token = clone $rawToken;
+
+        if ($customTokenId != -1) {
+          $token->setAll($customTokenId, $dirtyToken, -1);
+        } else {
+          //error_log('dirtyTokenFound='.$dirtyToken);
+          $token->setAll(-1, $dirtyToken, -1);
+        }
+
       }
 
       if ($token instanceof RawToken) {

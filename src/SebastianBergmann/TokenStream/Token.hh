@@ -6,6 +6,8 @@ use SebastianBergmann\TokenStream\Token\Stream;
 use SebastianBergmann\TokenStream\Token\Stream\CachingFactory;
 use SebastianBergmann\TokenStream\TokenInterface;
 use Zynga\CodeBase\V1\File;
+use SebastianBergmann\TokenStream\Token\Types;
+
 use \Exception;
 
 /**
@@ -27,7 +29,7 @@ abstract class Token implements TokenInterface {
   //
   // --
 
-  public function setAllAttributes(
+  final public function setAllAttributes(
     string $text,
     int $line,
     File $file,
@@ -39,50 +41,47 @@ abstract class Token implements TokenInterface {
     $this->_id = $id;
   }
 
-  public function getFile(): ?File {
+  final public function getFile(): ?File {
     return $this->_file;
   }
 
-  public function setFile(File $file): bool {
+  final public function setFile(File $file): bool {
     $this->_file = $file;
     return true;
   }
 
-  public function getText(): string {
+  final public function getText(): string {
     return $this->_text;
   }
 
-  public function setText(string $text): bool {
+  final public function setText(string $text): bool {
     $this->_text = $text;
     return true;
   }
 
-  public function getLine(): int {
+  final public function getLine(): int {
     return $this->_line;
   }
 
-  public function setLine(int $line): bool {
+  final public function setLine(int $line): bool {
     $this->_line = $line;
     return true;
   }
 
-  public function getId(): int {
+  final public function getId(): int {
     return $this->_id;
   }
 
-  public function setId(int $id): bool {
+  final public function setId(int $id): bool {
     $this->_id = $id;
     return true;
   }
 
-  /**
-   * @return string
-   */
-  public function __toString(): string {
+  final public function __toString(): string {
     return strval($this->_text);
   }
 
-  public function tokenStream(): Stream {
+  final public function tokenStream(): Stream {
     $file = $this->getFile();
     if ($file instanceof File) {
       return $file->stream();
@@ -92,11 +91,12 @@ abstract class Token implements TokenInterface {
     );
   }
 
-  public function getShortTokenName(): string {
+  final public function getShortTokenName(): string {
     return str_replace(
       'SebastianBergmann\TokenStream\Tokens\PHP_Token_',
       '',
       static::class,
     );
   }
+
 }

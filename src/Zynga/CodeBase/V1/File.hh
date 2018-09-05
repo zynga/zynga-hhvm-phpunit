@@ -410,7 +410,7 @@ class File {
 
         $this->_lineToTokens->set($lineNo, $lineStack);
 
-        $lineStack = Vector {};
+        $lineStack->clear();
 
         $lineNo = $nextLineNo;
 

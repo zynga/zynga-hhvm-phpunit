@@ -4,6 +4,7 @@ namespace SebastianBergmann\TokenStream\Tokens;
 
 use SebastianBergmann\TokenStream\TokenWithScope;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Ns_Seperator;
+use SebastianBergmann\TokenStream\Token\Types;
 
 class PHP_Token_Namespace extends TokenWithScope {
 
@@ -29,4 +30,9 @@ class PHP_Token_Namespace extends TokenWithScope {
 
     return $namespace;
   }
+
+  public function getTokenType(): string {
+    return Types::T_KEYWORD;
+  }
+
 }

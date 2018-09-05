@@ -20,5 +20,6 @@ interface TokenInterface {
   public function getShortTokenName(): string;
   //public function getFile(): ?File;
   //public function setFile(File $file): bool;
+  public function getTokenType(): string;
   public function __toString(): string;
 }

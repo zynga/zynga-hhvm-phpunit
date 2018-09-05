@@ -6,6 +6,7 @@ use SebastianBergmann\TokenStream\TokenInterface;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Interface;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_String;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_WhiteSpace;
+use SebastianBergmann\TokenStream\Token\Types;
 
 class PHP_Token_Class extends PHP_Token_Interface {
 
@@ -73,4 +74,9 @@ class PHP_Token_Class extends PHP_Token_Interface {
     return 'anonymous class';
 
   }
+
+  public function getTokenType(): string {
+    return Types::T_KEYWORD;
+  }
+
 }

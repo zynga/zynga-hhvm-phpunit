@@ -209,40 +209,608 @@ use \Exception;
 
 class Factory {
 
-  private static Map<string, TokenInterface> $_tokenTemplateCache = Map {};
+  private static Map<string, TokenInterface>
+    $_tokenTemplateCacheByName = Map {};
+  private static Map<int, TokenInterface> $_tokenTemplateCacheById = Map {};
 
-  public static function createToken(
-    string $name,
-    string $text,
-    int $line,
-    File $parent,
-    int $id,
+  public static function createTokenFromTokenId(
+    int $tokenId,
   ): ?TokenInterface {
 
-    // --
-    // Multi-pass token creation:
-    // 1) Stats generated if statements
-    // 2) Clone cache based implementation
-    // --
-    $token = self::createTokenFromStats($name);
-
-    if ($token instanceof TokenInterface) {
-      $token->setAllAttributes($text, $line, $parent, $id);
-      return $token;
-    }
-
-    $templateToken = self::$_tokenTemplateCache->get($name);
-
-    if (!$templateToken instanceof TokenInterface) {
-      $templateToken = self::createTokenFromName($name);
-      if ($templateToken instanceof TokenInterface) {
-        self::$_tokenTemplateCache->set($name, $templateToken);
-      }
-    }
+    $templateToken = self::$_tokenTemplateCacheById->get($tokenId);
 
     if ($templateToken instanceof TokenInterface) {
       $token = clone $templateToken;
-      $token->setAllAttributes($text, $line, $parent, $id);
+      return $token;
+    }
+
+    $templateToken = self::createTokenFromTokenIdRaw($tokenId);
+
+    if ($templateToken instanceof TokenInterface) {
+      self::$_tokenTemplateCacheById->set($tokenId, $templateToken);
+      // We clone to make sure that we don't hand back a ref to our template.
+      $token = clone $templateToken;
+      return $token;
+    }
+
+    return null;
+  }
+
+  private static function createTokenFromTokenIdRaw(
+    int $tokenId,
+  ): ?TokenInterface {
+    if ($tokenId == T_REQUIRE_ONCE) {
+      return new PHP_Token_Require_Once();
+    }
+    if ($tokenId == T_REQUIRE) {
+      return new PHP_Token_Require();
+    }
+    if ($tokenId == T_EVAL) {
+      return new PHP_Token_Eval();
+    }
+    if ($tokenId == T_INCLUDE_ONCE) {
+      return new PHP_Token_Include_Once();
+    }
+    if ($tokenId == T_INCLUDE) {
+      return new PHP_Token_Include();
+    }
+    if ($tokenId == T_LOGICAL_OR) {
+      return new PHP_Token_Logical_Or();
+    }
+    if ($tokenId == T_LOGICAL_XOR) {
+      return new PHP_Token_Logical_Xor();
+    }
+    if ($tokenId == T_LOGICAL_AND) {
+      return new PHP_Token_Logical_And();
+    }
+    if ($tokenId == T_PRINT) {
+      return new PHP_Token_Print();
+    }
+    if ($tokenId == T_SR_EQUAL) {
+      return new PHP_Token_Sr_Equal();
+    }
+    if ($tokenId == T_SL_EQUAL) {
+      return new PHP_Token_Sl_Equal();
+    }
+    if ($tokenId == T_XOR_EQUAL) {
+      return new PHP_Token_Xor_Equal();
+    }
+    if ($tokenId == T_AND_EQUAL) {
+      return new PHP_Token_And_Equal();
+    }
+    if ($tokenId == T_MOD_EQUAL) {
+      return new PHP_Token_Mod_Equal();
+    }
+    if ($tokenId == T_CONCAT_EQUAL) {
+      return new PHP_Token_Concat_Equal();
+    }
+    if ($tokenId == T_DIV_EQUAL) {
+      return new PHP_Token_Div_Equal();
+    }
+    if ($tokenId == T_MUL_EQUAL) {
+      return new PHP_Token_Mul_Equal();
+    }
+    if ($tokenId == T_MINUS_EQUAL) {
+      return new PHP_Token_Minus_Equal();
+    }
+    if ($tokenId == T_PLUS_EQUAL) {
+      return new PHP_Token_Plus_Equal();
+    }
+    if ($tokenId == T_BOOLEAN_OR) {
+      return new PHP_Token_Boolean_Or();
+    }
+    if ($tokenId == T_BOOLEAN_AND) {
+      return new PHP_Token_Boolean_And();
+    }
+    if ($tokenId == T_IS_NOT_IDENTICAL) {
+      return new PHP_Token_Is_Not_Identical();
+    }
+    if ($tokenId == T_IS_NOT_EQUAL) {
+      return new PHP_Token_Is_Identical();
+    }
+    if ($tokenId == T_IS_NOT_EQUAL) {
+      return new PHP_Token_Is_Not_Equal();
+    }
+    if ($tokenId == T_IS_EQUAL) {
+      return new PHP_Token_Is_Equal();
+    }
+    if ($tokenId == T_IS_GREATER_OR_EQUAL) {
+      return new PHP_Token_Is_Greater_Or_Equal();
+    }
+    if ($tokenId == T_IS_SMALLER_OR_EQUAL) {
+      return new PHP_Token_Is_Smaller_Or_Equal();
+    }
+    if ($tokenId == T_SR) {
+      return new PHP_Token_Sr();
+    }
+    if ($tokenId == T_SL) {
+      return new PHP_Token_Sl();
+    }
+    if ($tokenId == T_INSTANCEOF) {
+      return new PHP_Token_Insteadof();
+    }
+    if ($tokenId == T_UNSET) {
+      return new PHP_Token_Unset();
+    }
+    if ($tokenId == T_UNSET_CAST) {
+      return new PHP_Token_Unset_Cast();
+    }
+    if ($tokenId == T_BOOL_CAST) {
+      return new PHP_Token_Bool_Cast();
+    }
+    if ($tokenId == T_OBJECT_CAST) {
+      return new PHP_Token_Object_Cast();
+    }
+    if ($tokenId == T_ARRAY_CAST) {
+      return new PHP_Token_Array_Cast();
+    }
+    if ($tokenId == T_STRING_CAST) {
+      return new PHP_Token_String_Cast();
+    }
+    if ($tokenId == T_DOUBLE_CAST) {
+      return new PHP_Token_Double_Cast();
+    }
+    if ($tokenId == T_INT_CAST) {
+      return new PHP_Token_Int_Cast();
+    }
+    if ($tokenId == T_DEC) {
+      return new PHP_Token_Dec();
+    }
+    if ($tokenId == T_INC) {
+      return new PHP_Token_Inc();
+    }
+    if ($tokenId == T_CLONE) {
+      return new PHP_Token_Clone();
+    }
+    if ($tokenId == T_NEW) {
+      return new PHP_Token_New();
+    }
+    if ($tokenId == T_EXIT) {
+      return new PHP_Token_Exit();
+    }
+    if ($tokenId == T_IF) {
+      return new PHP_Token_If();
+    }
+    if ($tokenId == T_ELSEIF) {
+      return new PHP_Token_Elseif();
+    }
+    if ($tokenId == T_ELSE) {
+      return new PHP_Token_Else();
+    }
+    if ($tokenId == T_LNUMBER) {
+      return new PHP_Token_Lnumber();
+    }
+    if ($tokenId == T_DNUMBER) {
+      return new PHP_Token_Dnumber();
+    }
+    if ($tokenId == T_STRING) {
+      return new PHP_Token_String();
+    }
+    if ($tokenId == T_STRING_VARNAME) {
+      return new PHP_Token_String_Varname();
+    }
+    if ($tokenId == T_VARIABLE) {
+      return new PHP_Token_Variable();
+    }
+    if ($tokenId == T_NUM_STRING) {
+      return new PHP_Token_Num_String();
+    }
+    if ($tokenId == T_INLINE_HTML) {
+      return new PHP_Token_Inline_Html();
+    }
+    if ($tokenId == T_CHARACTER) {
+      return new PHP_Token_Character();
+    }
+    if ($tokenId == T_BAD_CHARACTER) {
+      return new PHP_Token_Bad_Character();
+    }
+    if ($tokenId == T_ENCAPSED_AND_WHITESPACE) {
+      return new PHP_Token_Encapsed_And_Whitespace();
+    }
+    if ($tokenId == T_CONSTANT_ENCAPSED_STRING) {
+      return new PHP_Token_Constant_Encapsed_String();
+    }
+    if ($tokenId == T_ECHO) {
+      return new PHP_Token_Echo();
+    }
+    if ($tokenId == T_DO) {
+      return new PHP_Token_Do();
+    }
+    if ($tokenId == T_WHILE) {
+      return new PHP_Token_While();
+    }
+    if ($tokenId == T_ENDWHILE) {
+      return new PHP_Token_Endwhile();
+    }
+    if ($tokenId == T_FOR) {
+      return new PHP_Token_For();
+    }
+    if ($tokenId == T_ENDFOR) {
+      return new PHP_Token_Endfor();
+    }
+    if ($tokenId == T_FOREACH) {
+      return new PHP_Token_Foreach();
+    }
+    if ($tokenId == T_ENDFOREACH) {
+      return new PHP_Token_Endforeach();
+    }
+    if ($tokenId == T_DECLARE) {
+      return new PHP_Token_Declare();
+    }
+    if ($tokenId == T_ENDDECLARE) {
+      return new PHP_Token_Enddeclare();
+    }
+    if ($tokenId == T_AS) {
+      return new PHP_Token_As();
+    }
+    if ($tokenId == T_SWITCH) {
+      return new PHP_Token_Switch();
+    }
+    if ($tokenId == T_ENDSWITCH) {
+      return new PHP_Token_Endswitch();
+    }
+    if ($tokenId == T_CASE) {
+      return new PHP_Token_Case();
+    }
+    if ($tokenId == T_DEFAULT) {
+      return new PHP_Token_Default();
+    }
+    if ($tokenId == T_BREAK) {
+      return new PHP_Token_Break();
+    }
+    if ($tokenId == T_GOTO) {
+      return new PHP_Token_Goto();
+    }
+    if ($tokenId == T_CONTINUE) {
+      return new PHP_Token_Continue();
+    }
+    if ($tokenId == T_FUNCTION) {
+      return new PHP_Token_Function();
+    }
+    if ($tokenId == T_CONST) {
+      return new PHP_Token_Const();
+    }
+    if ($tokenId == T_RETURN) {
+      return new PHP_Token_Return();
+    }
+    if ($tokenId == T_TRY) {
+      return new PHP_Token_Try();
+    }
+    if ($tokenId == T_CATCH) {
+      return new PHP_Token_Catch();
+    }
+    if ($tokenId == T_THROW) {
+      return new PHP_Token_Throw();
+    }
+    if ($tokenId == T_USE) {
+      return new PHP_Token_Use();
+    }
+    if ($tokenId == T_GLOBAL) {
+      return new PHP_Token_Global();
+    }
+    if ($tokenId == T_PUBLIC) {
+      return new PHP_Token_Public();
+    }
+    if ($tokenId == T_PROTECTED) {
+      return new PHP_Token_Protected();
+    }
+    if ($tokenId == T_PRIVATE) {
+      return new PHP_Token_Private();
+    }
+    if ($tokenId == T_FINAL) {
+      return new PHP_Token_Final();
+    }
+    if ($tokenId == T_ABSTRACT) {
+      return new PHP_Token_Abstract();
+    }
+    if ($tokenId == T_STATIC) {
+      return new PHP_Token_Static();
+    }
+    if ($tokenId == T_VAR) {
+      return new PHP_Token_Var();
+    }
+    if ($tokenId == T_UNSET) {
+      return new PHP_Token_Unset();
+    }
+    if ($tokenId == T_ISSET) {
+      return new PHP_Token_Isset();
+    }
+    if ($tokenId == T_EMPTY) {
+      return new PHP_Token_Empty();
+    }
+    if ($tokenId == T_HALT_COMPILER) {
+      return new PHP_Token_Halt_Compiler();
+    }
+    if ($tokenId == T_CLASS) {
+      return new PHP_Token_Class();
+    }
+    if ($tokenId == T_INTERFACE) {
+      return new PHP_Token_Interface();
+    }
+    if ($tokenId == T_EXTENDS) {
+      return new PHP_Token_Extends();
+    }
+    if ($tokenId == T_IMPLEMENTS) {
+      return new PHP_Token_Implements();
+    }
+    if ($tokenId == T_OBJECT_OPERATOR) {
+      return new PHP_Token_Object_Operator();
+    }
+    if ($tokenId == T_DOUBLE_ARROW) {
+      return new PHP_Token_Double_Arrow();
+    }
+    if ($tokenId == T_LIST) {
+      return new PHP_Token_List();
+    }
+    if ($tokenId == T_ARRAY) {
+      return new PHP_Token_Array();
+    }
+    if ($tokenId == T_CLASS_C) {
+      return new PHP_Token_Class_C();
+    }
+    if ($tokenId == T_METHOD_C) {
+      return new PHP_Token_Method_C();
+    }
+    if ($tokenId == T_FUNC_C) {
+      return new PHP_Token_Func_C();
+    }
+    if ($tokenId == T_LINE) {
+      return new PHP_Token_Line();
+    }
+    if ($tokenId == T_FILE) {
+      return new PHP_Token_File();
+    }
+    if ($tokenId == T_COMMENT) {
+      return new PHP_Token_Comment();
+    }
+    if ($tokenId == T_DOC_COMMENT) {
+      return new PHP_Token_Doc_Comment();
+    }
+    if ($tokenId == T_OPEN_TAG) {
+      return new PHP_Token_Open_Tag();
+    }
+    if ($tokenId == T_OPEN_TAG_WITH_ECHO) {
+      return new PHP_Token_Open_Tag_With_Echo();
+    }
+    if ($tokenId == T_CLOSE_TAG) {
+      return new PHP_Token_Close_Tag();
+    }
+    if ($tokenId == T_WHITESPACE) {
+      return new PHP_Token_Whitespace();
+    }
+    if ($tokenId == T_START_HEREDOC) {
+      return new PHP_Token_Start_Heredoc();
+    }
+    if ($tokenId == T_END_HEREDOC) {
+      return new PHP_Token_End_Heredoc();
+    }
+    if ($tokenId == T_DOLLAR_OPEN_CURLY_BRACES) {
+      return new PHP_Token_Dollar_Open_Curly_Braces();
+    }
+    if ($tokenId == T_CURLY_OPEN) {
+      return new PHP_Token_Curly_Open();
+    }
+    // --
+    // JEO: Currently unused, but stubbing it in jic it is used in the future.
+    //const int UserTokenId_T_PAAMAYIM_NEKUDOTAYIM UNUSED = 376;
+    //if ($tokenId == T_PAAMAYIM_NEKUDOTAYIM) {
+    //  return new PHP_Token_XXX();
+    //}
+    // --
+    if ($tokenId == T_NAMESPACE) {
+      return new PHP_Token_Namespace();
+    }
+    if ($tokenId == T_NS_C) {
+      return new PHP_Token_Ns_C();
+    }
+    if ($tokenId == T_DIR) {
+      return new PHP_Token_Dir();
+    }
+    if ($tokenId == T_NS_SEPARATOR) {
+      return new PHP_Token_Ns_Separator();
+    }
+    if ($tokenId == T_YIELD) {
+      return new PHP_Token_Yield();
+    }
+    if ($tokenId == T_XHP_LABEL) {
+      return new PHP_Token_Xhp_Label();
+    }
+    if ($tokenId == T_XHP_ATTRIBUTE) {
+      return new PHP_Token_Xhp_Attribute();
+    }
+    if ($tokenId == T_XHP_CATEGORY) {
+      return new PHP_Token_Xhp_Category();
+    }
+    if ($tokenId == T_XHP_CATEGORY_LABEL) {
+      return new PHP_Token_Xhp_Category_Label();
+    }
+    if ($tokenId == T_XHP_CHILDREN) {
+      return new PHP_Token_Xhp_Children();
+    }
+    if ($tokenId == T_ENUM) {
+      return new PHP_Token_Enum();
+    }
+    if ($tokenId == T_XHP_REQUIRED) {
+      return new PHP_Token_Xhp_Required();
+    }
+    if ($tokenId == T_TRAIT) {
+      return new PHP_Token_Trait();
+    }
+    if ($tokenId == T_INSTEADOF) {
+      return new PHP_Token_Insteadof();
+    }
+    if ($tokenId == T_TRAIT_C) {
+      return new PHP_Token_Trait_C();
+    }
+    if ($tokenId == T_ELLIPSIS) {
+      return new PHP_Token_Ellipsis();
+    }
+    // --
+    // Defined int he types list, but don't know if it's actually used.
+    //if ($tokenId == T_HH_ERROR) {
+    //  return new PHP_Token_Hh_Error();
+    //}
+    // --
+    if ($tokenId == T_FINALLY) {
+      return new PHP_Token_Finally();
+    }
+    if ($tokenId == T_XHP_TAG_LT) {
+      return new PHP_Token_Xhp_Tag_Lt();
+    }
+    if ($tokenId == T_XHP_TAG_GT) {
+      return new PHP_Token_Xhp_Tag_Gt();
+    }
+    if ($tokenId == T_TYPELIST_LT) {
+      return new PHP_Token_Typelist_Lt();
+    }
+    if ($tokenId == T_TYPELIST_GT) {
+      return new PHP_Token_Typelist_Gt();
+    }
+    // JEO: We don't currently have a token for this one yet, do we need one?
+    //if ($tokenId == T_UNRESOLVED_LT) {
+    //  return new PHP_Token_Unresolved_Lt();
+    //}
+    // const int UserTokenId_T_COLLECTION = 401;
+    //if ($tokenId == T_COLLECTION) {
+    //  return new PHP_Token_Collection();
+    //}
+    if ($tokenId == T_SHAPE) {
+      return new PHP_Token_Shape();
+    }
+    if ($tokenId == T_TYPE) {
+      return new PHP_Token_Type();
+    }
+    // const int UserTokenId_T_UNRESOLVED_TYPE = 404;
+    //if ($tokenId == T_UNRESOLVED_TYPE) {
+    //  return new PHP_Token_Unresolved_Type();
+    //}
+    // const int UserTokenId_T_NEWTYPE = 405;
+    // if ($tokenId == T_NEWTYPE) {
+    //   return new PHP_Token_Newtype();
+    // }
+    // const int UserTokenId_T_NEWTYPE = 405;
+    //if ($tokenId == T_UNRESOLVED_NEWTYPE) {
+    //  return new PHP_Token_Unresolved_Newtype();
+    //}
+    if ($tokenId == T_COMPILER_HALT_OFFSET) {
+      return new PHP_Token_Compiler_Halt_Offset();
+    }
+    if ($tokenId == T_AWAIT) {
+      return new PHP_Token_Await();
+    }
+    if ($tokenId == T_ASYNC) {
+      return new PHP_Token_Async();
+    }
+    if ($tokenId == T_LAMBDA_ARROW) {
+      return new PHP_Token_Lambda_Arrow();
+    }
+    if ($tokenId == T_DOUBLE_COLON) {
+      return new PHP_Token_Double_Colon();
+    }
+    if ($tokenId == T_LAMBDA_OP) {
+      return new PHP_Token_Lambda_Op();
+    }
+    if ($tokenId == T_LAMBDA_CP) {
+      return new PHP_Token_Lambda_Cp();
+    }
+    // const int UserTokenId_T_UNRESOLVED_OP = 429;
+    //if ($tokenId == T_UNRESOLVED_OP) {
+    //  return new PHP_Token_Unresolved_Op();
+    //}
+    if ($tokenId == T_CALLABLE) {
+      return new PHP_Token_Callable();
+    }
+    if ($tokenId == T_ONUMBER) {
+      return new PHP_Token_Onumber();
+    }
+    if ($tokenId == T_POW) {
+      return new PHP_Token_Pow();
+    }
+    if ($tokenId == T_POW_EQUAL) {
+      return new PHP_Token_Pow_Equal();
+    }
+    if ($tokenId == T_NULLSAFE_OBJECT_OPERATOR) {
+      return new PHP_Token_Nullsafe_Object_Operator();
+    }
+    //const int UserTokenId_T_HASHBANG = 435;
+    //if ($tokenId == T_HASHBANG) {
+    //  return new PHP_Token_Hashbang();
+    //}
+    if ($tokenId == T_SUPER) {
+      return new PHP_Token_Super();
+    }
+    if ($tokenId == T_SPACESHIP) {
+      return new PHP_Token_Spaceship();
+    }
+    // const int UserTokenId_T_COALESCE = 438;
+    // if ($tokenId == T_COALESCE) {
+    //   return new PHP_Token_Colaesce();
+    // }
+    if ($tokenId == T_YIELD_FROM) {
+      return new PHP_Token_Yield_From();
+    }
+    if ($tokenId == T_PIPE) {
+      return new PHP_Token_Pipe();
+    }
+    // const int UserTokenId_T_PIPE_VAR = 441;
+    // if ($tokenId == T_PIPE_VAR) {
+    //   return new PHP_Token_Pipe_Var();
+    // }
+    // const int UserTokenId_T_DICT = 442;
+    // if ($tokenId == T_DICT) {
+    //   return new PHP_Token_Dict();
+    // }
+    // const int UserTokenId_T_VEC = 443;
+    // if ($tokenId == T_VEC) {
+    //   return new PHP_Token_Vec();
+    // }
+    // const int UserTokenId_T_KEYSET = 444;
+    // if ($tokenId == T_KEYSET) {
+    //   return new PHP_Token_Keyset();
+    // }
+    // const int UserTokenId_T_WHERE = 445;
+    // if ($tokenId == T_WHERE) {
+    //   return new PHP_Token_Where();
+    // }
+    // const int UserTokenId_T_VARRAY = 446;
+    // if ($tokenId == T_VARRAY) {
+    //   return new PHP_Token_Varray();
+    // }
+    // const int UserTokenId_T_DARRAY = 447;
+    // if ($tokenId == T_DARRAY) {
+    //   return new PHP_Token_Darray();
+    // }
+    // const int UserTokenId_T_USING = 448;
+    // if ($tokenId == T_USING) {
+    //   return new PHP_Token_Using();
+    // }
+    // const int UserTokenId_T_INOUT = 449;
+    // if ($tokenId == T_INOUT) {
+    //   return new PHP_Token_Inout();
+    // }
+    // const int UserTokenId_T_TUPLE = 450;
+    // if ($tokenId == T_TUPLE) {
+    //   return new PHP_Token_Tuple();
+    // }
+    return null;
+
+  }
+
+  public static function createTokenFromName(string $name): ?TokenInterface {
+
+    $templateToken = self::$_tokenTemplateCacheByName->get($name);
+
+    if ($templateToken instanceof TokenInterface) {
+      $token = clone $templateToken;
+      return $token;
+    }
+
+    $templateToken = self::createTokenFromNameStepped($name);
+
+    if ($templateToken instanceof TokenInterface) {
+      self::$_tokenTemplateCacheByName->set($name, $templateToken);
+      // We clone to make sure that we don't hand back a ref to our template.
+      $token = clone $templateToken;
       return $token;
     }
 
@@ -250,493 +818,9 @@ class Factory {
 
   }
 
-  private static function createTokenFromStats(string $name): ?TokenInterface {
-
-    // --
-    // JEO: To do this optimization:
-    //
-    // 1) first remove all the if statements below and turn on the error_log
-    //    statement.
-    //
-    // 2) Now run some tests against your codebase.
-    //
-    // 3) Take a look at the token frequency via:
-    //   <repo>/bin/token_count.sh | less # It will be sorted most used to least
-    //
-    // 4) Now generate some hack code to replace the ifs you removed.
-    //   <repo>/bin/token_optimize.sh
-    //
-    // 5) Turn off the error_log and re-run your tests.
-    // --
-
-    // --
-    // Autogenerated code starts here, remove the below to begin optimizing.
-    // --
-    if ($name == "PHP_Token_Whitespace") {
-      // 38491 PHP_Token_Whitespace
-      $token = new PHP_Token_Whitespace();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_String") {
-      // 23227 PHP_Token_String
-      $token = new PHP_Token_String();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Ns_Separator") {
-      // 8333 PHP_Token_Ns_Separator
-      $token = new PHP_Token_Ns_Separator();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Variable") {
-      // 7616 PHP_Token_Variable
-      $token = new PHP_Token_Variable();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Semicolon") {
-      // 6559 PHP_Token_Semicolon
-      $token = new PHP_Token_Semicolon();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Open_Bracket") {
-      // 5391 PHP_Token_Open_Bracket
-      $token = new PHP_Token_Open_Bracket();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Close_Bracket") {
-      // 5391 PHP_Token_Close_Bracket
-      $token = new PHP_Token_Close_Bracket();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Equal") {
-      // 3538 PHP_Token_Equal
-      $token = new PHP_Token_Equal();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Function") {
-      // 3400 PHP_Token_Function
-      $token = new PHP_Token_Function();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Public") {
-      // 3324 PHP_Token_Public
-      $token = new PHP_Token_Public();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Colon") {
-      // 3128 PHP_Token_Colon
-      $token = new PHP_Token_Colon();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Open_Curly") {
-      // 3001 PHP_Token_Open_Curly
-      $token = new PHP_Token_Open_Curly();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Close_Curly") {
-      // 3001 PHP_Token_Close_Curly
-      $token = new PHP_Token_Close_Curly();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Comma") {
-      // 2882 PHP_Token_Comma
-      $token = new PHP_Token_Comma();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Return") {
-      // 2754 PHP_Token_Return
-      $token = new PHP_Token_Return();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Object_Operator") {
-      // 2656 PHP_Token_Object_Operator
-      $token = new PHP_Token_Object_Operator();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Use") {
-      // 2630 PHP_Token_Use
-      $token = new PHP_Token_Use();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Comment") {
-      // 2148 PHP_Token_Comment
-      $token = new PHP_Token_Comment();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Constant_Encapsed_String") {
-      // 1968 PHP_Token_Constant_Encapsed_String
-      $token = new PHP_Token_Constant_Encapsed_String();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_If") {
-      // 1282 PHP_Token_If
-      $token = new PHP_Token_If();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Double_Colon") {
-      // 1266 PHP_Token_Double_Colon
-      $token = new PHP_Token_Double_Colon();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Class") {
-      // 954 PHP_Token_Class
-      $token = new PHP_Token_Class();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Open_Tag") {
-      // 930 PHP_Token_Open_Tag
-      $token = new PHP_Token_Open_Tag();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_New") {
-      // 928 PHP_Token_New
-      $token = new PHP_Token_New();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Namespace") {
-      // 928 PHP_Token_Namespace
-      $token = new PHP_Token_Namespace();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_As") {
-      // 822 PHP_Token_As
-      $token = new PHP_Token_As();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Dot") {
-      // 820 PHP_Token_Dot
-      $token = new PHP_Token_Dot();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Doc_Comment") {
-      // 740 PHP_Token_Doc_Comment
-      $token = new PHP_Token_Doc_Comment();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Typelist_Lt") {
-      // 680 PHP_Token_Typelist_Lt
-      $token = new PHP_Token_Typelist_Lt();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Typelist_Gt") {
-      // 680 PHP_Token_Typelist_Gt
-      $token = new PHP_Token_Typelist_Gt();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Lnumber") {
-      // 666 PHP_Token_Lnumber
-      $token = new PHP_Token_Lnumber();
-      return $token;
-    }
-
-    if ($name == "PHP_Token_Extends") {
-      // 620 PHP_Token_Extends
-      $token = new PHP_Token_Extends();
-      return $token;
-    } else if ($name == "PHP_Token_Throw") {
-      // 558 PHP_Token_Throw
-      $token = new PHP_Token_Throw();
-      return $token;
-    } else if ($name == "PHP_Token_Private") {
-      // 516 PHP_Token_Private
-      $token = new PHP_Token_Private();
-      return $token;
-    } else if ($name == "PHP_Token_Is_Identical") {
-      // 484 PHP_Token_Is_Identical
-      $token = new PHP_Token_Is_Identical();
-      return $token;
-    } else if ($name == "PHP_Token_Static") {
-      // 386 PHP_Token_Static
-      $token = new PHP_Token_Static();
-      return $token;
-    } else if ($name == "PHP_Token_Question_Mark") {
-      // 306 PHP_Token_Question_Mark
-      $token = new PHP_Token_Question_Mark();
-      return $token;
-    } else if ($name == "PHP_Token_Open_Square") {
-      // 306 PHP_Token_Open_Square
-      $token = new PHP_Token_Open_Square();
-      return $token;
-    } else if ($name == "PHP_Token_Concat_Equal") {
-      // 306 PHP_Token_Concat_Equal
-      $token = new PHP_Token_Concat_Equal();
-      return $token;
-    } else if ($name == "PHP_Token_Close_Square") {
-      // 306 PHP_Token_Close_Square
-      $token = new PHP_Token_Close_Square();
-      return $token;
-    } else if ($name == "PHP_Token_Sr") {
-      // 298 PHP_Token_Sr
-      $token = new PHP_Token_Sr();
-      return $token;
-    } else if ($name == "PHP_Token_Sl") {
-      // 298 PHP_Token_Sl
-      $token = new PHP_Token_Sl();
-      return $token;
-    } else if ($name == "PHP_Token_Protected") {
-      // 282 PHP_Token_Protected
-      $token = new PHP_Token_Protected();
-      return $token;
-    } else if ($name == "PHP_Token_Is_Not_Identical") {
-      // 242 PHP_Token_Is_Not_Identical
-      $token = new PHP_Token_Is_Not_Identical();
-      return $token;
-    } else if ($name == "PHP_Token_Catch") {
-      // 236 PHP_Token_Catch
-      $token = new PHP_Token_Catch();
-      return $token;
-    } else if ($name == "PHP_Token_Try") {
-      // 216 PHP_Token_Try
-      $token = new PHP_Token_Try();
-      return $token;
-    } else if ($name == "PHP_Token_Const") {
-      // 206 PHP_Token_Const
-      $token = new PHP_Token_Const();
-      return $token;
-    } else if ($name == "PHP_Token_Dnumber") {
-      // 184 PHP_Token_Dnumber
-      $token = new PHP_Token_Dnumber();
-      return $token;
-    } else if ($name == "PHP_Token_Foreach") {
-      // 180 PHP_Token_Foreach
-      $token = new PHP_Token_Foreach();
-      return $token;
-    } else if ($name == "PHP_Token_Implements") {
-      // 172 PHP_Token_Implements
-      $token = new PHP_Token_Implements();
-      return $token;
-    } else if ($name == "PHP_Token_Abstract") {
-      // 162 PHP_Token_Abstract
-      $token = new PHP_Token_Abstract();
-      return $token;
-    } else if ($name == "PHP_Token_Instanceof") {
-      // 160 PHP_Token_Instanceof
-      $token = new PHP_Token_Instanceof();
-      return $token;
-    } else if ($name == "PHP_Token_Else") {
-      // 136 PHP_Token_Else
-      $token = new PHP_Token_Else();
-      return $token;
-    } else if ($name == "PHP_Token_Boolean_And") {
-      // 134 PHP_Token_Boolean_And
-      $token = new PHP_Token_Boolean_And();
-      return $token;
-    } else if ($name == "PHP_Token_Exclamation_Mark") {
-      // 126 PHP_Token_Exclamation_Mark
-      $token = new PHP_Token_Exclamation_Mark();
-      return $token;
-    } else if ($name == "PHP_Token_Is_Equal") {
-      // 122 PHP_Token_Is_Equal
-      $token = new PHP_Token_Is_Equal();
-      return $token;
-    } else if ($name == "PHP_Token_Array") {
-      // 104 PHP_Token_Array
-      $token = new PHP_Token_Array();
-      return $token;
-    } else if ($name == "PHP_Token_Interface") {
-      // 102 PHP_Token_Interface
-      $token = new PHP_Token_Interface();
-      return $token;
-    } else if ($name == "PHP_Token_Double_Arrow") {
-      // 86 PHP_Token_Double_Arrow
-      $token = new PHP_Token_Double_Arrow();
-      return $token;
-    } else if ($name == "PHP_Token_Minus") {
-      // 84 PHP_Token_Minus
-      $token = new PHP_Token_Minus();
-      return $token;
-    } else if ($name == "PHP_Token_Double_Quotes") {
-      // 80 PHP_Token_Double_Quotes
-      $token = new PHP_Token_Double_Quotes();
-      return $token;
-    } else if ($name == "PHP_Token_Boolean_Or") {
-      // 80 PHP_Token_Boolean_Or
-      $token = new PHP_Token_Boolean_Or();
-      return $token;
-    } else if ($name == "PHP_Token_Encapsed_And_Whitespace") {
-      // 64 PHP_Token_Encapsed_And_Whitespace
-      $token = new PHP_Token_Encapsed_And_Whitespace();
-      return $token;
-    } else if ($name == "PHP_Token_Gt") {
-      // 54 PHP_Token_Gt
-      $token = new PHP_Token_Gt();
-      return $token;
-    } else if ($name == "PHP_Token_Is_Not_Equal") {
-      // 52 PHP_Token_Is_Not_Equal
-      $token = new PHP_Token_Is_Not_Equal();
-      return $token;
-    } else if ($name == "PHP_Token_Final") {
-      // 50 PHP_Token_Final
-      $token = new PHP_Token_Final();
-      return $token;
-    } else if ($name == "PHP_Token_Inc") {
-      // 36 PHP_Token_Inc
-      $token = new PHP_Token_Inc();
-      return $token;
-    } else if ($name == "PHP_Token_Continue") {
-      // 36 PHP_Token_Continue
-      $token = new PHP_Token_Continue();
-      return $token;
-    } else if ($name == "PHP_Token_Plus") {
-      // 34 PHP_Token_Plus
-      $token = new PHP_Token_Plus();
-      return $token;
-    } else if ($name == "PHP_Token_List") {
-      // 32 PHP_Token_List
-      $token = new PHP_Token_List();
-      return $token;
-    } else if ($name == "PHP_Token_Is_Smaller_Or_Equal") {
-      // 30 PHP_Token_Is_Smaller_Or_Equal
-      $token = new PHP_Token_Is_Smaller_Or_Equal();
-      return $token;
-    } else if ($name == "PHP_Token_Lt") {
-      // 22 PHP_Token_Lt
-      $token = new PHP_Token_Lt();
-      return $token;
-    } else if ($name == "PHP_Token_Is_Greater_Or_Equal") {
-      // 20 PHP_Token_Is_Greater_Or_Equal
-      $token = new PHP_Token_Is_Greater_Or_Equal();
-      return $token;
-    } else if ($name == "PHP_Token_For") {
-      // 14 PHP_Token_For
-      $token = new PHP_Token_For();
-      return $token;
-    } else if ($name == "PHP_Token_Case") {
-      // 14 PHP_Token_Case
-      $token = new PHP_Token_Case();
-      return $token;
-    } else if ($name == "PHP_Token_Enum") {
-      // 12 PHP_Token_Enum
-      $token = new PHP_Token_Enum();
-      return $token;
-    } else if ($name == "PHP_Token_While") {
-      // 10 PHP_Token_While
-      $token = new PHP_Token_While();
-      return $token;
-    } else if ($name == "PHP_Token_Unset") {
-      // 10 PHP_Token_Unset
-      $token = new PHP_Token_Unset();
-      return $token;
-    } else if ($name == "PHP_Token_Div") {
-      // 10 PHP_Token_Div
-      $token = new PHP_Token_Div();
-      return $token;
-    } else if ($name == "PHP_Token_Mult") {
-      // 8 PHP_Token_Mult
-      $token = new PHP_Token_Mult();
-      return $token;
-    } else if ($name == "PHP_Token_Method_C") {
-      // 8 PHP_Token_Method_C
-      $token = new PHP_Token_Method_C();
-      return $token;
-    } else if ($name == "PHP_Token_Echo") {
-      // 8 PHP_Token_Echo
-      $token = new PHP_Token_Echo();
-      return $token;
-    } else if ($name == "PHP_Token_Require_Once") {
-      // 6 PHP_Token_Require_Once
-      $token = new PHP_Token_Require_Once();
-      return $token;
-    } else if ($name == "PHP_Token_Plus_Equal") {
-      // 6 PHP_Token_Plus_Equal
-      $token = new PHP_Token_Plus_Equal();
-      return $token;
-    } else if ($name == "PHP_Token_Pipe") {
-      // 6 PHP_Token_Pipe
-      $token = new PHP_Token_Pipe();
-      return $token;
-    } else if ($name == "PHP_Token_String_Cast") {
-      // 4 PHP_Token_String_Cast
-      $token = new PHP_Token_String_Cast();
-      return $token;
-    } else if ($name == "PHP_Token_Percent") {
-      // 4 PHP_Token_Percent
-      $token = new PHP_Token_Percent();
-      return $token;
-    } else if ($name == "PHP_Token_Int_Cast") {
-      // 4 PHP_Token_Int_Cast
-      $token = new PHP_Token_Int_Cast();
-      return $token;
-    } else if ($name == "PHP_Token_File") {
-      // 4 PHP_Token_File
-      $token = new PHP_Token_File();
-      return $token;
-    } else if ($name == "PHP_Token_And_Equal") {
-      // 4 PHP_Token_And_Equal
-      $token = new PHP_Token_And_Equal();
-      return $token;
-    } else if ($name == "PHP_Token_Ampersand") {
-      // 4 PHP_Token_Ampersand
-      $token = new PHP_Token_Ampersand();
-      return $token;
-    } else if ($name == "PHP_Token_Tilde") {
-      // 2 PHP_Token_Tilde
-      $token = new PHP_Token_Tilde();
-      return $token;
-    } else if ($name == "PHP_Token_Switch") {
-      // 2 PHP_Token_Switch
-      $token = new PHP_Token_Switch();
-      return $token;
-    } else if ($name == "PHP_Token_Super") {
-      // 2 PHP_Token_Super
-      $token = new PHP_Token_Super();
-      return $token;
-    } else if ($name == "PHP_Token_Or_Equal") {
-      // 2 PHP_Token_Or_Equal
-      $token = new PHP_Token_Or_Equal();
-      return $token;
-    } else if ($name == "PHP_Token_Double_Cast") {
-      // 2 PHP_Token_Double_Cast
-      $token = new PHP_Token_Double_Cast();
-      return $token;
-    } else if ($name == "PHP_Token_Do") {
-      // 2 PHP_Token_Do
-      $token = new PHP_Token_Do();
-      return $token;
-    } else if ($name == "PHP_Token_Caret") {
-      // 2 PHP_Token_Caret
-      $token = new PHP_Token_Caret();
-      return $token;
-    }
-    // --
-    // Autogenerated code ends here.
-    // --
-    // This is the error_log we want to turn on when testing for optimization.
-    // error_log($name."\n", 3, '/tmp/token.log');
-    return null;
-
-  }
-
-  private static function createTokenFromName(string $name): ?TokenInterface {
+  private static function createTokenFromNameStepped(
+    string $name,
+  ): ?TokenInterface {
     $token = null;
 
     $firstChar = substr($name, 10, 1);

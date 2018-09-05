@@ -6,6 +6,7 @@ namespace SebastianBergmann\TokenStream\Tokens;
 
 use SebastianBergmann\TokenStream\TokenInterface;
 use SebastianBergmann\TokenStream\TokenWithScopeAndVisibility;
+use SebastianBergmann\TokenStream\Token\Types;
 
 class PHP_Token_Function extends TokenWithScopeAndVisibility {
 
@@ -47,10 +48,13 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
 
     $tokens = $this->tokenStream()->tokens();
 
-    $endOfDefinitionToken = $tokens->get($this->endOfDefinitionId);
+    // don't bother running this if we are still at initialization state.
+    if ($this->endOfDefinitionId != -1) {
+      $endOfDefinitionToken = $tokens->get($this->endOfDefinitionId);
 
-    if ($endOfDefinitionToken instanceof TokenInterface) {
-      return $endOfDefinitionToken;
+      if ($endOfDefinitionToken instanceof TokenInterface) {
+        return $endOfDefinitionToken;
+      }
     }
 
     // echo "skipAmount name=".$this->getName()."\n";
@@ -265,4 +269,9 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
 
     return $this->signature;
   }
+
+  public function getTokenType(): string {
+    return Types::T_KEYWORD;
+  }
+
 }
