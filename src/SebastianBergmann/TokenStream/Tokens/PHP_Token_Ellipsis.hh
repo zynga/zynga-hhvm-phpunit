@@ -12,4 +12,8 @@ class PHP_Token_Ellipsis extends Token {
     return Types::T_OPERATOR;
   }
 
+  public function getShortTokenName(): string {
+    return 'Ellipsis';
+  }
+
 }

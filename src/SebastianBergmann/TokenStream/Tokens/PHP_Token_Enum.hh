@@ -11,4 +11,8 @@ class PHP_Token_Enum extends TokenWithScopeAndVisibility {
     return Types::T_KEYWORD;
   }
 
+  public function getShortTokenName(): string {
+    return 'Enum';
+  }
+
 }

@@ -25,12 +25,15 @@ class Stream {
   /**
    * @var array
    */
-  protected Vector<TokenInterface> $tokens;
+  private Vector<TokenInterface> $tokens = Vector {};
+
+  // Map of lineNumber to tokens on that line.
+  private Map<int, Vector<TokenInterface>> $_lineToTokens = Map {};
 
   /**
    * @var int
    */
-  protected int $position;
+  private int $position = 0;
 
   /**
    * @var array
@@ -41,7 +44,7 @@ class Stream {
   /**
    * @var array
    */
-  protected Map<int, string> $lineToFunctionMap;
+  protected Map<int, string> $lineToFunctionMap = Map {};
 
   private File $_parent;
   /**
@@ -52,10 +55,6 @@ class Stream {
   public function __construct(File $parent) {
 
     $this->_parent = $parent;
-
-    $this->tokens = Vector {};
-    $this->lineToFunctionMap = Map {};
-    $this->position = 0;
 
   }
 
@@ -184,12 +183,39 @@ class Stream {
     return $token;
   }
 
-  /**
-   * @param int   $offset
-   * @param mixed $value
-   */
-  public function offsetSet(int $offset, TokenInterface $value): void {
-    $this->tokens[$offset] = $value;
+  public function addToken(TokenInterface $token): bool {
+    $this->tokens->add($token);
+    $this->addTokenToLine($token);
+    return true;
+  }
+
+  public function addTokenToLine(TokenInterface $token): bool {
+
+    $lineNo = $token->getLine();
+
+    if (!$this->_lineToTokens->containsKey($lineNo)) {
+      $this->_lineToTokens->set($lineNo, Vector {});
+    }
+
+    $this->_lineToTokens[$lineNo]->add($token);
+
+    return true;
+
+  }
+
+  public function getLineToTokens(int $lineNo): Vector<TokenInterface> {
+    $tokens = $this->_lineToTokens->get($lineNo);
+
+    if ($tokens instanceof Vector) {
+      return $tokens;
+    }
+
+    return Vector {};
+
+  }
+
+  public function getLineToTokensForLine(): Map<int, Vector<TokenInterface>> {
+    return $this->_lineToTokens;
   }
 
   /**

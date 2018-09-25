@@ -12,4 +12,8 @@ class PHP_Token_Coalesce extends Token {
     return Types::T_KEYWORD;
   }
 
+  public function getShortTokenName(): string {
+    return 'Coalesce';
+  }
+
 }

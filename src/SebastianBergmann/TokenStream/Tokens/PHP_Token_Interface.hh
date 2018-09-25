@@ -4,36 +4,63 @@ namespace SebastianBergmann\TokenStream\Tokens;
 
 use SebastianBergmann\TokenStream\TokenWithScopeAndVisibility;
 use SebastianBergmann\TokenStream\Token\Types;
+use SebastianBergmann\TokenStream\TokenInterface;
 
 class PHP_Token_Interface extends TokenWithScopeAndVisibility {
 
   /**
    * @var array|bool
    */
-  protected Vector<string> $interfaces = Vector {};
-  protected bool $didInterfaces = false;
+  private Vector<string> $interfaces = Vector {};
+  private bool $didInterfaces = false;
+
+  private bool $_didName = false;
+  private string $_name = '[UNKNOWN_INTERFACE]';
+  private bool $_didHasParent = false;
+  private bool $_hasParent = false;
+  private bool $_didGetParent = false;
+  private string $_parentName = '';
 
   /**
    * @return string
    */
   public function getName(): string {
+
+    if ($this->_didName == true) {
+      return $this->_name;
+    }
+
     $id = $this->getId();
     $tokens = $this->tokenStream()->tokens();
-    $nameToken = $tokens->get($id + 2);
-    if ($nameToken instanceof PHP_Token_String) {
-      return strval($nameToken);
+    for ($i = $id; $i < ($id + 10); $i++) {
+      $nameToken = $tokens->get($i);
+      if ($nameToken instanceof PHP_Token_String) {
+        $this->_name = $nameToken->getText();
+        break;
+      }
     }
-    return '[UNKNOWN_INTERFACE]';
+    $this->_didName = true;
+    return $this->_name;
   }
 
   /**
    * @return bool
    */
   public function hasParent(): bool {
-    $id = $this->getId();
-    $tokens = $this->tokenStream()->tokens();
-    $token = $tokens->get($id + 4);
-    return $token instanceof PHP_Token_Extends;
+
+    if ($this->_didHasParent == true) {
+      return $this->_hasParent;
+    }
+
+    $parent = $this->getParent();
+
+    if ($parent != '') {
+      $this->_hasParent = true;
+    }
+
+    $this->_didHasParent = true;
+    return $this->_hasParent;
+
   }
 
   /**
@@ -129,29 +156,56 @@ class PHP_Token_Interface extends TokenWithScopeAndVisibility {
     return $result;
   }
 
-  /**
-   * @return bool|string
-   */
-  public function getParent(): mixed {
+  public function getParent(): ?string {
 
-    if (!$this->hasParent()) {
-      return false;
+    if ($this->_didGetParent == true) {
+      return $this->_parentName;
     }
 
-    $i = $this->getId() + 6;
-    $tokens = $this->tokenStream()->tokens();
-    $className = (string) $tokens[$i];
+    $this->_hasParent = false;
+    $this->_parentName = '';
 
-    for ($r = $i; $r < $tokens->count(); $r++) {
-      $token = $tokens->get($r);
-      $nextToken = $tokens->get($r + 1);
-      if ($nextToken === null || $nextToken instanceof PHP_Token_Whitespace) {
+    $id = $this->getId();
+
+    $tokens = $this->tokenStream()->tokens();
+
+    for ($i = $id; $i < ($id + 50); $i++) {
+
+      $token = $tokens->get($i);
+
+      if (!$token instanceof TokenInterface) {
+        continue;
+      }
+
+      // hunt for the interface foo extends baz {}
+      if ($token instanceof PHP_Token_Extends) {
+        $this->_hasParent = true;
+        continue;
+      }
+
+      // once the extend is found we have a parent and swap into hunting
+      // for the class name and finally the open curly.
+      if ($this->_hasParent == false) {
+        continue;
+      }
+
+      // if we hit a open curly we are done.
+      if ($token instanceof PHP_Token_Open_Curly) {
         break;
       }
-      $className .= $token;
+
+      // ignore whitespace
+      if ($token instanceof PHP_Token_Whitespace) {
+        continue;
+      }
+
+      // bump the value of the token into the name
+      $this->_parentName .= $token->getText();
+
     }
 
-    return $className;
+    $this->_didGetParent = true;
+    return $this->_parentName;
 
   }
 
@@ -160,20 +214,9 @@ class PHP_Token_Interface extends TokenWithScopeAndVisibility {
    */
   public function hasInterfaces(): bool {
 
-    $id = $this->getId();
+    $interfaces = $this->getInterfaces();
 
-    // basic: class implements X {}
-    $tokens = $this->tokenStream()->tokens();
-
-    $basicImplementsToken = $tokens->get($id + 4);
-
-    if ($basicImplementsToken instanceof PHP_Token_Implements) {
-      return true;
-    }
-
-    $deeperPokeToken = $tokens->get($id + 8);
-
-    if ($deeperPokeToken instanceof PHP_Token_Implements) {
+    if ($interfaces->count() > 0) {
       return true;
     }
 
@@ -184,47 +227,42 @@ class PHP_Token_Interface extends TokenWithScopeAndVisibility {
   /**
    * @return array|bool
    */
-  public function getInterfaces(): mixed {
+  public function getInterfaces(): Vector<string> {
 
     if ($this->didInterfaces === true) {
-      if ($this->interfaces->count() === 0) {
-        return false;
-      }
       return $this->interfaces;
-    }
-
-    if (!$this->hasInterfaces()) {
-      $this->didInterfaces = true;
-      return false;
     }
 
     $id = $this->getId();
 
     $tokens = $this->tokenStream()->tokens();
 
-    $interfacesToken = $tokens->get($id + 4);
+    $foundImplements = false;
+    for ($i = $id; $i < $tokens->count(); $i++) {
 
-    $i = 0;
+      $token = $tokens->get($i);
 
-    if ($interfacesToken instanceof PHP_Token_Implements) {
-      $i = $id + 3;
-    } else {
-      $i = $id + 7;
-    }
-
-    for ($r = $i; $r < $tokens->count(); $r++) {
-
-      $token = $tokens->get($r);
-      $nextToken = $tokens->get($r + 1);
-
-      if ($nextToken instanceof PHP_Token_Open_Curly) {
+      // if we hit a open curly we're done
+      if ($token instanceof PHP_Token_Open_Curly) {
         break;
       }
 
-      if ($token instanceof PHP_Token_String) {
-        $this->interfaces->add(strval($token));
+      // found a implements clause
+      if ($token instanceof PHP_Token_Implements) {
+        $foundImplements = true;
+        continue;
       }
 
+      // if no implements, don't process it for interfaces.
+      if ($foundImplements === false) {
+        continue;
+      }
+
+      // We found a string type, yay.. it's a implements Foo clause in this
+      // context.
+      if ($token instanceof PHP_Token_String) {
+        $this->interfaces->add($token->getText());
+      }
     }
 
     $this->didInterfaces = true;
@@ -234,4 +272,9 @@ class PHP_Token_Interface extends TokenWithScopeAndVisibility {
   public function getTokenType(): string {
     return Types::T_KEYWORD;
   }
+
+  public function getShortTokenName(): string {
+    return 'Interface';
+  }
+
 }

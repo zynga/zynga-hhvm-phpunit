@@ -4,6 +4,7 @@ namespace SebastianBergmann\TokenStream\Tokens;
 
 use SebastianBergmann\TokenStream\Token as PHP_Token;
 use SebastianBergmann\TokenStream\Token\Types;
+use SebastianBergmann\TokenStream\TokenInterface;
 
 abstract class PHP_Token_Includes extends PHP_Token {
 
@@ -47,19 +48,27 @@ abstract class PHP_Token_Includes extends PHP_Token {
 
     $tokens = $this->tokenStream()->tokens();
     $id = $this->getId();
-    $token = $tokens->get($id);
+    $this->type = strtolower($this->getShortTokenName());
 
-    $tokenOffset = $this->tokenStream()->get($id + 2);
+    for ($i = $id; $i < 100; $i++) {
 
-    if ($tokenOffset instanceof PHP_Token_Constant_Encapsed_String) {
-      $this->name = trim(strval($tokenOffset), "'\"");
-      $this->type = strtolower(
-        str_replace(
-          'SebastianBergmann\TokenStream\Tokens\PHP_Token_',
-          '',
-          get_class($token),
-        ),
-      );
+      $token = $tokens->get($i);
+
+      if (!$token instanceof TokenInterface) {
+        continue;
+      }
+
+      // found the end of a inclusion statement.
+      if ($token instanceof PHP_Token_Semicolon) {
+        break;
+      }
+
+      if ($token instanceof PHP_Token_Whitespace) {
+        continue;
+      }
+
+      $this->name .= trim($token->getText(), "'\"");
+
     }
 
     $this->didProcess = true;

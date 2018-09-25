@@ -92,25 +92,11 @@ class Scanner {
 
       }
 
-      // if ($newToken === null) {
-      //   // --
-      //   // JEO: DynamicClassCreation is actually somewhat slow with the number
-      //   // of ops we are asking it to do.
-      //   // --
-      //   $tokenParams = Vector {};
-      //
-      //   $newToken = DynamicClassCreation::createClassByNameGeneric(
-      //     'SebastianBergmann\TokenStream\Tokens\\'.$tokenClass,
-      //     $tokenParams,
-      //   );
-      //
-      // }
-
       $id++;
 
       if ($newToken instanceof TokenInterface) {
         $newToken->setAllAttributes($text, $line, $codeFile, $id);
-        $stream->tokens()->add($newToken);
+        $stream->addToken($newToken);
       }
 
       $lines = substr_count($text, "\n");

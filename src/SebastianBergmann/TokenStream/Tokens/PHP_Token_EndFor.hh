@@ -11,4 +11,8 @@ class PHP_Token_Endfor extends Token {
     return Types::T_KEYWORD;
   }
 
+  public function getShortTokenName(): string {
+    return 'Endfor';
+  }
+
 }

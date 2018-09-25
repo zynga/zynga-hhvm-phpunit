@@ -11,4 +11,8 @@ class PHP_Token_Boolean_And extends Token {
     return Types::T_OPERATOR;
   }
 
+  public function getShortTokenName(): string {
+    return 'Boolean_And';
+  }
+
 }

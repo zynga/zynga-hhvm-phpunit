@@ -11,4 +11,8 @@ class PHP_Token_Concat_Equal extends Token {
     return Types::T_OPERATOR;
   }
 
+  public function getShortTokenName(): string {
+    return 'Concat_Equal';
+  }
+
 }

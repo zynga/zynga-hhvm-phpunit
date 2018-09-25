@@ -7,19 +7,27 @@ use SebastianBergmann\TokenStream\TokenInterface;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Class;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Close_Curly;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Curly_Open;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Comment;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Doc_Comment;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Function;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Namespace;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Open_Curly;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Public;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Private;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Static;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Semicolon;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Trait;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Whitespace;
+use Zynga\CodeBase\V1\File;
 
 abstract class TokenWithScope extends Token {
   /**
    * @var int
    */
   protected int $endTokenId = -1;
+
+  private string $_docBlock = '';
+  private bool $_didDocBlock = false;
 
   /**
    * Get the docblock for this token
@@ -30,49 +38,53 @@ abstract class TokenWithScope extends Token {
    *
    * @return string|null Returns the docblock as a string if found
    */
-  public function getDocblock(): ?string {
+  public function getDocblock(): string {
+
+    if ($this->_didDocBlock === true) {
+      return $this->_docBlock;
+    }
+
     $id = $this->getId();
+    $scanLimit = max($id - 100, 0);
+
     $tokens = $this->tokenStream()->tokens();
-    $currentLineNumber = $tokens[$id]->getLine();
-    $prevLineNumber = $currentLineNumber - 1;
 
-    for ($i = $id - 1; $i; $i--) {
+    $fileName = $this->tokenStream()->getFilename();
 
-      if (!$tokens->containsKey($i)) {
-        return null;
-      }
+    for ($i = ($id - 2); $i > $scanLimit; $i--) {
 
       $token = $tokens->get($i);
 
       if (!$token instanceof TokenInterface) {
-        return null;
-      }
-
-      if ($token instanceof PHP_Token_Function ||
-          $token instanceof PHP_Token_Class ||
-          $token instanceof PHP_Token_Trait) {
-        // Some other trait, class or function, no docblock can be
-        // used for the current token
         break;
       }
 
-      $line = $token->getLine();
-
-      if ($line == $currentLineNumber ||
-          ($line == $prevLineNumber &&
-           $token instanceof PHP_Token_Whitespace)) {
+      // rewind until we find a comment or something else.
+      if ($token instanceof PHP_Token_Whitespace) {
         continue;
       }
 
-      if ($line < $currentLineNumber &&
-          !$token instanceof PHP_Token_Doc_Comment) {
+      // modifiers don't count.
+      if ($token instanceof PHP_Token_Public ||
+          $token instanceof PHP_Token_Private ||
+          $token instanceof PHP_Token_Static) {
+        continue;
+      }
+
+      if ($token instanceof PHP_Token_Doc_Comment) {
+        $this->_docBlock = $token->getText();
+        break;
+      } else if ($token instanceof PHP_Token_Comment) {
+        $this->_docBlock = $token->getText();
+        break;
+      } else {
         break;
       }
 
-      return (string) $tokens[$i];
     }
 
-    return null;
+    $this->_didDocBlock = true;
+    return $this->_docBlock;
 
   }
 

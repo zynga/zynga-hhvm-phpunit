@@ -13,28 +13,28 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
   /**
    * @var array
    */
-  protected Map<string, ?string> $arguments = Map {};
-  protected bool $didArguments = false;
+  private Map<string, ?string> $arguments = Map {};
+  private bool $didArguments = false;
 
   /**
    * @var int
    */
-  protected int $ccn = -1;
+  private int $ccn = -1;
 
   /**
    * @var string
    */
-  protected string $name = '';
-  protected bool $didName = false;
+  private string $name = '';
+  private bool $didName = false;
 
   /**
    * @var string
    */
-  protected string $signature = '';
-  protected bool $didSignature = false;
+  private string $signature = '';
+  private bool $didSignature = false;
 
-  protected int $endOfDefinitionId = -1;
-  protected bool $didEndOfDefinitionId = false;
+  private int $endOfDefinitionId = -1;
+  private bool $didEndOfDefinitionId = false;
 
   public function getEndOfDefinitionLineNo(): int {
     $token = $this->getEndofDefinitionToken();
@@ -101,24 +101,39 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
     $typeDeclaration = null;
 
     // Search for first token inside brackets
-    $i = $this->getId() + 2;
+    $startIdx = $this->getId() + 2;
 
-    while (!$tokens[$i - 1] instanceof PHP_Token_Open_Bracket) {
-      $i++;
-    }
+    $foundStart = false;
 
-    while (!$tokens[$i] instanceof PHP_Token_Close_Bracket) {
-
+    for ($i = $startIdx; $i < $tokens->count(); $i++) {
       $currentToken = $tokens->get($i);
 
-      if ($currentToken instanceof PHP_Token_String) {
-        $typeDeclaration = (string) $tokens[$i];
-      } else if ($currentToken instanceof PHP_Token_Variable) {
-        $this->arguments->set(strval($currentToken), $typeDeclaration);
-        $typeDeclaration = null;
+      if (!$currentToken instanceof TokenInterface) {
+        break;
       }
 
-      $i++;
+      // find the starting (
+      if ($foundStart === false) {
+        if ($currentToken instanceof PHP_Token_Open_Bracket) {
+          $foundStart = true;
+          continue;
+        } else {
+          continue;
+        }
+      }
+
+      // found the ending )
+      if ($currentToken instanceof PHP_Token_Close_Bracket) {
+        break;
+      }
+
+      if ($currentToken instanceof PHP_Token_String) {
+        $typeDeclaration = $currentToken->getText();
+      } else if ($currentToken instanceof PHP_Token_Variable) {
+        $argName = $currentToken->getText();
+        $this->arguments->set($argName, $typeDeclaration);
+        $typeDeclaration = null;
+      }
     }
 
     $this->didArguments = true;
@@ -136,17 +151,12 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
 
     $tokens = $this->tokenStream()->tokens();
 
-    for ($i = $this->getId() + 1; $i < $tokens->count(); $i++) {
+    for ($i = $this->getId(); $i < $tokens->count(); $i++) {
 
       $token = $tokens->get($i);
-      $nextToken = $tokens->get($i + 1);
 
       if ($token instanceof PHP_Token_String) {
-        $this->name = (string) $token;
-        break;
-      } else if ($token instanceof PHP_Token_Ampersand &&
-                 $nextToken instanceof PHP_Token_String) {
-        $this->name = (string) $nextToken;
+        $this->name = $token->getText();
         break;
       } else if ($token instanceof PHP_Token_Open_Bracket) {
         $this->name = 'anonymous function';
@@ -245,7 +255,7 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
       $this->signature = 'anonymous function';
       $i = $id + 1;
     } else {
-      $this->signature = '';
+      $this->signature = $this->getName();
       $i = $id + 2;
     }
 
@@ -272,6 +282,10 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
 
   public function getTokenType(): string {
     return Types::T_KEYWORD;
+  }
+
+  public function getShortTokenName(): string {
+    return 'Function';
   }
 
 }

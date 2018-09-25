@@ -6,7 +6,13 @@ use SebastianBergmann\TokenStream\Token;
 use SebastianBergmann\TokenStream\Token\Types;
 
 final class PHP_Token_Yield extends Token {
+
   final public function getTokenType(): string {
     return Types::T_KEYWORD;
   }
+
+  final public function getShortTokenName(): string {
+    return 'Yield';
+  }
+
 }

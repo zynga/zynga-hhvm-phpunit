@@ -11,4 +11,8 @@ class PHP_Token_Class_C extends Token {
     return Types::T_KEYWORD;
   }
 
+  public function getShortTokenName(): string {
+    return 'Class_C';
+  }
+
 }

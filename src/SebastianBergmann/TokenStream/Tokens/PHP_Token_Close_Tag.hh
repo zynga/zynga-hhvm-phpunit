@@ -11,4 +11,8 @@ class PHP_Token_Close_Tag extends Token {
     return Types::T_KEYWORD;
   }
 
+  public function getShortTokenName(): string {
+    return 'Close_Tag';
+  }
+
 }

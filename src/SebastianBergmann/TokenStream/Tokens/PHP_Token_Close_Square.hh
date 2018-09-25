@@ -11,4 +11,8 @@ class PHP_Token_Close_Square extends Token {
     return Types::T_DEFAULT;
   }
 
+  public function getShortTokenName(): string {
+    return 'Close_Square';
+  }
+
 }

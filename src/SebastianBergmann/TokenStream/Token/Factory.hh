@@ -217,20 +217,26 @@ class Factory {
     int $tokenId,
   ): ?TokenInterface {
 
-    $templateToken = self::$_tokenTemplateCacheById->get($tokenId);
+    // --
+    // JEO: Temporarily commenting out the clone behavior, found a instance
+    // where the cloning wasn't pure and ended up adding more data to a childs
+    // member variables.
+    // --
 
-    if ($templateToken instanceof TokenInterface) {
-      $token = clone $templateToken;
-      return $token;
-    }
+    // $templateToken = self::$_tokenTemplateCacheById->get($tokenId);
+    //
+    // if ($templateToken instanceof TokenInterface) {
+    //   $token = clone $templateToken;
+    //   return $token;
+    // }
 
     $templateToken = self::createTokenFromTokenIdRaw($tokenId);
 
     if ($templateToken instanceof TokenInterface) {
-      self::$_tokenTemplateCacheById->set($tokenId, $templateToken);
+      //self::$_tokenTemplateCacheById->set($tokenId, $templateToken);
       // We clone to make sure that we don't hand back a ref to our template.
-      $token = clone $templateToken;
-      return $token;
+      //$token = clone $templateToken;
+      return $templateToken;
     }
 
     return null;

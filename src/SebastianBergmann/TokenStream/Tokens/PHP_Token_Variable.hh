@@ -6,7 +6,13 @@ use SebastianBergmann\TokenStream\Token;
 use SebastianBergmann\TokenStream\Token\Types;
 
 class PHP_Token_Variable extends Token {
+
   public function getTokenType(): string {
     return Types::T_VARIABLE;
   }
+
+  public function getShortTokenName(): string {
+    return 'Variable';
+  }
+
 }

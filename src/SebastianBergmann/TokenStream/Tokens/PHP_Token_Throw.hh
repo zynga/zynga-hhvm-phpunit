@@ -47,8 +47,12 @@ class PHP_Token_Throw extends Token {
 
   }
 
-  public function getTokenType(): string {
+  final public function getTokenType(): string {
     return Types::T_KEYWORD;
+  }
+
+  final public function getShortTokenName(): string {
+    return 'Throw';
   }
 
 }

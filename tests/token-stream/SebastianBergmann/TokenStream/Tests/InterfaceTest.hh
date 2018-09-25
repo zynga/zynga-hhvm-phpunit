@@ -69,6 +69,13 @@ class InterfaceTest extends TestCase {
 
   }
 
+  public function testInterfacesFromSetupFunction(): void {
+    list($class, $interfaces) = $this->getTestClassAndInterfaces();
+    $this->assertEquals('iTemplate', $interfaces[0]->getName());
+    $this->assertEquals('a', $interfaces[1]->getName());
+    $this->assertEquals('b', $interfaces[2]->getName());
+  }
+
   public function testGetName(): void {
     list($class, $interfaces) = $this->getTestClassAndInterfaces();
     $this->assertEquals('iTemplate', $interfaces[0]->getName());
@@ -76,7 +83,7 @@ class InterfaceTest extends TestCase {
 
   public function testGetParentNotExists(): void {
     list($class, $interfaces) = $this->getTestClassAndInterfaces();
-    $this->assertFalse(boolval($interfaces[0]->getParent()));
+    $this->assertEquals('', $interfaces[0]->getParent());
   }
 
   public function testHasParentNotExists(): void {
@@ -180,7 +187,7 @@ class InterfaceTest extends TestCase {
     }
   }
 
-  public function testGetPackageNamespaceWhenExtentingFromNamespaceClass(
+  public function testGetPackageNamespaceWhenExtendingFromNamespaceClass(
   ): void {
     $filename = $this->getFilesDirectory().'classExtendsNamespacedClass.php';
 

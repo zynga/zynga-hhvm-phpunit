@@ -11,4 +11,8 @@ class PHP_Token_Double_Arrow extends Token {
     return Types::T_OPERATOR;
   }
 
+  public function getShortTokenName(): string {
+    return 'Double_Arrow';
+  }
+
 }

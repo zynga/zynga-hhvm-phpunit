@@ -23,7 +23,7 @@ class Foo{function foo(){}
     }
 
     /**
-     * This docblock does not belong to the baz function
+     * This docblock does not belong to the baz function, except in the zynga version where we are more permissive in whitespace parsing.
      */
 
     public function baz()

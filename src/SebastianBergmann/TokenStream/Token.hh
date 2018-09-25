@@ -91,12 +91,10 @@ abstract class Token implements TokenInterface {
     );
   }
 
-  final public function getShortTokenName(): string {
-    return str_replace(
-      'SebastianBergmann\TokenStream\Tokens\PHP_Token_',
-      '',
-      static::class,
-    );
-  }
+  // --
+  // JEO: Why not have a str_replace here to change the namespace name down
+  // to this short name? We run this function a few hundred thousand times ;)
+  // --
+  abstract public function getShortTokenName(): string;
 
 }

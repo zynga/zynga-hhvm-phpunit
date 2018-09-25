@@ -112,7 +112,7 @@ class FunctionTest extends TestCase {
   public function testGetDocblock(): void {
 
     $functions = $this->getTestFunctions();
-    $this->assertNull($functions[0]->getDocblock());
+    $this->assertEquals('', $functions[0]->getDocblock());
 
     $this->assertEquals(
       "/**\n     * @param Baz \$baz\n     */",
@@ -124,8 +124,12 @@ class FunctionTest extends TestCase {
       $functions[2]->getDocblock(),
     );
 
-    $this->assertNull($functions[3]->getDocblock());
-    $this->assertNull($functions[4]->getDocblock());
+    $this->assertEquals('', $functions[3]->getDocblock());
+    // JEO: Another key difference in zynga version vs phpunit stock. We are more permissive for the docblock.
+    $this->assertEquals(
+      "/**\n     * This docblock does not belong to the baz function, except in the zynga version where we are more permissive in whitespace parsing.\n     */",
+      $functions[4]->getDocblock(),
+    );
   }
 
   public function testSignature(): void {
@@ -151,7 +155,7 @@ class FunctionTest extends TestCase {
       $c['a']->methods['m']->signature,
     );
 
-    file_put_contents('/tmp/jeo-debug.txt', var_export($i['i'], true));
+    //file_put_contents('/tmp/jeo-debug.txt', var_export($i['i'], true));
 
     $this->assertEquals(
       'm($a, array $b, array $c = array())',

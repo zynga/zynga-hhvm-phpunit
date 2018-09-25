@@ -11,4 +11,8 @@ class PHP_Token_Bad_Character extends Token {
     return Types::T_DEFAULT;
   }
 
+  public function getShortTokenName(): string {
+    return 'Bad_Character';
+  }
+
 }

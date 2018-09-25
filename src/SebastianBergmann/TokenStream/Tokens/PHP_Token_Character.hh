@@ -10,4 +10,9 @@ class PHP_Token_Character extends Token {
   public function getTokenType(): string {
     return Types::T_DEFAULT;
   }
+
+  public function getShortTokenName(): string {
+    return 'Character';
+  }
+
 }

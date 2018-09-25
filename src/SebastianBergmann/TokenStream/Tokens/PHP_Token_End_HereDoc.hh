@@ -11,4 +11,8 @@ class PHP_Token_End_Heredoc extends Token {
     return Types::T_KEYWORD;
   }
 
+  public function getShortTokenName(): string {
+    return 'End_Heredoc';
+  }
+
 }

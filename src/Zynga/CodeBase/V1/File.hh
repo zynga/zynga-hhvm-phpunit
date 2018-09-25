@@ -34,7 +34,6 @@ class File {
   private bool $_didInit;
   private string $_file;
   private Map<int, Map<string, bool>> $_lineToTests;
-  private Map<int, Vector<TokenInterface>> $_lineToTokens;
   private int $_startLine;
   private int $_endLine;
 
@@ -53,7 +52,6 @@ class File {
     $this->_didInit = false;
     $this->_file = $file;
     $this->_lineToTests = Map {};
-    $this->_lineToTokens = Map {};
     $this->_startLine = -1;
     $this->_endLine = -1;
 
@@ -175,17 +173,6 @@ class File {
     $this->_inclusions = new Inclusions($this);
 
     return $this->_inclusions;
-
-  }
-
-  public function getLineToTokens(int $lineNo): Vector<TokenInterface> {
-    $tokens = $this->_lineToTokens->get($lineNo);
-
-    if ($tokens instanceof Vector) {
-      return $tokens;
-    }
-
-    return Vector {};
 
   }
 
@@ -369,62 +356,28 @@ class File {
       return;
     }
 
+    // load the source for this file.
     $this->source()->load();
+
+    // get the raw tokens loaded.
     $this->rawTokens()->load();
-    // $this->stream();
 
-    $tokenStream = $this->stream();
-    $tokens = $tokenStream->tokens();
+    $lineToTokens = $this->stream()->getLineToTokensForLine();
 
-    $lineNo = -1;
-
-    $tokenCount = $tokens->count();
-    $lineStack = Vector {};
     $skipAmount = 0;
+    foreach ($lineToTokens as $lineNo => $lineStack) {
 
-    for ($tokenOffset = 0; $tokenOffset < $tokenCount; $tokenOffset++) {
+      // we update the endLine every pass on this loop.
+      $this->_endLine = $lineNo;
 
-      $token = $tokens->get($tokenOffset);
-
-      // not a token, prevent overrun jic we are stupid.
-      if (!$token instanceof TokenInterface) {
-        continue;
+      if ($skipAmount > 0) {
+        $skipAmount--;
+      } else {
+        $skipAmount = $this->determineLineExecutable($lineStack, $lineNo);
       }
-
-      $nextLineNo = $token->getLine();
-
-      if ($lineNo != $nextLineNo) {
-
-        if ($lineNo === -1) {
-          // do nothing
-          $this->_startLine = $nextLineNo;
-        } else {
-
-          if ($skipAmount > 0) {
-            $skipAmount--;
-          } else {
-            $skipAmount = $this->determineLineExecutable($lineStack, $lineNo);
-          }
-
-        }
-
-        $this->_lineToTokens->set($lineNo, $lineStack);
-
-        $lineStack->clear();
-
-        $lineNo = $nextLineNo;
-
-      }
-
-      $lineStack->add($token);
 
     }
 
-    if ($lineStack->count() !== 0) {
-      $this->determineLineExecutable($lineStack, $lineNo);
-    }
-
-    $this->_endLine = $lineNo;
     $this->_didInit = true;
 
   }

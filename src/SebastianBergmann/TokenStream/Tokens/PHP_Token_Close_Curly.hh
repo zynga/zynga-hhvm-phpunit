@@ -11,4 +11,8 @@ class PHP_Token_Close_Curly extends Token {
     return Types::T_DEFAULT;
   }
 
+  public function getShortTokenName(): string {
+    return 'PHP_Token_Close_Curly';
+  }
+
 }

@@ -356,7 +356,7 @@ class File extends Renderer {
       if (self::DEBUG_TOKENS === true) {
         $tokensForLine = '';
 
-        $tokens = $processedFile->getLineToTokens($lineNo);
+        $tokens = $processedFile->stream()->getLineToTokens($lineNo);
 
         foreach ($tokens as $token) {
           if ($tokensForLine != '') {
@@ -365,7 +365,6 @@ class File extends Renderer {
           $tokensForLine .= $token->getShortTokenName();
           $tokensForLine .= '['.$token->getId().']';
         }
-        implode(", ", $processedFile->getLineToTokens($lineNo));
 
         $lines .= CodeTokens::render($lineNo, $tokensForLine);
       }

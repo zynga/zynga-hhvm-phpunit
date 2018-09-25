@@ -11,4 +11,8 @@ class PHP_Token_Comment extends Token {
     return Types::T_COMMENT;
   }
 
+  public function getShortTokenName(): string {
+    return 'Comment';
+  }
+
 }

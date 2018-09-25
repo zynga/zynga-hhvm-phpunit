@@ -11,4 +11,8 @@ class PHP_Token_Curly_Open extends Token {
     return Types::T_DEFAULT;
   }
 
+  public function getShortTokenName(): string {
+    return 'Curly_Open';
+  }
+
 }

@@ -79,4 +79,8 @@ class PHP_Token_Class extends PHP_Token_Interface {
     return Types::T_KEYWORD;
   }
 
+  public function getShortTokenName(): string {
+    return 'Class';
+  }
+
 }

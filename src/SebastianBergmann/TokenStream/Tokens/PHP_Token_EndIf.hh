@@ -11,4 +11,8 @@ class PHP_Token_Endif extends Token {
     return Types::T_KEYWORD;
   }
 
+  public function getShortTokenName(): string {
+    return 'Endif';
+  }
+
 }

@@ -11,4 +11,8 @@ class PHP_Token_Encapsed_And_Whitespace extends Token {
     return Types::T_DEFAULT;
   }
 
+  public function getShortTokenName(): string {
+    return 'Encapsed_And_Whitespace';
+  }
+
 }

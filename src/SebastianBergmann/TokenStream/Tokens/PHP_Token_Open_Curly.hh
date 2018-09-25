@@ -6,7 +6,13 @@ use SebastianBergmann\TokenStream\Token;
 use SebastianBergmann\TokenStream\Token\Types;
 
 class PHP_Token_Open_Curly extends Token {
+
   public function getTokenType(): string {
     return Types::T_DEFAULT;
   }
+
+  public function getShortTokenName(): string {
+    return 'Open_Curly';
+  }
+
 }

@@ -39,17 +39,17 @@ class Inclusions {
   public function getAll(): Vector<string> {
     $allInclusions = Vector {};
 
-    $allRequires = $this->requires()->getAll();
-    $allInclusions->addAll($allRequires);
-
     $allRequireOnces = $this->require_onces()->getAll();
     $allInclusions->addAll($allRequireOnces);
 
-    $allIncludes = $this->includes()->getAll();
-    $allInclusions->addAll($allIncludes);
+    $allRequires = $this->requires()->getAll();
+    $allInclusions->addAll($allRequires);
 
     $allIncludeOnces = $this->include_onces()->getAll();
     $allInclusions->addAll($allIncludeOnces);
+
+    $allIncludes = $this->includes()->getAll();
+    $allInclusions->addAll($allIncludes);
 
     return $allInclusions;
 
@@ -58,17 +58,17 @@ class Inclusions {
   public function getAllAsMap(): Map<string, Vector<string>> {
     $allInclusions = Map {};
 
-    $allRequires = $this->requires()->getAll();
-    $allInclusions->set('require', $allRequires);
-
     $allRequireOnces = $this->require_onces()->getAll();
     $allInclusions->set('require_once', $allRequireOnces);
 
-    $allIncludes = $this->includes()->getAll();
-    $allInclusions->set('include', $allIncludes);
+    $allRequires = $this->requires()->getAll();
+    $allInclusions->set('require', $allRequires);
 
     $allIncludeOnces = $this->include_onces()->getAll();
     $allInclusions->set('include_once', $allIncludeOnces);
+
+    $allIncludes = $this->includes()->getAll();
+    $allInclusions->set('include', $allIncludes);
 
     return $allInclusions;
 

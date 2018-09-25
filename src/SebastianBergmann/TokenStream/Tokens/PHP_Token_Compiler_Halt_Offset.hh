@@ -11,4 +11,8 @@ class PHP_Token_Compiler_Halt_Offset extends Token {
     return Types::T_KEYWORD;
   }
 
+  public function getShortTokenName(): string {
+    return 'Compiler_Halt_Offset';
+  }
+
 }

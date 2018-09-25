@@ -9,4 +9,7 @@ class PHP_Token_Include extends PHP_Token_Includes {
   public function getTokenType(): string {
     return Types::T_KEYWORD;
   }
+  public function getShortTokenName(): string {
+    return 'Include';
+  }
 }

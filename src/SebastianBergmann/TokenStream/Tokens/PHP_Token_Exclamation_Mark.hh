@@ -11,4 +11,8 @@ class PHP_Token_Exclamation_Mark extends Token {
     return Types::T_OPERATOR;
   }
 
+  public function getShortTokenName(): string {
+    return 'Exclamation_Mark';
+  }
+
 }

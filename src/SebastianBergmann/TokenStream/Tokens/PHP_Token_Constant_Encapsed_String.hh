@@ -11,4 +11,8 @@ class PHP_Token_Constant_Encapsed_String extends Token {
     return Types::T_CONSTANT;
   }
 
+  public function getShortTokenName(): string {
+    return 'Constant_Encapsed_String';
+  }
+
 }
