@@ -101,7 +101,7 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
     $typeDeclaration = null;
 
     // Search for first token inside brackets
-    $startIdx = $this->getId() + 2;
+    $startIdx = $this->getId();
 
     $foundStart = false;
 
