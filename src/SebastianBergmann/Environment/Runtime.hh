@@ -66,7 +66,13 @@ class Runtime {
    * @return string
    */
   public function getVersion(): string {
-    return HHVM_VERSION;
+
+    if (defined('HHVM_VERSION')) {
+      return strval(constant('HHVM_VERSION'));
+    }
+
+    return phpversion();
+
   }
 
   /**
