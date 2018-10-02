@@ -24,6 +24,7 @@ use SebastianBergmann\CodeCoverage\Report\Html\Renderer\Template\CodeTokens;
 use SebastianBergmann\CodeCoverage\Util;
 
 use SebastianBergmann\TokenStream\Token\StreamInterfaceStructure;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Foreach;
 use
   SebastianBergmann\CodeCoverage\Report\Html\Renderer\SourcreFileLineBuffer
 ;
@@ -293,7 +294,7 @@ class File extends Renderer {
     );
   }
 
-  const DEBUG_TOKENS = false;
+  const DEBUG_TOKENS = true;
 
   /**
    * @param FileNode $node
@@ -364,6 +365,11 @@ class File extends Renderer {
           }
           $tokensForLine .= $token->getShortTokenName();
           $tokensForLine .= '['.$token->getId().']';
+
+          if ( $token instanceof PHP_Token_Foreach ) {
+            $tokensForLine .= '::[' . $token->getEndTokenId() . ']';
+          }
+
         }
 
         $lines .= CodeTokens::render($lineNo, $tokensForLine);

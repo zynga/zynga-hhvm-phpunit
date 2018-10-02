@@ -2,14 +2,9 @@
 
 namespace SebastianBergmann\TokenStream\Tokens;
 
-use SebastianBergmann\TokenStream\Token;
-use SebastianBergmann\TokenStream\Token\Types;
+use SebastianBergmann\TokenStream\TokenOperator;
 
-class PHP_Token_Equal extends Token {
-
-  public function getTokenType(): string {
-    return Types::T_DEFAULT;
-  }
+class PHP_Token_Equal extends TokenOperator {
 
   public function getShortTokenName(): string {
     return 'Equal';

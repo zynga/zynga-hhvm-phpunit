@@ -59,6 +59,14 @@ abstract class Token implements TokenInterface {
     return true;
   }
 
+  // --
+  // JEO: This is by default the same value as the lineno, some of the tokens have overloaded
+  // this defintition to allow you to find the end of a code block or definition.
+  // --
+  public function getEndOfDefinitionLineNo(): int {
+    return $this->getLine();
+  }
+
   final public function getLine(): int {
     return $this->_line;
   }

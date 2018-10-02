@@ -9,13 +9,23 @@ use SebastianBergmann\TokenStream\Token\Stream;
 use SebastianBergmann\TokenStream\Token\Stream\Scanner as StreamScanner;
 use SebastianBergmann\TokenStream\Token\Stream\Parser as StreamParser;
 use SebastianBergmann\TokenStream\Token\Stream\CachingFactory;
-
+use SebastianBergmann\TokenStream\Token\Types;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Catch;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Class;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Close_Bracket;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Close_Curly;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Comment;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Foreach;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Function;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Object_Operator;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Open_Bracket;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Private;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Protected;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Public;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Return;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Semicolon;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Throw;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Whitespace;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Variable;
 
 use SebastianBergmann\TokenStream\TokenInterface;
@@ -238,10 +248,12 @@ class File {
     TokenInterface $token,
     int $currentLine,
   ): (bool, int, string) {
+
     if ($token instanceof PHP_Token_Return) {
-      $skipAmount = 0; // JEO: @TODO: I think there might be a issue for multi line return.
+      $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
       return tuple(true, $skipAmount, 'return');
     }
+
     if ($token instanceof PHP_Token_Variable) {
       $skipAmount = 0;
       return tuple(true, $skipAmount, 'variable');
@@ -251,6 +263,7 @@ class File {
       $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
       return tuple(true, $skipAmount, 'throw');
     }
+    
 
     $skipAmount = 0;
     return tuple(false, $skipAmount, '');
@@ -261,12 +274,23 @@ class File {
     return false;
   }
 
+  private function isTokenOperator(TokenInterface $token): bool {
+    if ( $token->getTokenType() == Types::T_OPERATOR && ! $token instanceof PHP_Token_Object_Operator ) {
+      return true;
+    }
+    return false;
+  }
+
   private function determineLineExecutableForeachLine(
     Vector<TokenInterface> $lineStack,
     int $currentLine,
   ): (bool, int, string) {
 
+    $offset = 0;
     $isExecutable = false;
+    $isPublic = false;
+    $isPrivate = false;
+    $isProtected = false;
 
     foreach ($lineStack as $token) {
 
@@ -280,10 +304,103 @@ class File {
         return tuple(false, $skipAmount, 'function');
       }
 
+      if ($token instanceof PHP_Token_Catch) {
+        $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
+        return tuple(false, $skipAmount, 'catch');
+      }
+      
+      if ($token instanceof PHP_Token_Foreach) {
+        $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
+        return tuple(true, $skipAmount, 'foreach');
+      }
+
+      if ( $token instanceof PHP_Token_Public ) {
+        $isPublic = true;
+      } 
+      if ( $token instanceof PHP_Token_Private ) {
+        $isPrivate = true;
+      }
+      if ( $token instanceof PHP_Token_Protected ) {
+        $isProtected = true;
+      }
+
       list($isExecutable, $skipAmount, $reason) =
         $this->isTokenExecutable($token, $currentLine);
 
       if ($isExecutable === true) {
+
+        if ( $token instanceof PHP_Token_Variable ) {
+          
+          // this is a class variable of some sort due to it's accessability level.
+          if ( $isPublic === true || $isPrivate === true || $isProtected === true) {
+            return tuple(false, 0, '');
+          }
+
+          // does this line contain an operator?
+          $tokenCount = $lineStack->count();
+
+          for ( $i = $offset + 1; $i < $tokenCount; $i++ ) {
+            $futureToken = $lineStack->get($i);
+            if ( ! $futureToken instanceof TokenInterface ) {
+              break;
+            }
+            if ( $futureToken instanceof PHP_Token_Whitespace ) {
+              continue;
+            }
+            if ( $this->isTokenOperator($futureToken) ) {
+              $skipAmount = $futureToken->getEndOfDefinitionLineNo() - $currentLine;
+              return tuple(true, $skipAmount, 'variable-with-operator');
+            }
+          }
+
+          // --
+          // Need to support $foo->baz(\w*);
+          //
+          // In order to do such we need to pull the raw stream in.
+          //
+          // --
+          $allTokens = $this->stream()->tokens();
+          $allTokenCount = $allTokens->count();
+
+          $foundObjectOperator = false;
+          $block = 0;
+          for ( $i = $token->getId(); $i < $allTokenCount; $i++ ) {
+
+            $futureToken = $allTokens->get($i);
+            
+            if ( ! $futureToken instanceof TokenInterface ) {
+              break;
+            }
+
+            if ( $futureToken instanceof PHP_Token_Whitespace ) {
+              continue;
+            }
+
+            if ( $futureToken instanceof PHP_Token_Object_Operator ) {
+              $foundObjectOperator = true;
+              continue;
+            }
+
+            // Next up we should see a open bracket: ( , also allow for inner function calls
+            if ( $futureToken instanceof PHP_Token_Open_Bracket ) {
+              $block++;
+              continue;
+            }
+
+            if ( $futureToken instanceof PHP_Token_Close_Bracket ) {
+              $block--;
+              continue;
+            }
+
+            if ( $block == 0 && $futureToken instanceof PHP_Token_Semicolon ) {
+              $skipAmount = $futureToken->getEndOfDefinitionLineNo() - $currentLine;
+              return tuple(true, $skipAmount, 'variable-object-function-call');
+            }
+     
+          }
+          
+        }
+        
         // we found a executable token, stop working so hard
         return tuple($isExecutable, $skipAmount, $reason);
       }
@@ -292,6 +409,8 @@ class File {
         // everything to the right of this token is useless
         break;
       }
+
+      $offset++;
 
     }
 
@@ -326,6 +445,7 @@ class File {
 
     // mark the line up with the state.
     if ($isExecutable === true) {
+
       // echo " lineIsExecutable=".$currentLine."\n";
       if ($skipAmount > 0) {
         for ($s = 0; $s < $skipAmount; $s++) {

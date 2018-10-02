@@ -226,7 +226,30 @@ abstract class Renderer {
   }
 
   protected function getPathToRoot(AbstractNode $node): string {
-    return '/';
+
+    $currentPath = $node->getPath();
+    $rootPath = $this->root->getPath();
+
+    if ($currentPath == $rootPath ) {
+      return './';
+    }
+
+    $strippedPath = str_replace($rootPath, '', $currentPath);
+
+    $slashCount = substr_count($strippedPath, '/');
+    // echo "strippedPath=$strippedPath slashCount=$slashCount\n";
+
+    $path = '../';
+
+    if ( $slashCount > 1 ) {
+      if ( $node instanceof FileNode ) {
+        $slashCount = $slashCount - 1;
+      }
+      $path = str_repeat('../', $slashCount);
+    }
+
+    // echo "strippedPath=$strippedPath slashCount=$slashCount path=$path\n";
+    return $path; 
   }
 
   protected function getCoverageBar(float $percent): string {

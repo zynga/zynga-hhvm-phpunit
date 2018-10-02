@@ -116,13 +116,13 @@ abstract class TokenWithScope extends Token {
         $block--;
 
         if ($block === 0) {
-          $this->endTokenId = $i;
+          $this->endTokenId = $token->getId();
         }
       } else if (($this instanceof PHP_Token_Function ||
                   $this instanceof PHP_Token_Namespace) &&
                  $token instanceof PHP_Token_Semicolon) {
         if ($block === 0) {
-          $this->endTokenId = $i;
+          $this->endTokenId = $token->getId();
         }
       }
 
@@ -134,6 +134,10 @@ abstract class TokenWithScope extends Token {
     }
 
     return $this->endTokenId;
+  }
+
+  public function getEndOfDefinitionLineNo(): int {
+    return $this->getEndLine();
   }
 
   /**

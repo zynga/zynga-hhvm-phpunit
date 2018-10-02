@@ -12,7 +12,7 @@ class PHP_Token_Private extends Token {
   }
 
   public function getShortTokenName(): string {
-    return 'Protected';
+    return 'Private';
   }
 
 }

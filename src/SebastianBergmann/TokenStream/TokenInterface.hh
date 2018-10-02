@@ -11,6 +11,7 @@ interface TokenInterface {
     File $file,
     int $id,
   ): void;
+  public function getEndOfDefinitionLineNo(): int;
   public function setText(string $text): bool;
   public function getText(): ?string;
   public function setLine(int $line): bool;
