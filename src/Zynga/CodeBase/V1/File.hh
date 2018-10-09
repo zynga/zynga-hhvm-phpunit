@@ -15,6 +15,8 @@ use SebastianBergmann\TokenStream\Tokens\PHP_Token_Class;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Close_Bracket;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Close_Curly;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Comment;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Double_Colon;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_If;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Foreach;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Function;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Object_Operator;
@@ -24,6 +26,8 @@ use SebastianBergmann\TokenStream\Tokens\PHP_Token_Protected;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Public;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Return;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Semicolon;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_String;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Switch;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Throw;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Whitespace;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Variable;
@@ -263,7 +267,6 @@ class File {
       $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
       return tuple(true, $skipAmount, 'throw');
     }
-    
 
     $skipAmount = 0;
     return tuple(false, $skipAmount, '');
@@ -281,45 +284,226 @@ class File {
     return false;
   }
 
+  private function handleVariableExecutionStatus(
+      Vector<TokenInterface> $lineStack,
+      int $currentLine, 
+      int $offset, 
+      TokenInterface $token, 
+      bool $isPublic, 
+      bool $isPrivate, 
+      bool $isProtected, 
+      bool $isExecutable, 
+      int $skipAmount, 
+      string $reason
+      ): (bool, int, string) {
+
+    // public|private|protected $baz != executable code.
+    // this is a class variable of some sort due to it's accessability level.
+    if ( $isPublic === true || $isPrivate === true || $isProtected === true) {
+      return tuple(false, 0, '');
+    }
+
+    // $foo (=|+=|...) variable operator support
+    // does this line contain an operator?
+    $tokenCount = $lineStack->count();
+
+    for ( $i = $offset + 1; $i < $tokenCount; $i++ ) {
+      $futureToken = $lineStack->get($i);
+      if ( ! $futureToken instanceof TokenInterface ) {
+        break;
+      }
+      if ( $futureToken instanceof PHP_Token_Whitespace ) {
+        continue;
+      }
+      if ( $this->isTokenOperator($futureToken) ) {
+        $skipAmount = $futureToken->getEndOfDefinitionLineNo() - $currentLine;
+        return tuple(true, $skipAmount, 'variable-with-operator');
+      }
+    }
+
+    // --
+    // Need to support $foo->baz(\w*);
+    //
+    // In order to do such we need to pull the raw stream in.
+    //
+    // --
+    $allTokens = $this->stream()->tokens();
+    $allTokenCount = $allTokens->count();
+
+    $foundObjectOperator = false;
+    $block = 0;
+
+    for ( $i = $token->getId(); $i < $allTokenCount; $i++ ) {
+
+      $futureToken = $allTokens->get($i);
+            
+      if ( ! $futureToken instanceof TokenInterface ) {
+        break;
+      }
+
+      if ( $futureToken instanceof PHP_Token_Whitespace ) {
+        continue;
+      } 
+      
+      if ( $futureToken instanceof PHP_Token_Object_Operator ) {
+        $foundObjectOperator = true;
+        continue;
+      }
+
+      // Next up we should see a open bracket: ( , also allow for inner function calls
+      if ( $futureToken instanceof PHP_Token_Open_Bracket ) {
+        $block++;
+        continue;
+      } 
+      
+      if ( $futureToken instanceof PHP_Token_Close_Bracket ) {
+        $block--;
+        continue;
+      }
+
+      if ( $block == 0 && $futureToken instanceof PHP_Token_Semicolon ) {
+        $skipAmount = $futureToken->getEndOfDefinitionLineNo() - $currentLine;
+        $isExecutable = true;
+        $reason = 'variable-object-function-call';
+        return tuple($isExecutable, $skipAmount, $reason);
+      }
+
+    }
+        
+    // we found a executable token, stop working so hard
+    return tuple($isExecutable, $skipAmount, $reason);
+
+  }
+
+  private function handleStaticFunctionCallBlock(int $currentLine, TokenInterface $token
+      ): (bool, int, string) {
+    $allTokens = $this->stream()->tokens();
+    $allTokenCount = $allTokens->count();
+
+    $foundDoubleColon = false;
+    $block = 0;
+
+    for ( $i = $token->getId(); $i < $allTokenCount; $i++ ) {
+
+      $futureToken = $allTokens->get($i);
+            
+      if ( ! $futureToken instanceof TokenInterface ) {
+        break;
+      }
+
+      if ( $futureToken instanceof PHP_Token_Whitespace ) {
+        continue;
+      } 
+      
+      if ( $futureToken instanceof PHP_Token_Double_Colon ) {
+        $foundDoubleColon = true;
+        continue;
+      }
+
+      // Next up we should see a open bracket: ( , also allow for inner function calls
+      if ( $futureToken instanceof PHP_Token_Open_Bracket ) {
+        $block++;
+        continue;
+      } 
+      
+      if ( $futureToken instanceof PHP_Token_Close_Bracket ) {
+        $block--;
+        continue;
+      }
+
+      if ( $block == 0 && $futureToken instanceof PHP_Token_Semicolon ) {
+        $isExecutable = true;
+        $skipAmount = $futureToken->getEndOfDefinitionLineNo() - $currentLine;
+        $reason = 'object-static-function-call';
+        return tuple($isExecutable, $skipAmount, $reason);
+      }
+
+    }
+
+    $isExecutable = false;
+    $skipAmount = 0;
+    $reason = 'invalid-static-call';
+    return tuple($isExecutable, $skipAmount, $reason);
+
+  }
+
   private function determineLineExecutableForeachLine(
     Vector<TokenInterface> $lineStack,
     int $currentLine,
   ): (bool, int, string) {
 
     $offset = 0;
-    $isExecutable = false;
     $isPublic = false;
     $isPrivate = false;
     $isProtected = false;
 
+    $isExecutable = false;
+    $skipAmount = 0;
+    $reason = 'none-given';
+
     foreach ($lineStack as $token) {
 
       if ($token instanceof PHP_Token_Class) {
+        $isExecutable = false;
         $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
-        return tuple(false, $skipAmount, 'class');
+        $reason = 'class';
+        return tuple($isExecutable, $skipAmount, $reason);
       }
 
       if ($token instanceof PHP_Token_Function) {
+        $isExecutable = false;
         $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
-        return tuple(false, $skipAmount, 'function');
+        $reason = 'function';
+        error_log('JEO file=' . $this->_file . ' function=' . $token->getName() . ' skipAmount=' . $skipAmount . ' lineNo=' . $currentLine  );
+        return tuple($isExecutable, $skipAmount, $reason);
+      }
+
+      if ($token instanceof PHP_Token_If) {
+        $isExecutable = true;
+        $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
+        $reason = 'if';
+        return tuple($isExecutable, $skipAmount, $reason);
+      }
+
+      if ($token instanceof PHP_Token_Switch) {
+        $isExecutable = false;
+        $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
+        $reason = 'switch';
+        return tuple($isExecutable, $skipAmount, $reason);
       }
 
       if ($token instanceof PHP_Token_Catch) {
+        $isExecutable = false;
         $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
-        return tuple(false, $skipAmount, 'catch');
+        $reason = 'catch';
+        return tuple($isExecutable, $skipAmount, $reason);
       }
       
       if ($token instanceof PHP_Token_Foreach) {
+        $isExecutable = true;
         $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
-        return tuple(true, $skipAmount, 'foreach');
+        $reason = 'foreach';
+        return tuple($isExecutable, $skipAmount, $reason);
+      }
+
+      // Handle static function calls and their blocks they create.
+      if ( $token instanceof PHP_Token_Double_Colon ) {
+        $t_functionName = $lineStack->get($offset + 1);
+        $t_bracketToken = $lineStack->get($offset + 2);
+        if ( $t_functionName instanceof PHP_Token_String && 
+             $t_bracketToken instanceof PHP_Token_Open_Bracket ) {
+          return $this->handleStaticFunctionCallBlock($currentLine, $token);
+        }
       }
 
       if ( $token instanceof PHP_Token_Public ) {
         $isPublic = true;
-      } 
+      }
+
       if ( $token instanceof PHP_Token_Private ) {
         $isPrivate = true;
       }
+
       if ( $token instanceof PHP_Token_Protected ) {
         $isProtected = true;
       }
@@ -329,80 +513,19 @@ class File {
 
       if ($isExecutable === true) {
 
+        // Executable variable tokens are handled specially and in their  own handler.
         if ( $token instanceof PHP_Token_Variable ) {
           
-          // this is a class variable of some sort due to it's accessability level.
-          if ( $isPublic === true || $isPrivate === true || $isProtected === true) {
-            return tuple(false, 0, '');
-          }
+          return $this->handleVariableExecutionStatus(
+              $lineStack, $currentLine, $offset, $token, $isPublic, $isPrivate, $isProtected,
+              $isExecutable, $skipAmount, $reason
+            );
 
-          // does this line contain an operator?
-          $tokenCount = $lineStack->count();
-
-          for ( $i = $offset + 1; $i < $tokenCount; $i++ ) {
-            $futureToken = $lineStack->get($i);
-            if ( ! $futureToken instanceof TokenInterface ) {
-              break;
-            }
-            if ( $futureToken instanceof PHP_Token_Whitespace ) {
-              continue;
-            }
-            if ( $this->isTokenOperator($futureToken) ) {
-              $skipAmount = $futureToken->getEndOfDefinitionLineNo() - $currentLine;
-              return tuple(true, $skipAmount, 'variable-with-operator');
-            }
-          }
-
-          // --
-          // Need to support $foo->baz(\w*);
-          //
-          // In order to do such we need to pull the raw stream in.
-          //
-          // --
-          $allTokens = $this->stream()->tokens();
-          $allTokenCount = $allTokens->count();
-
-          $foundObjectOperator = false;
-          $block = 0;
-          for ( $i = $token->getId(); $i < $allTokenCount; $i++ ) {
-
-            $futureToken = $allTokens->get($i);
-            
-            if ( ! $futureToken instanceof TokenInterface ) {
-              break;
-            }
-
-            if ( $futureToken instanceof PHP_Token_Whitespace ) {
-              continue;
-            }
-
-            if ( $futureToken instanceof PHP_Token_Object_Operator ) {
-              $foundObjectOperator = true;
-              continue;
-            }
-
-            // Next up we should see a open bracket: ( , also allow for inner function calls
-            if ( $futureToken instanceof PHP_Token_Open_Bracket ) {
-              $block++;
-              continue;
-            }
-
-            if ( $futureToken instanceof PHP_Token_Close_Bracket ) {
-              $block--;
-              continue;
-            }
-
-            if ( $block == 0 && $futureToken instanceof PHP_Token_Semicolon ) {
-              $skipAmount = $futureToken->getEndOfDefinitionLineNo() - $currentLine;
-              return tuple(true, $skipAmount, 'variable-object-function-call');
-            }
-     
-          }
-          
         }
-        
+
         // we found a executable token, stop working so hard
         return tuple($isExecutable, $skipAmount, $reason);
+
       }
 
       if ($this->isTokenComment($token) === true) {
@@ -446,7 +569,7 @@ class File {
     // mark the line up with the state.
     if ($isExecutable === true) {
 
-      // echo " lineIsExecutable=".$currentLine."\n";
+      error_log(" lineIsExecutable=".$currentLine." reason=$reason");
       if ($skipAmount > 0) {
         for ($s = 0; $s < $skipAmount; $s++) {
           $this->lineExecutionState()
@@ -491,6 +614,7 @@ class File {
       $this->_endLine = $lineNo;
 
       if ($skipAmount > 0) {
+        error_log('skipLine=' . $skipAmount . ' lineNo=' . $lineNo);
         $skipAmount--;
       } else {
         $skipAmount = $this->determineLineExecutable($lineStack, $lineNo);

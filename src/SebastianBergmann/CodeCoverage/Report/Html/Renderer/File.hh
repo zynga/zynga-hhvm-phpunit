@@ -24,7 +24,10 @@ use SebastianBergmann\CodeCoverage\Report\Html\Renderer\Template\CodeTokens;
 use SebastianBergmann\CodeCoverage\Util;
 
 use SebastianBergmann\TokenStream\Token\StreamInterfaceStructure;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_If;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Foreach;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Function;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Switch;
 use
   SebastianBergmann\CodeCoverage\Report\Html\Renderer\SourcreFileLineBuffer
 ;
@@ -368,6 +371,16 @@ class File extends Renderer {
 
           if ( $token instanceof PHP_Token_Foreach ) {
             $tokensForLine .= '::[' . $token->getEndTokenId() . ']';
+            $tokensForLine .= '::[' . $token->getEndOfDefinitionLineNo() . ']';
+          } elseif ( $token instanceof PHP_Token_Function ) {
+            $tokensForLine .= '::[' . $token->getEndTokenId() . ']';
+            $tokensForLine .= '::[' . $token->getEndOfDefinitionLineNo() . ']';
+          } elseif ( $token instanceof PHP_Token_If ) {
+            //$tokensForLine .= '::[' . $token->getEndTokenId() . ']';
+            $tokensForLine .= '::[' . $token->getEndOfDefinitionLineNo() . ']';
+          } elseif ( $token instanceof PHP_Token_Switch ) {
+            // $tokensForLine .= '::[' . $token->getEndTokenId() . ']';
+            $tokensForLine .= '::[' . $token->getEndOfDefinitionLineNo() . ']';
           }
 
         }

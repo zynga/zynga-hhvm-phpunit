@@ -30,7 +30,7 @@ abstract class TokenEndsWithSemicolon extends Token {
       }
     }
 
-    $tokenCount = $this->getId() + 100; 
+    $tokenCount = $tokens->count(); 
     $endWasFound = false;
     for ( $i = $this->getId(); $i < $tokenCount; $i++ ) {
       $token = $tokens->get($i);

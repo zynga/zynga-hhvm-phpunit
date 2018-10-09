@@ -165,7 +165,7 @@ abstract class Renderer {
           $breadcrumbs .= $this->getActiveBreadcrumb($shortPath, $dirCrumb);
           $breadcrumbs .= '<li>(<a href="dashboard.html">Dashboard</a>)</li>';
         } else {
-          $breadcrumbs .= $this->getInactiveBreadcrumb($shortPath, $dirCrumb);
+          $breadcrumbs .= $this->getInactiveBreadcrumb($this->getPathToRoot($node) . $shortPath, $dirCrumb);
         }
         $offset++;
       }
