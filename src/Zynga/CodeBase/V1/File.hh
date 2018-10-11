@@ -17,6 +17,7 @@ use SebastianBergmann\TokenStream\Tokens\PHP_Token_Close_Curly;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Comment;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Double_Colon;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_If;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Invariant;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Foreach;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Function;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Object_Operator;
@@ -413,7 +414,7 @@ class File {
 
       if ( $block == 0 && $futureToken instanceof PHP_Token_Semicolon ) {
         $isExecutable = true;
-        $skipAmount = $futureToken->getEndOfDefinitionLineNo() - $currentLine;
+        $skipAmount = $futureToken->getLine() - $currentLine;
         $reason = 'object-static-function-call';
         return tuple($isExecutable, $skipAmount, $reason);
       }
@@ -473,7 +474,7 @@ class File {
       }
 
       if ($token instanceof PHP_Token_Catch) {
-        $isExecutable = false;
+        $isExecutable = true;
         $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
         $reason = 'catch';
         return tuple($isExecutable, $skipAmount, $reason);
@@ -483,6 +484,13 @@ class File {
         $isExecutable = true;
         $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
         $reason = 'foreach';
+        return tuple($isExecutable, $skipAmount, $reason);
+      }
+      
+      if ($token instanceof PHP_Token_Invariant) {
+        $isExecutable = true;
+        $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
+        $reason = 'invariant';
         return tuple($isExecutable, $skipAmount, $reason);
       }
 

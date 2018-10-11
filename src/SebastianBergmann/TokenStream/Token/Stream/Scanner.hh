@@ -66,6 +66,21 @@ class Scanner {
 
       }
 
+      if ( $tokenId == T_STRING ) {
+        
+        $t_tokenId = CustomTokens::getTokenIdFromString($text);
+        $t_tokenName = null;
+
+        if ($t_tokenId > 0 ) {
+          $t_tokenName = CustomTokens::getTokenClassNameFromId($t_tokenId);
+        }
+
+        if ( $t_tokenName !== null ) {
+          $newToken = TokenFactory::createTokenFromName($t_tokenName);
+        }
+
+      }
+
       if ($newToken == null) {
 
         if ($lastNonWhitespaceTokenWasDoubleColon && $tokenId == T_CLASS) {

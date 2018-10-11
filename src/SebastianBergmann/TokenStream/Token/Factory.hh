@@ -104,6 +104,7 @@ use SebastianBergmann\TokenStream\Tokens\PHP_Token_Instanceof;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Insteadof;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Int_Cast;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Interface;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Invariant;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Is_Equal;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Is_Greater_Or_Equal;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Is_Identical;
@@ -1129,6 +1130,8 @@ class Factory {
         return new PHP_Token_Int_Cast();
       case 'PHP_Token_Interface':
         return new PHP_Token_Interface();
+      case 'PHP_Token_Invariant':
+        return new PHP_Token_Invariant();
       case 'PHP_Token_Is_Equal':
         return new PHP_Token_Is_Equal();
       case 'PHP_Token_Is_Greater_Or_Equal':

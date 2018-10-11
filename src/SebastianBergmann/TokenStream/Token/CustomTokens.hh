@@ -36,38 +36,7 @@ class CustomTokens {
       124 => 'PHP_Token_Pipe',
       125 => 'PHP_Token_Close_Curly',
       126 => 'PHP_Token_Tilde',
-    };
-
-  private static ImmMap<string, int>
-    $_tokenToId = ImmMap {
-      '!' => 33,
-      '"' => 34,
-      '%' => 37,
-      '$' => 36,
-      '&' => 38,
-      '(' => 40,
-      ')' => 41,
-      '+' => 43,
-      '*' => 42,
-      ',' => 44,
-      '-' => 45,
-      '.' => 46,
-      '/' => 47,
-      ':' => 58,
-      ';' => 59,
-      '<' => 60,
-      '=' => 61,
-      '>' => 62,
-      '?' => 63,
-      '@' => 64,
-      '[' => 91,
-      ']' => 93,
-      '^' => 94,
-      '`' => 96,
-      '{' => 123,
-      '|' => 124,
-      '}' => 125,
-      '~' => 126,
+      8801 => 'PHP_Token_Invariant',
     };
 
   public static function getTokenClassNameFromId(int $id): ?string {
@@ -168,7 +137,9 @@ class CustomTokens {
     if ($value == '~') {
       return 126;
     }
-
+    if ($value == 'invariant') {
+      return 8801;
+    }
     //echo "miss=$value\n";
     return -1;
 
