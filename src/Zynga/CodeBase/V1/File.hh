@@ -455,7 +455,12 @@ class File {
         $isExecutable = false;
         $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
         $reason = 'function';
-        error_log('JEO file=' . $this->_file . ' function=' . $token->getName() . ' skipAmount=' . $skipAmount . ' lineNo=' . $currentLine  );
+        $this->debug(Map {
+            'action' => 'debug-function', 
+            'function' => $token->getName(),
+            'skipAmount' => $skipAmount,
+            'currentLine' => $currentLine
+            });
         return tuple($isExecutable, $skipAmount, $reason);
       }
 
@@ -577,7 +582,13 @@ class File {
     // mark the line up with the state.
     if ($isExecutable === true) {
 
-      error_log(" lineIsExecutable=".$currentLine." reason=$reason");
+      $this->debug(Map {
+         'action' => 'isExecutable',
+         'currentLine' => $currentLine,
+         'reason' => $reason,
+         'skipAmount' => $skipAmount
+         });
+
       if ($skipAmount > 0) {
         for ($s = 0; $s < $skipAmount; $s++) {
           $this->lineExecutionState()
@@ -601,28 +612,60 @@ class File {
 
   }
 
+  public function debug(Map <string, mixed> $params): void {
+
+    if ( ! preg_match('/RewardCenter\/V2\/RewardCenter.hh/', $this->_file ) ) {
+      return;
+    }
+
+    $text = '';
+    $text .= 'file=' . $this->_file;
+
+    foreach ( $params as $key => $value ) {
+      if ( $text != '' ) {
+        $text .= ' ';
+      }
+      $text .= $key . '=';
+      $text .= json_encode($value);
+    }
+
+    error_log(
+        $text
+    );
+
+  }
+
   public function init(): void {
 
     if ($this->_didInit === true) {
       return;
     }
 
+    $this->debug(Map{'action' => 'init-start'});
+    
     // load the source for this file.
     $this->source()->load();
 
     // get the raw tokens loaded.
     $this->rawTokens()->load();
 
+    $lineCount = $this->stream()->getLineCount();
     $lineToTokens = $this->stream()->getLineToTokensForLine();
 
     $skipAmount = 0;
-    foreach ($lineToTokens as $lineNo => $lineStack) {
+    for ( $lineNo = 1; $lineNo < $lineCount; $lineNo++ ) {
+
+      $lineStack = $lineToTokens->get($lineNo);
+
+      if ( ! $lineStack instanceof Vector ) {
+        $lineStack = Vector {};
+      }
 
       // we update the endLine every pass on this loop.
       $this->_endLine = $lineNo;
 
       if ($skipAmount > 0) {
-        error_log('skipLine=' . $skipAmount . ' lineNo=' . $lineNo);
+        $this->debug(Map{'action' => 'skipping','lineNo' => $lineNo, 'skipAmount' => $skipAmount});
         $skipAmount--;
       } else {
         $skipAmount = $this->determineLineExecutable($lineStack, $lineNo);
@@ -630,6 +673,7 @@ class File {
 
     }
 
+    $this->debug(Map{'action' => 'init-complete'});
     $this->_didInit = true;
 
   }
