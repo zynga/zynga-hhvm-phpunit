@@ -94,19 +94,22 @@ class HHVM {
                 $lineNo,
               ) ===
               true) {
-            $executableRange =
-              $processedFile->lineExecutionState()
-                ->getExecutableRange($lineNo);
 
-            if ($executableRange instanceof ExecutableRange) {
-              for (
+            $executableRanges = $processedFile->lineExecutionState()->getExecutableRanges($lineNo);
+
+            foreach ( $executableRanges as $executableRange ) {
+
+              if ($executableRange instanceof ExecutableRange) {
+                for (
                 $innerRange = $executableRange->getStart();
                 $innerRange <= $executableRange->getEnd();
                 $innerRange++
-              ) {
+                ) {
                 $processedFile->lineExecutionState()
                   ->set($innerRange, Driver::LINE_EXECUTED);
+               }
               }
+
             }
 
           }

@@ -9,7 +9,7 @@ use Zynga\CodeBase\V1\File\ExecutableRange;
 class LineExecutionState {
   private File $_parent;
   private Map<int, int> $_lineExecutionState;
-  private Map<int, ExecutableRange> $_executableRanges;
+  private Map<int, Vector<ExecutableRange>> $_executableRanges;
 
   public function __construct(File $parent) {
     $this->_parent = $parent;
@@ -24,8 +24,38 @@ class LineExecutionState {
     return false;
   }
 
-  public function getExecutableRange(int $lineNo): ?ExecutableRange {
-    return $this->_executableRanges->get($lineNo);
+  public function getExecutableRanges(int $lineNo): Vector<ExecutableRange> {
+    $ranges = $this->_executableRanges->get($lineNo);
+    if ( $ranges instanceof Vector ) {
+      return $ranges;
+    }
+    return Vector {};
+  }
+
+  public function addFiniteExecutableRange(
+    string $reason,
+    int $lineNo,
+    int $rangeStart,
+    int $rangeEnd
+  ): bool {
+    $executableRange = new ExecutableRange($reason, $rangeStart, $rangeEnd);
+    return $this->addRangeToLineNo($lineNo, $executableRange);
+  }
+
+  public function addRangeToLineNo(int $lineNo, ExecutableRange $range): bool {
+
+    $currentRanges = $this->_executableRanges->get($lineNo);
+
+    if ( ! $currentRanges instanceof Vector ) {
+      $currentRanges = Vector {};
+    }
+
+    $currentRanges->add($range);
+
+    $this->_executableRanges->set($lineNo, $currentRanges);
+
+    return true;
+
   }
 
   public function addExecutableRange(
@@ -33,11 +63,16 @@ class LineExecutionState {
     int $startLine,
     int $endLine,
   ): bool {
+
+
     $executableRange = new ExecutableRange($reason, $startLine, $endLine);
+
     for ($lineNo = $startLine; $lineNo <= $endLine; $lineNo++) {
-      $this->_executableRanges->set($lineNo, $executableRange);
+      $this->addRangeToLineNo($lineNo, $executableRange);
     }
+
     return true;
+
   }
 
   public function get(int $lineNo): ?int {

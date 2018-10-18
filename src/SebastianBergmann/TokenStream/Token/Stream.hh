@@ -35,10 +35,9 @@ class Stream {
    */
   private int $position = 0;
 
-  /**
-   * @var array
-   */
-  protected Map<string, int>
+  private int $totalLineCount = 0;
+
+  private Map<string, int>
     $linesOfCode = Map {'loc' => 0, 'cloc' => 0, 'ncloc' => 0};
 
   /**
@@ -87,11 +86,7 @@ class Stream {
   }
 
   public function getLineCount(): int {
-    $locEntry = $this->linesOfCode->get('loc');
-    if (is_int($locEntry)) {
-      return $locEntry;
-    }
-    return -1;
+    return $this->totalLineCount;
   }
 
   /**
@@ -186,6 +181,10 @@ class Stream {
   public function addToken(TokenInterface $token): bool {
     $this->tokens->add($token);
     $this->addTokenToLine($token);
+    $lineNo = $token->getLine();
+    if ( $lineNo > $this->totalLineCount ) {
+      $this->totalLineCount = $lineNo;
+    }
     return true;
   }
 

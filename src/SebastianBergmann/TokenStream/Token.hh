@@ -67,6 +67,10 @@ abstract class Token implements TokenInterface {
     return $this->getLine();
   }
 
+  public function getEndLine(): int {
+    return $this->getLine();
+  }
+
   final public function getLine(): int {
     return $this->_line;
   }

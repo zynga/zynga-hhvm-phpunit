@@ -26,6 +26,7 @@ use SebastianBergmann\CodeCoverage\Util;
 use SebastianBergmann\TokenStream\Token\StreamInterfaceStructure;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Comment;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Catch;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Finally;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_If;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Foreach;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Function;
@@ -353,6 +354,7 @@ class File extends Renderer {
 
       if ( preg_match('/\@codeCoverageIgnore/', $codeLine) ) {
         $lineStateCss = 'danger';
+        $lineState = 'NA';
         $codeLine .= '<span class="string">!!We do not support code coverage ignore.!!</span>';
       }
 
@@ -391,6 +393,9 @@ class File extends Renderer {
             // $tokensForLine .= '::[' . $token->getEndTokenId() . ']';
             $tokensForLine .= '::[' . $token->getEndOfDefinitionLineNo() . ']';
           } elseif ( $token instanceof PHP_Token_Catch ) {
+            // $tokensForLine .= '::[' . $token->getEndTokenId() . ']';
+            $tokensForLine .= '::[' . $token->getEndOfDefinitionLineNo() . ']';
+          } elseif ( $token instanceof PHP_Token_Finally ) {
             // $tokensForLine .= '::[' . $token->getEndTokenId() . ']';
             $tokensForLine .= '::[' . $token->getEndOfDefinitionLineNo() . ']';
           }
