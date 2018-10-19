@@ -15,5 +15,9 @@ class PHP_Token_Finally extends TokenWithScope {
   public function getShortTokenName(): string {
     return 'Finally';
   }
+  
+  public function getEndOfDefinitionLineNo(): int {
+    return $this->getLine();
+  }
 
 }

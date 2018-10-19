@@ -1,24 +1,15 @@
-<?hh // strict
+<?hh // strict 
 
-namespace SebastianBergmann\TokenStream\Tokens;
+namespace SebastianBergmann\TokenStream;
 
 use SebastianBergmann\TokenStream\TokenWithScope;
-use SebastianBergmann\TokenStream\Token\Types;
 use SebastianBergmann\TokenStream\TokenInterface;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Open_Curly;
-use SebastianBergmann\TokenStream\Tokens\PHP_Token_Semicolon;
 
-class PHP_Token_If extends TokenWithScope {
+abstract class TokenWithScopeStartsWithCurly extends TokenWithScope {
+
   private int $endOfDefinitionId = -1;
   private bool $didEndOfDefinitionId = false;
-
-  public function getTokenType(): string {
-    return Types::T_KEYWORD;
-  }
-
-  public function getShortTokenName(): string {
-    return 'If';
-  }
 
   public function getEndOfDefinitionLineNo(): int {
     $token = $this->getEndofDefinitionToken();
@@ -32,10 +23,13 @@ class PHP_Token_If extends TokenWithScope {
 
     $tokens = $this->tokenStream()->tokens();
 
-    $endOfDefinitionToken = $tokens->get($this->endOfDefinitionId);
+    // don't bother running this if we are still at initialization state.
+    if ($this->endOfDefinitionId != -1) {
+      $endOfDefinitionToken = $tokens->get($this->endOfDefinitionId);
 
-    if ($endOfDefinitionToken instanceof TokenInterface) {
-      return $endOfDefinitionToken;
+      if ($endOfDefinitionToken instanceof TokenInterface) {
+        return $endOfDefinitionToken;
+      }
     }
 
     // echo "skipAmount name=".$this->getName()."\n";
@@ -45,11 +39,6 @@ class PHP_Token_If extends TokenWithScope {
       $token = $tokens->get($i);
 
       if ($token instanceof PHP_Token_Open_Curly) {
-        $this->endOfDefinitionId = $token->getId();
-        break;
-      }
-      
-      if ($token instanceof PHP_Token_Semicolon) {
         $this->endOfDefinitionId = $token->getId();
         break;
       }

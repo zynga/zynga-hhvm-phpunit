@@ -15,4 +15,8 @@ class PHP_Token_Catch extends TokenWithScope {
     return 'Catch';
   }
 
+  public function getEndOfDefinitionLineNo(): int {
+    return $this->getLine();
+  }
+
 }

@@ -31,6 +31,8 @@ use SebastianBergmann\TokenStream\Tokens\PHP_Token_If;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Foreach;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Function;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Switch;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Try;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_While;
 use
   SebastianBergmann\CodeCoverage\Report\Html\Renderer\SourcreFileLineBuffer
 ;
@@ -374,35 +376,49 @@ class File extends Renderer {
         $tokens = $processedFile->stream()->getLineToTokens($lineNo);
 
         foreach ($tokens as $token) {
-          if ($tokensForLine != '') {
-            $tokensForLine .= ', ';
-          }
-          $tokensForLine .= $token->getShortTokenName();
-          $tokensForLine .= '['.$token->getId().']';
 
-          if ( $token instanceof PHP_Token_Foreach ) {
-            $tokensForLine .= '::[' . $token->getEndTokenId() . ']';
-            $tokensForLine .= '::[' . $token->getEndOfDefinitionLineNo() . ']';
-          } elseif ( $token instanceof PHP_Token_Function ) {
-            $tokensForLine .= '::[' . $token->getEndTokenId() . ']';
-            $tokensForLine .= '::[' . $token->getEndOfDefinitionLineNo() . ']';
-          } elseif ( $token instanceof PHP_Token_If ) {
-            //$tokensForLine .= '::[' . $token->getEndTokenId() . ']';
-            $tokensForLine .= '::[' . $token->getEndOfDefinitionLineNo() . ']';
-          } elseif ( $token instanceof PHP_Token_Switch ) {
-            // $tokensForLine .= '::[' . $token->getEndTokenId() . ']';
-            $tokensForLine .= '::[' . $token->getEndOfDefinitionLineNo() . ']';
-          } elseif ( $token instanceof PHP_Token_Catch ) {
-            // $tokensForLine .= '::[' . $token->getEndTokenId() . ']';
-            $tokensForLine .= '::[' . $token->getEndOfDefinitionLineNo() . ']';
-          } elseif ( $token instanceof PHP_Token_Finally ) {
-            // $tokensForLine .= '::[' . $token->getEndTokenId() . ']';
-            $tokensForLine .= '::[' . $token->getEndOfDefinitionLineNo() . ']';
+          if ($tokensForLine != '') {
+            $tokensForLine .= ',&nbsp;';
+          }
+
+          $tokensForLine .= $token->getShortTokenName();
+          $tokensForLine .= '[tokenId|'.$token->getId().']';
+
+          if ( $token instanceof PHP_Token_Foreach || 
+               $token instanceof PHP_Token_While || 
+               $token instanceof PHP_Token_Function ||
+               $token instanceof PHP_Token_If || 
+               $token instanceof PHP_Token_Switch ||
+               $token instanceof PHP_Token_Try ||
+               $token instanceof PHP_Token_Catch ||
+               $token instanceof PHP_Token_Finally ) {
+            $tokensForLine .= '::[endTokenId|' . $token->getEndTokenId() . ']';
+            $tokensForLine .= '::[endOfDefinitionLineNo|' . $token->getEndOfDefinitionLineNo() . ']';
+            $tokensForLine .= '::[endLineNo|' . $token->getEndLine() . ']';
           }
 
         }
 
-        $lines .= CodeTokens::render($lineNo, $tokensForLine);
+        $lines .= CodeTokens::render('Tokens', $lineNo, $tokensForLine);
+
+        // Executable ranges need debugging at times.
+        $execRanges = $processedFile->lineExecutionState()->getExecutableRanges($lineNo);
+
+        if ( $execRanges instanceof Vector && $execRanges->count() > 0 ) {
+          $data = '';
+          foreach ( $execRanges as $range ) {
+            if ( $data != '' ) {
+              $data .= ', ';
+            }
+            $data .= $range->getReason() . 
+              ' [' . $range->getStart() . ':' . $range->getEnd() . ']';
+          }
+          $lines .= CodeTokens::render('ExecRanges', $lineNo, $data);
+        } else {
+          $lines .= CodeTokens::render('ExecRanges', $lineNo, '-NONE-');
+        }
+
+
       }
 
     }

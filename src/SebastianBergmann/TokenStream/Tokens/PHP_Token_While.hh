@@ -2,10 +2,10 @@
 
 namespace SebastianBergmann\TokenStream\Tokens;
 
-use SebastianBergmann\TokenStream\Token;
+use SebastianBergmann\TokenStream\TokenWithScopeStartsWithCurly;
 use SebastianBergmann\TokenStream\Token\Types;
 
-class PHP_Token_While extends Token {
+class PHP_Token_While extends TokenWithScopeStartsWithCurly {
 
   public function getTokenType(): string {
     return Types::T_KEYWORD;

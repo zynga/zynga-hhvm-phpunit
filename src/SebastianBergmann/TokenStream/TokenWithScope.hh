@@ -98,10 +98,9 @@ abstract class TokenWithScope extends Token {
     }
 
     $block = 0;
-    $i = $this->getId();
     $tokens = $this->tokenStream()->tokens();
 
-    while ($this->endTokenId === -1) {
+    for ( $i = $this->getId(); $i < $tokens->count(); $i++ ) {
 
       $token = $tokens->get($i);
 
@@ -111,22 +110,31 @@ abstract class TokenWithScope extends Token {
 
       if ($token instanceof PHP_Token_Open_Curly ||
           $token instanceof PHP_Token_Curly_Open) {
+
         $block++;
+
       } else if ($token instanceof PHP_Token_Close_Curly) {
+
         $block--;
 
         if ($block === 0) {
           $this->endTokenId = $token->getId();
+          break;
         }
+
       } else if (($this instanceof PHP_Token_Function ||
                   $this instanceof PHP_Token_Namespace) &&
                  $token instanceof PHP_Token_Semicolon) {
+
+        // This is to support singular line function or namespace suppport, we should consider 
+        // swapping them to default to semicolon parser.
         if ($block === 0) {
           $this->endTokenId = $token->getId();
+          break;
         }
+
       }
 
-      $i++;
     }
 
     if ($this->endTokenId === -1) {

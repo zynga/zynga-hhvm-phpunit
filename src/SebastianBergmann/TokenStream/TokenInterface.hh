@@ -16,6 +16,7 @@ interface TokenInterface {
   public function getText(): ?string;
   public function setLine(int $line): bool;
   public function getLine(): int;
+  public function getEndTokenId(): int;
   public function getEndLine(): int;
   public function getId(): int;
   public function setId(int $id): bool;
