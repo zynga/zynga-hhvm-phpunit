@@ -26,10 +26,14 @@ use SebastianBergmann\CodeCoverage\Util;
 use SebastianBergmann\TokenStream\Token\StreamInterfaceStructure;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Comment;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Catch;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Double_Colon;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Finally;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_If;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Else;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Elseif;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Foreach;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Function;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Object_Operator;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Switch;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Try;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_While;
@@ -388,10 +392,14 @@ class File extends Renderer {
                $token instanceof PHP_Token_While || 
                $token instanceof PHP_Token_Function ||
                $token instanceof PHP_Token_If || 
+               $token instanceof PHP_Token_Else || 
+               $token instanceof PHP_Token_Elseif || 
                $token instanceof PHP_Token_Switch ||
                $token instanceof PHP_Token_Try ||
                $token instanceof PHP_Token_Catch ||
-               $token instanceof PHP_Token_Finally ) {
+               $token instanceof PHP_Token_Finally || 
+               $token instanceof PHP_Token_Object_Operator ||
+               $token instanceof PHP_Token_Double_Colon) {
             $tokensForLine .= '::[endTokenId|' . $token->getEndTokenId() . ']';
             $tokensForLine .= '::[endOfDefinitionLineNo|' . $token->getEndOfDefinitionLineNo() . ']';
             $tokensForLine .= '::[endLineNo|' . $token->getEndLine() . ']';

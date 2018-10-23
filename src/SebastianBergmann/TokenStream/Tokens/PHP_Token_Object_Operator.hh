@@ -2,10 +2,10 @@
 
 namespace SebastianBergmann\TokenStream\Tokens;
 
-use SebastianBergmann\TokenStream\Token;
+use SebastianBergmann\TokenStream\TokenEndsWithSemicolon;
 use SebastianBergmann\TokenStream\Token\Types;
 
-class PHP_Token_Object_Operator extends Token {
+class PHP_Token_Object_Operator extends TokenEndsWithSemicolon {
 
   public function getTokenType(): string {
     return Types::T_OPERATOR;
@@ -14,5 +14,11 @@ class PHP_Token_Object_Operator extends Token {
   public function getShortTokenName(): string {
     return 'Object_Operator';
   }
+
+  /*
+  public function getEndLineNo(): int {
+    return $this->getEndOfDefinitionLineNo();
+  }
+  */
 
 }

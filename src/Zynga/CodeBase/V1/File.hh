@@ -18,12 +18,14 @@ use SebastianBergmann\TokenStream\Tokens\PHP_Token_Close_Bracket;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Close_Curly;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Comment;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Double_Colon;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Echo;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Else;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Elseif;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_If;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Invariant;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Foreach;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Function;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Nullsafe_Object_Operator;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Object_Operator;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Open_Bracket;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Private;
@@ -337,7 +339,7 @@ class File {
     $allTokens = $this->stream()->tokens();
     $allTokenCount = $allTokens->count();
 
-    $foundObjectOperator = false;
+    $objectOperator = null;
     $block = 0;
 
     for ( $i = $token->getId(); $i < $allTokenCount; $i++ ) {
@@ -351,43 +353,37 @@ class File {
       if ( $futureToken instanceof PHP_Token_Whitespace ) {
         continue;
       } 
+
+      if ( $futureToken instanceof PHP_Token_Nullsafe_Object_Operator ) {
+        continue;
+      }
       
       if ( $futureToken instanceof PHP_Token_Object_Operator ) {
-        $foundObjectOperator = true;
-        continue;
-      }
-
-      // Next up we should see a open bracket: ( , also allow for inner function calls
-      if ( $futureToken instanceof PHP_Token_Open_Bracket ) {
-        $block++;
-        continue;
-      } 
-      
-      if ( $futureToken instanceof PHP_Token_Close_Bracket ) {
-        $block--;
-        continue;
-      }
-
-      if ( $block == 0 && $futureToken instanceof PHP_Token_Semicolon ) {
-        $skipAmount = $futureToken->getEndOfDefinitionLineNo() - $currentLine;
-        $isExecutable = true;
-        $reason = 'variable-object-function-call';
-        return tuple($isExecutable, $skipAmount, $reason);
+        $objectOperator = $futureToken;
+        break;
       }
 
     }
-        
+
+    if ( $objectOperator instanceof PHP_Token_Object_Operator ) {
+      $reason = 'variable-object-function-call';
+      $skipAmount = $objectOperator->getEndOfDefinitionLineNo() - $currentLine;
+      $this->markExecutableForDefintionToClose($objectOperator, $reason, true);
+      return tuple(false, $skipAmount, $reason);
+    }
+
     // we found a executable token, stop working so hard
     return tuple($isExecutable, $skipAmount, $reason);
 
   }
 
+  // @TODO deprecate this function
   private function handleStaticFunctionCallBlock(int $currentLine, TokenInterface $token
       ): (bool, int, string) {
     $allTokens = $this->stream()->tokens();
     $allTokenCount = $allTokens->count();
 
-    $foundDoubleColon = false;
+    $staticOperator = null;
     $block = 0;
 
     for ( $i = $token->getId(); $i < $allTokenCount; $i++ ) {
@@ -403,28 +399,17 @@ class File {
       } 
       
       if ( $futureToken instanceof PHP_Token_Double_Colon ) {
-        $foundDoubleColon = true;
-        continue;
+        $staticOperator = $futureToken;
+        break;
       }
 
-      // Next up we should see a open bracket: ( , also allow for inner function calls
-      if ( $futureToken instanceof PHP_Token_Open_Bracket ) {
-        $block++;
-        continue;
-      } 
-      
-      if ( $futureToken instanceof PHP_Token_Close_Bracket ) {
-        $block--;
-        continue;
-      }
+    }
 
-      if ( $block == 0 && $futureToken instanceof PHP_Token_Semicolon ) {
-        $isExecutable = true;
-        $skipAmount = $futureToken->getLine() - $currentLine;
-        $reason = 'object-static-function-call';
-        return tuple($isExecutable, $skipAmount, $reason);
-      }
-
+    if ( $staticOperator instanceof PHP_Token_Double_Colon ) {
+      $reason = 'variable-static-function-call';
+      $skipAmount = $staticOperator->getEndOfDefinitionLineNo() - $currentLine;
+      $this->markExecutableForDefintionToClose($staticOperator, $reason, true);
+      return tuple(false, $skipAmount, $reason);
     }
 
     $isExecutable = false;
@@ -500,7 +485,7 @@ class File {
       // handle the end of token
       if ( $markEndOfBlock === true && $currentLine != $endOfBlock ) {
         $this->lineExecutionState()->addFiniteExecutableRange(
-          $reason,
+          $reason . '-EOB',
           $blockLineNo,
           $endOfBlock,
           $endOfBlock
@@ -526,8 +511,6 @@ class File {
     $reason = 'none-given';
 
     foreach ($lineStack as $token) {
-
-      error_log('JEO token=' . get_class($token));
 
       if ( $token instanceof PHP_Token_Comment ) {
         // Everything to the right of this isn't executable.
@@ -571,28 +554,41 @@ class File {
 
       if ($token instanceof PHP_Token_If || $token instanceof PHP_Token_Else || $token instanceof PHP_Token_Elseif) {
         
-        $this->markExecutableForDefintionToClose($token, 'if', true);
-        
         $isExecutable = false; // JEO: We overwrite the isExecutable via markExecutable, need to remove
         
         $endOfDef = $token->getEndOfDefinitionLineNo();
-        $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
+        $endLineNo = $token->getEndLine();
+        $skipAmount = $endLineNo - $currentLine;
 
         // Detecif if this has a else or elseif block, as we have to lower the skip amount by 1 to allow 
         //  else | elseif to handle it's business
         $lineToTokens = $this->stream()->getLineToTokensForLine();
-        $endOfDefTokens = $lineToTokens->get($endOfDef);
+        $endOfDefTokens = $lineToTokens->get($endLineNo);
 
-        if ( $endOfDefTokens instanceof Vector && $endOfDefTokens->count() > 1 ) {
+        $hasContinuation = false;
+        if ( $endOfDefTokens instanceof Vector && $endOfDefTokens->count() > 0 ) {
           foreach ( $endOfDefTokens as $endOfDefToken ) {
             if ( $endOfDefToken instanceof PHP_Token_Else || $endOfDefToken instanceof PHP_Token_Elseif ) {
-              $skipAmount -= 1;
+              $hasContinuation = true;
               break;
             }
           }
+          if ( $hasContinuation === false && preg_match('/Grant.hh$/', $this->_file) ) {
+              $tokenNames = '';
+              foreach ( $endOfDefTokens as $endOfDefToken ) {
+                if ( $tokenNames != '' ) { $tokenNames .= ', '; }
+                $tokenNames .= $endOfDefToken->getShortTokenName();
+              }
+          }
         }
         
-        $reason = 'if';
+        $reason = $token->getShortTokenName();
+
+        if ( $hasContinuation === true ) {
+          $this->markExecutableForDefintionToClose($token, $reason, false);
+        } else {
+          $this->markExecutableForDefintionToClose($token, $reason, true);
+        }
 
         return tuple($isExecutable, $skipAmount, $reason);
       }
@@ -658,8 +654,9 @@ class File {
         return tuple($isExecutable, $skipAmount, $reason);
       }
       
-      if ($token instanceof PHP_Token_While || 
-          $token instanceof PHP_Token_Foreach) {
+      if ( $token instanceof PHP_Token_Echo || 
+          $token instanceof PHP_Token_Foreach || 
+          $token instanceof PHP_Token_While) {
         $reason = $token->getShortTokenName();
         $this->markExecutableForDefintionToClose($token, $reason, true);
         $isExecutable = false; // JEO: We overwrite the isExecutable via markExecutable, need to remove
@@ -681,7 +678,11 @@ class File {
         $t_bracketToken = $lineStack->get($offset + 2);
         if ( $t_functionName instanceof PHP_Token_String && 
              $t_bracketToken instanceof PHP_Token_Open_Bracket ) {
-          return $this->handleStaticFunctionCallBlock($currentLine, $token);
+          $reason = $token->getShortTokenName();
+          $this->markExecutableForDefintionToClose($token, $reason, true);
+          $isExecutable = false; // JEO: We overwrite the isExecutable via markExecutable, need to remove
+          $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
+          return tuple($isExecutable, $skipAmount, $reason);
         }
       }
 
@@ -735,20 +736,19 @@ class File {
     int $currentLine,
   ): int {
 
-    // echo "execFile=".$this->_file." currentLine=$currentLine\n";
-
     $isExecutable = false;
     $skipAmount = 0;
     $reason = '';
 
     if ($lineStack->count() == 0) {
       // empty stack therefor noop
-    } else if ($lineStack->count() == 1) {
-      // if it's a trailing } from either a control structure it's a non-op
-      $token = $lineStack->get(0);
-      if ($token instanceof PHP_Token_Close_Curly) {
-        $isExecutable = false;
-      }
+    // -- JEO: probably dead with the imporoved block parsing.
+    // } else if ($lineStack->count() == 1) {
+    //  // if it's a trailing } from either a control structure it's a non-op
+    //  $token = $lineStack->get(0);
+    //  if ($token instanceof PHP_Token_Close_Curly) {
+    //    $isExecutable = false;
+    //  }
     } else {
       // Loop across the line looking for more complex patterns.
       list($isExecutable, $skipAmount, $reason) =

@@ -11,6 +11,22 @@ abstract class TokenEndsWithSemicolon extends Token {
   private int $endOfDefinitionId = -1;
   private bool $didEndofDefinitionId = false;
 
+  public function getEndLine(): int {
+    $token = $this->getEndofDefinitionToken();
+    if ( $token instanceof TokenInterface ) {
+      return $token->getLine();
+    }
+    return $this->getLine();
+  }
+
+  public function getEndTokenId(): int {
+    if ( $this->endOfDefinitionId > 0 ) {
+      return $this->endOfDefinitionId;
+    }
+    $token = $this->getEndofDefinitionToken();
+    return $this->endOfDefinitionId;
+  }
+
   public function getEndOfDefinitionLineNo(): int {
     $token = $this->getEndofDefinitionToken();
     if ( $token instanceof TokenInterface ) {
