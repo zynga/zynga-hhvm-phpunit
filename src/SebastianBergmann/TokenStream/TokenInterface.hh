@@ -11,7 +11,6 @@ interface TokenInterface {
     File $file,
     int $id,
   ): void;
-  public function getEndOfDefinitionLineNo(): int;
   public function setText(string $text): bool;
   public function getText(): ?string;
   public function setLine(int $line): bool;
@@ -24,5 +23,11 @@ interface TokenInterface {
   //public function getFile(): ?File;
   //public function setFile(File $file): bool;
   public function getTokenType(): string;
+  public function hasContinuation(): bool;
+  public function getContinuationTokenId(): int;
+  public function getContinuationToken(): ?TokenInterface;
+  public function getEndOfDefinitionToken(): ?TokenInterface;
+  public function getEndOfDefinitionTokenId(): int;
+  public function getEndOfDefinitionLineNo(): int;  
   public function __toString(): string;
 }

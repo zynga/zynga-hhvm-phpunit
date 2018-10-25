@@ -357,11 +357,11 @@ class File extends Renderer {
         $lineState = '&nbsp;';
       }
 
-
-      if ( preg_match('/\@codeCoverageIgnore/', $codeLine) ) {
+      if (preg_match('/\@codeCoverageIgnore/', $codeLine)) {
         $lineStateCss = 'danger';
         $lineState = 'NA';
-        $codeLine .= '<span class="string">!!We do not support code coverage ignore.!!</span>';
+        $codeLine .=
+          '<span class="string">!!We do not support code coverage ignore.!!</span>';
       }
 
       $lines .= CodeRow::render(
@@ -388,21 +388,36 @@ class File extends Renderer {
           $tokensForLine .= $token->getShortTokenName();
           $tokensForLine .= '[tokenId|'.$token->getId().']';
 
-          if ( $token instanceof PHP_Token_Foreach || 
-               $token instanceof PHP_Token_While || 
-               $token instanceof PHP_Token_Function ||
-               $token instanceof PHP_Token_If || 
-               $token instanceof PHP_Token_Else || 
-               $token instanceof PHP_Token_Elseif || 
-               $token instanceof PHP_Token_Switch ||
-               $token instanceof PHP_Token_Try ||
-               $token instanceof PHP_Token_Catch ||
-               $token instanceof PHP_Token_Finally || 
-               $token instanceof PHP_Token_Object_Operator ||
-               $token instanceof PHP_Token_Double_Colon) {
-            $tokensForLine .= '::[endTokenId|' . $token->getEndTokenId() . ']';
-            $tokensForLine .= '::[endOfDefinitionLineNo|' . $token->getEndOfDefinitionLineNo() . ']';
-            $tokensForLine .= '::[endLineNo|' . $token->getEndLine() . ']';
+          if ($token instanceof PHP_Token_Foreach ||
+              $token instanceof PHP_Token_While ||
+              $token instanceof PHP_Token_Function ||
+              $token instanceof PHP_Token_If ||
+              $token instanceof PHP_Token_Else ||
+              $token instanceof PHP_Token_Elseif ||
+              $token instanceof PHP_Token_Switch ||
+              $token instanceof PHP_Token_Try ||
+              $token instanceof PHP_Token_Catch ||
+              $token instanceof PHP_Token_Finally ||
+              $token instanceof PHP_Token_Object_Operator ||
+              $token instanceof PHP_Token_Double_Colon) {
+            $tokensForLine .= '::[endTokenId|'.$token->getEndTokenId().']';
+            $tokensForLine .= '::[endLineNo|'.$token->getEndLine().']';
+            $tokensForLine .=
+              '::[endOfDefinitionId|'.$token->getEndOfDefinitionTokenId().']';
+            $tokensForLine .=
+              '::[endOfDefinitionLineNo|'.
+              $token->getEndOfDefinitionLineNo().
+              ']';
+            if ($token instanceof PHP_Token_If ||
+                $token instanceof PHP_Token_Elseif ||
+                $token instanceof PHP_Token_Else) {
+              $tokensForLine .=
+                '::[hasContinuation|'.
+                json_encode($token->hasContinuation()).
+                ']';
+              $tokensForLine .=
+                '::[continuationId|'.$token->getContinuationTokenId().']';
+            }
           }
 
         }
@@ -410,22 +425,27 @@ class File extends Renderer {
         $lines .= CodeTokens::render('Tokens', $lineNo, $tokensForLine);
 
         // Executable ranges need debugging at times.
-        $execRanges = $processedFile->lineExecutionState()->getExecutableRanges($lineNo);
+        $execRanges =
+          $processedFile->lineExecutionState()->getExecutableRanges($lineNo);
 
-        if ( $execRanges instanceof Vector && $execRanges->count() > 0 ) {
+        if ($execRanges instanceof Vector && $execRanges->count() > 0) {
           $data = '';
-          foreach ( $execRanges as $range ) {
-            if ( $data != '' ) {
+          foreach ($execRanges as $range) {
+            if ($data != '') {
               $data .= ', ';
             }
-            $data .= $range->getReason() . 
-              ' [' . $range->getStart() . ':' . $range->getEnd() . ']';
+            $data .=
+              $range->getReason().
+              ' ['.
+              $range->getStart().
+              ':'.
+              $range->getEnd().
+              ']';
           }
           $lines .= CodeTokens::render('ExecRanges', $lineNo, $data);
         } else {
           $lines .= CodeTokens::render('ExecRanges', $lineNo, '-NONE-');
         }
-
 
       }
 

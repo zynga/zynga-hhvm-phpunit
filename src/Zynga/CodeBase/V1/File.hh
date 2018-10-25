@@ -287,28 +287,29 @@ class File {
   }
 
   private function isTokenOperator(TokenInterface $token): bool {
-    if ( $token->getTokenType() == Types::T_OPERATOR && ! $token instanceof PHP_Token_Object_Operator ) {
+    if ($token->getTokenType() == Types::T_OPERATOR &&
+        !$token instanceof PHP_Token_Object_Operator) {
       return true;
     }
     return false;
   }
 
   private function handleVariableExecutionStatus(
-      Vector<TokenInterface> $lineStack,
-      int $currentLine, 
-      int $offset, 
-      TokenInterface $token, 
-      bool $isPublic, 
-      bool $isPrivate, 
-      bool $isProtected, 
-      bool $isExecutable, 
-      int $skipAmount, 
-      string $reason
-      ): (bool, int, string) {
+    Vector<TokenInterface> $lineStack,
+    int $currentLine,
+    int $offset,
+    TokenInterface $token,
+    bool $isPublic,
+    bool $isPrivate,
+    bool $isProtected,
+    bool $isExecutable,
+    int $skipAmount,
+    string $reason,
+  ): (bool, int, string) {
 
     // public|private|protected $baz != executable code.
     // this is a class variable of some sort due to it's accessability level.
-    if ( $isPublic === true || $isPrivate === true || $isProtected === true) {
+    if ($isPublic === true || $isPrivate === true || $isProtected === true) {
       return tuple(false, 0, '');
     }
 
@@ -316,15 +317,15 @@ class File {
     // does this line contain an operator?
     $tokenCount = $lineStack->count();
 
-    for ( $i = $offset + 1; $i < $tokenCount; $i++ ) {
+    for ($i = $offset + 1; $i < $tokenCount; $i++) {
       $futureToken = $lineStack->get($i);
-      if ( ! $futureToken instanceof TokenInterface ) {
+      if (!$futureToken instanceof TokenInterface) {
         break;
       }
-      if ( $futureToken instanceof PHP_Token_Whitespace ) {
+      if ($futureToken instanceof PHP_Token_Whitespace) {
         continue;
       }
-      if ( $this->isTokenOperator($futureToken) ) {
+      if ($this->isTokenOperator($futureToken)) {
         $skipAmount = $futureToken->getEndOfDefinitionLineNo() - $currentLine;
         return tuple(true, $skipAmount, 'variable-with-operator');
       }
@@ -342,33 +343,38 @@ class File {
     $objectOperator = null;
     $block = 0;
 
-    for ( $i = $token->getId(); $i < $allTokenCount; $i++ ) {
+    for ($i = $token->getId(); $i < $allTokenCount; $i++) {
 
       $futureToken = $allTokens->get($i);
-            
-      if ( ! $futureToken instanceof TokenInterface ) {
+
+      if (!$futureToken instanceof TokenInterface) {
         break;
       }
 
-      if ( $futureToken instanceof PHP_Token_Whitespace ) {
-        continue;
-      } 
-
-      if ( $futureToken instanceof PHP_Token_Nullsafe_Object_Operator ) {
+      if ($futureToken instanceof PHP_Token_Whitespace) {
         continue;
       }
-      
-      if ( $futureToken instanceof PHP_Token_Object_Operator ) {
+
+      if ($futureToken instanceof PHP_Token_Nullsafe_Object_Operator) {
+        continue;
+      }
+
+      if ($futureToken instanceof PHP_Token_Object_Operator) {
         $objectOperator = $futureToken;
         break;
       }
 
     }
 
-    if ( $objectOperator instanceof PHP_Token_Object_Operator ) {
+    if ($objectOperator instanceof PHP_Token_Object_Operator) {
       $reason = 'variable-object-function-call';
-      $skipAmount = $objectOperator->getEndOfDefinitionLineNo() - $currentLine;
-      $this->markExecutableForDefintionToClose($objectOperator, $reason, true);
+      $skipAmount =
+        $objectOperator->getEndOfDefinitionLineNo() - $currentLine;
+      $this->markExecutableForDefintionToClose(
+        $objectOperator,
+        $reason,
+        true,
+      );
       return tuple(false, $skipAmount, $reason);
     }
 
@@ -378,46 +384,46 @@ class File {
   }
 
   private function markExecutableForDefintionToClose(
-      TokenInterface $token, 
-      string $reason, 
-      bool $markEndOfBlock
-      ): void {
+    TokenInterface $token,
+    string $reason,
+    bool $markEndOfBlock,
+  ): void {
 
     $currentLine = $token->getLine();
-    $endOfDef    = $token->getEndOfDefinitionLineNo();
-    $endOfBlock  = $token->getEndLine();
+    $endOfDef = $token->getEndOfDefinitionLineNo();
+    $endOfBlock = $token->getEndLine();
     $lineToTokens = $this->stream()->getLineToTokensForLine();
 
     /*
-    JEO:
-    if ( preg_match('/UserIterator/', $this->_file) ) {
-    echo "currentLine=$currentLine endOfDef=$endOfDef endOfBlock=$endOfBlock\n";
-    }
-    */
+     JEO:
+     if ( preg_match('/UserIterator/', $this->_file) ) {
+     echo "currentLine=$currentLine endOfDef=$endOfDef endOfBlock=$endOfBlock\n";
+     }
+     */
 
     // --
-    // The whole definition gets marked as a 'executable' component, with the 'innards' being the trigger 
+    // The whole definition gets marked as a 'executable' component, with the 'innards' being the trigger
     // for successful execution.
     // --
     // 1) Mark all of the defition as not executed.
-    for ( $defLineNo = $currentLine; $defLineNo <= $endOfDef; $defLineNo++ ) {
+    for ($defLineNo = $currentLine; $defLineNo <= $endOfDef; $defLineNo++) {
 
       $lineTokens = $lineToTokens->get($defLineNo);
 
-      if ( ! $lineTokens instanceof Vector ) {
+      if (!$lineTokens instanceof Vector) {
         continue;
       }
 
-      if ( $lineTokens->count() == 0 ) {
+      if ($lineTokens->count() == 0) {
         continue;
       }
 
       // Check for blank or comment only lines before saying it should be executed.
       $nonWhitespaceTokens = false;
-      foreach ( $lineTokens as $lineToken ) {
-        if ( $lineToken instanceof PHP_Token_Whitespace ) {
+      foreach ($lineTokens as $lineToken) {
+        if ($lineToken instanceof PHP_Token_Whitespace) {
           continue;
-        } else if ( $lineToken instanceof PHP_Token_Comment ) {
+        } else if ($lineToken instanceof PHP_Token_Comment) {
           continue;
         } else {
           $nonWhitespaceTokens = true;
@@ -425,35 +431,53 @@ class File {
         }
       }
 
-      if ( $nonWhitespaceTokens === true ) {
-        $this->lineExecutionState()->set($defLineNo, Driver::LINE_NOT_EXECUTED);
+      if ($nonWhitespaceTokens === true) {
+        $this->lineExecutionState()
+          ->set($defLineNo, Driver::LINE_NOT_EXECUTED);
       }
 
     }
 
     // 2) This is the last line in the block that needs to be marked up as non-executed.
-    if ( $markEndOfBlock === true && $currentLine != $endOfBlock ) {
-      $this->lineExecutionState()->set($endOfBlock, Driver::LINE_NOT_EXECUTED);
+    if ($markEndOfBlock === true && $currentLine != $endOfBlock) {
+      $this->lineExecutionState()
+        ->set($endOfBlock, Driver::LINE_NOT_EXECUTED);
     }
 
     // 3) Wire up a block line => token definition trigger && end of token trigger.
-    for ( $blockLineNo = $endOfDef; $blockLineNo <= $endOfBlock; $blockLineNo++ ) {
+    $this->debug(
+      Map {
+        'action' => 'mark-block-start',
+        'endOfDef' => $endOfDef,
+        'endOfBlock' => $endOfBlock,
+      },
+    );
+
+    for (
+      $blockLineNo = $endOfDef;
+      $blockLineNo <= $endOfBlock;
+      $blockLineNo++
+    ) {
+
+      $this->debug(
+        Map {'action' => 'mark-block-phase-3', 'blockNo' => $blockLineNo},
+      );
 
       // handle the definition component for the token
       $this->lineExecutionState()->addFiniteExecutableRange(
-        $reason . '-BLOCK',
+        $reason.'-BLOCK',
         $blockLineNo,
         $currentLine,
         $endOfDef,
       );
 
       // handle the end of token
-      if ( $markEndOfBlock === true && $currentLine != $endOfBlock ) {
+      if ($markEndOfBlock === true) {
         $this->lineExecutionState()->addFiniteExecutableRange(
-          $reason . '-EOB',
+          $reason.'-EOB',
           $blockLineNo,
           $endOfBlock,
-          $endOfBlock
+          $endOfBlock,
         );
       }
 
@@ -477,9 +501,9 @@ class File {
 
     foreach ($lineStack as $token) {
 
-      if ( $token instanceof PHP_Token_Comment ) {
+      if ($token instanceof PHP_Token_Comment) {
         // Everything to the right of this isn't executable.
-        if ( $reason == 'none-given' ) {
+        if ($reason == 'none-given') {
           $reason = 'only-comments';
         }
         break;
@@ -492,7 +516,7 @@ class File {
         return tuple($isExecutable, $skipAmount, $reason);
       }
 
-      if ( $token instanceof PHP_Token_Abstract) {
+      if ($token instanceof PHP_Token_Abstract) {
         $isExecutable = false;
         $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
         $reason = 'abstract';
@@ -507,62 +531,29 @@ class File {
         $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
         $reason = 'function';
 
-        $this->debug(Map {
-            'action' => 'function', 
+        $this->debug(
+          Map {
+            'action' => 'function',
             'function' => $token->getName(),
             'skipAmount' => $skipAmount,
-            'currentLine' => $currentLine
-            });
+            'currentLine' => $currentLine,
+          },
+        );
 
         return tuple($isExecutable, $skipAmount, $reason);
       }
 
-      if ($token instanceof PHP_Token_If || $token instanceof PHP_Token_Else || $token instanceof PHP_Token_Elseif) {
-        
+      if ($token instanceof PHP_Token_If ||
+          $token instanceof PHP_Token_Else ||
+          $token instanceof PHP_Token_Elseif) {
+
         $isExecutable = false; // JEO: We overwrite the isExecutable via markExecutable, need to remove
-        
         $endOfDef = $token->getEndOfDefinitionLineNo();
-        $endLineNo = $token->getEndLine();
         $skipAmount = $endOfDef - $currentLine;
-
-        // Detecif if this has a else or elseif block, as we have to lower the skip amount by 1 to allow 
-        //  else | elseif to handle it's business
-        $lineToTokens = $this->stream()->getLineToTokensForLine();
-        $endOfDefTokens = $lineToTokens->get($endLineNo);
-
-        $hasContinuation = false;
-        if ( $endOfDefTokens instanceof Vector && $endOfDefTokens->count() > 0 ) {
-          foreach ( $endOfDefTokens as $endOfDefToken ) {
-            if ( $endOfDefToken instanceof PHP_Token_Else || $endOfDefToken instanceof PHP_Token_Elseif ) {
-
-    /* 
-    JEO: 
-    if ( preg_match('/UserIterator/', $this->_file) ) {
-              echo "file=" . $this->_file . " lineNo=" . $currentLine . " has-cont\n";
-    }
-    */
-
-              $hasContinuation = true;
-              break;
-            }
-          }
-          if ( $hasContinuation === false && preg_match('/UserIterator/', $this->_file) ) {
-              $tokenNames = '';
-              foreach ( $endOfDefTokens as $endOfDefToken ) {
-                if ( $tokenNames != '' ) { $tokenNames .= ', '; }
-                $tokenNames .= $endOfDefToken->getShortTokenName();
-              }
-              /*
-              JEO:
-              echo "file=" . $this->_file . " lineNo=" . $currentLine . "\n";
-              echo "no-cont: $tokenNames\n";
-              */
-          }
-        }
-        
+        $hasContinuation = $token->hasContinuation();
         $reason = $token->getShortTokenName();
 
-        if ( $hasContinuation === true ) {
+        if ($hasContinuation === true) {
           $this->markExecutableForDefintionToClose($token, $reason, false);
         } else {
           $this->markExecutableForDefintionToClose($token, $reason, true);
@@ -571,7 +562,7 @@ class File {
         return tuple($isExecutable, $skipAmount, $reason);
 
       }
-      
+
       if ($token instanceof PHP_Token_Switch) {
         $isExecutable = false;
         $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
@@ -594,27 +585,28 @@ class File {
       }
 
       if ($token instanceof PHP_Token_Catch) {
-        
+
         $isExecutable = false; // JEO: We overwrite the isExecutable via markExecutable, need to remove
         $reason = $token->getShortTokenName();
         $endOfDef = $token->getEndOfDefinitionLineNo();
         $skipAmount = $endOfDef - $currentLine;
-   
-        // Detect if this has a finally block, as we have to lower the skip amount by 1 to allow 
+
+        // Detect if this has a finally block, as we have to lower the skip amount by 1 to allow
         //  finally to handle it's business
         $lineToTokens = $this->stream()->getLineToTokensForLine();
         $endOfDefTokens = $lineToTokens->get($endOfDef);
 
         $hasFinallyBlock = false;
-        if ( $endOfDefTokens instanceof Vector && $endOfDefTokens->count() > 1 ) {
-          foreach ( $endOfDefTokens as $endOfDefToken ) {
-            if ( $endOfDefToken instanceof PHP_Token_Finally ) {
+        if ($endOfDefTokens instanceof Vector &&
+            $endOfDefTokens->count() > 1) {
+          foreach ($endOfDefTokens as $endOfDefToken) {
+            if ($endOfDefToken instanceof PHP_Token_Finally) {
               $hasFinallyBlock = true;
             }
           }
         }
-       
-        if ( $hasFinallyBlock === true ) {
+
+        if ($hasFinallyBlock === true) {
           $this->markExecutableForDefintionToClose($token, $reason, false);
         } else {
           $this->markExecutableForDefintionToClose($token, $reason, true);
@@ -624,7 +616,7 @@ class File {
         return tuple($isExecutable, $skipAmount, $reason);
 
       }
-      
+
       if ($token instanceof PHP_Token_Finally) {
         $this->markExecutableForDefintionToClose($token, 'finally', true);
         $isExecutable = false; // JEO: We overwrite the isExecutable via markExecutable, need to remove
@@ -632,9 +624,9 @@ class File {
         $reason = 'finally';
         return tuple($isExecutable, $skipAmount, $reason);
       }
-      
-      if ( $token instanceof PHP_Token_Echo || 
-          $token instanceof PHP_Token_Foreach || 
+
+      if ($token instanceof PHP_Token_Echo ||
+          $token instanceof PHP_Token_Foreach ||
           $token instanceof PHP_Token_While) {
         $reason = $token->getShortTokenName();
         $this->markExecutableForDefintionToClose($token, $reason, true);
@@ -643,7 +635,6 @@ class File {
         return tuple($isExecutable, $skipAmount, $reason);
       }
 
-      
       if ($token instanceof PHP_Token_Invariant) {
         $isExecutable = true;
         $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
@@ -652,11 +643,11 @@ class File {
       }
 
       // Handle static function calls and their blocks they create.
-      if ( $token instanceof PHP_Token_Double_Colon ) {
+      if ($token instanceof PHP_Token_Double_Colon) {
         $t_functionName = $lineStack->get($offset + 1);
         $t_bracketToken = $lineStack->get($offset + 2);
-        if ( $t_functionName instanceof PHP_Token_String && 
-             $t_bracketToken instanceof PHP_Token_Open_Bracket ) {
+        if ($t_functionName instanceof PHP_Token_String &&
+            $t_bracketToken instanceof PHP_Token_Open_Bracket) {
           $reason = $token->getShortTokenName();
           $this->markExecutableForDefintionToClose($token, $reason, true);
           $isExecutable = false; // JEO: We overwrite the isExecutable via markExecutable, need to remove
@@ -665,15 +656,15 @@ class File {
         }
       }
 
-      if ( $token instanceof PHP_Token_Public ) {
+      if ($token instanceof PHP_Token_Public) {
         $isPublic = true;
       }
 
-      if ( $token instanceof PHP_Token_Private ) {
+      if ($token instanceof PHP_Token_Private) {
         $isPrivate = true;
       }
 
-      if ( $token instanceof PHP_Token_Protected ) {
+      if ($token instanceof PHP_Token_Protected) {
         $isProtected = true;
       }
 
@@ -683,12 +674,20 @@ class File {
       if ($isExecutable === true) {
 
         // Executable variable tokens are handled specially and in their  own handler.
-        if ( $token instanceof PHP_Token_Variable ) {
-          
+        if ($token instanceof PHP_Token_Variable) {
+
           return $this->handleVariableExecutionStatus(
-              $lineStack, $currentLine, $offset, $token, $isPublic, $isPrivate, $isProtected,
-              $isExecutable, $skipAmount, $reason
-            );
+            $lineStack,
+            $currentLine,
+            $offset,
+            $token,
+            $isPublic,
+            $isPrivate,
+            $isProtected,
+            $isExecutable,
+            $skipAmount,
+            $reason,
+          );
 
         }
 
@@ -721,13 +720,6 @@ class File {
 
     if ($lineStack->count() == 0) {
       // empty stack therefor noop
-    // -- JEO: probably dead with the imporoved block parsing.
-    // } else if ($lineStack->count() == 1) {
-    //  // if it's a trailing } from either a control structure it's a non-op
-    //  $token = $lineStack->get(0);
-    //  if ($token instanceof PHP_Token_Close_Curly) {
-    //    $isExecutable = false;
-    //  }
     } else {
       // Loop across the line looking for more complex patterns.
       list($isExecutable, $skipAmount, $reason) =
@@ -737,12 +729,14 @@ class File {
     // mark the line up with the state.
     if ($isExecutable === true) {
 
-      $this->debug(Map {
-         'action' => 'isExecutable',
-         'currentLine' => $currentLine,
-         'reason' => $reason,
-         'skipAmount' => $skipAmount
-         });
+      $this->debug(
+        Map {
+          'action' => 'isExecutable',
+          'currentLine' => $currentLine,
+          'reason' => $reason,
+          'skipAmount' => $skipAmount,
+        },
+      );
 
       if ($skipAmount > 0) {
         for ($s = 0; $s < $skipAmount; $s++) {
@@ -767,32 +761,36 @@ class File {
 
   }
 
-  public function debug(Map <string, mixed> $params): void {
+  public function debug(Map<string, mixed> $params): void {
 
-    return;
-    /*
-    //if ( ! preg_match('/Legacy\/Features\/Admin\/BoostConfig\/V1\/BoostConfigManager.hh/', $this->_file ) ) {
-    //  return;
-    // }
-    
-    if ( ! preg_match('/UserIterator/', $this->_file ) ) {
+    //return;
+
+    $fileName = 'ComplexBlockDetection';
+    $doEcho = true;
+    $doErrorLog = false;
+
+    if (!preg_match('/'.$fileName.'/', $this->_file)) {
       return;
     }
 
     $text = '';
-    $text .= 'file=' . $this->_file;
+    $text .= 'file='.$this->_file;
 
-    foreach ( $params as $key => $value ) {
-      if ( $text != '' ) {
+    foreach ($params as $key => $value) {
+      if ($text != '') {
         $text .= ' ';
       }
-      $text .= $key . '=';
+      $text .= $key.'=';
       $text .= json_encode($value);
     }
 
-    // echo "$text\n";
-    // error_log($text);
-    */
+    if ($doEcho === true) {
+      echo "$text\n";
+    }
+
+    if ($doErrorLog === true) {
+      error_log($text);
+    }
 
   }
 
@@ -802,8 +800,8 @@ class File {
       return;
     }
 
-    $this->debug(Map{'action' => 'init-start'});
-    
+    $this->debug(Map {'action' => 'init-start'});
+
     // load the source for this file.
     $this->source()->load();
 
@@ -814,34 +812,52 @@ class File {
     $lineToTokens = $this->stream()->getLineToTokensForLine();
 
     $skipAmount = 0;
-    $this->debug(Map{'action' => 'line-loop-start', 'lineCount' => $lineCount});
-    
+    $this->debug(
+      Map {'action' => 'line-loop-start', 'lineCount' => $lineCount},
+    );
+
     $reason = '';
 
-    for ( $lineNo = 1; $lineNo < $lineCount; $lineNo++ ) {
+    for ($lineNo = 1; $lineNo < $lineCount; $lineNo++) {
 
       $lineStack = $lineToTokens->get($lineNo);
 
-      if ( ! $lineStack instanceof Vector ) {
-        $this->debug(Map{'action' => 'line-loop-no-tokens', 'lineNo' => $lineNo});
+      if (!$lineStack instanceof Vector) {
+        $this->debug(
+          Map {'action' => 'line-loop-no-tokens', 'lineNo' => $lineNo},
+        );
         $lineStack = Vector {};
       } else {
-        $this->debug(Map{'action' => 'line-loop-has-tokens', 'lineNo' => $lineNo, 'tokenCount' => $lineStack->count()});
+        $this->debug(
+          Map {
+            'action' => 'line-loop-has-tokens',
+            'lineNo' => $lineNo,
+            'tokenCount' => $lineStack->count(),
+          },
+        );
       }
 
       // we update the endLine every pass on this loop.
       $this->_endLine = $lineNo;
 
       if ($skipAmount > 0) {
-        $this->debug(Map{'action' => 'skipping','lineNo' => $lineNo, 'skipAmount' => $skipAmount, 'reason' => $reason});
+        $this->debug(
+          Map {
+            'action' => 'skipping',
+            'lineNo' => $lineNo,
+            'skipAmount' => $skipAmount,
+            'reason' => $reason,
+          },
+        );
         $skipAmount--;
       } else {
-        list($skipAmount, $reason) = $this->determineLineExecutable($lineStack, $lineNo);
+        list($skipAmount, $reason) =
+          $this->determineLineExecutable($lineStack, $lineNo);
       }
 
     }
 
-    $this->debug(Map{'action' => 'init-complete'});
+    $this->debug(Map {'action' => 'init-complete'});
     $this->_didInit = true;
 
   }

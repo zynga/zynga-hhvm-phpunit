@@ -63,14 +63,6 @@ abstract class Token implements TokenInterface {
     return $this->_id;
   }
 
-  // --
-  // JEO: This is by default the same value as the lineno, some of the tokens have overloaded
-  // this defintition to allow you to find the end of a code block or definition.
-  // --
-  public function getEndOfDefinitionLineNo(): int {
-    return $this->getLine();
-  }
-
   public function getEndLine(): int {
     return $this->getLine();
   }
@@ -112,5 +104,76 @@ abstract class Token implements TokenInterface {
   // to this short name? We run this function a few hundred thousand times ;)
   // --
   abstract public function getShortTokenName(): string;
+
+  // --
+  // Most tokens don't have continuation concepts, however some block components
+  //  do, such as:
+  //  - If, Else, ElseIf
+  //  - Try, Catch, Finally
+  // --
+  public function hasContinuation(): bool {
+    $id = $this->getContinuationTokenId();
+
+    if ($id > -1) {
+      return true;
+    }
+
+    return false;
+  }
+
+  public function getContinuationTokenId(): int {
+    return -1;
+  }
+
+  public function getContinuationToken(): ?TokenInterface {
+
+    $id = $this->getContinuationTokenId();
+
+    // there isn't a continuation token for this token.
+    if ($id == -1) {
+      return null;
+    }
+
+    $tokens = $this->tokenStream()->tokens();
+
+    return $tokens->get($id);
+
+  }
+
+  public function getEndOfDefinitionLineNo(): int {
+
+    $token = $this->getEndOfDefinitionToken();
+
+    if ($token instanceof TokenInterface) {
+      return $token->getLine();
+    }
+
+    return $this->getLine();
+
+  }
+
+  // --
+  // JEO: This is by default the same value as the lineno, some of the tokens have overloaded
+  // this defintition to allow you to find the end of a code block or definition.
+  // --
+  public function getEndOfDefinitionTokenId(): int {
+    return -1;
+  }
+
+  public function getEndOfDefinitionToken(): ?TokenInterface {
+
+    $id = $this->getEndOfDefinitionTokenId();
+
+    if ($id == -1) {
+      return null;
+    }
+
+    $tokens = $this->tokenStream()->tokens();
+
+    $token = $tokens->get($id);
+
+    return $token;
+
+  }
 
 }
