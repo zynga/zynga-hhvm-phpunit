@@ -10,11 +10,11 @@ namespace Zynga\PHPUnit\V2;
 //
 // --
 class Version {
-  const string VERSION_NUMBER = "2.0.3";
-  const string VERSION_NAME   = "cable";
+  const string VERSION_NUMBER = "2.0.4";
+  const string VERSION_NAME = "cable";
 
   public static function get(): string {
-    return self::VERSION_NUMBER . ' - ' . self::VERSION_NAME;
+    return self::VERSION_NUMBER.' - '.self::VERSION_NAME;
   }
 
 }
