@@ -59,14 +59,6 @@ abstract class Token implements TokenInterface {
     return true;
   }
 
-  public function getEndTokenId(): int {
-    return $this->_id;
-  }
-
-  public function getEndLine(): int {
-    return $this->getLine();
-  }
-
   final public function getLine(): int {
     return $this->_line;
   }
@@ -105,6 +97,33 @@ abstract class Token implements TokenInterface {
   // --
   abstract public function getShortTokenName(): string;
 
+
+    public function getEndTokenId(): int {
+      return $this->_id;
+    }
+
+    public function getEndToken(): ?TokenInterface {
+
+      $id = $this->getEndTokenId();
+
+      $tokens = $this->tokenStream()->tokens();
+
+      return $tokens->get($id - 1);
+
+    }
+
+    public function getEndLine(): int {
+
+      $token = $this->getEndToken();
+
+      if ($token instanceof TokenInterface) {
+        return $token->getLine();
+      }
+
+      return $this->getLine();
+
+    }
+
   // --
   // Most tokens don't have continuation concepts, however some block components
   //  do, such as:
@@ -129,14 +148,9 @@ abstract class Token implements TokenInterface {
 
     $id = $this->getContinuationTokenId();
 
-    // there isn't a continuation token for this token.
-    if ($id == -1) {
-      return null;
-    }
-
     $tokens = $this->tokenStream()->tokens();
 
-    return $tokens->get($id);
+    return $tokens->get($id - 1);
 
   }
 
@@ -164,15 +178,9 @@ abstract class Token implements TokenInterface {
 
     $id = $this->getEndOfDefinitionTokenId();
 
-    if ($id == -1) {
-      return null;
-    }
-
     $tokens = $this->tokenStream()->tokens();
 
-    $token = $tokens->get($id);
-
-    return $token;
+    return $tokens->get($id - 1);
 
   }
 

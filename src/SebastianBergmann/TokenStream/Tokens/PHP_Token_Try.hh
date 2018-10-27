@@ -2,21 +2,17 @@
 
 namespace SebastianBergmann\TokenStream\Tokens;
 
-use SebastianBergmann\TokenStream\TokenWithScope;
+use SebastianBergmann\TokenStream\Tokens\Family\TryTokens;
 use SebastianBergmann\TokenStream\Token\Types;
 
-class PHP_Token_Try extends TokenWithScope {
+class PHP_Token_Try extends TryTokens {
 
-  public function getTokenType(): string {
+  public function TryTokens(): string {
     return Types::T_KEYWORD;
   }
 
   public function getShortTokenName(): string {
     return 'Try';
-  }
-
-  public function getEndOfDefinitionLineNo(): int {
-    return $this->getLine();
   }
 
 }

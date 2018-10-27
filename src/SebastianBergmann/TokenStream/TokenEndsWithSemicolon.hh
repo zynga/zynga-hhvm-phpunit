@@ -11,43 +11,22 @@ abstract class TokenEndsWithSemicolon extends Token {
   private int $endOfDefinitionId = -1;
   private bool $didEndofDefinitionId = false;
 
-  public function getEndLine(): int {
-    $token = $this->getEndofDefinitionToken();
-    if ( $token instanceof TokenInterface ) {
-      return $token->getLine();
-    }
-    return $this->getLine();
+  public function getEndTokenId(): int {
+    return $this->getEndOfDefinitionTokenId();
   }
 
-  public function getEndTokenId(): int {
-    if ( $this->endOfDefinitionId > 0 ) {
+  public function getEndOfDefinitionTokenId(): int {
+
+    if ( $this->didEndofDefinitionId === true ) {
       return $this->endOfDefinitionId;
     }
-    $token = $this->getEndofDefinitionToken();
-    return $this->endOfDefinitionId;
-  }
 
-  public function getEndOfDefinitionLineNo(): int {
-    $token = $this->getEndofDefinitionToken();
-    if ( $token instanceof TokenInterface ) {
-      return $token->getLine();
-    }
-    return $this->getLine();
-  }
-
-  public function getEndofDefinitionToken(): ?TokenInterface {
+    $this->didEndofDefinitionId = true;
 
     $tokens = $this->tokenStream()->tokens();
 
-    if ( $this->endOfDefinitionId != -1 ) {
-      $endOfDefinitionToken = $tokens->get($this->endOfDefinitionId);
-      if ( $endOfDefinitionToken instanceof TokenInterface ) {
-        return $endOfDefinitionToken;
-      }
-    }
+    $tokenCount = $tokens->count();
 
-    $tokenCount = $tokens->count(); 
-    $endWasFound = false;
     for ( $i = $this->getId(); $i < $tokenCount; $i++ ) {
       $token = $tokens->get($i);
 
@@ -57,19 +36,12 @@ abstract class TokenEndsWithSemicolon extends Token {
 
       if ( $token instanceof PHP_Token_Semicolon ) {
         $this->endOfDefinitionId = $token->getId();
-        $endWasFound = true;
         break;
       }
 
     }
 
-    if ( $endWasFound !== true ) {
-      $this->endOfDefinitionId = $this->getId();
-    }
-
-    $endOfDefinitionToken = $tokens->get($this->endOfDefinitionId);
-
-    return $endOfDefinitionToken;
+    return $this->endOfDefinitionId;
 
   }
 

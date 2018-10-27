@@ -16,6 +16,7 @@ interface TokenInterface {
   public function setLine(int $line): bool;
   public function getLine(): int;
   public function getEndTokenId(): int;
+  public function getEndToken(): ?TokenInterface;
   public function getEndLine(): int;
   public function getId(): int;
   public function setId(int $id): bool;
@@ -28,6 +29,6 @@ interface TokenInterface {
   public function getContinuationToken(): ?TokenInterface;
   public function getEndOfDefinitionToken(): ?TokenInterface;
   public function getEndOfDefinitionTokenId(): int;
-  public function getEndOfDefinitionLineNo(): int;  
+  public function getEndOfDefinitionLineNo(): int;
   public function __toString(): string;
 }

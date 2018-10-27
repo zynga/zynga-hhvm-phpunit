@@ -298,7 +298,7 @@ class File {
     Vector<TokenInterface> $lineStack,
     int $currentLine,
     int $offset,
-    TokenInterface $token,
+    PHP_Token_Variable $token,
     bool $isPublic,
     bool $isPrivate,
     bool $isProtected,
@@ -315,63 +315,21 @@ class File {
 
     // $foo (=|+=|...) variable operator support
     // does this line contain an operator?
-    $tokenCount = $lineStack->count();
-
-    for ($i = $offset + 1; $i < $tokenCount; $i++) {
-      $futureToken = $lineStack->get($i);
-      if (!$futureToken instanceof TokenInterface) {
-        break;
-      }
-      if ($futureToken instanceof PHP_Token_Whitespace) {
-        continue;
-      }
-      if ($this->isTokenOperator($futureToken)) {
-        $skipAmount = $futureToken->getEndOfDefinitionLineNo() - $currentLine;
-        return tuple(true, $skipAmount, 'variable-with-operator');
-      }
-    }
-
-    // --
-    // Need to support $foo->baz(\w*);
-    //
-    // In order to do such we need to pull the raw stream in.
-    //
-    // --
-    $allTokens = $this->stream()->tokens();
-    $allTokenCount = $allTokens->count();
-
-    $objectOperator = null;
-    $block = 0;
-
-    for ($i = $token->getId(); $i < $allTokenCount; $i++) {
-
-      $futureToken = $allTokens->get($i);
-
-      if (!$futureToken instanceof TokenInterface) {
-        break;
-      }
-
-      if ($futureToken instanceof PHP_Token_Whitespace) {
-        continue;
-      }
-
-      if ($futureToken instanceof PHP_Token_Nullsafe_Object_Operator) {
-        continue;
-      }
-
-      if ($futureToken instanceof PHP_Token_Object_Operator) {
-        $objectOperator = $futureToken;
-        break;
-      }
-
-    }
-
-    if ($objectOperator instanceof PHP_Token_Object_Operator) {
+    if ( $token->hasVariableWithOperator() === true ) {
+      $reason = 'variable-with-operator';
+      $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
+      $this->markExecutableForDefintionToClose(
+        $token,
+        $reason,
+        true,
+      );
+      return tuple(false, $skipAmount, $reason);
+    } else if ( $token->hasVariableWithObjectOperator() === true ) {
       $reason = 'variable-object-function-call';
       $skipAmount =
-        $objectOperator->getEndOfDefinitionLineNo() - $currentLine;
+        $token->getEndOfDefinitionLineNo() - $currentLine;
       $this->markExecutableForDefintionToClose(
-        $objectOperator,
+        $token,
         $reason,
         true,
       );
@@ -509,43 +467,26 @@ class File {
         break;
       }
 
-      if ($token instanceof PHP_Token_Class) {
+      if ($token instanceof PHP_Token_Class ||
+          $token instanceof PHP_Token_Abstract ||
+          $token instanceof PHP_Token_Switch ) {
         $isExecutable = false;
         $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
-        $reason = 'class';
+        $reason = $token->getShortTokenName();
         return tuple($isExecutable, $skipAmount, $reason);
       }
 
-      if ($token instanceof PHP_Token_Abstract) {
-        $isExecutable = false;
-        $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
-        $reason = 'abstract';
-        return tuple($isExecutable, $skipAmount, $reason);
-      }
-
-      if ($token instanceof PHP_Token_Function) {
-
-        $this->markExecutableForDefintionToClose($token, 'function', true);
-
-        $isExecutable = false; // JEO: We overwrite the isExecutable via markExecutable, need to remove
-        $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
-        $reason = 'function';
-
-        $this->debug(
-          Map {
-            'action' => 'function',
-            'function' => $token->getName(),
-            'skipAmount' => $skipAmount,
-            'currentLine' => $currentLine,
-          },
-        );
-
-        return tuple($isExecutable, $skipAmount, $reason);
-      }
-
-      if ($token instanceof PHP_Token_If ||
+      if ($token instanceof PHP_Token_Function ||
+          $token instanceof PHP_Token_Echo ||
+          $token instanceof PHP_Token_Foreach ||
+          $token instanceof PHP_Token_While ||
+          $token instanceof PHP_Token_If ||
           $token instanceof PHP_Token_Else ||
-          $token instanceof PHP_Token_Elseif) {
+          $token instanceof PHP_Token_Elseif ||
+          $token instanceof PHP_Token_Try ||
+          $token instanceof PHP_Token_Catch ||
+          $token instanceof PHP_Token_Finally ||
+          $token instanceof PHP_Token_Invariant) {
 
         $isExecutable = false; // JEO: We overwrite the isExecutable via markExecutable, need to remove
         $endOfDef = $token->getEndOfDefinitionLineNo();
@@ -561,85 +502,6 @@ class File {
 
         return tuple($isExecutable, $skipAmount, $reason);
 
-      }
-
-      if ($token instanceof PHP_Token_Switch) {
-        $isExecutable = false;
-        $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
-        $reason = 'switch';
-        return tuple($isExecutable, $skipAmount, $reason);
-      }
-
-      if ($token instanceof PHP_Token_Try) {
-
-        $this->markExecutableForDefintionToClose($token, 'try', false);
-
-        $isExecutable = false; // JEO: We overwrite the isExecutable via markExecutable, need to remove
-
-        $endOfDef = $token->getEndOfDefinitionLineNo();
-        $skipAmount = $endOfDef - $currentLine;
-
-        $reason = 'try';
-        return tuple($isExecutable, $skipAmount, $reason);
-
-      }
-
-      if ($token instanceof PHP_Token_Catch) {
-
-        $isExecutable = false; // JEO: We overwrite the isExecutable via markExecutable, need to remove
-        $reason = $token->getShortTokenName();
-        $endOfDef = $token->getEndOfDefinitionLineNo();
-        $skipAmount = $endOfDef - $currentLine;
-
-        // Detect if this has a finally block, as we have to lower the skip amount by 1 to allow
-        //  finally to handle it's business
-        $lineToTokens = $this->stream()->getLineToTokensForLine();
-        $endOfDefTokens = $lineToTokens->get($endOfDef);
-
-        $hasFinallyBlock = false;
-        if ($endOfDefTokens instanceof Vector &&
-            $endOfDefTokens->count() > 1) {
-          foreach ($endOfDefTokens as $endOfDefToken) {
-            if ($endOfDefToken instanceof PHP_Token_Finally) {
-              $hasFinallyBlock = true;
-            }
-          }
-        }
-
-        if ($hasFinallyBlock === true) {
-          $this->markExecutableForDefintionToClose($token, $reason, false);
-        } else {
-          $this->markExecutableForDefintionToClose($token, $reason, true);
-        }
-
-        $reason = 'catch';
-        return tuple($isExecutable, $skipAmount, $reason);
-
-      }
-
-      if ($token instanceof PHP_Token_Finally) {
-        $this->markExecutableForDefintionToClose($token, 'finally', true);
-        $isExecutable = false; // JEO: We overwrite the isExecutable via markExecutable, need to remove
-        $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
-        $reason = 'finally';
-        return tuple($isExecutable, $skipAmount, $reason);
-      }
-
-      if ($token instanceof PHP_Token_Echo ||
-          $token instanceof PHP_Token_Foreach ||
-          $token instanceof PHP_Token_While) {
-        $reason = $token->getShortTokenName();
-        $this->markExecutableForDefintionToClose($token, $reason, true);
-        $isExecutable = false; // JEO: We overwrite the isExecutable via markExecutable, need to remove
-        $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
-        return tuple($isExecutable, $skipAmount, $reason);
-      }
-
-      if ($token instanceof PHP_Token_Invariant) {
-        $isExecutable = true;
-        $skipAmount = $token->getEndOfDefinitionLineNo() - $currentLine;
-        $reason = 'invariant';
-        return tuple($isExecutable, $skipAmount, $reason);
       }
 
       // Handle static function calls and their blocks they create.
@@ -673,7 +535,7 @@ class File {
 
       if ($isExecutable === true) {
 
-        // Executable variable tokens are handled specially and in their  own handler.
+        // Executable variable tokens are handled specially and in their own handler.
         if ($token instanceof PHP_Token_Variable) {
 
           return $this->handleVariableExecutionStatus(
@@ -763,7 +625,7 @@ class File {
 
   public function debug(Map<string, mixed> $params): void {
 
-    //return;
+    return;
 
     $fileName = 'ComplexBlockDetection';
     $doEcho = true;

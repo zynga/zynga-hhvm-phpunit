@@ -27,6 +27,7 @@ use SebastianBergmann\TokenStream\Token\StreamInterfaceStructure;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Comment;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Catch;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Double_Colon;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Equal;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Finally;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_If;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Else;
@@ -37,6 +38,8 @@ use SebastianBergmann\TokenStream\Tokens\PHP_Token_Object_Operator;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Switch;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Try;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_While;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Variable;
+use SebastianBergmann\TokenStream\Token\Types;
 use
   SebastianBergmann\CodeCoverage\Report\Html\Renderer\SourcreFileLineBuffer
 ;
@@ -399,7 +402,11 @@ class File extends Renderer {
               $token instanceof PHP_Token_Catch ||
               $token instanceof PHP_Token_Finally ||
               $token instanceof PHP_Token_Object_Operator ||
-              $token instanceof PHP_Token_Double_Colon) {
+              $token instanceof PHP_Token_Double_Colon ||
+              $token instanceof PHP_Token_Variable ||
+              $token instanceof PHP_Token_Equal ||
+              $token->getTokenType() == Types::T_OPERATOR) {
+
             $tokensForLine .= '::[endTokenId|'.$token->getEndTokenId().']';
             $tokensForLine .= '::[endLineNo|'.$token->getEndLine().']';
             $tokensForLine .=
@@ -408,16 +415,27 @@ class File extends Renderer {
               '::[endOfDefinitionLineNo|'.
               $token->getEndOfDefinitionLineNo().
               ']';
+
             if ($token instanceof PHP_Token_If ||
                 $token instanceof PHP_Token_Elseif ||
                 $token instanceof PHP_Token_Else) {
+
               $tokensForLine .=
                 '::[hasContinuation|'.
                 json_encode($token->hasContinuation()).
                 ']';
               $tokensForLine .=
                 '::[continuationId|'.$token->getContinuationTokenId().']';
+
             }
+
+            if ( $token instanceof PHP_Token_Variable) {
+              $tokensForLine .=
+                '::[getVariableWithOperatorTokenId|'. $token->getVariableWithOperatorTokenId() .']';
+              $tokensForLine .=
+                '::[getVariableWithObjectOperatorTokenId|' . $token->getVariableWithObjectOperatorTokenId() . ']';
+            }
+
           }
 
         }
