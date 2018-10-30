@@ -17,6 +17,7 @@ use SebastianBergmann\TokenStream\Tokens\PHP_Token_Class;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Close_Bracket;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Close_Curly;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Comment;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Do;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Double_Colon;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Echo;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Else;
@@ -479,6 +480,7 @@ class File {
       if ($token instanceof PHP_Token_Function ||
           $token instanceof PHP_Token_Echo ||
           $token instanceof PHP_Token_Foreach ||
+          $token instanceof PHP_Token_Do ||
           $token instanceof PHP_Token_While ||
           $token instanceof PHP_Token_If ||
           $token instanceof PHP_Token_Else ||

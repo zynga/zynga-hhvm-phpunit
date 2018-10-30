@@ -33,29 +33,19 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
   private string $signature = '';
   private bool $didSignature = false;
 
-  private int $endOfDefinitionId = -1;
-  private bool $didEndOfDefinitionId = false;
+  private int $endOfDefinitionTokenId = -1;
+  private bool $didEndOfDefinitionTokenId = false;
 
-  public function getEndOfDefinitionLineNo(): int {
-    $token = $this->getEndofDefinitionToken();
-    if ($token instanceof TokenInterface) {
-      return $token->getLine();
-    }
-    return $this->getLine();
-  }
-
-  public function getEndofDefinitionToken(): ?TokenInterface {
-
-    $tokens = $this->tokenStream()->tokens();
+  public function getEndOfDefinitionTokenId(): int {
 
     // don't bother running this if we are still at initialization state.
-    if ($this->endOfDefinitionId != -1) {
-      $endOfDefinitionToken = $tokens->get($this->endOfDefinitionId);
-
-      if ($endOfDefinitionToken instanceof TokenInterface) {
-        return $endOfDefinitionToken;
-      }
+    if ($this->didEndOfDefinitionTokenId === true) {
+      return $this->endOfDefinitionTokenId;
     }
+
+    $this->didEndOfDefinitionTokenId = true;
+
+    $tokens = $this->tokenStream()->tokens();
 
     // echo "skipAmount name=".$this->getName()."\n";
 
@@ -64,7 +54,7 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
       $token = $tokens->get($i);
 
       if ($token instanceof PHP_Token_Open_Curly) {
-        $this->endOfDefinitionId = $token->getId();
+        $this->endOfDefinitionTokenId = $token->getId();
         break;
       }
 
@@ -82,9 +72,8 @@ class PHP_Token_Function extends TokenWithScopeAndVisibility {
 
     }
 
-    $endOfDefinitionToken = $tokens->get($this->endOfDefinitionId);
+    return $this->endOfDefinitionTokenId;
 
-    return $endOfDefinitionToken;
 
   }
 

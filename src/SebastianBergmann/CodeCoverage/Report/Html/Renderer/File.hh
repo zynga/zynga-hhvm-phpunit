@@ -26,6 +26,7 @@ use SebastianBergmann\CodeCoverage\Util;
 use SebastianBergmann\TokenStream\Token\StreamInterfaceStructure;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Comment;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Catch;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Do;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Double_Colon;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Equal;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Finally;
@@ -392,6 +393,7 @@ class File extends Renderer {
           $tokensForLine .= '[tokenId|'.$token->getId().']';
 
           if ($token instanceof PHP_Token_Foreach ||
+              $token instanceof PHP_Token_Do ||
               $token instanceof PHP_Token_While ||
               $token instanceof PHP_Token_Function ||
               $token instanceof PHP_Token_If ||
