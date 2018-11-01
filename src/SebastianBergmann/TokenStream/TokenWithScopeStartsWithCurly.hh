@@ -11,28 +11,15 @@ abstract class TokenWithScopeStartsWithCurly extends TokenWithScope {
   private int $endOfDefinitionId = -1;
   private bool $didEndOfDefinitionId = false;
 
-  public function getEndOfDefinitionLineNo(): int {
-    $token = $this->getEndofDefinitionToken();
-    if ($token instanceof TokenInterface) {
-      return $token->getLine();
-    }
-    return $this->getLine();
-  }
+  public function getEndOfDefinitionTokenId(): int {
 
-  public function getEndofDefinitionToken(): ?TokenInterface {
+    if ( $this->didEndOfDefinitionId == true ) {
+      return $this->endOfDefinitionId;
+    }
+
+    $this->didEndOfDefinitionId = true;
 
     $tokens = $this->tokenStream()->tokens();
-
-    // don't bother running this if we are still at initialization state.
-    if ($this->endOfDefinitionId != -1) {
-      $endOfDefinitionToken = $tokens->get($this->endOfDefinitionId);
-
-      if ($endOfDefinitionToken instanceof TokenInterface) {
-        return $endOfDefinitionToken;
-      }
-    }
-
-    // echo "skipAmount name=".$this->getName()."\n";
 
     for ($i = $this->getId(); $i < $tokens->count(); $i++) {
 
@@ -45,9 +32,7 @@ abstract class TokenWithScopeStartsWithCurly extends TokenWithScope {
 
     }
 
-    $endOfDefinitionToken = $tokens->get($this->endOfDefinitionId);
-
-    return $endOfDefinitionToken;
+    return $this->endOfDefinitionId;
 
   }
 

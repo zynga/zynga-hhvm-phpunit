@@ -12,7 +12,6 @@ use SebastianBergmann\TokenStream\Token\Stream\CachingFactory;
 use SebastianBergmann\TokenStream\Token\Types;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Abstract;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Catch;
-use SebastianBergmann\TokenStream\Tokens\PHP_Token_Finally;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Class;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Close_Bracket;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Close_Curly;
@@ -22,10 +21,12 @@ use SebastianBergmann\TokenStream\Tokens\PHP_Token_Double_Colon;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Echo;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Else;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Elseif;
-use SebastianBergmann\TokenStream\Tokens\PHP_Token_If;
-use SebastianBergmann\TokenStream\Tokens\PHP_Token_Invariant;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Finally;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Foreach;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Function;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_List;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_If;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Invariant;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Nullsafe_Object_Operator;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Object_Operator;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Open_Bracket;
@@ -488,6 +489,7 @@ class File {
           $token instanceof PHP_Token_Try ||
           $token instanceof PHP_Token_Catch ||
           $token instanceof PHP_Token_Finally ||
+          $token instanceof PHP_Token_List ||
           $token instanceof PHP_Token_Invariant) {
 
         $isExecutable = false; // JEO: We overwrite the isExecutable via markExecutable, need to remove
@@ -629,7 +631,7 @@ class File {
 
     return;
 
-    $fileName = 'ComplexBlockDetection';
+    $fileName = 'GDPR\/DbDeleter';
     $doEcho = true;
     $doErrorLog = false;
 

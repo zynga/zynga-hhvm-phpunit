@@ -5,6 +5,8 @@ namespace SebastianBergmann\TokenStream\Tokens;
 use SebastianBergmann\TokenStream\TokenInterface;
 use SebastianBergmann\TokenStream\TokenWithScope;
 use SebastianBergmann\TokenStream\Token\Types;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_While;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Semicolon;
 
 class PHP_Token_Do extends TokenWithScope {
   private int $do_endTokenId = -1;
@@ -34,11 +36,11 @@ class PHP_Token_Do extends TokenWithScope {
     // --
     $startAt = parent::getEndTokenId();
 
-    echo "startAt=$startAt\n";
     $tokens = $this->tokenStream()->tokens();
 
     $tokenCount = $tokens->count();
 
+    $foundWhile = false;
     for ( $i = $startAt; $i < $tokenCount; $i++ ) {
       $token = $tokens->get($i);
 
@@ -46,10 +48,18 @@ class PHP_Token_Do extends TokenWithScope {
         break;
       }
 
+      if ( $foundWhile == false && $token instanceof PHP_Token_While ) {
+        $token->setIsDoWhile(true);
+        $this->do_endTokenId = $token->getEndTokenId();
+        $foundWhile = true;
+      }
+
+      /*
       if ( $token instanceof PHP_Token_Semicolon ) {
         $this->do_endTokenId = $token->getId();
         break;
       }
+      */
 
     }
 

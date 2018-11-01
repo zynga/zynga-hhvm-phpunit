@@ -2,10 +2,10 @@
 
 namespace SebastianBergmann\TokenStream\Tokens;
 
-use SebastianBergmann\TokenStream\Token;
+use SebastianBergmann\TokenStream\TokenEndsWithSemicolon;
 use SebastianBergmann\TokenStream\Token\Types;
 
-class PHP_Token_List extends Token {
+class PHP_Token_List extends TokenEndsWithSemicolon {
 
   public function getTokenType(): string {
     return Types::T_KEYWORD;

@@ -37,6 +37,7 @@ use SebastianBergmann\TokenStream\Tokens\PHP_Token_Foreach;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Function;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Object_Operator;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Switch;
+use SebastianBergmann\TokenStream\Tokens\PHP_Token_Throw;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Try;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_While;
 use SebastianBergmann\TokenStream\Tokens\PHP_Token_Variable;
@@ -400,6 +401,7 @@ class File extends Renderer {
               $token instanceof PHP_Token_Else ||
               $token instanceof PHP_Token_Elseif ||
               $token instanceof PHP_Token_Switch ||
+              $token instanceof PHP_Token_Throw ||
               $token instanceof PHP_Token_Try ||
               $token instanceof PHP_Token_Catch ||
               $token instanceof PHP_Token_Finally ||
