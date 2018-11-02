@@ -120,6 +120,7 @@ class LineExecutionState {
     }
 
     if ($currentValue > $lineState) {
+      /*
       error_log(
         sprintf(
           'ccFileWarning-attemptLineStateDegredation file=%s line=%d currentValue=%d lineState=%d',
@@ -129,6 +130,7 @@ class LineExecutionState {
           $lineState,
         ),
       );
+      */
       return;
     }
 
