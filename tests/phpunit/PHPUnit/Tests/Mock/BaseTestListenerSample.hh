@@ -1,4 +1,9 @@
-<?php
+<?hh
+
+namespace PHPUnit\Tests\Mock;
+
+use \PHPUnit_Framework_BaseTestListener;
+use \PHPUnit_Framework_Test;
 
 class BaseTestListenerSample extends PHPUnit_Framework_BaseTestListener
 {

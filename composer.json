@@ -25,6 +25,8 @@
       "PHPUnit\\Tests\\": "tests/phpunit/PHPUnit/Tests/",
       "SebastianBergmann\\CodeCoverage\\": "src/SebastianBergmann/CodeCoverage/",
       "SebastianBergmann\\Environment\\": "src/SebastianBergmann/Environment/",
+      "SebastianBergmann\\Exporter\\": "src/SebastianBergmann/Exporter/",
+      "SebastianBergmann\\PHPUnit\\": "src/SebastianBergmann/PHPUnit/",
       "SebastianBergmann\\TextTemplate\\": "src/SebastianBergmann/TextTemplate/",
       "SebastianBergmann\\TokenStream\\": "src/SebastianBergmann/TokenStream/",
       "SebastianBergmann\\TokenStream\\Tests\\": "tests/token-stream/SebastianBergmann/TokenStream/Tests/",

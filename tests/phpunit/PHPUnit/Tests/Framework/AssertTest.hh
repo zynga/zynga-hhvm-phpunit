@@ -43,6 +43,13 @@ use \stdClass;
  */
 class AssertTest extends PHPUnit_Framework_TestCase {
 
+    public function doSetUpBeforeClass(): void {
+      // noop
+    }
+
+    public function doTearDownAfterClass(): void {
+      // noop
+    }
 
     protected function getFilesDirectory(): string
     {

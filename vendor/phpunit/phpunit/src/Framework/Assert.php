@@ -52,6 +52,9 @@ abstract class PHPUnit_Framework_Assert
         static::assertThat($array, $constraint, $message);
     }
 
+    // JEO: Port line.
+    //-------------------------- VVV NOT PORTED VVVV ---------------------------
+    
     /**
      * Asserts that an array has a specified subset.
      *
