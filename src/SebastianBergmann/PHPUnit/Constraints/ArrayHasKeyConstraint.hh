@@ -1,8 +1,8 @@
 <?hh // strict
 
-namespace SebastianBergmann\PHPUnit\Constraint;
+namespace SebastianBergmann\PHPUnit\Constraints;
 
-use SebastianBergmann\PHPUnit\Constraint\Base;
+use SebastianBergmann\PHPUnit\Constraints\Base;
 
 /*
  * This file is part of PHPUnit.
@@ -15,7 +15,6 @@ use SebastianBergmann\PHPUnit\Constraint\Base;
 
 // @TODO: Need to reign in what the exception class should be here.
 use \Exception;
-
 use \ArrayAccess;
 
 /**
@@ -28,26 +27,28 @@ use \ArrayAccess;
  *
  * @since Class available since Release 3.0.0
  */
-class ArrayHasKey extends Base {
+class ArrayHasKeyConstraint extends Base {
 
-  protected mixed $key;
+  protected mixed $key = null;
 
-  /**
-   * @param int|string $key
-   */
-  public function __construct(mixed $key) {
-    
-    parent::__construct();
+  public function resetExpected(): bool {
+    $this->key = null;
+    return true;
+  }
 
-    if (is_int($key)) {
-      $this->key = $key;
-    } else if (is_string($key)) {
-      $this->key = $key;
-    } else {
-      throw new Exception(
-        'ArrayHasKey requires either a string or int key value',
-      );
+  public function setExpected(mixed $expected): bool {
+
+    if (is_int($expected)) {
+      $this->key = $expected;
+      return true;
+    } else if (is_string($expected)) {
+      $this->key = $expected;
+      return true;
     }
+
+    throw new Exception(
+      'ArrayHasKey requires either a string or int key value',
+    );
 
   }
 
@@ -60,6 +61,7 @@ class ArrayHasKey extends Base {
    * @return bool
    */
   protected function matches(mixed $other): bool {
+
     if (is_array($other)) {
       return array_key_exists($this->key, $other);
     }
@@ -69,6 +71,7 @@ class ArrayHasKey extends Base {
     }
 
     return false;
+
   }
 
   /**
@@ -90,7 +93,7 @@ class ArrayHasKey extends Base {
    *
    * @return string
    */
-  protected function failureDescription(mixed $other): string {
+  public function failureDescription(mixed $other): string {
     return 'an array '.$this->toString();
   }
 

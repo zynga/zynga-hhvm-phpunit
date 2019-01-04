@@ -33,12 +33,14 @@ class BaseTestListenerTest extends PHPUnit_Framework_TestCase {
   // it's own outputbuffers. Please ignore until everything gets pushed into
   // strict.
   public function testEndEventsAreCounted() {
+
     $result = new PHPUnit_Framework_TestResult();
     $listener = new BaseTestListenerSample();
     $result->addListener($listener);
     $test = new Success();
     $test->run($result);
     $this->assertEquals(1, $listener->endCount);
+
   }
 
 }

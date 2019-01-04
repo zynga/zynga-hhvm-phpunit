@@ -1,6 +1,6 @@
 <?hh // strict
 
-namespace SebastianBergmann\PHPUnit\Constraint;
+namespace SebastianBergmann\PHPUnit\Constraints;
 
 /*
  * This file is part of PHPUnit.
@@ -26,8 +26,7 @@ use \Countable;
 abstract class Base
   implements Countable, SelfDescribingInterface, ConstraintInterface {
 
-  public function __construct() {
-  }
+  public function __construct() {}
 
   /**
    * Evaluates the constraint for parameter $other
@@ -47,7 +46,11 @@ abstract class Base
    *
    * @throws PHPUnit_Framework_ExpectationFailedException
    */
-  public function evaluate(mixed $other, string $description = '', bool $doThrowException = false): bool {
+  public function evaluate(
+    mixed $other,
+    string $description = '',
+    bool $doThrowException = false,
+  ): bool {
 
     $success = false;
 
@@ -55,7 +58,7 @@ abstract class Base
       $success = true;
     }
 
-    if ($doThrowException && $success !== true ) {
+    if ($doThrowException && $success !== true) {
       $this->fail($other, $description);
     }
 
@@ -112,7 +115,7 @@ abstract class Base
       $failureDescription .= "\n".$additionalFailureDescription;
     }
 
-    if ($description == '') {
+    if ($description != '') {
       $failureDescription = $description."\n".$failureDescription;
     }
 
@@ -154,7 +157,7 @@ abstract class Base
    *
    * @return string
    */
-  protected function failureDescription(mixed $other): string {
+  public function failureDescription(mixed $other): string {
     return $this->getExporter()->export($other).' '.$this->toString();
   }
 

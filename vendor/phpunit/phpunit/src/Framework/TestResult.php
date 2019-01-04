@@ -834,16 +834,16 @@ class PHPUnit_Framework_TestResult implements Countable
             } catch ( Exception $ue ) {
               $error = true;
               $e = $ue;
-              /*
-              JEO: frame debugging.
-              $frame = 0;
-              foreach ( $e->getTrace() as $traceItem ) {
-                echo "Trace frame=$frame\n";
-                var_dump($traceItem);
-                $frame++;
-              }
-              var_dump($e);
-              */
+              // --
+              // JEO: frame debugging.
+              // --
+              // $frame = 0;
+              //foreach ( $e->getTrace() as $traceItem ) {
+              //  echo "Trace frame=$frame\n";
+              //  var_dump($traceItem);
+              //  $frame++;
+              //}
+              //var_dump($e);
             }
         }
 

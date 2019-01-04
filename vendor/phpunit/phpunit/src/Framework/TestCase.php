@@ -14,6 +14,7 @@ use SebastianBergmann\GlobalState\Blacklist;
 use SebastianBergmann\Diff\Differ;
 use SebastianBergmann\Exporter\Exporter;
 use SebastianBergmann\ObjectEnumerator\Enumerator;
+use SebastianBergmann\PHPUnit\Environment\OutputBuffering;
 use Prophecy\Exception\Prediction\PredictionException;
 use Prophecy\Prophet;
 use DeepCopy\DeepCopy;
@@ -247,11 +248,6 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
     private $outputCallback = false;
 
     /**
-     * @var bool
-     */
-    private $outputBufferingActive = false;
-
-    /**
      * @var int
      */
     private $outputBufferingLevel;
@@ -457,10 +453,10 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
      */
     public function getActualOutput()
     {
-        if (!$this->outputBufferingActive) {
+        if (! OutputBuffering::getIsActive() ) {
             return $this->output;
         } else {
-            return ob_get_contents();
+            return OutputBuffering::get();
         }
     }
 
@@ -820,117 +816,8 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
             return;
         }
 
-        if ($this->runTestInSeparateProcess === true &&
-            $this->inIsolation !== true &&
-            !$this instanceof PHPUnit_Extensions_PhptTestCase) {
-
-            echo "Processisolation does -not- play well with resource contention in shared development environments, exiting!\n";
-            exit(255);
-
-            $class = ReflectionClasses::getReflection($this);
-
-
-            $template = new Text_Template(
-                __DIR__ . '/../Util/PHP/Template/TestCaseMethod.tpl'
-            );
-
-            // JEO: We don't allow for preserving global state within our hack environment.
-            /*
-            if ($this->preserveGlobalState) {
-                $constants     = PHPUnit_Util_GlobalState::getConstantsAsString();
-                $globals       = PHPUnit_Util_GlobalState::getGlobalsAsString();
-                $includedFiles = PHPUnit_Util_GlobalState::getIncludedFilesAsString();
-                $iniSettings   = PHPUnit_Util_GlobalState::getIniSettingsAsString();
-            } else {
-                $constants     = '';
-                if (!empty($GLOBALS['__PHPUNIT_BOOTSTRAP'])) {
-                    $globals     = '$GLOBALS[\'__PHPUNIT_BOOTSTRAP\'] = ' . var_export($GLOBALS['__PHPUNIT_BOOTSTRAP'], true) . ";\n";
-                } else {
-                    $globals     = '';
-                }
-                $includedFiles = '';
-                $iniSettings   = '';
-            }
-            */
-            $constants     = '';
-            $globals       = '';
-            $includedFiles = '';
-            $iniSettings   = '';
-
-            $coverage                                   = $result->getCollectCodeCoverageInformation()          ? 'true' : 'false';
-            $isStrictAboutTestsThatDoNotTestAnything    = $result->isStrictAboutTestsThatDoNotTestAnything()    ? 'true' : 'false';
-            $isStrictAboutOutputDuringTests             = $result->isStrictAboutOutputDuringTests()             ? 'true' : 'false';
-            $enforcesTimeLimit                          = $result->enforcesTimeLimit()                          ? 'true' : 'false';
-            $isStrictAboutTodoAnnotatedTests            = $result->isStrictAboutTodoAnnotatedTests()            ? 'true' : 'false';
-            $isStrictAboutResourceUsageDuringSmallTests = $result->isStrictAboutResourceUsageDuringSmallTests() ? 'true' : 'false';
-
-            if (defined('PHPUNIT_COMPOSER_INSTALL')) {
-                $composerAutoload = var_export(PHPUNIT_COMPOSER_INSTALL, true);
-            } else {
-                $composerAutoload = '\'\'';
-            }
-
-            if (defined('__PHPUNIT_PHAR__')) {
-                $phar = var_export(__PHPUNIT_PHAR__, true);
-            } else {
-                $phar = '\'\'';
-            }
-
-            if ($result->getCodeCoverage()) {
-                $codeCoverageFilter = $result->getCodeCoverage()->filter();
-            } else {
-                $codeCoverageFilter = null;
-            }
-
-            $data               = var_export(serialize($this->data), true);
-            $dataName           = var_export($this->dataName, true);
-            $dependencyInput    = var_export(serialize($this->dependencyInput), true);
-            $includePath        = var_export(get_include_path(), true);
-            $codeCoverageFilter = var_export(serialize($codeCoverageFilter), true);
-            // must do these fixes because TestCaseMethod.tpl has unserialize('{data}') in it, and we can't break BC
-            // the lines above used to use addcslashes() rather than var_export(), which breaks null byte escape sequences
-            $data               = "'." . $data . ".'";
-            $dataName           = "'.(" . $dataName . ").'";
-            $dependencyInput    = "'." . $dependencyInput . ".'";
-            $includePath        = "'." . $includePath . ".'";
-            $codeCoverageFilter = "'." . $codeCoverageFilter . ".'";
-
-            $configurationFilePath = (isset($GLOBALS['__PHPUNIT_CONFIGURATION_FILE']) ? $GLOBALS['__PHPUNIT_CONFIGURATION_FILE'] : '');
-
-            $template->setVar(
-                [
-                    'composerAutoload'                           => $composerAutoload,
-                    'phar'                                       => $phar,
-                    'filename'                                   => $class->getFileName(),
-                    'className'                                  => $class->getName(),
-                    'methodName'                                 => $this->getName(false),
-                    'collectCodeCoverageInformation'             => $coverage,
-                    'data'                                       => $data,
-                    'dataName'                                   => $dataName,
-                    'dependencyInput'                            => $dependencyInput,
-                    'constants'                                  => $constants,
-                    'globals'                                    => $globals,
-                    'include_path'                               => $includePath,
-                    'included_files'                             => $includedFiles,
-                    'iniSettings'                                => $iniSettings,
-                    'isStrictAboutTestsThatDoNotTestAnything'    => $isStrictAboutTestsThatDoNotTestAnything,
-                    'isStrictAboutOutputDuringTests'             => $isStrictAboutOutputDuringTests,
-                    'enforcesTimeLimit'                          => $enforcesTimeLimit,
-                    'isStrictAboutTodoAnnotatedTests'            => $isStrictAboutTodoAnnotatedTests,
-                    'isStrictAboutResourceUsageDuringSmallTests' => $isStrictAboutResourceUsageDuringSmallTests,
-                    'codeCoverageFilter'                         => $codeCoverageFilter,
-                    'configurationFilePath'                      => $configurationFilePath
-                ]
-            );
-
-            $this->prepareTemplate($template);
-
-            $php = PHPUnit_Util_PHP::factory();
-            $php->runTestJob($template->render(), $this, $result);
-        } else {
-            // Pass on the test into the run function for result.
-            $result->run($test);
-        }
+        // Pass on the test into the run function for result.
+        $result->run($test);
 
         if ($this->useErrorHandler !== null) {
             $result->convertErrorsToExceptions($oldErrorHandlerSetting);
@@ -2332,16 +2219,12 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
     /**
      * @since Method available since Release 4.2.0
      */
-    private function startOutputBuffering()
-    {
-        while (!defined('PHPUNIT_TESTSUITE') && ob_get_level() > 0) {
-            ob_end_clean();
-        }
+    private function startOutputBuffering() {
 
-        ob_start();
+      OutputBuffering::start();
 
-        $this->outputBufferingActive = true;
-        $this->outputBufferingLevel  = ob_get_level();
+      $this->outputBufferingLevel = OutputBuffering::getCurrentLevel();
+
     }
 
     /**
@@ -2349,17 +2232,16 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
      */
     private function stopOutputBuffering()
     {
-        if (ob_get_level() != $this->outputBufferingLevel) {
-            while (ob_get_level() > 0) {
-                ob_end_clean();
-            }
 
-            throw new PHPUnit_Framework_RiskyTestError(
-                'Test code or tested code did not (only) close its own output buffers'
-            );
-        }
+      if ( OutputBuffering::getCurrentLevel() != $this->outputBufferingLevel ) {
+        throw new PHPUnit_Framework_RiskyTestError(
+                 'Test code or tested code did not (only) close its own output buffers'
+        );
+      }
 
-        $output = ob_get_contents();
+        $output = OutputBuffering::get();
+
+        // $output = ob_get_contents();
 
         if ($this->outputCallback === false) {
             $this->output = $output;
@@ -2370,10 +2252,9 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
             );
         }
 
-        ob_end_clean();
+        OutputBuffering::end();
+        //$this->outputBufferingLevel = OutputBuffering::getCurrentLevel();
 
-        $this->outputBufferingActive = false;
-        $this->outputBufferingLevel  = ob_get_level();
     }
 
     private function snapshotGlobalState() {
