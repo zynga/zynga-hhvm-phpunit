@@ -9,7 +9,9 @@
  */
 
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+
 use SebastianBergmann\PHPUnit\AssertionsFactory;
+use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
 
 /**
  * A set of assert methods.
@@ -18,7 +20,7 @@ use SebastianBergmann\PHPUnit\AssertionsFactory;
  */
 abstract class PHPUnit_Framework_Assert
 {
-  const USE_NEW_ARRAY_HAS_KEY = false;
+  const USE_NEW_ARRAY_HAS_KEY = true;
 
     /**
      * Asserts that an array has a specified key.
@@ -32,8 +34,12 @@ abstract class PHPUnit_Framework_Assert
     public static function assertArrayHasKey($key, $array, $message = '')
     {
       if ( self::USE_NEW_ARRAY_HAS_KEY ) {
-        $assertions = AssertionsFactory::factory();
-        return $assertions->assertArrayHasKey($key, $array, $message);
+        try {
+          $assertions = AssertionsFactory::factory();
+          return $assertions->assertArrayHasKey($key, $array, $message);
+        } catch ( AssertionFailedException $e ) {
+          throw new PHPUnit_Framework_AssertionFailedError($e);
+        }
       }
         if (!(is_integer($key) || is_string($key))) {
             throw PHPUnit_Util_InvalidArgumentHelper::factory(
