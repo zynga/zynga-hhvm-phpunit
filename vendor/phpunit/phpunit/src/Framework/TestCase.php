@@ -2241,8 +2241,6 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
 
         $output = OutputBuffering::get();
 
-        // $output = ob_get_contents();
-
         if ($this->outputCallback === false) {
             $this->output = $output;
         } else {
@@ -2253,7 +2251,6 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
         }
 
         OutputBuffering::end();
-        //$this->outputBufferingLevel = OutputBuffering::getCurrentLevel();
 
     }
 

@@ -9,6 +9,7 @@
  */
 
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+use SebastianBergmann\PHPUnit\AssertionsFactory;
 
 /**
  * A set of assert methods.
@@ -17,10 +18,7 @@ use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
  */
 abstract class PHPUnit_Framework_Assert
 {
-    /**
-     * @var int
-     */
-    private static $count = 0;
+  const USE_NEW_ARRAY_HAS_KEY = false;
 
     /**
      * Asserts that an array has a specified key.
@@ -33,6 +31,10 @@ abstract class PHPUnit_Framework_Assert
      */
     public static function assertArrayHasKey($key, $array, $message = '')
     {
+      if ( self::USE_NEW_ARRAY_HAS_KEY ) {
+        $assertions = AssertionsFactory::factory();
+        return $assertions->assertArrayHasKey($key, $array, $message);
+      }
         if (!(is_integer($key) || is_string($key))) {
             throw PHPUnit_Util_InvalidArgumentHelper::factory(
                 1,
@@ -54,7 +56,7 @@ abstract class PHPUnit_Framework_Assert
 
     // JEO: Port line.
     //-------------------------- VVV NOT PORTED VVVV ---------------------------
-    
+
     /**
      * Asserts that an array has a specified subset.
      *
@@ -1980,9 +1982,10 @@ abstract class PHPUnit_Framework_Assert
      */
     public static function assertThat($value, PHPUnit_Framework_Constraint $constraint, $message = '')
     {
-        self::$count += count($constraint);
+      $assertions = AssertionsFactory::factory();
+      $assertions->count()->add(count($constraint));
 
-        $constraint->evaluate($value, $message);
+      $constraint->evaluate($value, $message);
     }
 
     /**
@@ -2916,7 +2919,8 @@ abstract class PHPUnit_Framework_Assert
      */
     public static function getCount()
     {
-        return self::$count;
+      $assertions = AssertionsFactory::factory();
+      return $assertions->count()->get();
     }
 
     /**
@@ -2926,6 +2930,7 @@ abstract class PHPUnit_Framework_Assert
      */
     public static function resetCount()
     {
-        self::$count = 0;
+      $assertions = AssertionsFactory::factory();
+      return $assertions->count()->reset();
     }
 }

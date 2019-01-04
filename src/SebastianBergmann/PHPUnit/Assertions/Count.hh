@@ -10,6 +10,11 @@ class Count {
     return $this->count;
   }
 
+  public function add(int $amount): bool {
+    $this->count += $amount;
+    return true;
+  }
+
   public function increment(int $byHowMuch = 1): bool {
     $this->count += $byHowMuch;
     return true;
