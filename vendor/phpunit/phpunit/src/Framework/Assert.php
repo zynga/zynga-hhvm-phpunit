@@ -12,15 +12,38 @@ use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 
 use SebastianBergmann\PHPUnit\AssertionsFactory;
 use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
+use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentException;
 
+// --
+// We are in the process of porting all of these assertion bits into hacklang
+// strict code. You will see a common pattern of:
+//  try {
+//   $assertions = AssertionsFactory::factory();
+//   return $assertions->assertArrayHasKey($key, $array, $message);
+// } catch ( AssertionFailedException $e ) {
+//   throw new PHPUnit_Framework_AssertionFailedError(
+//     $e->getMessage(),
+//     $e->getCode()
+//   );
+// } catch ( InvalidArgumentException $e ) {
+//   throw new PHPUnit_Framework_Exception(
+//     $e->getMessage(),
+//     $e->getCode()
+//   );
+// }
+// --
+// Note: The exception message / code clone is on purpose as the amount of cpu
+// consumed in order to use _Exception($e) exceeds the value of the extended
+// verbosity of the stack trace from the inner exception.
+// --
 /**
  * A set of assert methods.
  *
  * @since Class available since Release 2.0.0
  */
-abstract class PHPUnit_Framework_Assert
-{
+abstract class PHPUnit_Framework_Assert {
   const USE_NEW_ARRAY_HAS_KEY = true;
+  const USE_NEW_ARRAY_SUBSET  = true;
 
     /**
      * Asserts that an array has a specified key.
@@ -31,37 +54,48 @@ abstract class PHPUnit_Framework_Assert
      *
      * @since Method available since Release 3.0.0
      */
-    public static function assertArrayHasKey($key, $array, $message = '')
-    {
+    public static function assertArrayHasKey($key, $array, $message = '') {
+
       if ( self::USE_NEW_ARRAY_HAS_KEY ) {
         try {
           $assertions = AssertionsFactory::factory();
           return $assertions->assertArrayHasKey($key, $array, $message);
         } catch ( AssertionFailedException $e ) {
-          throw new PHPUnit_Framework_AssertionFailedError($e);
+          throw new PHPUnit_Framework_AssertionFailedError(
+            $e->getMessage(),
+            $e->getCode()
+          );
+        } catch ( InvalidArgumentException $e ) {
+          throw new PHPUnit_Framework_Exception(
+            $e->getMessage(),
+            $e->getCode()
+          );
         }
       }
-        if (!(is_integer($key) || is_string($key))) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(
-                1,
-                'integer or string'
-            );
-        }
 
-        if (!(is_array($array) || $array instanceof ArrayAccess)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(
-                2,
-                'array or ArrayAccess'
-            );
-        }
+      self::_legacyAssertArrayHasKey($key, $array, $message);
 
-        $constraint = new PHPUnit_Framework_Constraint_ArrayHasKey($key);
-
-        static::assertThat($array, $constraint, $message);
     }
 
-    // JEO: Port line.
-    //-------------------------- VVV NOT PORTED VVVV ---------------------------
+    private static function _legacyAssertArrayHasKey($key, $array, $message = '') {
+      if (!(is_integer($key) || is_string($key))) {
+          throw PHPUnit_Util_InvalidArgumentHelper::factory(
+              1,
+              'integer or string'
+          );
+      }
+
+      if (!(is_array($array) || $array instanceof ArrayAccess)) {
+          throw PHPUnit_Util_InvalidArgumentHelper::factory(
+              2,
+              'array or ArrayAccess'
+          );
+      }
+
+      $constraint = new PHPUnit_Framework_Constraint_ArrayHasKey($key);
+
+      static::assertThat($array, $constraint, $message);
+    }
 
     /**
      * Asserts that an array has a specified subset.
@@ -73,8 +107,30 @@ abstract class PHPUnit_Framework_Assert
      *
      * @since Method available since Release 4.4.0
      */
-    public static function assertArraySubset($subset, $array, $strict = false, $message = '')
-    {
+    public static function assertArraySubset($subset, $array, $strict = false, $message = '') {
+
+      if ( self::USE_NEW_ARRAY_SUBSET ) {
+        try {
+          $assertions = AssertionsFactory::factory();
+          return $assertions->assertArraySubset($subset, $array, $strict, $message);
+        } catch ( AssertionFailedException $e ) {
+          throw new PHPUnit_Framework_AssertionFailedError(
+            $e->getMessage(),
+            $e->getCode()
+          );
+        } catch ( InvalidArgumentException $e ) {
+          throw new PHPUnit_Framework_Exception(
+            $e->getMessage(),
+            $e->getCode()
+          );
+        }
+      }
+
+      self::_legacyAssertArraySubset($subset, $array, $strict, $message);
+
+    }
+
+    public static function _legacyAssertArraySubset($subset, $array, $strict = false, $message = '') {
         if (!is_array($subset)) {
             throw PHPUnit_Util_InvalidArgumentHelper::factory(
                 1,
@@ -93,6 +149,9 @@ abstract class PHPUnit_Framework_Assert
 
         static::assertThat($array, $constraint, $message);
     }
+
+    // JEO: Port line.
+    //-------------------------- VVV NOT PORTED VVVV ---------------------------
 
     /**
      * Asserts that an array does not have a specified key.

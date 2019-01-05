@@ -4,7 +4,9 @@ namespace SebastianBergmann\PHPUnit\Constraints;
 
 use SebastianBergmann\PHPUnit\Interfaces\ConstraintInterface;
 use SebastianBergmann\PHPUnit\Constraints\ArrayHasKeyConstraint;
-use SebastianBergmann\PHPUnit\Constraints\NotConstraint;
+use SebastianBergmann\PHPUnit\Constraints\ArraySubsetConstraint;
+
+//use SebastianBergmann\PHPUnit\Constraints\NotConstraint;
 use \Exception;
 
 class Factory {
@@ -32,14 +34,17 @@ class Factory {
 
     if ($name == 'ArrayHasKey') {
       return new ArrayHasKeyConstraint();
-    }
-    if ($name == 'NotConstraint') {
-      return new NotConstraint();
+    } else if ($name == 'ArraySubsetConstraint') {
+      return new ArraySubsetConstraint();
     }
 
-    if ($name == 'IsTrue') {
-      error_log('IsTrue');
-    }
+    //if ($name == 'NotConstraint') {
+    //  return new NotConstraint();
+    //}
+
+    //if ($name == 'IsTrue') {
+    //  error_log('IsTrue');
+    //}
 
     return null;
 

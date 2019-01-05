@@ -14,6 +14,7 @@ namespace SebastianBergmann\PHPUnit;
 use SebastianBergmann\PHPUnit\Assertions\Count as AssertionsCount;
 use SebastianBergmann\PHPUnit\Constraints\Factory as ConstraintFactory;
 use SebastianBergmann\PHPUnit\Constraints\ArrayHasKeyConstraint;
+use SebastianBergmann\PHPUnit\Constraints\ArraySubsetConstraint;
 use SebastianBergmann\PHPUnit\Constraints\NotConstraint;
 use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
 use SebastianBergmann\PHPUnit\Exceptions\ExpectationFailedException;
@@ -63,6 +64,49 @@ class Assertions {
     $constraint = ConstraintFactory::factory('ArrayHasKey');
 
     $constraint->setExpected($key);
+
+    return $this->assertThat($array, $constraint, $message);
+
+  }
+
+  /**
+   * Asserts that an array has a specified subset.
+   *
+   * @param array|ArrayAccess $subset
+   * @param array|ArrayAccess $array
+   * @param bool              $strict  Check for object identity
+   * @param string            $message
+   *
+   * @since Method available since Release 4.4.0
+   */
+  final public function assertArraySubset(
+    mixed $subset,
+    mixed $array,
+    bool $strict = false,
+    string $message = '',
+  ): bool {
+
+    if (!is_array($subset)) {
+      throw InvalidArgumentExceptionFactory::factory(
+        1,
+        'array or ArrayAccess',
+      );
+    }
+
+    if (!is_array($array)) {
+      throw InvalidArgumentExceptionFactory::factory(
+        2,
+        'array or ArrayAccess',
+      );
+    }
+
+    $constraint = ConstraintFactory::factory('ArraySubsetConstraint');
+
+    $constraint->setExpected($subset);
+
+    if ($constraint instanceof ArraySubsetConstraint) {
+      $constraint->setStrict($strict);
+    }
 
     return $this->assertThat($array, $constraint, $message);
 
