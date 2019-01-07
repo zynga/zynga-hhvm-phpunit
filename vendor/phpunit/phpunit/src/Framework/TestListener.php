@@ -46,7 +46,7 @@ interface PHPUnit_Framework_TestListener
      * @param PHPUnit_Framework_AssertionFailedError $e
      * @param float                                  $time
      */
-    public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e, $time);
+    public function addFailure(PHPUnit_Framework_Test $test, Exception $e, $time);
 
     /**
      * Incomplete test.

@@ -17,6 +17,10 @@ use SebastianBergmann\ResourceOperations\ResourceOperations;
 use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 
+
+use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
+use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentException;
+
 /**
  * A TestResult collects the results of executing a test case.
  *
@@ -303,7 +307,7 @@ class PHPUnit_Framework_TestResult implements Countable
      * @param PHPUnit_Framework_AssertionFailedError $e
      * @param float                                  $time
      */
-    public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e, $time)
+    public function addFailure(PHPUnit_Framework_Test $test, Exception $e, $time)
     {
         if ($e instanceof PHPUnit_Framework_RiskyTest ||
             $e instanceof PHPUnit_Framework_OutputError) {
@@ -709,6 +713,10 @@ class PHPUnit_Framework_TestResult implements Countable
             );
 
             $warning = true;
+        } catch (AssertionFailedException $e) {
+          $failure = true;
+        } catch (InvalidArgumentException $e) {
+          $error = true;
         } catch (PHPUnit_Framework_AssertionFailedError $e) {
             $failure = true;
 

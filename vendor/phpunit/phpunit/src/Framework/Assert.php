@@ -57,20 +57,8 @@ abstract class PHPUnit_Framework_Assert {
     public static function assertArrayHasKey($key, $array, $message = '') {
 
       if ( self::USE_NEW_ARRAY_HAS_KEY ) {
-        try {
-          $assertions = AssertionsFactory::factory();
-          return $assertions->assertArrayHasKey($key, $array, $message);
-        } catch ( AssertionFailedException $e ) {
-          throw new PHPUnit_Framework_AssertionFailedError(
-            $e->getMessage(),
-            $e->getCode()
-          );
-        } catch ( InvalidArgumentException $e ) {
-          throw new PHPUnit_Framework_Exception(
-            $e->getMessage(),
-            $e->getCode()
-          );
-        }
+        $assertions = AssertionsFactory::factory();
+        return $assertions->assertArrayHasKey($key, $array, $message);
       }
 
       self::_legacyAssertArrayHasKey($key, $array, $message);
@@ -110,20 +98,8 @@ abstract class PHPUnit_Framework_Assert {
     public static function assertArraySubset($subset, $array, $strict = false, $message = '') {
 
       if ( self::USE_NEW_ARRAY_SUBSET ) {
-        try {
-          $assertions = AssertionsFactory::factory();
-          return $assertions->assertArraySubset($subset, $array, $strict, $message);
-        } catch ( AssertionFailedException $e ) {
-          throw new PHPUnit_Framework_AssertionFailedError(
-            $e->getMessage(),
-            $e->getCode()
-          );
-        } catch ( InvalidArgumentException $e ) {
-          throw new PHPUnit_Framework_Exception(
-            $e->getMessage(),
-            $e->getCode()
-          );
-        }
+        $assertions = AssertionsFactory::factory();
+        return $assertions->assertArraySubset($subset, $array, $strict, $message);
       }
 
       self::_legacyAssertArraySubset($subset, $array, $strict, $message);
