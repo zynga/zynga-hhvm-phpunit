@@ -353,14 +353,13 @@ class AssertTest extends PHPUnit_Framework_TestCase {
   //     $this->assertArrayNotHasKey(0, null);
   // }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertArrayNotHasKey
-   */
   public function testAssertArrayNotHasIntegerKey() {
     $this->assertArrayNotHasKey(1, ['foo']);
 
     try {
       $this->assertArrayNotHasKey(0, ['foo']);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -382,14 +381,14 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertArrayNotHasKey
-   */
   public function testAssertArrayNotHasStringKey() {
+
     $this->assertArrayNotHasKey('bar', ['foo' => 'bar']);
 
     try {
       $this->assertArrayNotHasKey('foo', ['foo' => 'bar']);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }

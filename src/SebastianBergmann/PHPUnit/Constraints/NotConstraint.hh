@@ -99,7 +99,7 @@ class NotConstraint extends Base {
       return false;
     }
 
-    $success = !$this->constraint->evaluate($other, $description, true);
+    $success = !$this->constraint->evaluate($other, $description, false);
 
     if ($doThrowException && !$success) {
       $this->fail($other, $description);

@@ -28,7 +28,7 @@ class Assertions {
 
   private ?AssertionsCount $count;
 
-  public function count(): AssertionsCount {
+  final public function count(): AssertionsCount {
     if (!$this->count instanceof AssertionsCount) {
       $this->count = new AssertionsCount();
     }
@@ -109,6 +109,42 @@ class Assertions {
     }
 
     return $this->assertThat($array, $constraint, $message);
+
+  }
+
+  /**
+   * Asserts that an array does not have a specified key.
+   *
+   * @param mixed             $key
+   * @param array|ArrayAccess $array
+   * @param string            $message
+   *
+   * @since Method available since Release 3.0.0
+   */
+  final public function assertArrayNotHasKey(
+    mixed $key,
+    mixed $array,
+    string $message = '',
+  ): bool {
+
+    if (!(is_int($key) || is_string($key))) {
+      throw InvalidArgumentExceptionFactory::factory(1, 'integer or string');
+    }
+
+    if (!(is_array($array) || $array instanceof ArrayAccess)) {
+      throw InvalidArgumentExceptionFactory::factory(
+        2,
+        'array or ArrayAccess',
+      );
+    }
+
+    $hasKeyConstraint = ConstraintFactory::factory('ArrayHasKey');
+    $hasKeyConstraint->setExpected($key);
+
+    $notConstraint = ConstraintFactory::factory('Not');
+    $notConstraint->setExpected($hasKeyConstraint);
+
+    return $this->assertThat($array, $notConstraint, $message);
 
   }
 

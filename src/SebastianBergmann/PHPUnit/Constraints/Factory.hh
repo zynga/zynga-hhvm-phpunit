@@ -38,9 +38,9 @@ class Factory {
       return new ArraySubsetConstraint();
     }
 
-    //if ($name == 'NotConstraint') {
-    //  return new NotConstraint();
-    //}
+    if ($name == 'Not') {
+      return new NotConstraint();
+    }
 
     //if ($name == 'IsTrue') {
     //  error_log('IsTrue');

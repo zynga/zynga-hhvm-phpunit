@@ -42,8 +42,11 @@ use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentException;
  * @since Class available since Release 2.0.0
  */
 abstract class PHPUnit_Framework_Assert {
+
   const USE_NEW_ARRAY_HAS_KEY = true;
   const USE_NEW_ARRAY_SUBSET  = true;
+  const USE_NEW_ARRAY_NOT_HAS_KEY = true;
+
   const USE_NEW_FAIL = true;
 
     /**
@@ -127,9 +130,6 @@ abstract class PHPUnit_Framework_Assert {
         static::assertThat($array, $constraint, $message);
     }
 
-    // JEO: Port line.
-    //-------------------------- VVV NOT PORTED VVVV ---------------------------
-
     /**
      * Asserts that an array does not have a specified key.
      *
@@ -140,6 +140,17 @@ abstract class PHPUnit_Framework_Assert {
      * @since Method available since Release 3.0.0
      */
     public static function assertArrayNotHasKey($key, $array, $message = '')
+    {
+      if ( self::USE_NEW_ARRAY_NOT_HAS_KEY ) {
+        $assertions = AssertionsFactory::factory();
+        return $assertions->assertArrayNotHasKey($key, $array, $message);
+      }
+
+      static::_legacyAssertArrayNotHasKey($key, $array, $message);
+
+    }
+
+    public static function _legacyAssertArrayNotHasKey($key, $array, $message = '')
     {
         if (!(is_integer($key) || is_string($key))) {
             throw PHPUnit_Util_InvalidArgumentHelper::factory(
@@ -161,6 +172,10 @@ abstract class PHPUnit_Framework_Assert {
 
         static::assertThat($array, $constraint, $message);
     }
+
+    // JEO: Port line.
+    //-------------------------- VVV NOT PORTED VVVV ---------------------------
+
 
     /**
      * Asserts that a haystack contains a needle.
