@@ -165,4 +165,15 @@ class Assertions {
     return $this->assertThat($condition, $constraint, $message);
   }
 
+  /**
+   * Fails a test with the given message.
+   *
+   * @param string $message
+   *
+   * @throws PHPUnit_Framework_AssertionFailedError
+   */
+  public function fail(string $message = ''): void {
+    throw new AssertionFailedException($message);
+  }
+
 }

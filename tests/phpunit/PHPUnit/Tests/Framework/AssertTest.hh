@@ -78,12 +78,12 @@ class AssertTest extends PHPUnit_Framework_TestCase {
   public function testFail() {
     try {
       $this->fail();
+    } catch (AssertionFailedException $e) {
+      return $this->assertTrue(true);
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return $this->assertTrue(true);
     }
-    throw new PHPUnit_Framework_AssertionFailedError(
-      'Fail did not throw fail exception',
-    );
+    throw new AssertionFailedException('Fail did not throw fail exception');
   }
 
   /**

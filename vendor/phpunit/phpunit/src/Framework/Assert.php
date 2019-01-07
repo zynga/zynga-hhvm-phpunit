@@ -44,6 +44,7 @@ use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentException;
 abstract class PHPUnit_Framework_Assert {
   const USE_NEW_ARRAY_HAS_KEY = true;
   const USE_NEW_ARRAY_SUBSET  = true;
+  const USE_NEW_FAIL = true;
 
     /**
      * Asserts that an array has a specified key.
@@ -2753,6 +2754,7 @@ abstract class PHPUnit_Framework_Assert {
     {
         return new PHPUnit_Framework_Constraint_Count($count);
     }
+
     /**
      * Fails a test with the given message.
      *
@@ -2760,9 +2762,19 @@ abstract class PHPUnit_Framework_Assert {
      *
      * @throws PHPUnit_Framework_AssertionFailedError
      */
-    public static function fail($message = '')
-    {
-        throw new PHPUnit_Framework_AssertionFailedError($message);
+    public static function fail($message = '') {
+
+      if ( self::USE_NEW_FAIL ) {
+        $assertions = AssertionsFactory::factory();
+        return $assertions->fail($message);
+      }
+
+      self::_legacyFail($message);
+
+    }
+
+    public static function _legacyFail($message = '' ) {
+      throw new PHPUnit_Framework_AssertionFailedError($message);
     }
 
     /**
