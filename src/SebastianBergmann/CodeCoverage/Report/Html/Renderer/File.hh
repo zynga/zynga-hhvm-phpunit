@@ -312,7 +312,7 @@ class File extends Renderer {
     );
   }
 
-  const DEBUG_TOKENS = true;
+  const DEBUG_TOKENS = false;
 
   /**
    * @param FileNode $node
