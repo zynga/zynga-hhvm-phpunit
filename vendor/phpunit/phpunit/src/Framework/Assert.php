@@ -46,6 +46,7 @@ abstract class PHPUnit_Framework_Assert {
   const USE_NEW_ARRAY_HAS_KEY = true;
   const USE_NEW_ARRAY_SUBSET  = true;
   const USE_NEW_ARRAY_NOT_HAS_KEY = true;
+  const USE_NEW_CONTAINS = true;
 
   const USE_NEW_FAIL = true;
 
@@ -190,6 +191,18 @@ abstract class PHPUnit_Framework_Assert {
      * @since Method available since Release 2.1.0
      */
     public static function assertContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false)
+    {
+
+      if ( self::USE_NEW_CONTAINS ) {
+        $assertions = AssertionsFactory::factory();
+        return $assertions->assertContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity, $checkForNonObjectIdentity);
+      }
+
+      static::_legacyAssertContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity, $checkForNonObjectIdentity);
+
+    }
+
+    public static function _legacyAssertContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false)
     {
         if (is_array($haystack) ||
             is_object($haystack) && $haystack instanceof Traversable) {

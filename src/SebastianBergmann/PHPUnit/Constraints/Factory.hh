@@ -5,6 +5,9 @@ namespace SebastianBergmann\PHPUnit\Constraints;
 use SebastianBergmann\PHPUnit\Interfaces\ConstraintInterface;
 use SebastianBergmann\PHPUnit\Constraints\ArrayHasKeyConstraint;
 use SebastianBergmann\PHPUnit\Constraints\ArraySubsetConstraint;
+use SebastianBergmann\PHPUnit\Constraints\NotConstraint;
+use SebastianBergmann\PHPUnit\Constraints\StringContainsConstraint;
+use SebastianBergmann\PHPUnit\Constraints\TraversableContainsConstraint;
 
 //use SebastianBergmann\PHPUnit\Constraints\NotConstraint;
 use \Exception;
@@ -34,11 +37,13 @@ class Factory {
 
     if ($name == 'ArrayHasKey') {
       return new ArrayHasKeyConstraint();
-    } else if ($name == 'ArraySubsetConstraint') {
+    } else if ($name == 'ArraySubset') {
       return new ArraySubsetConstraint();
-    }
-
-    if ($name == 'Not') {
+    } else if ($name == 'StringContains') {
+      return new StringContainsConstraint();
+    } else if ($name == 'TraversableContains') {
+      return new TraversableContainsConstraint();
+    } else if ($name == 'Not') {
       return new NotConstraint();
     }
 

@@ -15,6 +15,8 @@ use SebastianBergmann\PHPUnit\Assertions\Count as AssertionsCount;
 use SebastianBergmann\PHPUnit\Constraints\Factory as ConstraintFactory;
 use SebastianBergmann\PHPUnit\Constraints\ArrayHasKeyConstraint;
 use SebastianBergmann\PHPUnit\Constraints\ArraySubsetConstraint;
+use SebastianBergmann\PHPUnit\Constraints\StringContainsConstraint;
+use SebastianBergmann\PHPUnit\Constraints\TraversableContainsConstraint;
 use SebastianBergmann\PHPUnit\Constraints\NotConstraint;
 use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
 use SebastianBergmann\PHPUnit\Exceptions\ExpectationFailedException;
@@ -100,7 +102,7 @@ class Assertions {
       );
     }
 
-    $constraint = ConstraintFactory::factory('ArraySubsetConstraint');
+    $constraint = ConstraintFactory::factory('ArraySubset');
 
     $constraint->setExpected($subset);
 
@@ -145,6 +147,64 @@ class Assertions {
     $notConstraint->setExpected($hasKeyConstraint);
 
     return $this->assertThat($array, $notConstraint, $message);
+
+  }
+
+  /**
+   * Asserts that a haystack contains a needle.
+   *
+   * @param mixed  $needle
+   * @param mixed  $haystack
+   * @param string $message
+   * @param bool   $ignoreCase
+   * @param bool   $checkForObjectIdentity
+   * @param bool   $checkForNonObjectIdentity
+   *
+   * @since Method available since Release 2.1.0
+   */
+  public function assertContains(
+    mixed $needle,
+    mixed $haystack,
+    string $message = '',
+    bool $ignoreCase = false,
+    bool $checkForObjectIdentity = true,
+    bool $checkForNonObjectIdentity = false,
+  ): bool {
+
+    if (is_array($haystack) ||
+        is_object($haystack) && $haystack instanceof Traversable) {
+
+      $constraint = ConstraintFactory::factory('TraversableContains');
+      $constraint->setExpected($needle);
+
+      if ($constraint instanceof TraversableContainsConstraint) {
+        $constraint->setCheckForObjectIdentity($checkForObjectIdentity);
+        $constraint->setCheckForNonObjectIdentity($checkForNonObjectIdentity);
+      }
+
+      return $this->assertThat($haystack, $constraint, $message);
+
+    } else if (is_string($haystack)) {
+
+      if (!is_string($needle)) {
+        throw InvalidArgumentExceptionFactory::factory(1, 'string');
+      }
+
+      $constraint = ConstraintFactory::factory('StringContains');
+      $constraint->setExpected($needle);
+
+      if ($constraint instanceof StringContainsConstraint) {
+        $constraint->setIgnoreCase($ignoreCase);
+      }
+
+      return $this->assertThat($haystack, $constraint, $message);
+
+    }
+
+    throw InvalidArgumentExceptionFactory::factory(
+      2,
+      'array, traversable or string',
+    );
 
   }
 
