@@ -113,7 +113,7 @@ class AssertTest extends PHPUnit_Framework_TestCase {
 
     try {
       $this->assertContains($a, [$b]);
-    } catch (AssertionFailedException $e ) {
+    } catch (AssertionFailedException $e) {
       return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
@@ -466,10 +466,10 @@ class AssertTest extends PHPUnit_Framework_TestCase {
   public function testAssertContainsThrowsException() {
     try {
       $this->assertContains(null, null);
-    } catch ( InvalidArgumentException $e ) {
+    } catch (InvalidArgumentException $e) {
       $this->assertTrue(true);
       return;
-    } catch ( PHPUnit_Framework_Exception $e ) {
+    } catch (PHPUnit_Framework_Exception $e) {
       $this->assertTrue(true);
       return;
     }
@@ -483,7 +483,7 @@ class AssertTest extends PHPUnit_Framework_TestCase {
 
     try {
       $this->assertContains($foo, new TestIterator([new stdClass()]));
-    } catch (AssertionFailedException $e ) {
+    } catch (AssertionFailedException $e) {
       return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;

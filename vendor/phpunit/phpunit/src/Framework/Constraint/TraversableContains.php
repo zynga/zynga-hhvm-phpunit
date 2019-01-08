@@ -55,6 +55,34 @@ class PHPUnit_Framework_Constraint_TraversableContains extends PHPUnit_Framework
         $this->value                     = $value;
     }
 
+    private function _matchesForArrayOther(mixed $other): bool {
+      if (is_array($other)) {
+        foreach ($other as $element) {
+          if ($this->checkForObjectIdentity && $element === $this->value) {
+            return true;
+          } else if (!$this->checkForObjectIdentity &&
+                     $element == $this->value) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    private function _matchesForTraversableOther(mixed $other): bool {
+      if ($other instanceof Traversable) {
+        foreach ($other as $element) {
+          if ($this->checkForObjectIdentity && $element === $this->value) {
+            return true;
+          } else if (!$this->checkForObjectIdentity &&
+                     $element == $this->value) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    
     /**
      * Evaluates the constraint for parameter $other. Returns true if the
      * constraint is met, false otherwise.

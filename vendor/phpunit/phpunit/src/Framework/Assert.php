@@ -43,13 +43,6 @@ use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentException;
  */
 abstract class PHPUnit_Framework_Assert {
 
-  const USE_NEW_ARRAY_HAS_KEY = true;
-  const USE_NEW_ARRAY_SUBSET  = true;
-  const USE_NEW_ARRAY_NOT_HAS_KEY = true;
-  const USE_NEW_CONTAINS = true;
-
-  const USE_NEW_FAIL = true;
-
     /**
      * Asserts that an array has a specified key.
      *
@@ -60,34 +53,8 @@ abstract class PHPUnit_Framework_Assert {
      * @since Method available since Release 3.0.0
      */
     public static function assertArrayHasKey($key, $array, $message = '') {
-
-      if ( self::USE_NEW_ARRAY_HAS_KEY ) {
-        $assertions = AssertionsFactory::factory();
-        return $assertions->assertArrayHasKey($key, $array, $message);
-      }
-
-      self::_legacyAssertArrayHasKey($key, $array, $message);
-
-    }
-
-    private static function _legacyAssertArrayHasKey($key, $array, $message = '') {
-      if (!(is_integer($key) || is_string($key))) {
-          throw PHPUnit_Util_InvalidArgumentHelper::factory(
-              1,
-              'integer or string'
-          );
-      }
-
-      if (!(is_array($array) || $array instanceof ArrayAccess)) {
-          throw PHPUnit_Util_InvalidArgumentHelper::factory(
-              2,
-              'array or ArrayAccess'
-          );
-      }
-
-      $constraint = new PHPUnit_Framework_Constraint_ArrayHasKey($key);
-
-      static::assertThat($array, $constraint, $message);
+      $assertions = AssertionsFactory::factory();
+      return $assertions->assertArrayHasKey($key, $array, $message);
     }
 
     /**
@@ -101,34 +68,8 @@ abstract class PHPUnit_Framework_Assert {
      * @since Method available since Release 4.4.0
      */
     public static function assertArraySubset($subset, $array, $strict = false, $message = '') {
-
-      if ( self::USE_NEW_ARRAY_SUBSET ) {
-        $assertions = AssertionsFactory::factory();
-        return $assertions->assertArraySubset($subset, $array, $strict, $message);
-      }
-
-      self::_legacyAssertArraySubset($subset, $array, $strict, $message);
-
-    }
-
-    public static function _legacyAssertArraySubset($subset, $array, $strict = false, $message = '') {
-        if (!is_array($subset)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(
-                1,
-                'array or ArrayAccess'
-            );
-        }
-
-        if (!is_array($array)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(
-                2,
-                'array or ArrayAccess'
-            );
-        }
-
-        $constraint = new PHPUnit_Framework_Constraint_ArraySubset($subset, $strict);
-
-        static::assertThat($array, $constraint, $message);
+      $assertions = AssertionsFactory::factory();
+      return $assertions->assertArraySubset($subset, $array, $strict, $message);
     }
 
     /**
@@ -140,43 +81,10 @@ abstract class PHPUnit_Framework_Assert {
      *
      * @since Method available since Release 3.0.0
      */
-    public static function assertArrayNotHasKey($key, $array, $message = '')
-    {
-      if ( self::USE_NEW_ARRAY_NOT_HAS_KEY ) {
-        $assertions = AssertionsFactory::factory();
-        return $assertions->assertArrayNotHasKey($key, $array, $message);
-      }
-
-      static::_legacyAssertArrayNotHasKey($key, $array, $message);
-
+    public static function assertArrayNotHasKey($key, $array, $message = '') {
+      $assertions = AssertionsFactory::factory();
+      return $assertions->assertArrayNotHasKey($key, $array, $message);
     }
-
-    public static function _legacyAssertArrayNotHasKey($key, $array, $message = '')
-    {
-        if (!(is_integer($key) || is_string($key))) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(
-                1,
-                'integer or string'
-            );
-        }
-
-        if (!(is_array($array) || $array instanceof ArrayAccess)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(
-                2,
-                'array or ArrayAccess'
-            );
-        }
-
-        $constraint = new PHPUnit_Framework_Constraint_Not(
-            new PHPUnit_Framework_Constraint_ArrayHasKey($key)
-        );
-
-        static::assertThat($array, $constraint, $message);
-    }
-
-    // JEO: Port line.
-    //-------------------------- VVV NOT PORTED VVVV ---------------------------
-
 
     /**
      * Asserts that a haystack contains a needle.
@@ -190,47 +98,9 @@ abstract class PHPUnit_Framework_Assert {
      *
      * @since Method available since Release 2.1.0
      */
-    public static function assertContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false)
-    {
-
-      if ( self::USE_NEW_CONTAINS ) {
-        $assertions = AssertionsFactory::factory();
-        return $assertions->assertContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity, $checkForNonObjectIdentity);
-      }
-
-      static::_legacyAssertContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity, $checkForNonObjectIdentity);
-
-    }
-
-    public static function _legacyAssertContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false)
-    {
-        if (is_array($haystack) ||
-            is_object($haystack) && $haystack instanceof Traversable) {
-            $constraint = new PHPUnit_Framework_Constraint_TraversableContains(
-                $needle,
-                $checkForObjectIdentity,
-                $checkForNonObjectIdentity
-            );
-        } elseif (is_string($haystack)) {
-            if (!is_string($needle)) {
-                throw PHPUnit_Util_InvalidArgumentHelper::factory(
-                    1,
-                    'string'
-                );
-            }
-
-            $constraint = new PHPUnit_Framework_Constraint_StringContains(
-                $needle,
-                $ignoreCase
-            );
-        } else {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(
-                2,
-                'array, traversable or string'
-            );
-        }
-
-        static::assertThat($haystack, $constraint, $message);
+    public static function assertContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false) {
+      $assertions = AssertionsFactory::factory();
+      return $assertions->assertContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity, $checkForNonObjectIdentity);
     }
 
     /**
@@ -247,17 +117,24 @@ abstract class PHPUnit_Framework_Assert {
      *
      * @since Method available since Release 3.0.0
      */
-    public static function assertAttributeContains($needle, $haystackAttributeName, $haystackClassOrObject, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false)
-    {
-        static::assertContains(
-            $needle,
-            static::readAttribute($haystackClassOrObject, $haystackAttributeName),
-            $message,
-            $ignoreCase,
-            $checkForObjectIdentity,
-            $checkForNonObjectIdentity
-        );
+    public static function assertAttributeContains($needle, $haystackAttributeName, $haystackClassOrObject, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false) {
+
+      $assertions = AssertionsFactory::factory();
+
+      return $haystack = $assertions->assertAttributeContains(
+        $needle,
+        $haystackAttributeName,
+        $haystackClassOrObject,
+        $message,
+        $ignoreCase,
+        $checkForObjectIdentity,
+        $checkForNonObjectIdentity
+      );
+
     }
+
+    // JEO: Port line.
+    //-------------------------- VVV NOT PORTED VVVV ---------------------------
 
     /**
      * Asserts that a haystack does not contain a needle.
@@ -2791,18 +2668,8 @@ abstract class PHPUnit_Framework_Assert {
      * @throws PHPUnit_Framework_AssertionFailedError
      */
     public static function fail($message = '') {
-
-      if ( self::USE_NEW_FAIL ) {
-        $assertions = AssertionsFactory::factory();
-        return $assertions->fail($message);
-      }
-
-      self::_legacyFail($message);
-
-    }
-
-    public static function _legacyFail($message = '' ) {
-      throw new PHPUnit_Framework_AssertionFailedError($message);
+      $assertions = AssertionsFactory::factory();
+      return $assertions->fail($message);
     }
 
     /**

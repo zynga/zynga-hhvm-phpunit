@@ -56,6 +56,34 @@ class TraversableContainsConstraint extends Base {
     return true;
   }
 
+  private function _matchesForArrayOther(bool $checkVar, mixed $other): bool {
+    if (is_array($other)) {
+      foreach ($other as $element) {
+        if ($checkVar && $element === $this->value) {
+          return true;
+        } else if (!$checkVar &&
+                   $element == $this->value) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  private function _matchesForTraversableOther(bool $checkVar, mixed $other): bool {
+    if ($other instanceof Traversable) {
+      foreach ($other as $element) {
+        if ($checkVar && $element === $this->value) {
+          return true;
+        } else if (!$checkVar &&
+                   $element == $this->value) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   /**
    * Evaluates the constraint for parameter $other. Returns true if the
    * constraint is met, false otherwise.
@@ -73,49 +101,51 @@ class TraversableContainsConstraint extends Base {
     if (is_object($this->value)) {
 
       if (is_array($other)) {
-        foreach ($other as $element) {
-          if ($this->checkForObjectIdentity && $element === $this->value) {
-            return true;
-          } else if (!$this->checkForObjectIdentity &&
-                     $element == $this->value) {
-            return true;
-          }
-        }
-        return false;
-      }
-
-      if ($other instanceof Traversable) {
-        foreach ($other as $element) {
-          if ($this->checkForObjectIdentity && $element === $this->value) {
-            return true;
-          } else if (!$this->checkForObjectIdentity &&
-                     $element == $this->value) {
-            return true;
-          }
-        }
-        return false;
+        return $this->_matchesForArrayOther($this->checkForObjectIdentity, $other);
+        // foreach ($other as $element) {
+        //   if ($this->checkForObjectIdentity && $element === $this->value) {
+        //     return true;
+        //   } else if (!$this->checkForObjectIdentity &&
+        //              $element == $this->value) {
+        //     return true;
+        //   }
+        // }
+        // return false;
+      } else if ($other instanceof Traversable) {
+        return $this->_matchesForTraversableOther($this->checkForObjectIdentity, $other);
+        // foreach ($other as $element) {
+        //   if ($this->checkForObjectIdentity && $element === $this->value) {
+        //     return true;
+        //   } else if (!$this->checkForObjectIdentity &&
+        //              $element == $this->value) {
+        //     return true;
+        //   }
+        // }
+        // return false;
       }
 
       return false;
 
     } else if (is_array($other)) {
-      foreach ($other as $element) {
-        if ($this->checkForNonObjectIdentity && $element === $this->value) {
-          return true;
-        } else if (!$this->checkForNonObjectIdentity &&
-                   $element == $this->value) {
-          return true;
-        }
-      }
+      return $this->_matchesForArrayOther($this->checkForNonObjectIdentity, $other);
+      // foreach ($other as $element) {
+      //   if ($this->checkForNonObjectIdentity && $element === $this->value) {
+      //     return true;
+      //   } else if (!$this->checkForNonObjectIdentity &&
+      //              $element == $this->value) {
+      //     return true;
+      //   }
+      // }
     } else if ($other instanceof Traversable) {
-      foreach ($other as $element) {
-        if ($this->checkForNonObjectIdentity && $element === $this->value) {
-          return true;
-        } else if (!$this->checkForNonObjectIdentity &&
-                   $element == $this->value) {
-          return true;
-        }
-      }
+      return $this->_matchesForTraversableOther($this->checkForNonObjectIdentity, $other);
+      // foreach ($other as $element) {
+      //   if ($this->checkForNonObjectIdentity && $element === $this->value) {
+      //     return true;
+      //   } else if (!$this->checkForNonObjectIdentity &&
+      //              $element == $this->value) {
+      //     return true;
+      //   }
+      // }
     }
 
     return false;
