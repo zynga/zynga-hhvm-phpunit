@@ -121,7 +121,7 @@ abstract class PHPUnit_Framework_Assert {
 
       $assertions = AssertionsFactory::factory();
 
-      return $haystack = $assertions->assertAttributeContains(
+      return $assertions->assertAttributeContains(
         $needle,
         $haystackAttributeName,
         $haystackClassOrObject,
@@ -148,39 +148,41 @@ abstract class PHPUnit_Framework_Assert {
      *
      * @since Method available since Release 2.1.0
      */
-    public static function assertNotContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false)
-    {
-        if (is_array($haystack) ||
-            is_object($haystack) && $haystack instanceof Traversable) {
-            $constraint = new PHPUnit_Framework_Constraint_Not(
-                new PHPUnit_Framework_Constraint_TraversableContains(
-                    $needle,
-                    $checkForObjectIdentity,
-                    $checkForNonObjectIdentity
-                )
-            );
-        } elseif (is_string($haystack)) {
-            if (!is_string($needle)) {
-                throw PHPUnit_Util_InvalidArgumentHelper::factory(
-                    1,
-                    'string'
-                );
-            }
+    public static function assertNotContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false) {
+      $assertions = AssertionsFactory::factory();
+      return $assertions->assertNotContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity, $checkForNonObjectIdentity);
 
-            $constraint = new PHPUnit_Framework_Constraint_Not(
-                new PHPUnit_Framework_Constraint_StringContains(
-                    $needle,
-                    $ignoreCase
-                )
-            );
-        } else {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(
-                2,
-                'array, traversable or string'
-            );
-        }
-
-        static::assertThat($haystack, $constraint, $message);
+        // if (is_array($haystack) ||
+        //     is_object($haystack) && $haystack instanceof Traversable) {
+        //     $constraint = new PHPUnit_Framework_Constraint_Not(
+        //         new PHPUnit_Framework_Constraint_TraversableContains(
+        //             $needle,
+        //             $checkForObjectIdentity,
+        //             $checkForNonObjectIdentity
+        //         )
+        //     );
+        // } elseif (is_string($haystack)) {
+        //     if (!is_string($needle)) {
+        //         throw PHPUnit_Util_InvalidArgumentHelper::factory(
+        //             1,
+        //             'string'
+        //         );
+        //     }
+        //
+        //     $constraint = new PHPUnit_Framework_Constraint_Not(
+        //         new PHPUnit_Framework_Constraint_StringContains(
+        //             $needle,
+        //             $ignoreCase
+        //         )
+        //     );
+        // } else {
+        //     throw PHPUnit_Util_InvalidArgumentHelper::factory(
+        //         2,
+        //         'array, traversable or string'
+        //     );
+        // }
+        //
+        // static::assertThat($haystack, $constraint, $message);
     }
 
     /**

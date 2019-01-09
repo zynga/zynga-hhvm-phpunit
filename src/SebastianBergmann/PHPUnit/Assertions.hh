@@ -11,7 +11,6 @@
 
 namespace SebastianBergmann\PHPUnit;
 
-use SebastianBergmann\PHPUnit\Assertions\Count as AssertionsCount;
 use SebastianBergmann\PHPUnit\Constraints\Factory as ConstraintFactory;
 use SebastianBergmann\PHPUnit\Constraints\ArrayHasKeyConstraint;
 use SebastianBergmann\PHPUnit\Constraints\ArraySubsetConstraint;
@@ -31,6 +30,17 @@ use \ReflectionClass;
 use \ReflectionException;
 use \ReflectionObject;
 use \ReflectionProperty;
+
+// --
+// JEO: So we broke up the assertions into individual static classes to make
+// them more readable and to keep the 'outward' api interface as light as possible.
+//
+// As the autoloader is lazy, it lowers the total amount of code loaded in most
+// use cases.
+// --
+use SebastianBergmann\PHPUnit\Assertions\Count as AssertionsCount;
+use SebastianBergmann\PHPUnit\Assertions\AssertArrayHasKey;
+use SebastianBergmann\PHPUnit\Assertions\AssertArraySubset;
 
 class Assertions {
 
@@ -58,22 +68,7 @@ class Assertions {
     string $message = '',
   ): bool {
 
-    if (!(is_int($key) || is_string($key))) {
-      throw InvalidArgumentExceptionFactory::factory(1, 'integer or string');
-    }
-
-    if (!(is_array($array) || $array instanceof ArrayAccess)) {
-      throw InvalidArgumentExceptionFactory::factory(
-        2,
-        'array or ArrayAccess',
-      );
-    }
-
-    $constraint = ConstraintFactory::factory('ArrayHasKey');
-
-    $constraint->setExpected($key);
-
-    return $this->assertThat($array, $constraint, $message);
+    return AssertArrayHasKey::evaluate($this, $key, $array, $message);
 
   }
 
@@ -94,29 +89,8 @@ class Assertions {
     string $message = '',
   ): bool {
 
-    if (!is_array($subset)) {
-      throw InvalidArgumentExceptionFactory::factory(
-        1,
-        'array or ArrayAccess',
-      );
-    }
-
-    if (!is_array($array)) {
-      throw InvalidArgumentExceptionFactory::factory(
-        2,
-        'array or ArrayAccess',
-      );
-    }
-
-    $constraint = ConstraintFactory::factory('ArraySubset');
-
-    $constraint->setExpected($subset);
-
-    if ($constraint instanceof ArraySubsetConstraint) {
-      $constraint->setStrict($strict);
-    }
-
-    return $this->assertThat($array, $constraint, $message);
+    return
+      AssertArraySubset::evaluate($this, $subset, $array, $strict, $message);
 
   }
 
@@ -230,18 +204,99 @@ class Assertions {
    *
    * @since Method available since Release 3.0.0
    */
-  public function assertAttributeContains($needle, $haystackAttributeName, $haystackClassOrObject, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false)
-  {
+  public function assertAttributeContains(
+    mixed $needle,
+    string $haystackAttributeName,
+    mixed $haystackClassOrObject,
+    string $message = '',
+    bool $ignoreCase = false,
+    bool $checkForObjectIdentity = true,
+    bool $checkForNonObjectIdentity = false,
+  ): bool {
 
-    $haystack = $this->readAttribute($haystackClassOrObject, $haystackAttributeName);
+    $haystack =
+      $this->readAttribute($haystackClassOrObject, $haystackAttributeName);
 
     return $this->assertContains(
-         $needle,
-         $haystack,
-         $message,
-         $ignoreCase,
-         $checkForObjectIdentity,
-         $checkForNonObjectIdentity
+      $needle,
+      $haystack,
+      $message,
+      $ignoreCase,
+      $checkForObjectIdentity,
+      $checkForNonObjectIdentity,
+    );
+
+  }
+
+  /**
+   * Asserts that a haystack does not contain a needle.
+   *
+   * @param mixed  $needle
+   * @param mixed  $haystack
+   * @param string $message
+   * @param bool   $ignoreCase
+   * @param bool   $checkForObjectIdentity
+   * @param bool   $checkForNonObjectIdentity
+   *
+   * @since Method available since Release 2.1.0
+   */
+  public function assertNotContains(
+    mixed $needle,
+    mixed $haystack,
+    string $message = '',
+    bool $ignoreCase = false,
+    bool $checkForObjectIdentity = true,
+    bool $checkForNonObjectIdentity = false,
+  ): bool {
+
+    if (is_array($haystack) ||
+        $haystack instanceof Traversable ||
+        $haystack instanceof Vector ||
+        $haystack instanceof Map) {
+
+      $traversableConstraint =
+        ConstraintFactory::factory('TraversableContains');
+      $traversableConstraint->setExpected($needle);
+
+      if ($traversableConstraint instanceof TraversableContainsConstraint) {
+        $traversableConstraint->setCheckForObjectIdentity(
+          $checkForObjectIdentity,
+        );
+        $traversableConstraint->setCheckForNonObjectIdentity(
+          $checkForNonObjectIdentity,
+        );
+      }
+
+      $notConstraint = ConstraintFactory::factory('Not');
+      $notConstraint->setExpected($traversableConstraint);
+
+      return $this->assertThat($haystack, $notConstraint, $message);
+
+    } else if (is_string($haystack)) {
+
+      if (!is_string($needle)) {
+        throw InvalidArgumentExceptionFactory::factory(1, 'string');
+      }
+
+      $stringContainsConstraint =
+        ConstraintFactory::factory('StringContains');
+
+      $stringContainsConstraint->setExpected($needle);
+
+      if ($stringContainsConstraint instanceof StringContainsConstraint) {
+        $stringContainsConstraint->setIgnoreCase($ignoreCase);
+      }
+
+      $notConstraint = ConstraintFactory::factory('Not');
+      $notConstraint->setExpected($stringContainsConstraint);
+
+      return $this->assertThat($haystack, $notConstraint, $message);
+
+    }
+
+    throw InvalidArgumentExceptionFactory::factory(
+      2,
+      'array, traversable or string',
     );
 
   }

@@ -521,17 +521,19 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     $this->fail();
   }
 
-  /**
-   * @covers            PHPUnit_Framework_Assert::assertNotContains
-   * @expectedException PHPUnit_Framework_Exception
-   */
   public function testAssertNotContainsThrowsException() {
-    $this->assertNotContains(null, null);
+    try {
+      $this->assertNotContains(null, null);
+    } catch (InvalidArgumentException $e) {
+      $this->assertTrue(true);
+      return;
+    } catch (PHPUnit_Framework_Exception $e) {
+      $this->assertTrue(true);
+      return;
+    }
+    $this->fail('Failed to find an acceptable exception.');
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertNotContains
-   */
   public function testAssertSplObjectStorageNotContainsObject() {
     $a = new stdClass();
     $b = new stdClass();
@@ -542,6 +544,8 @@ class AssertTest extends PHPUnit_Framework_TestCase {
 
     try {
       $this->assertNotContains($a, $c);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -549,9 +553,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertNotContains
-   */
   public function testAssertArrayNotContainsObject() {
     $a = new stdClass();
     $b = new stdClass();
@@ -560,6 +561,8 @@ class AssertTest extends PHPUnit_Framework_TestCase {
 
     try {
       $this->assertNotContains($a, [$a]);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -567,14 +570,13 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertNotContains
-   */
   public function testAssertArrayNotContainsString() {
     $this->assertNotContains('foo', ['bar']);
 
     try {
       $this->assertNotContains('foo', ['foo']);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -582,14 +584,13 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertNotContains
-   */
   public function testAssertArrayNotContainsNonObject() {
     $this->assertNotContains('foo', [true], '', false, true, true);
 
     try {
       $this->assertNotContains('foo', [true]);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -597,14 +598,13 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertNotContains
-   */
   public function testAssertStringNotContainsString() {
     $this->assertNotContains('foo', 'bar');
 
     try {
       $this->assertNotContains('foo', 'foo');
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -2265,6 +2265,8 @@ XML;
 
     try {
       $this->assertAttributeNotContains('foo', 'publicArray', $obj);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -2305,9 +2307,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertAttributeNotContains
-   */
   public function testAssertProtectedAttributeNotContains() {
     $obj = new ClassWithNonPublicAttributes();
 
@@ -2315,6 +2314,8 @@ XML;
 
     try {
       $this->assertAttributeNotContains('bar', 'protectedArray', $obj);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -2338,9 +2339,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertAttributeNotContains
-   */
   public function testAssertPrivateAttributeNotContains() {
     $obj = new ClassWithNonPublicAttributes();
 
@@ -2348,6 +2346,8 @@ XML;
 
     try {
       $this->assertAttributeNotContains('baz', 'privateArray', $obj);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -2379,9 +2379,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertAttributeNotContains
-   */
   public function testAssertAttributeNotContainsNonObject() {
     $obj = new ClassWithNonPublicAttributes();
 
@@ -2397,6 +2394,8 @@ XML;
 
     try {
       $this->assertAttributeNotContains(true, 'privateArray', $obj);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -2404,9 +2403,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertAttributeEquals
-   */
   public function testAssertPublicAttributeEquals() {
     $obj = new ClassWithNonPublicAttributes();
 
@@ -2421,9 +2417,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertAttributeNotEquals
-   */
   public function testAssertPublicAttributeNotEquals() {
     $obj = new ClassWithNonPublicAttributes();
 
@@ -2438,9 +2431,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertAttributeSame
-   */
   public function testAssertPublicAttributeSame() {
     $obj = new ClassWithNonPublicAttributes();
 
@@ -2455,9 +2445,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertAttributeNotSame
-   */
   public function testAssertPublicAttributeNotSame() {
     $obj = new ClassWithNonPublicAttributes();
 
@@ -2472,9 +2459,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertAttributeEquals
-   */
   public function testAssertProtectedAttributeEquals() {
     $obj = new ClassWithNonPublicAttributes();
 
@@ -2489,9 +2473,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertAttributeNotEquals
-   */
   public function testAssertProtectedAttributeNotEquals() {
     $obj = new ClassWithNonPublicAttributes();
 
