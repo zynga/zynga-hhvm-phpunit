@@ -40,17 +40,19 @@ use \ReflectionProperty;
 // --
 use SebastianBergmann\PHPUnit\Assertions\Count as AssertionsCount;
 use SebastianBergmann\PHPUnit\Assertions\AssertArrayHasKey;
+use SebastianBergmann\PHPUnit\Assertions\AssertArrayNotHasKey;
 use SebastianBergmann\PHPUnit\Assertions\AssertArraySubset;
+use SebastianBergmann\PHPUnit\Assertions\GetObjectAttribute;
 
 class Assertions {
 
-  private ?AssertionsCount $count;
+  private static ?AssertionsCount $count;
 
   final public function count(): AssertionsCount {
-    if (!$this->count instanceof AssertionsCount) {
-      $this->count = new AssertionsCount();
+    if (!self::$count instanceof AssertionsCount) {
+      self::$count = new AssertionsCount();
     }
-    return $this->count;
+    return self::$count;
   }
 
   /**
@@ -109,24 +111,7 @@ class Assertions {
     string $message = '',
   ): bool {
 
-    if (!(is_int($key) || is_string($key))) {
-      throw InvalidArgumentExceptionFactory::factory(1, 'integer or string');
-    }
-
-    if (!(is_array($array) || $array instanceof ArrayAccess)) {
-      throw InvalidArgumentExceptionFactory::factory(
-        2,
-        'array or ArrayAccess',
-      );
-    }
-
-    $hasKeyConstraint = ConstraintFactory::factory('ArrayHasKey');
-    $hasKeyConstraint->setExpected($key);
-
-    $notConstraint = ConstraintFactory::factory('Not');
-    $notConstraint->setExpected($hasKeyConstraint);
-
-    return $this->assertThat($array, $notConstraint, $message);
+    return AssertArrayNotHasKey::evaluate($this, $key, $array, $message);
 
   }
 
@@ -512,62 +497,7 @@ class Assertions {
     string $attributeName,
   ): mixed {
 
-    if (!is_object($object)) {
-      throw InvalidArgumentExceptionFactory::factory(1, 'object');
-    }
-
-    if (!is_string($attributeName)) {
-      throw InvalidArgumentExceptionFactory::factory(2, 'string');
-    }
-
-    if (!preg_match(
-          '/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/',
-          $attributeName,
-        )) {
-
-      throw InvalidArgumentExceptionFactory::factory(
-        2,
-        'valid attribute name',
-      );
-
-    }
-
-    $reflectionObject = new ReflectionObject($object);
-
-    $attribute =
-      $this->_getReflectionProperty($reflectionObject, $attributeName);
-
-    if ($attribute instanceof ReflectionProperty) {
-
-      $attribute->setAccessible(true);
-      $value = $attribute->getValue($object);
-
-      return $value;
-
-    }
-
-    throw new AttributeNotFoundException(
-      sprintf('Attribute "%s" not found in object.', $attributeName),
-    );
-
-  }
-
-  private function _getReflectionProperty(
-    ReflectionClass $reflector,
-    string $attributeName,
-  ): ?ReflectionProperty {
-
-    try {
-      $attribute = $reflector->getProperty($attributeName);
-      return $attribute;
-    } catch (Exception $e) {
-      $parentClass = $reflector->getParentClass();
-      if ($parentClass instanceof ReflectionClass) {
-        return $this->_getReflectionProperty($parentClass, $attributeName);
-      }
-    }
-
-    return null;
+    return GetObjectAttribute::evaluate($object, $attributeName);
 
   }
 

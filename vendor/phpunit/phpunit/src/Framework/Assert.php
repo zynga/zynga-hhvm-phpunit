@@ -118,9 +118,7 @@ abstract class PHPUnit_Framework_Assert {
      * @since Method available since Release 3.0.0
      */
     public static function assertAttributeContains($needle, $haystackAttributeName, $haystackClassOrObject, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false) {
-
       $assertions = AssertionsFactory::factory();
-
       return $assertions->assertAttributeContains(
         $needle,
         $haystackAttributeName,
@@ -130,7 +128,6 @@ abstract class PHPUnit_Framework_Assert {
         $checkForObjectIdentity,
         $checkForNonObjectIdentity
       );
-
     }
 
     // JEO: Port line.
