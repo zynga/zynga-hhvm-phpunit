@@ -42,7 +42,13 @@ use SebastianBergmann\PHPUnit\Assertions\Count as AssertionsCount;
 use SebastianBergmann\PHPUnit\Assertions\AssertArrayHasKey;
 use SebastianBergmann\PHPUnit\Assertions\AssertArrayNotHasKey;
 use SebastianBergmann\PHPUnit\Assertions\AssertArraySubset;
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeContains;
+use SebastianBergmann\PHPUnit\Assertions\AssertContains;
+use SebastianBergmann\PHPUnit\Assertions\AssertNotContains;
+use SebastianBergmann\PHPUnit\Assertions\AssertThat;
 use SebastianBergmann\PHPUnit\Assertions\GetObjectAttribute;
+use SebastianBergmann\PHPUnit\Assertions\GetStaticAttribute;
+use SebastianBergmann\PHPUnit\Assertions\ReadAttribute;
 
 class Assertions {
 
@@ -127,7 +133,7 @@ class Assertions {
    *
    * @since Method available since Release 2.1.0
    */
-  public function assertContains(
+  final public function assertContains(
     mixed $needle,
     mixed $haystack,
     string $message = '',
@@ -136,41 +142,14 @@ class Assertions {
     bool $checkForNonObjectIdentity = false,
   ): bool {
 
-    if (is_array($haystack) ||
-        $haystack instanceof Traversable ||
-        $haystack instanceof Vector ||
-        $haystack instanceof Map) {
-
-      $constraint = ConstraintFactory::factory('TraversableContains');
-      $constraint->setExpected($needle);
-
-      if ($constraint instanceof TraversableContainsConstraint) {
-        $constraint->setCheckForObjectIdentity($checkForObjectIdentity);
-        $constraint->setCheckForNonObjectIdentity($checkForNonObjectIdentity);
-      }
-
-      return $this->assertThat($haystack, $constraint, $message);
-
-    } else if (is_string($haystack)) {
-
-      if (!is_string($needle)) {
-        throw InvalidArgumentExceptionFactory::factory(1, 'string');
-      }
-
-      $constraint = ConstraintFactory::factory('StringContains');
-      $constraint->setExpected($needle);
-
-      if ($constraint instanceof StringContainsConstraint) {
-        $constraint->setIgnoreCase($ignoreCase);
-      }
-
-      return $this->assertThat($haystack, $constraint, $message);
-
-    }
-
-    throw InvalidArgumentExceptionFactory::factory(
-      2,
-      'array, traversable or string',
+    return AssertContains::evaluate(
+      $this,
+      $needle,
+      $haystack,
+      $message,
+      $ignoreCase,
+      $checkForObjectIdentity,
+      $checkForNonObjectIdentity,
     );
 
   }
@@ -189,7 +168,7 @@ class Assertions {
    *
    * @since Method available since Release 3.0.0
    */
-  public function assertAttributeContains(
+  final public function assertAttributeContains(
     mixed $needle,
     string $haystackAttributeName,
     mixed $haystackClassOrObject,
@@ -199,12 +178,11 @@ class Assertions {
     bool $checkForNonObjectIdentity = false,
   ): bool {
 
-    $haystack =
-      $this->readAttribute($haystackClassOrObject, $haystackAttributeName);
-
-    return $this->assertContains(
+    return AssertAttributeContains::evaluate(
+      $this,
       $needle,
-      $haystack,
+      $haystackAttributeName,
+      $haystackClassOrObject,
       $message,
       $ignoreCase,
       $checkForObjectIdentity,
@@ -225,7 +203,7 @@ class Assertions {
    *
    * @since Method available since Release 2.1.0
    */
-  public function assertNotContains(
+  final public function assertNotContains(
     mixed $needle,
     mixed $haystack,
     string $message = '',
@@ -234,54 +212,14 @@ class Assertions {
     bool $checkForNonObjectIdentity = false,
   ): bool {
 
-    if (is_array($haystack) ||
-        $haystack instanceof Traversable ||
-        $haystack instanceof Vector ||
-        $haystack instanceof Map) {
-
-      $traversableConstraint =
-        ConstraintFactory::factory('TraversableContains');
-      $traversableConstraint->setExpected($needle);
-
-      if ($traversableConstraint instanceof TraversableContainsConstraint) {
-        $traversableConstraint->setCheckForObjectIdentity(
-          $checkForObjectIdentity,
-        );
-        $traversableConstraint->setCheckForNonObjectIdentity(
-          $checkForNonObjectIdentity,
-        );
-      }
-
-      $notConstraint = ConstraintFactory::factory('Not');
-      $notConstraint->setExpected($traversableConstraint);
-
-      return $this->assertThat($haystack, $notConstraint, $message);
-
-    } else if (is_string($haystack)) {
-
-      if (!is_string($needle)) {
-        throw InvalidArgumentExceptionFactory::factory(1, 'string');
-      }
-
-      $stringContainsConstraint =
-        ConstraintFactory::factory('StringContains');
-
-      $stringContainsConstraint->setExpected($needle);
-
-      if ($stringContainsConstraint instanceof StringContainsConstraint) {
-        $stringContainsConstraint->setIgnoreCase($ignoreCase);
-      }
-
-      $notConstraint = ConstraintFactory::factory('Not');
-      $notConstraint->setExpected($stringContainsConstraint);
-
-      return $this->assertThat($haystack, $notConstraint, $message);
-
-    }
-
-    throw InvalidArgumentExceptionFactory::factory(
-      2,
-      'array, traversable or string',
+    return AssertNotContains::evaluate(
+      $this,
+      $needle,
+      $haystack,
+      $message,
+      $ignoreCase,
+      $checkForObjectIdentity,
+      $checkForNonObjectIdentity,
     );
 
   }
@@ -295,19 +233,13 @@ class Assertions {
    *
    * @since Method available since Release 3.0.0
    */
-  public function assertThat(
+  final public function assertThat(
     mixed $value,
     ConstraintInterface $constraint,
     string $message = '',
   ): bool {
 
-    $this->count()->increment($constraint->count());
-
-    try {
-      return $constraint->evaluate($value, $message, true);
-    } catch (ExpectationFailedException $e) {
-      throw new AssertionFailedException($e->getMessage(), $e->getCode(), $e);
-    }
+    return AssertThat::evaluate($this, $value, $constraint, $message);
 
   }
 
@@ -361,42 +293,13 @@ class Assertions {
    *
    * @throws PHPUnit_Framework_Exception
    */
-  public function readAttribute(
+  final public function readAttribute(
     mixed $classOrObject,
     string $attributeName,
   ): mixed {
 
-    if (!is_string($attributeName)) {
-      throw InvalidArgumentExceptionFactory::factory(2, 'string');
-    }
+    return ReadAttribute::evaluate($this, $classOrObject, $attributeName);
 
-    if (!preg_match(
-          '/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/',
-          $attributeName,
-        )) {
-      throw InvalidArgumentExceptionFactory::factory(
-        2,
-        'valid attribute name',
-      );
-    }
-
-    if (is_string($classOrObject)) {
-      if (!class_exists($classOrObject)) {
-        throw InvalidArgumentExceptionFactory::factory(1, 'class name');
-      }
-
-      return $this->getStaticAttribute($classOrObject, $attributeName);
-
-    } else if (is_object($classOrObject)) {
-
-      return $this->getObjectAttribute($classOrObject, $attributeName);
-
-    } else {
-      throw InvalidArgumentExceptionFactory::factory(
-        1,
-        'class name or object',
-      );
-    }
   }
 
   /**
@@ -412,70 +315,12 @@ class Assertions {
    *
    * @since Method available since Release 4.0.0
    */
-  public function getStaticAttribute(
+  final public function getStaticAttribute(
     string $className,
     string $attributeName,
   ): mixed {
 
-    if (!is_string($className)) {
-      throw InvalidArgumentExceptionFactory::factory(1, 'string');
-    }
-
-    if (!class_exists($className)) {
-      throw InvalidArgumentExceptionFactory::factory(1, 'class name');
-    }
-
-    if (!is_string($attributeName)) {
-      throw InvalidArgumentExceptionFactory::factory(2, 'string');
-    }
-
-    if (!preg_match(
-          '/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/',
-          $attributeName,
-        )) {
-      throw InvalidArgumentExceptionFactory::factory(
-        2,
-        'valid attribute name',
-      );
-    }
-
-    $class = ReflectionClasses::getReflection($className);
-
-    if ($class instanceof ReflectionClass) {
-
-      $value = $this->_getStaticAttributeFromClass($class, $attributeName);
-
-      if ($value != '[JEO-ATTRIBUTE_NOT_FOUND]') {
-        return $value;
-      }
-
-    }
-
-    throw new AttributeNotFoundException(
-      sprintf('Attribute "%s" not found in class.', $attributeName),
-    );
-
-  }
-
-  private function _getStaticAttributeFromClass(
-    ReflectionClass $class,
-    string $attributeName,
-  ): mixed {
-
-    $attributes = $class->getStaticProperties();
-
-    if (array_key_exists($attributeName, $attributes)) {
-      return $attributes[$attributeName];
-    }
-
-    $parentClass = $class->getParentClass();
-
-    if ($parentClass instanceof ReflectionClass) {
-      return
-        $this->_getStaticAttributeFromClass($parentClass, $attributeName);
-    }
-
-    return '[JEO-ATTRIBUTE_NOT_FOUND]';
+    return GetStaticAttribute::evaluate($className, $attributeName);
 
   }
 
@@ -492,7 +337,7 @@ class Assertions {
    *
    * @since Method available since Release 4.0.0
    */
-  public function getObjectAttribute(
+  final public function getObjectAttribute(
     mixed $object,
     string $attributeName,
   ): mixed {

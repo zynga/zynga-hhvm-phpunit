@@ -11,6 +11,7 @@ use \ReflectionProperty;
 use \Exception;
 
 class GetObjectAttribute {
+
   /**
    * Returns the value of an object's attribute.
    * This also works for attributes that are declared protected or private.
@@ -24,7 +25,7 @@ class GetObjectAttribute {
    *
    * @since Method available since Release 4.0.0
    */
-  public static function evaluate(
+  final public static function evaluate(
     mixed $object,
     string $attributeName,
   ): mixed {
@@ -69,7 +70,7 @@ class GetObjectAttribute {
 
   }
 
-  private static function _getReflectionProperty(
+  final private static function _getReflectionProperty(
     ReflectionClass $reflector,
     string $attributeName,
   ): ?ReflectionProperty {
