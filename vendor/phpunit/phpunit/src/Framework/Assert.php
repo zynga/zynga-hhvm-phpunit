@@ -130,9 +130,6 @@ abstract class PHPUnit_Framework_Assert {
       );
     }
 
-    // JEO: Port line.
-    //-------------------------- VVV NOT PORTED VVVV ---------------------------
-
     /**
      * Asserts that a haystack does not contain a needle.
      *
@@ -146,40 +143,10 @@ abstract class PHPUnit_Framework_Assert {
      * @since Method available since Release 2.1.0
      */
     public static function assertNotContains($needle, $haystack, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false) {
+
       $assertions = AssertionsFactory::factory();
       return $assertions->assertNotContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity, $checkForNonObjectIdentity);
 
-        // if (is_array($haystack) ||
-        //     is_object($haystack) && $haystack instanceof Traversable) {
-        //     $constraint = new PHPUnit_Framework_Constraint_Not(
-        //         new PHPUnit_Framework_Constraint_TraversableContains(
-        //             $needle,
-        //             $checkForObjectIdentity,
-        //             $checkForNonObjectIdentity
-        //         )
-        //     );
-        // } elseif (is_string($haystack)) {
-        //     if (!is_string($needle)) {
-        //         throw PHPUnit_Util_InvalidArgumentHelper::factory(
-        //             1,
-        //             'string'
-        //         );
-        //     }
-        //
-        //     $constraint = new PHPUnit_Framework_Constraint_Not(
-        //         new PHPUnit_Framework_Constraint_StringContains(
-        //             $needle,
-        //             $ignoreCase
-        //         )
-        //     );
-        // } else {
-        //     throw PHPUnit_Util_InvalidArgumentHelper::factory(
-        //         2,
-        //         'array, traversable or string'
-        //     );
-        // }
-        //
-        // static::assertThat($haystack, $constraint, $message);
     }
 
     /**
@@ -198,14 +165,10 @@ abstract class PHPUnit_Framework_Assert {
      */
     public static function assertAttributeNotContains($needle, $haystackAttributeName, $haystackClassOrObject, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false)
     {
-        static::assertNotContains(
-            $needle,
-            static::readAttribute($haystackClassOrObject, $haystackAttributeName),
-            $message,
-            $ignoreCase,
-            $checkForObjectIdentity,
-            $checkForNonObjectIdentity
-        );
+
+      $assertions = AssertionsFactory::factory();
+      return $assertions->assertAttributeNotContains($needle, $haystackAttributeName, $haystackClassOrObject, $message, $ignoreCase, $checkForObjectIdentity, $checkForNonObjectIdentity);
+
     }
 
     /**
@@ -218,29 +181,17 @@ abstract class PHPUnit_Framework_Assert {
      *
      * @since Method available since Release 3.1.4
      */
-    public static function assertContainsOnly($type, $haystack, $isNativeType = null, $message = '')
+    public static function assertContainsOnly($type, $haystack, $isNativeType = false, $message = '')
     {
-        if (!(is_array($haystack) ||
-            is_object($haystack) && $haystack instanceof Traversable)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(
-                2,
-                'array or traversable'
-            );
-        }
-
-        if ($isNativeType == null) {
-            $isNativeType = PHPUnit_Util_Type::isType($type);
-        }
-
-        static::assertThat(
-            $haystack,
-            new PHPUnit_Framework_Constraint_TraversableContainsOnly(
-                $type,
-                $isNativeType
-            ),
-            $message
-        );
+      $assertions = AssertionsFactory::factory();
+      if ( is_bool($isNativeType) != true ) {
+        $isNativeType = false;
+      }
+      return $assertions->assertContainsOnly($type, $haystack, $isNativeType, $message);
     }
+
+    // JEO: Port line.
+    //-------------------------- VVV NOT PORTED VVVV ---------------------------
 
     /**
      * Asserts that a haystack contains only instances of a given classname

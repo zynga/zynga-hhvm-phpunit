@@ -72,16 +72,15 @@ class AssertTest extends PHPUnit_Framework_TestCase {
       DIRECTORY_SEPARATOR;
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::fail
-   */
-  public function testFail() {
+  public function testFail(): void {
     try {
       $this->fail();
     } catch (AssertionFailedException $e) {
-      return $this->assertTrue(true);
+      $this->assertTrue(true);
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return $this->assertTrue(true);
+      $this->assertTrue(true);
+      return;
     }
     throw new AssertionFailedException('Fail did not throw fail exception');
   }
@@ -105,7 +104,7 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     $this->fail();
   }
 
-  public function testAssertArrayContainsObject() {
+  public function testAssertArrayContainsObject(): void {
     $a = new stdClass();
     $b = new stdClass();
 
@@ -122,7 +121,7 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     $this->fail('Expected exceptions for test were not thrown');
   }
 
-  public function testAssertArrayContainsString() {
+  public function testAssertArrayContainsString(): void {
     $this->assertContains('foo', ['foo']);
 
     try {
@@ -136,7 +135,7 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     $this->fail();
   }
 
-  public function testAssertArrayContainsNonObject() {
+  public function testAssertArrayContainsNonObject(): void {
     $this->assertContains('foo', [true]);
 
     try {
@@ -150,10 +149,7 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertContainsOnlyInstancesOf
-   */
-  public function testAssertContainsOnlyInstancesOf() {
+  public function testAssertContainsOnlyInstancesOf(): void {
     $test = [new Book(), new Book()];
     $this->assertContainsOnlyInstancesOf(Book::class, $test);
     $this->assertContainsOnlyInstancesOf(stdClass::class, [new stdClass()]);
@@ -166,26 +162,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     }
     $this->fail();
   }
-
-  // JEO: invalid test function sig arraykey, array, string
-  // /**
-  //  * @covers            PHPUnit_Framework_Assert::assertArrayHasKey
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertArrayHasKeyThrowsExceptionForInvalidFirstArgument()
-  // {
-  //     $this->assertArrayHasKey(null, []);
-  // }
-
-  // JEO: invalid test function sig arraykey, array, string
-  // /**
-  //  * @covers            PHPUnit_Framework_Assert::assertArrayHasKey
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertArrayHasKeyThrowsExceptionForInvalidSecondArgument()
-  // {
-  //     $this->assertArrayHasKey(0, null);
-  // }
 
   public function testAssertArrayHasIntegerKey() {
     $this->assertArrayHasKey(0, ['foo']);
@@ -201,10 +177,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertArraySubset
-   * @covers PHPUnit_Framework_Constraint_ArraySubset
-   */
   public function testAssertArraySubset() {
     $array = [
       'a' => 'item a',
@@ -242,10 +214,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertArraySubset
-   * @covers PHPUnit_Framework_Constraint_ArraySubset
-   */
   public function testAssertArraySubsetWithDeepNestedArrays() {
     $array = ['path' => ['to' => ['the' => ['cake' => 'is a lie']]]];
 
@@ -271,10 +239,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertArraySubset
-   * @covers PHPUnit_Framework_Constraint_ArraySubset
-   */
   public function testAssertArraySubsetWithNoStrictCheckAndObjects() {
     $obj = new stdClass();
     $reference = &$obj;
@@ -650,11 +614,13 @@ class AssertTest extends PHPUnit_Framework_TestCase {
 
     try {
       $this->assertContainsOnly('integer', ['1', 2, 3]);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
-    $this->fail();
+    $this->fail('Failed to catch appropriate exceptions.');
   }
 
   /**
@@ -672,9 +638,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertContainsOnly
-   */
   public function testAssertArrayContainsOnlyStdClass() {
     $this->assertContainsOnly('StdClass', [new stdClass()]);
 
@@ -682,9 +645,12 @@ class AssertTest extends PHPUnit_Framework_TestCase {
       $this->assertContainsOnly('StdClass', ['StdClass']);
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
+    } catch (AssertionFailedException $e) {
+      return;
     }
 
-    $this->fail();
+    $this->fail('Failed to catch appropriate exceptions.');
+
   }
 
   /**
@@ -2236,7 +2202,9 @@ XML;
       return;
     }
 
-    $this->fail();
+    $this->fail(
+      'Failed exception trap, should of raised AssertionFailedException',
+    );
   }
 
   public function testAssertPublicAttributeContainsOnly() {
@@ -2252,7 +2220,10 @@ XML;
       return;
     }
 
-    $this->fail();
+    $this->fail(
+      'Failed exception trap, should of raised AssertionFailedException',
+    );
+
   }
 
   /**
@@ -2271,7 +2242,9 @@ XML;
       return;
     }
 
-    $this->fail();
+    $this->fail(
+      'Failed exception trap, should of raised AssertionFailedException',
+    );
   }
 
   /**

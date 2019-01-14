@@ -11,26 +11,6 @@
 
 namespace SebastianBergmann\PHPUnit;
 
-use SebastianBergmann\PHPUnit\Constraints\Factory as ConstraintFactory;
-use SebastianBergmann\PHPUnit\Constraints\ArrayHasKeyConstraint;
-use SebastianBergmann\PHPUnit\Constraints\ArraySubsetConstraint;
-use SebastianBergmann\PHPUnit\Constraints\StringContainsConstraint;
-use SebastianBergmann\PHPUnit\Constraints\TraversableContainsConstraint;
-use SebastianBergmann\PHPUnit\Constraints\NotConstraint;
-use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
-use SebastianBergmann\PHPUnit\Exceptions\AttributeNotFoundException;
-use SebastianBergmann\PHPUnit\Exceptions\ExpectationFailedException;
-use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentExceptionFactory;
-use SebastianBergmann\PHPUnit\Interfaces\ConstraintInterface;
-use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
-
-use \ArrayAccess;
-use \Exception;
-use \ReflectionClass;
-use \ReflectionException;
-use \ReflectionObject;
-use \ReflectionProperty;
-
 // --
 // JEO: So we broke up the assertions into individual static classes to make
 // them more readable and to keep the 'outward' api interface as light as possible.
@@ -43,12 +23,17 @@ use SebastianBergmann\PHPUnit\Assertions\AssertArrayHasKey;
 use SebastianBergmann\PHPUnit\Assertions\AssertArrayNotHasKey;
 use SebastianBergmann\PHPUnit\Assertions\AssertArraySubset;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeContains;
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertContains;
+use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertThat;
+use SebastianBergmann\PHPUnit\Assertions\AssertTrue;
 use SebastianBergmann\PHPUnit\Assertions\GetObjectAttribute;
 use SebastianBergmann\PHPUnit\Assertions\GetStaticAttribute;
 use SebastianBergmann\PHPUnit\Assertions\ReadAttribute;
+use SebastianBergmann\PHPUnit\Interfaces\ConstraintInterface;
+use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
 
 class Assertions {
 
@@ -225,6 +210,70 @@ class Assertions {
   }
 
   /**
+   * Asserts that a haystack that is stored in a static attribute of a class
+   * or an attribute of an object does not contain a needle.
+   *
+   * @param mixed         $needle
+   * @param string        $haystackAttributeName
+   * @param string|object $haystackClassOrObject
+   * @param string        $message
+   * @param bool          $ignoreCase
+   * @param bool          $checkForObjectIdentity
+   * @param bool          $checkForNonObjectIdentity
+   *
+   * @since Method available since Release 3.0.0
+   */
+  final public function assertAttributeNotContains(
+    mixed $needle,
+    string $haystackAttributeName,
+    mixed $haystackClassOrObject,
+    string $message = '',
+    bool $ignoreCase = false,
+    bool $checkForObjectIdentity = true,
+    bool $checkForNonObjectIdentity = false,
+  ): bool {
+
+    return AssertAttributeNotContains::evaluate(
+      $this,
+      $needle,
+      $haystackAttributeName,
+      $haystackClassOrObject,
+      $message,
+      $ignoreCase,
+      $checkForObjectIdentity,
+      $checkForNonObjectIdentity,
+    );
+
+  }
+
+  /**
+   * Asserts that a haystack contains only values of a given type.
+   *
+   * @param string $type
+   * @param mixed  $haystack
+   * @param bool   $isNativeType
+   * @param string $message
+   *
+   * @since Method available since Release 3.1.4
+   */
+  final public function assertContainsOnly(
+    string $type,
+    mixed $haystack,
+    bool $isNativeType = false,
+    string $message = '',
+  ): bool {
+
+    return AssertContainsOnly::evaluate(
+      $this,
+      $type,
+      $haystack,
+      $isNativeType,
+      $message,
+    );
+
+  }
+
+  /**
    * Evaluates a PHPUnit_Framework_Constraint matcher object.
    *
    * @param mixed                        $value
@@ -266,10 +315,10 @@ class Assertions {
    *
    * @throws AssertionFailedException
    */
-  public function assertTrue(bool $condition, string $message = ''): bool {
-    $constraint = ConstraintFactory::factory('IsTrue');
-    return $this->assertThat($condition, $constraint, $message);
-  }
+  // public function assertTrue(bool $condition, string $message = ''): bool {
+  //   $constraint = ConstraintFactory::factory('IsTrue');
+  //   return $this->assertThat($condition, $constraint, $message);
+  // }
 
   /**
    * Fails a test with the given message.
