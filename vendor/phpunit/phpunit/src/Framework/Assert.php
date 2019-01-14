@@ -118,7 +118,9 @@ abstract class PHPUnit_Framework_Assert {
      * @since Method available since Release 3.0.0
      */
     public static function assertAttributeContains($needle, $haystackAttributeName, $haystackClassOrObject, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false) {
+
       $assertions = AssertionsFactory::factory();
+
       return $assertions->assertAttributeContains(
         $needle,
         $haystackAttributeName,
@@ -128,6 +130,7 @@ abstract class PHPUnit_Framework_Assert {
         $checkForObjectIdentity,
         $checkForNonObjectIdentity
       );
+
     }
 
     /**
@@ -163,8 +166,7 @@ abstract class PHPUnit_Framework_Assert {
      *
      * @since Method available since Release 3.0.0
      */
-    public static function assertAttributeNotContains($needle, $haystackAttributeName, $haystackClassOrObject, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false)
-    {
+    public static function assertAttributeNotContains($needle, $haystackAttributeName, $haystackClassOrObject, $message = '', $ignoreCase = false, $checkForObjectIdentity = true, $checkForNonObjectIdentity = false) {
 
       $assertions = AssertionsFactory::factory();
       return $assertions->assertAttributeNotContains($needle, $haystackAttributeName, $haystackClassOrObject, $message, $ignoreCase, $checkForObjectIdentity, $checkForNonObjectIdentity);
@@ -181,15 +183,18 @@ abstract class PHPUnit_Framework_Assert {
      *
      * @since Method available since Release 3.1.4
      */
-    public static function assertContainsOnly($type, $haystack, $isNativeType = false, $message = '')
-    {
+    public static function assertContainsOnly($type, $haystack, $isNativeType = false, $message = '') {
+
       $assertions = AssertionsFactory::factory();
+
       // JEO, somehow isNativeType is being manipulated at a higher stack level within the php code
       // hacking this if statement in to patch a warning in moving it to be bool only.
       if ( is_bool($isNativeType) != true ) {
         $isNativeType = false;
       }
+
       return $assertions->assertContainsOnly($type, $haystack, $isNativeType, $message);
+
     }
 
     /**
@@ -199,31 +204,12 @@ abstract class PHPUnit_Framework_Assert {
      * @param array|Traversable $haystack
      * @param string            $message
      */
-    public static function assertContainsOnlyInstancesOf($classname, $haystack, $message = '')
-    {
+    public static function assertContainsOnlyInstancesOf($classname, $haystack, $message = '') {
+
       $assertions = AssertionsFactory::factory();
       return $assertions->assertContainsOnlyInstancesOf($classname, $haystack, $message);
-        // if (!(is_array($haystack) ||
-        //     is_object($haystack) && $haystack instanceof Traversable)) {
-        //     throw PHPUnit_Util_InvalidArgumentHelper::factory(
-        //         2,
-        //         'array or traversable'
-        //     );
-        // }
-        //
-        // static::assertThat(
-        //     $haystack,
-        //     new PHPUnit_Framework_Constraint_TraversableContainsOnly(
-        //         $classname,
-        //         false
-        //     ),
-        //     $message
-        // );
+
     }
-
-    // JEO: Port line.
-    //-------------------------- VVV NOT PORTED VVVV ---------------------------
-
 
     /**
      * Asserts that a haystack that is stored in a static attribute of a class
@@ -237,15 +223,16 @@ abstract class PHPUnit_Framework_Assert {
      *
      * @since Method available since Release 3.1.4
      */
-    public static function assertAttributeContainsOnly($type, $haystackAttributeName, $haystackClassOrObject, $isNativeType = null, $message = '')
-    {
-        static::assertContainsOnly(
-            $type,
-            static::readAttribute($haystackClassOrObject, $haystackAttributeName),
-            $isNativeType,
-            $message
-        );
+    public static function assertAttributeContainsOnly($type, $haystackAttributeName, $haystackClassOrObject, $isNativeType = false, $message = '') {
+
+      $assertions = AssertionsFactory::factory();
+
+      return $assertions->assertAttributeCOntainsOnly($type, $haystackAttributeName, $haystackClassOrObject, $isNativeType, $message);
+
     }
+
+    // JEO: Port line.
+    //-------------------------- VVV NOT PORTED VVVV ---------------------------
 
     /**
      * Asserts that a haystack does not contain only values of a given type.

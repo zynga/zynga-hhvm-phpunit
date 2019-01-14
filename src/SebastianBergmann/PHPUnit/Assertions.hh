@@ -28,6 +28,7 @@ use SebastianBergmann\PHPUnit\Assertions\AssertContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnlyInstancesOf;
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertThat;
 use SebastianBergmann\PHPUnit\Assertions\AssertTrue;
 use SebastianBergmann\PHPUnit\Assertions\GetObjectAttribute;
@@ -291,6 +292,37 @@ class Assertions {
       $this,
       $classname,
       $haystack,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that a haystack that is stored in a static attribute of a class
+   * or an attribute of an object contains only values of a given type.
+   *
+   * @param string        $type
+   * @param string        $haystackAttributeName
+   * @param string|object $haystackClassOrObject
+   * @param bool          $isNativeType
+   * @param string        $message
+   *
+   * @since Method available since Release 3.1.4
+   */
+  final public function assertAttributeContainsOnly(
+    string $type,
+    string $haystackAttributeName,
+    mixed $haystackClassOrObject,
+    bool $isNativeType = false,
+    string $message = '',
+  ): bool {
+
+    return AssertAttributeContainsOnly::evaluate(
+      $this,
+      $type,
+      $haystackAttributeName,
+      $haystackClassOrObject,
+      $isNativeType,
       $message,
     );
 
