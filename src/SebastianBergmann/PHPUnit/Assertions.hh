@@ -27,6 +27,7 @@ use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotContains;
+use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnlyInstancesOf;
 use SebastianBergmann\PHPUnit\Assertions\AssertThat;
 use SebastianBergmann\PHPUnit\Assertions\AssertTrue;
 use SebastianBergmann\PHPUnit\Assertions\GetObjectAttribute;
@@ -268,6 +269,28 @@ class Assertions {
       $type,
       $haystack,
       $isNativeType,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that a haystack contains only instances of a given classname
+   *
+   * @param string            $classname
+   * @param array|Traversable $haystack
+   * @param string            $message
+   */
+  final public function assertContainsOnlyInstancesOf(
+    string $classname,
+    mixed $haystack,
+    string $message = '',
+  ): bool {
+
+    return AssertContainsOnlyInstancesOf::evaluate(
+      $this,
+      $classname,
+      $haystack,
       $message,
     );
 

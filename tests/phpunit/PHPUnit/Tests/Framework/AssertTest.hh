@@ -157,6 +157,8 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     $test2 = [new Author('Test')];
     try {
       $this->assertContainsOnlyInstancesOf(Book::class, $test2);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }

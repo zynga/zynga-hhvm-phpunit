@@ -79,7 +79,7 @@ class IsInstanceOfConstraint extends Base {
       return true;
     }
 
-    $reflection = ReflectionClasses::getReflection($this->className);
+    $reflection = ReflectionClasses::getReflection($other);
 
     if (!$reflection instanceof ReflectionClass) {
       return false;

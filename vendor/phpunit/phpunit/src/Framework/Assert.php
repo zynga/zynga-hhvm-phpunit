@@ -184,14 +184,13 @@ abstract class PHPUnit_Framework_Assert {
     public static function assertContainsOnly($type, $haystack, $isNativeType = false, $message = '')
     {
       $assertions = AssertionsFactory::factory();
+      // JEO, somehow isNativeType is being manipulated at a higher stack level within the php code
+      // hacking this if statement in to patch a warning in moving it to be bool only.
       if ( is_bool($isNativeType) != true ) {
         $isNativeType = false;
       }
       return $assertions->assertContainsOnly($type, $haystack, $isNativeType, $message);
     }
-
-    // JEO: Port line.
-    //-------------------------- VVV NOT PORTED VVVV ---------------------------
 
     /**
      * Asserts that a haystack contains only instances of a given classname
@@ -202,23 +201,29 @@ abstract class PHPUnit_Framework_Assert {
      */
     public static function assertContainsOnlyInstancesOf($classname, $haystack, $message = '')
     {
-        if (!(is_array($haystack) ||
-            is_object($haystack) && $haystack instanceof Traversable)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(
-                2,
-                'array or traversable'
-            );
-        }
-
-        static::assertThat(
-            $haystack,
-            new PHPUnit_Framework_Constraint_TraversableContainsOnly(
-                $classname,
-                false
-            ),
-            $message
-        );
+      $assertions = AssertionsFactory::factory();
+      return $assertions->assertContainsOnlyInstancesOf($classname, $haystack, $message);
+        // if (!(is_array($haystack) ||
+        //     is_object($haystack) && $haystack instanceof Traversable)) {
+        //     throw PHPUnit_Util_InvalidArgumentHelper::factory(
+        //         2,
+        //         'array or traversable'
+        //     );
+        // }
+        //
+        // static::assertThat(
+        //     $haystack,
+        //     new PHPUnit_Framework_Constraint_TraversableContainsOnly(
+        //         $classname,
+        //         false
+        //     ),
+        //     $message
+        // );
     }
+
+    // JEO: Port line.
+    //-------------------------- VVV NOT PORTED VVVV ---------------------------
+
 
     /**
      * Asserts that a haystack that is stored in a static attribute of a class
