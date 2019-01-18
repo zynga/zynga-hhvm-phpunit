@@ -633,6 +633,8 @@ class AssertTest extends PHPUnit_Framework_TestCase {
 
     try {
       $this->assertNotContainsOnly('integer', [1, 2, 3]);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -663,6 +665,8 @@ class AssertTest extends PHPUnit_Framework_TestCase {
 
     try {
       $this->assertNotContainsOnly('StdClass', [new stdClass()]);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -2259,6 +2263,8 @@ XML;
 
     try {
       $this->assertAttributeNotContainsOnly('string', 'publicArray', $obj);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }

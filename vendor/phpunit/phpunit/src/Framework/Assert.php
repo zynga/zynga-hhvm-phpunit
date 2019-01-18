@@ -231,9 +231,6 @@ abstract class PHPUnit_Framework_Assert {
 
     }
 
-    // JEO: Port line.
-    //-------------------------- VVV NOT PORTED VVVV ---------------------------
-
     /**
      * Asserts that a haystack does not contain only values of a given type.
      *
@@ -244,30 +241,18 @@ abstract class PHPUnit_Framework_Assert {
      *
      * @since Method available since Release 3.1.4
      */
-    public static function assertNotContainsOnly($type, $haystack, $isNativeType = null, $message = '')
-    {
-        if (!(is_array($haystack) ||
-            is_object($haystack) && $haystack instanceof Traversable)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(
-                2,
-                'array or traversable'
-            );
-        }
+    public static function assertNotContainsOnly($type, $haystack, $isNativeType = false, $message = '') {
 
-        if ($isNativeType == null) {
-            $isNativeType = PHPUnit_Util_Type::isType($type);
-        }
+      $assertions = AssertionsFactory::factory();
 
-        static::assertThat(
-            $haystack,
-            new PHPUnit_Framework_Constraint_Not(
-                new PHPUnit_Framework_Constraint_TraversableContainsOnly(
-                    $type,
-                    $isNativeType
-                )
-            ),
-            $message
-        );
+      // JEO, somehow isNativeType is being manipulated at a higher stack level within the php code
+      // hacking this if statement in to patch a warning in moving it to be bool only.
+      if ( is_bool($isNativeType) != true ) {
+        $isNativeType = false;
+      }
+
+      return $assertions->assertNotContainsOnly($type, $haystack, $isNativeType, $message);
+
     }
 
     /**
@@ -283,15 +268,16 @@ abstract class PHPUnit_Framework_Assert {
      *
      * @since Method available since Release 3.1.4
      */
-    public static function assertAttributeNotContainsOnly($type, $haystackAttributeName, $haystackClassOrObject, $isNativeType = null, $message = '')
-    {
-        static::assertNotContainsOnly(
-            $type,
-            static::readAttribute($haystackClassOrObject, $haystackAttributeName),
-            $isNativeType,
-            $message
-        );
+    public static function assertAttributeNotContainsOnly($type, $haystackAttributeName, $haystackClassOrObject, $isNativeType = false, $message = '') {
+
+      $assertions = AssertionsFactory::factory();
+      
+      return $assertions->assertAttributeNotContainsOnly($type, $haystackAttributeName, $haystackClassOrObject, $isNativeType, $message);
+
     }
+
+    // JEO: Port line.
+    //-------------------------- VVV NOT PORTED VVVV ---------------------------
 
     /**
      * Asserts the number of elements of an array, Countable or Traversable.

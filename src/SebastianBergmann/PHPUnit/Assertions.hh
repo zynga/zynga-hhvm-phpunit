@@ -29,6 +29,8 @@ use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnlyInstancesOf;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeContainsOnly;
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotContainsOnly;
+use SebastianBergmann\PHPUnit\Assertions\AssertNotContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertThat;
 use SebastianBergmann\PHPUnit\Assertions\AssertTrue;
 use SebastianBergmann\PHPUnit\Assertions\GetObjectAttribute;
@@ -318,6 +320,65 @@ class Assertions {
   ): bool {
 
     return AssertAttributeContainsOnly::evaluate(
+      $this,
+      $type,
+      $haystackAttributeName,
+      $haystackClassOrObject,
+      $isNativeType,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that a haystack does not contain only values of a given type.
+   *
+   * @param string $type
+   * @param mixed  $haystack
+   * @param bool   $isNativeType
+   * @param string $message
+   *
+   * @since Method available since Release 3.1.4
+   */
+  final public function assertNotContainsOnly(
+    string $type,
+    mixed $haystack,
+    bool $isNativeType = false,
+    string $message = '',
+  ): bool {
+
+    return AssertNotContainsOnly::evaluate(
+      $this,
+      $type,
+      $haystack,
+      $isNativeType,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that a haystack that is stored in a static attribute of a class
+   * or an attribute of an object does not contain only values of a given
+   * type.
+   *
+   * @param string        $type
+   * @param string        $haystackAttributeName
+   * @param string|object $haystackClassOrObject
+   * @param bool          $isNativeType
+   * @param string        $message
+   *
+   * @since Method available since Release 3.1.4
+   */
+  final public function assertAttributeNotContainsOnly(
+    string $type,
+    string $haystackAttributeName,
+    mixed $haystackClassOrObject,
+    bool $isNativeType = false,
+    string $message = '',
+  ): bool {
+
+    return AssertAttributeNotContainsOnly::evaluate(
       $this,
       $type,
       $haystackAttributeName,
