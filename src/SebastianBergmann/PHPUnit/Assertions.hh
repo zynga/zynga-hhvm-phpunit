@@ -23,14 +23,18 @@ use SebastianBergmann\PHPUnit\Assertions\AssertArrayHasKey;
 use SebastianBergmann\PHPUnit\Assertions\AssertArrayNotHasKey;
 use SebastianBergmann\PHPUnit\Assertions\AssertArraySubset;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeContains;
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeContainsOnly;
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeCount;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotContains;
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotContainsOnly;
+
 use SebastianBergmann\PHPUnit\Assertions\AssertContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnly;
-use SebastianBergmann\PHPUnit\Assertions\AssertNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnlyInstancesOf;
-use SebastianBergmann\PHPUnit\Assertions\AssertAttributeContainsOnly;
-use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotContainsOnly;
+use SebastianBergmann\PHPUnit\Assertions\AssertCount;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotContainsOnly;
+use SebastianBergmann\PHPUnit\Assertions\AssertNotContains;
+
 use SebastianBergmann\PHPUnit\Assertions\AssertThat;
 use SebastianBergmann\PHPUnit\Assertions\AssertTrue;
 use SebastianBergmann\PHPUnit\Assertions\GetObjectAttribute;
@@ -384,6 +388,51 @@ class Assertions {
       $haystackAttributeName,
       $haystackClassOrObject,
       $isNativeType,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts the number of elements of an array, Countable or Traversable.
+   *
+   * @param int    $expectedCount
+   * @param mixed  $haystack
+   * @param string $message
+   */
+  final public function assertCount(
+    int $expectedCount,
+    mixed $haystack,
+    string $message = '',
+  ): bool {
+
+    return AssertCount::evaluate($this, $expectedCount, $haystack, $message);
+
+  }
+
+  /**
+   * Asserts the number of elements of an array, Countable or Traversable
+   * that is stored in an attribute.
+   *
+   * @param int           $expectedCount
+   * @param string        $haystackAttributeName
+   * @param string|object $haystackClassOrObject
+   * @param string        $message
+   *
+   * @since Method available since Release 3.6.0
+   */
+  final public function assertAttributeCount(
+    int $expectedCount,
+    string $haystackAttributeName,
+    mixed $haystackClassOrObject,
+    string $message = '',
+  ): bool {
+
+    return AssertAttributeCount::evaluate(
+      $this,
+      $expectedCount,
+      $haystackAttributeName,
+      $haystackClassOrObject,
       $message,
     );
 

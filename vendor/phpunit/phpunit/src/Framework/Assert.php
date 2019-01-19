@@ -271,13 +271,10 @@ abstract class PHPUnit_Framework_Assert {
     public static function assertAttributeNotContainsOnly($type, $haystackAttributeName, $haystackClassOrObject, $isNativeType = false, $message = '') {
 
       $assertions = AssertionsFactory::factory();
-      
+
       return $assertions->assertAttributeNotContainsOnly($type, $haystackAttributeName, $haystackClassOrObject, $isNativeType, $message);
 
     }
-
-    // JEO: Port line.
-    //-------------------------- VVV NOT PORTED VVVV ---------------------------
 
     /**
      * Asserts the number of elements of an array, Countable or Traversable.
@@ -286,23 +283,12 @@ abstract class PHPUnit_Framework_Assert {
      * @param mixed  $haystack
      * @param string $message
      */
-    public static function assertCount($expectedCount, $haystack, $message = '')
-    {
-        if (!is_int($expectedCount)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'integer');
-        }
+    public static function assertCount($expectedCount, $haystack, $message = '') {
 
-        if (!$haystack instanceof Countable &&
-            !$haystack instanceof Traversable &&
-            !is_array($haystack)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(2, 'countable or traversable');
-        }
+        $assertions = AssertionsFactory::factory();
 
-        static::assertThat(
-            $haystack,
-            new PHPUnit_Framework_Constraint_Count($expectedCount),
-            $message
-        );
+        return $assertions->assertCount($expectedCount, $haystack, $message);
+
     }
 
     /**
@@ -316,13 +302,12 @@ abstract class PHPUnit_Framework_Assert {
      *
      * @since Method available since Release 3.6.0
      */
-    public static function assertAttributeCount($expectedCount, $haystackAttributeName, $haystackClassOrObject, $message = '')
-    {
-        static::assertCount(
-            $expectedCount,
-            static::readAttribute($haystackClassOrObject, $haystackAttributeName),
-            $message
-        );
+    public static function assertAttributeCount($expectedCount, $haystackAttributeName, $haystackClassOrObject, $message = '') {
+
+      $assertions = AssertionsFactory::factory();
+
+      return $assertions->assertAttributeCount($expectedCount, $haystackAttributeName, $haystackClassOrObject, $message);
+        
     }
 
     /**
@@ -370,6 +355,9 @@ abstract class PHPUnit_Framework_Assert {
             $message
         );
     }
+
+    // JEO: Port line.
+    //-------------------------- VVV NOT PORTED VVVV ---------------------------
 
     /**
      * Asserts that two variables are equal.
@@ -2793,8 +2781,7 @@ abstract class PHPUnit_Framework_Assert {
      *
      * @since Method available since Release 3.3.3
      */
-    public static function getCount()
-    {
+    public static function getCount() {
       $assertions = AssertionsFactory::factory();
       return $assertions->count()->get();
     }
@@ -2804,9 +2791,9 @@ abstract class PHPUnit_Framework_Assert {
      *
      * @since Method available since Release 3.3.3
      */
-    public static function resetCount()
-    {
+    public static function resetCount() {
       $assertions = AssertionsFactory::factory();
       return $assertions->count()->reset();
     }
+
 }
