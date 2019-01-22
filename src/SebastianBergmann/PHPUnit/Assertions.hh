@@ -32,6 +32,7 @@ use SebastianBergmann\PHPUnit\Assertions\AssertContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnlyInstancesOf;
 use SebastianBergmann\PHPUnit\Assertions\AssertCount;
+use SebastianBergmann\PHPUnit\Assertions\AssertEquals;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotCount;
@@ -480,6 +481,40 @@ class Assertions {
       $haystackAttributeName,
       $haystackClassOrObject,
       $message,
+    );
+
+  }
+
+  /**
+   * Asserts that two variables are equal.
+   *
+   * @param mixed  $expected
+   * @param mixed  $actual
+   * @param string $message
+   * @param float  $delta
+   * @param int    $maxDepth
+   * @param bool   $canonicalize
+   * @param bool   $ignoreCase
+   */
+  final public function assertEquals(
+    mixed $expected,
+    mixed $actual,
+    string $message = '',
+    float $delta = 0.0,
+    int $maxDepth = 10,
+    bool $canonicalize = false,
+    bool $ignoreCase = false,
+  ): bool {
+
+    return AssertEquals::evaluate(
+      $this,
+      $expected,
+      $actual,
+      $message,
+      $delta,
+      $maxDepth,
+      $canonicalize,
+      $ignoreCase,
     );
 
   }

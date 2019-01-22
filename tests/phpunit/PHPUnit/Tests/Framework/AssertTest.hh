@@ -1047,6 +1047,8 @@ class AssertTest extends PHPUnit_Framework_TestCase {
   ) {
     try {
       $this->assertEquals($a, $b, '', $delta, 10, $canonicalize, $ignoreCase);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -1153,6 +1155,8 @@ class AssertTest extends PHPUnit_Framework_TestCase {
         $this->getFilesDirectory().'foo.xml',
         $this->getFilesDirectory().'bar.xml',
       );
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -1189,6 +1193,8 @@ class AssertTest extends PHPUnit_Framework_TestCase {
         $this->getFilesDirectory().'foo.xml',
         file_get_contents($this->getFilesDirectory().'bar.xml'),
       );
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -1219,6 +1225,8 @@ class AssertTest extends PHPUnit_Framework_TestCase {
 
     try {
       $this->assertXmlStringEqualsXmlString('<foo/>', '<bar/>');
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -1281,42 +1289,56 @@ XML;
     );
   }
 
-  /**
-   * @expectedException PHPUnit_Framework_ExpectationFailedException
-   */
   public function testXMLStructureWrongNumberOfAttributes() {
-    $expected = new DOMDocument();
-    $expected->load($this->getFilesDirectory().'structureExpected.xml');
 
-    $actual = new DOMDocument();
-    $actual->load(
-      $this->getFilesDirectory().'structureWrongNumberOfAttributes.xml',
-    );
+    try {
+      $expected = new DOMDocument();
+      $expected->load($this->getFilesDirectory().'structureExpected.xml');
 
-    $this->assertEqualXMLStructure(
-      $expected->firstChild,
-      $actual->firstChild,
-      true,
-    );
+      $actual = new DOMDocument();
+      $actual->load(
+        $this->getFilesDirectory().'structureWrongNumberOfAttributes.xml',
+      );
+
+      $this->assertEqualXMLStructure(
+        $expected->firstChild,
+        $actual->firstChild,
+        true,
+      );
+
+    } catch (AssertionFailedException $e) {
+      $this->assertTrue(true);
+      return;
+    } catch (PHPUnit_Framework_ExpectationFailedException $e) {
+      $this->assertTrue(true);
+      return;
+    }
+
+    $this->fail('Failed emitting assertion failure exception.');
+
   }
 
-  /**
-   * @expectedException PHPUnit_Framework_ExpectationFailedException
-   */
   public function testXMLStructureWrongNumberOfNodes() {
-    $expected = new DOMDocument();
-    $expected->load($this->getFilesDirectory().'structureExpected.xml');
+    try {
+      $expected = new DOMDocument();
+      $expected->load($this->getFilesDirectory().'structureExpected.xml');
 
-    $actual = new DOMDocument();
-    $actual->load(
-      $this->getFilesDirectory().'structureWrongNumberOfNodes.xml',
-    );
+      $actual = new DOMDocument();
+      $actual->load(
+        $this->getFilesDirectory().'structureWrongNumberOfNodes.xml',
+      );
 
-    $this->assertEqualXMLStructure(
-      $expected->firstChild,
-      $actual->firstChild,
-      true,
-    );
+      $this->assertEqualXMLStructure(
+        $expected->firstChild,
+        $actual->firstChild,
+        true,
+      );
+    } catch (AssertionFailedException $e) {
+      return;
+    } catch (PHPUnit_Framework_ExpectationFailedException $e) {
+      return;
+    }
+    $this->fail('Did not emit expected assertion failure');
   }
 
   public function testXMLStructureIsSameButDataIsNot() {
@@ -1371,6 +1393,8 @@ XML;
 
     try {
       $this->assertEquals('0', 1);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -1644,6 +1668,8 @@ XML;
 
     try {
       $this->assertSame(true, false);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -1682,9 +1708,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertNotSame
-   */
   public function testAssertNotSameFailsNull() {
     try {
       $this->assertNotSame(null, null);
@@ -1695,9 +1718,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertGreaterThan
-   */
   public function testGreaterThan() {
     $this->assertGreaterThan(1, 2);
 
@@ -1710,9 +1730,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertAttributeGreaterThan
-   */
   public function testAttributeGreaterThan() {
     $this->assertAttributeGreaterThan(
       1,
@@ -1733,9 +1750,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertGreaterThanOrEqual
-   */
   public function testGreaterThanOrEqual() {
     $this->assertGreaterThanOrEqual(1, 2);
 
@@ -1748,9 +1762,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertAttributeGreaterThanOrEqual
-   */
   public function testAttributeGreaterThanOrEqual() {
     $this->assertAttributeGreaterThanOrEqual(
       1,
@@ -1771,9 +1782,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertLessThan
-   */
   public function testLessThan() {
     $this->assertLessThan(2, 1);
 
@@ -1786,9 +1794,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertAttributeLessThan
-   */
   public function testAttributeLessThan() {
     $this->assertAttributeLessThan(
       2,
@@ -1809,9 +1814,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertLessThanOrEqual
-   */
   public function testLessThanOrEqual() {
     $this->assertLessThanOrEqual(2, 1);
 
@@ -1824,9 +1826,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertAttributeLessThanOrEqual
-   */
   public function testAttributeLessThanOrEqual() {
     $this->assertAttributeLessThanOrEqual(
       2,
@@ -1847,11 +1846,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::readAttribute
-   * @covers PHPUnit_Framework_Assert::getStaticAttribute
-   * @covers PHPUnit_Framework_Assert::getObjectAttribute
-   */
   public function testReadAttribute() {
     $obj = new ClassWithNonPublicAttributes();
 
@@ -1874,11 +1868,6 @@ XML;
     //$this->assertEquals('bar', static::readAttribute($obj, 'privateParentAttribute'));
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::readAttribute
-   * @covers PHPUnit_Framework_Assert::getStaticAttribute
-   * @covers PHPUnit_Framework_Assert::getObjectAttribute
-   */
   public function testReadAttribute2() {
     $this->assertEquals(
       'foo',
@@ -2254,6 +2243,8 @@ XML;
 
     try {
       $this->assertAttributeEquals('bar', 'publicAttribute', $obj);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -2310,6 +2301,8 @@ XML;
 
     try {
       $this->assertAttributeEquals('foo', 'protectedAttribute', $obj);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -2331,9 +2324,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertAttributeEquals
-   */
   public function testAssertPrivateAttributeEquals() {
     $obj = new ClassWithNonPublicAttributes();
 
@@ -2341,6 +2331,8 @@ XML;
 
     try {
       $this->assertAttributeEquals('foo', 'privateAttribute', $obj);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -2365,9 +2357,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertAttributeEquals
-   */
   public function testAssertPublicStaticAttributeEquals() {
     $this->assertAttributeEquals(
       'foo',
@@ -2381,6 +2370,8 @@ XML;
         'publicStaticAttribute',
         ClassWithNonPublicAttributes::class,
       );
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -2411,9 +2402,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertAttributeEquals
-   */
   public function testAssertProtectedStaticAttributeEquals() {
     $this->assertAttributeEquals(
       'bar',
@@ -2427,6 +2415,8 @@ XML;
         'protectedStaticAttribute',
         ClassWithNonPublicAttributes::class,
       );
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -2457,9 +2447,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertAttributeEquals
-   */
   public function testAssertPrivateStaticAttributeEquals() {
     $this->assertAttributeEquals(
       'baz',
@@ -2473,6 +2460,8 @@ XML;
         'privateStaticAttribute',
         ClassWithNonPublicAttributes::class,
       );
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -3196,9 +3185,6 @@ XML;
     $this->assertThat([1], $this->countOf(1));
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertFileEquals
-   */
   public function testAssertFileEquals() {
     $this->assertFileEquals(
       $this->getFilesDirectory().'foo.xml',
@@ -3210,6 +3196,8 @@ XML;
         $this->getFilesDirectory().'foo.xml',
         $this->getFilesDirectory().'bar.xml',
       );
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -3238,10 +3226,8 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertStringEqualsFile
-   */
   public function testAssertStringEqualsFile() {
+
     $this->assertStringEqualsFile(
       $this->getFilesDirectory().'foo.xml',
       file_get_contents($this->getFilesDirectory().'foo.xml'),
@@ -3252,11 +3238,13 @@ XML;
         $this->getFilesDirectory().'foo.xml',
         file_get_contents($this->getFilesDirectory().'bar.xml'),
       );
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
-    $this->fail();
+    $this->fail('Did not trap AssertionFailedException on differing files');
   }
 
   /**

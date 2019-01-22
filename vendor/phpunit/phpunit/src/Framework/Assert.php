@@ -341,16 +341,11 @@ abstract class PHPUnit_Framework_Assert {
       $assertions = AssertionsFactory::factory();
 
       return $assertions->assertAttributeNotCount($expectedCount, $haystackAttributeName, $haystackClassOrObject, $message);
-      
-        // static::assertNotCount(
-        //     $expectedCount,
-        //     static::readAttribute($haystackClassOrObject, $haystackAttributeName),
-        //     $message
-        // );
+
     }
 
-    // JEO: Port line.
-    //-------------------------- VVV NOT PORTED VVVV ---------------------------
+    //-------------------------- VVVV -INPROGRESS- PORTING VVVV ---------------------------
+    // JEO: Start Port line.
 
     /**
      * Asserts that two variables are equal.
@@ -363,17 +358,16 @@ abstract class PHPUnit_Framework_Assert {
      * @param bool   $canonicalize
      * @param bool   $ignoreCase
      */
-    public static function assertEquals($expected, $actual, $message = '', $delta = 0.0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false)
-    {
-        $constraint = new PHPUnit_Framework_Constraint_IsEqual(
-            $expected,
-            $delta,
-            $maxDepth,
-            $canonicalize,
-            $ignoreCase
-        );
+    public static function assertEquals($expected, $actual, $message = '', $delta = 0.0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false) {
 
-        static::assertThat($actual, $constraint, $message);
+      $assertions = AssertionsFactory::factory();
+
+      if ( is_float($delta) != true ) {
+        $delta = floatval($delta);
+      }
+      
+      return $assertions->assertEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
+
     }
 
     /**
@@ -453,6 +447,10 @@ abstract class PHPUnit_Framework_Assert {
             $ignoreCase
         );
     }
+
+    // JEO: END Port line.
+    //-------------------------- VVVV -REALLY- NOT PORTED VVVV ---------------------------
+
 
     /**
      * Asserts that a variable is empty.
