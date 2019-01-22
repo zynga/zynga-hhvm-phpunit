@@ -25,6 +25,7 @@ use SebastianBergmann\PHPUnit\Assertions\AssertArraySubset;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeCount;
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeEquals;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotCount;
@@ -510,6 +511,43 @@ class Assertions {
       $this,
       $expected,
       $actual,
+      $message,
+      $delta,
+      $maxDepth,
+      $canonicalize,
+      $ignoreCase,
+    );
+
+  }
+
+  /**
+   * Asserts that a variable is equal to an attribute of an object.
+   *
+   * @param mixed         $expected
+   * @param string        $actualAttributeName
+   * @param string|object $actualClassOrObject
+   * @param string        $message
+   * @param float         $delta
+   * @param int           $maxDepth
+   * @param bool          $canonicalize
+   * @param bool          $ignoreCase
+   */
+  public function assertAttributeEquals(
+    mixed $expected,
+    string $actualAttributeName,
+    mixed $actualClassOrObject,
+    string $message = '',
+    float $delta = 0.0,
+    int $maxDepth = 10,
+    bool $canonicalize = false,
+    bool $ignoreCase = false,
+  ): bool {
+
+    return AssertAttributeEquals::evaluate(
+      $this,
+      $expected,
+      $actualAttributeName,
+      $actualClassOrObject,
       $message,
       $delta,
       $maxDepth,

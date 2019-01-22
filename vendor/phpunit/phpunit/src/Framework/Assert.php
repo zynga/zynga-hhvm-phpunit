@@ -367,10 +367,6 @@ abstract class PHPUnit_Framework_Assert {
 
     }
 
-    //-------------------------- VVVV -INPROGRESS- PORTING VVVV ---------------------------
-    // JEO: Start Port line.
-
-
     /**
      * Asserts that a variable is equal to an attribute of an object.
      *
@@ -383,18 +379,25 @@ abstract class PHPUnit_Framework_Assert {
      * @param bool          $canonicalize
      * @param bool          $ignoreCase
      */
-    public static function assertAttributeEquals($expected, $actualAttributeName, $actualClassOrObject, $message = '', $delta = 0.0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false)
-    {
-        static::assertEquals(
-            $expected,
-            static::readAttribute($actualClassOrObject, $actualAttributeName),
-            $message,
-            $delta,
-            $maxDepth,
-            $canonicalize,
-            $ignoreCase
-        );
+    public static function assertAttributeEquals($expected, $actualAttributeName, $actualClassOrObject, $message = '', $delta = 0.0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false) {
+
+      $assertions = AssertionsFactory::factory();
+
+      return $assertions->assertAttributeEquals($expected, $actualAttributeName, $actualClassOrObject, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
+        //
+        // static::assertEquals(
+        //     $expected,
+        //     static::readAttribute($actualClassOrObject, $actualAttributeName),
+        //     $message,
+        //     $delta,
+        //     $maxDepth,
+        //     $canonicalize,
+        //     $ignoreCase
+        // );
     }
+
+    //-------------------------- VVVV -INPROGRESS- PORTING VVVV ---------------------------
+    // JEO: Start Port line.
 
     /**
      * Asserts that two variables are not equal.
