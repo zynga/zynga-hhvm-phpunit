@@ -323,21 +323,6 @@ abstract class PHPUnit_Framework_Assert {
 
       return $assertions->assertNotCount($expectedCount, $haystack, $message);
 
-        // if (!is_int($expectedCount)) {
-        //     throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'integer');
-        // }
-        //
-        // if (!$haystack instanceof Countable &&
-        //     !$haystack instanceof Traversable &&
-        //     !is_array($haystack)) {
-        //     throw PHPUnit_Util_InvalidArgumentHelper::factory(2, 'countable or traversable');
-        // }
-        //
-        // $constraint = new PHPUnit_Framework_Constraint_Not(
-        //     new PHPUnit_Framework_Constraint_Count($expectedCount)
-        // );
-        //
-        // static::assertThat($haystack, $constraint, $message);
     }
 
     /**
@@ -351,13 +336,17 @@ abstract class PHPUnit_Framework_Assert {
      *
      * @since Method available since Release 3.6.0
      */
-    public static function assertAttributeNotCount($expectedCount, $haystackAttributeName, $haystackClassOrObject, $message = '')
-    {
-        static::assertNotCount(
-            $expectedCount,
-            static::readAttribute($haystackClassOrObject, $haystackAttributeName),
-            $message
-        );
+    public static function assertAttributeNotCount($expectedCount, $haystackAttributeName, $haystackClassOrObject, $message = '') {
+
+      $assertions = AssertionsFactory::factory();
+
+      return $assertions->assertAttributeNotCount($expectedCount, $haystackAttributeName, $haystackClassOrObject, $message);
+      
+        // static::assertNotCount(
+        //     $expectedCount,
+        //     static::readAttribute($haystackClassOrObject, $haystackAttributeName),
+        //     $message
+        // );
     }
 
     // JEO: Port line.

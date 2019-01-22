@@ -27,7 +27,7 @@ use SebastianBergmann\PHPUnit\Assertions\AssertAttributeContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeCount;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotContainsOnly;
-
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotCount;
 use SebastianBergmann\PHPUnit\Assertions\AssertContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnlyInstancesOf;
@@ -453,6 +453,34 @@ class Assertions {
 
     return
       AssertNotCount::evaluate($this, $expectedCount, $haystack, $message);
+
+  }
+
+  /**
+   * Asserts the number of elements of an array, Countable or Traversable
+   * that is stored in an attribute.
+   *
+   * @param int           $expectedCount
+   * @param string        $haystackAttributeName
+   * @param string|object $haystackClassOrObject
+   * @param string        $message
+   *
+   * @since Method available since Release 3.6.0
+   */
+  final public function assertAttributeNotCount(
+    int $expectedCount,
+    string $haystackAttributeName,
+    mixed $haystackClassOrObject,
+    string $message = '',
+  ): bool {
+
+    return AssertAttributeNotCount::evaluate(
+      $this,
+      $expectedCount,
+      $haystackAttributeName,
+      $haystackClassOrObject,
+      $message,
+    );
 
   }
 
