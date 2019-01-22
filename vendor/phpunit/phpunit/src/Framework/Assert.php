@@ -344,9 +344,6 @@ abstract class PHPUnit_Framework_Assert {
 
     }
 
-    //-------------------------- VVVV -INPROGRESS- PORTING VVVV ---------------------------
-    // JEO: Start Port line.
-
     /**
      * Asserts that two variables are equal.
      *
@@ -365,10 +362,14 @@ abstract class PHPUnit_Framework_Assert {
       if ( is_float($delta) != true ) {
         $delta = floatval($delta);
       }
-      
+
       return $assertions->assertEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
 
     }
+
+    //-------------------------- VVVV -INPROGRESS- PORTING VVVV ---------------------------
+    // JEO: Start Port line.
+
 
     /**
      * Asserts that a variable is equal to an attribute of an object.
