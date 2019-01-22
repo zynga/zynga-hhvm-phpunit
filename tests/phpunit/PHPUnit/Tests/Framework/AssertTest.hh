@@ -3667,6 +3667,8 @@ XML;
 
     try {
       $this->assertNotCount(2, [1, 2]);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -3683,11 +3685,19 @@ XML;
   //     $this->assertNotCount('a', []);
   // }
 
-  /**
-   * @expectedException PHPUnit_Framework_Exception
-   */
   public function testAssertNotCountThrowsExceptionIfElementIsNotCountable() {
-    $this->assertNotCount(2, '');
+
+    try {
+      $this->assertNotCount(2, '');
+    } catch (InvalidArgumentException $e) {
+      $this->assertTrue(true);
+      return;
+    } catch (PHPUnit_Framework_Exception $e) {
+      $this->assertTrue(true);
+      return;
+    }
+    $this->fail('Did not catch invalid argument expected exception.');
+
   }
 
   public function testAssertAttributeNotCount() {

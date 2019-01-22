@@ -307,7 +307,7 @@ abstract class PHPUnit_Framework_Assert {
       $assertions = AssertionsFactory::factory();
 
       return $assertions->assertAttributeCount($expectedCount, $haystackAttributeName, $haystackClassOrObject, $message);
-        
+
     }
 
     /**
@@ -317,23 +317,27 @@ abstract class PHPUnit_Framework_Assert {
      * @param mixed  $haystack
      * @param string $message
      */
-    public static function assertNotCount($expectedCount, $haystack, $message = '')
-    {
-        if (!is_int($expectedCount)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'integer');
-        }
+    public static function assertNotCount($expectedCount, $haystack, $message = '') {
 
-        if (!$haystack instanceof Countable &&
-            !$haystack instanceof Traversable &&
-            !is_array($haystack)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(2, 'countable or traversable');
-        }
+      $assertions = AssertionsFactory::factory();
 
-        $constraint = new PHPUnit_Framework_Constraint_Not(
-            new PHPUnit_Framework_Constraint_Count($expectedCount)
-        );
+      return $assertions->assertNotCount($expectedCount, $haystack, $message);
 
-        static::assertThat($haystack, $constraint, $message);
+        // if (!is_int($expectedCount)) {
+        //     throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'integer');
+        // }
+        //
+        // if (!$haystack instanceof Countable &&
+        //     !$haystack instanceof Traversable &&
+        //     !is_array($haystack)) {
+        //     throw PHPUnit_Util_InvalidArgumentHelper::factory(2, 'countable or traversable');
+        // }
+        //
+        // $constraint = new PHPUnit_Framework_Constraint_Not(
+        //     new PHPUnit_Framework_Constraint_Count($expectedCount)
+        // );
+        //
+        // static::assertThat($haystack, $constraint, $message);
     }
 
     /**

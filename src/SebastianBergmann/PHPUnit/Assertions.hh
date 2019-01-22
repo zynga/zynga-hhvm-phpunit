@@ -34,7 +34,7 @@ use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnlyInstancesOf;
 use SebastianBergmann\PHPUnit\Assertions\AssertCount;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotContains;
-
+use SebastianBergmann\PHPUnit\Assertions\AssertNotCount;
 use SebastianBergmann\PHPUnit\Assertions\AssertThat;
 use SebastianBergmann\PHPUnit\Assertions\AssertTrue;
 use SebastianBergmann\PHPUnit\Assertions\GetObjectAttribute;
@@ -435,6 +435,24 @@ class Assertions {
       $haystackClassOrObject,
       $message,
     );
+
+  }
+
+  /**
+   * Asserts the number of elements of an array, Countable or Traversable.
+   *
+   * @param int    $expectedCount
+   * @param mixed  $haystack
+   * @param string $message
+   */
+  final public function assertNotCount(
+    int $expectedCount,
+    mixed $haystack,
+    string $message = '',
+  ): bool {
+
+    return
+      AssertNotCount::evaluate($this, $expectedCount, $haystack, $message);
 
   }
 
