@@ -37,6 +37,7 @@ use SebastianBergmann\PHPUnit\Assertions\AssertEquals;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotCount;
+use SebastianBergmann\PHPUnit\Assertions\AssertNotEquals;
 use SebastianBergmann\PHPUnit\Assertions\AssertThat;
 use SebastianBergmann\PHPUnit\Assertions\AssertTrue;
 use SebastianBergmann\PHPUnit\Assertions\GetObjectAttribute;
@@ -532,7 +533,7 @@ class Assertions {
    * @param bool          $canonicalize
    * @param bool          $ignoreCase
    */
-  public function assertAttributeEquals(
+  final public function assertAttributeEquals(
     mixed $expected,
     string $actualAttributeName,
     mixed $actualClassOrObject,
@@ -548,6 +549,42 @@ class Assertions {
       $expected,
       $actualAttributeName,
       $actualClassOrObject,
+      $message,
+      $delta,
+      $maxDepth,
+      $canonicalize,
+      $ignoreCase,
+    );
+
+  }
+
+  /**
+   * Asserts that two variables are not equal.
+   *
+   * @param mixed  $expected
+   * @param mixed  $actual
+   * @param string $message
+   * @param float  $delta
+   * @param int    $maxDepth
+   * @param bool   $canonicalize
+   * @param bool   $ignoreCase
+   *
+   * @since Method available since Release 2.3.0
+   */
+  final public function assertNotEquals(
+    mixed $expected,
+    mixed $actual,
+    string $message = '',
+    float $delta = 0.0,
+    int $maxDepth = 10,
+    bool $canonicalize = false,
+    bool $ignoreCase = false,
+  ): bool {
+
+    return AssertNotEquals::evaluate(
+      $this,
+      $expected,
+      $actual,
       $message,
       $delta,
       $maxDepth,

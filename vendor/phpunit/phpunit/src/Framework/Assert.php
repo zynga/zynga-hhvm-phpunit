@@ -17,24 +17,13 @@ use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentException;
 // --
 // We are in the process of porting all of these assertion bits into hacklang
 // strict code. You will see a common pattern of:
-//  try {
+//
 //   $assertions = AssertionsFactory::factory();
 //   return $assertions->assertArrayHasKey($key, $array, $message);
-// } catch ( AssertionFailedException $e ) {
-//   throw new PHPUnit_Framework_AssertionFailedError(
-//     $e->getMessage(),
-//     $e->getCode()
-//   );
-// } catch ( InvalidArgumentException $e ) {
-//   throw new PHPUnit_Framework_Exception(
-//     $e->getMessage(),
-//     $e->getCode()
-//   );
-// }
-// --
-// Note: The exception message / code clone is on purpose as the amount of cpu
-// consumed in order to use _Exception($e) exceeds the value of the extended
-// verbosity of the stack trace from the inner exception.
+//
+// When we complete all the porting, we will be attempting removal of the base
+//  level class of PHPUnit_Framework_Assert
+//
 // --
 /**
  * A set of assert methods.
@@ -384,16 +373,7 @@ abstract class PHPUnit_Framework_Assert {
       $assertions = AssertionsFactory::factory();
 
       return $assertions->assertAttributeEquals($expected, $actualAttributeName, $actualClassOrObject, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
-        //
-        // static::assertEquals(
-        //     $expected,
-        //     static::readAttribute($actualClassOrObject, $actualAttributeName),
-        //     $message,
-        //     $delta,
-        //     $maxDepth,
-        //     $canonicalize,
-        //     $ignoreCase
-        // );
+
     }
 
     //-------------------------- VVVV -INPROGRESS- PORTING VVVV ---------------------------
@@ -412,19 +392,27 @@ abstract class PHPUnit_Framework_Assert {
      *
      * @since Method available since Release 2.3.0
      */
-    public static function assertNotEquals($expected, $actual, $message = '', $delta = 0.0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false)
-    {
-        $constraint = new PHPUnit_Framework_Constraint_Not(
-            new PHPUnit_Framework_Constraint_IsEqual(
-                $expected,
-                $delta,
-                $maxDepth,
-                $canonicalize,
-                $ignoreCase
-            )
-        );
+    public static function assertNotEquals($expected, $actual, $message = '', $delta = 0.0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false) {
 
-        static::assertThat($actual, $constraint, $message);
+      $assertions = AssertionsFactory::factory();
+
+      if ( ! is_float($delta) ) {
+        $delta = floatval($delta);
+      }
+      
+      return $assertions->assertNotEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
+
+        // $constraint = new PHPUnit_Framework_Constraint_Not(
+        //     new PHPUnit_Framework_Constraint_IsEqual(
+        //         $expected,
+        //         $delta,
+        //         $maxDepth,
+        //         $canonicalize,
+        //         $ignoreCase
+        //     )
+        // );
+        //
+        // static::assertThat($actual, $constraint, $message);
     }
 
     /**
