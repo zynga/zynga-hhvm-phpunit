@@ -376,9 +376,6 @@ abstract class PHPUnit_Framework_Assert {
 
     }
 
-    //-------------------------- VVVV -INPROGRESS- PORTING VVVV ---------------------------
-    // JEO: Start Port line.
-
     /**
      * Asserts that two variables are not equal.
      *
@@ -399,20 +396,9 @@ abstract class PHPUnit_Framework_Assert {
       if ( ! is_float($delta) ) {
         $delta = floatval($delta);
       }
-      
+
       return $assertions->assertNotEquals($expected, $actual, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
 
-        // $constraint = new PHPUnit_Framework_Constraint_Not(
-        //     new PHPUnit_Framework_Constraint_IsEqual(
-        //         $expected,
-        //         $delta,
-        //         $maxDepth,
-        //         $canonicalize,
-        //         $ignoreCase
-        //     )
-        // );
-        //
-        // static::assertThat($actual, $constraint, $message);
     }
 
     /**
@@ -427,22 +413,17 @@ abstract class PHPUnit_Framework_Assert {
      * @param bool          $canonicalize
      * @param bool          $ignoreCase
      */
-    public static function assertAttributeNotEquals($expected, $actualAttributeName, $actualClassOrObject, $message = '', $delta = 0.0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false)
-    {
-        static::assertNotEquals(
-            $expected,
-            static::readAttribute($actualClassOrObject, $actualAttributeName),
-            $message,
-            $delta,
-            $maxDepth,
-            $canonicalize,
-            $ignoreCase
-        );
+    public static function assertAttributeNotEquals($expected, $actualAttributeName, $actualClassOrObject, $message = '', $delta = 0.0, $maxDepth = 10, $canonicalize = false, $ignoreCase = false) {
+
+      $assertions = AssertionsFactory::factory();
+
+      if ( ! is_float($delta) ) {
+        $delta = floatval($delta);
+      }
+
+      return $assertions->assertAttributeNotEquals($expected, $actualAttributeName, $actualClassOrObject, $message, $delta, $maxDepth, $canonicalize, $ignoreCase);
+
     }
-
-    // JEO: END Port line.
-    //-------------------------- VVVV -REALLY- NOT PORTED VVVV ---------------------------
-
 
     /**
      * Asserts that a variable is empty.
@@ -454,7 +435,11 @@ abstract class PHPUnit_Framework_Assert {
      */
     public static function assertEmpty($actual, $message = '')
     {
-        static::assertThat($actual, static::isEmpty(), $message);
+
+      $assertions = AssertionsFactory::factory();
+
+      return $assertions->assertEmpty($actual, $message);
+
     }
 
     /**
@@ -467,12 +452,12 @@ abstract class PHPUnit_Framework_Assert {
      *
      * @since Method available since Release 3.5.0
      */
-    public static function assertAttributeEmpty($haystackAttributeName, $haystackClassOrObject, $message = '')
-    {
-        static::assertEmpty(
-            static::readAttribute($haystackClassOrObject, $haystackAttributeName),
-            $message
-        );
+    public static function assertAttributeEmpty($haystackAttributeName, $haystackClassOrObject, $message = '') {
+
+      $assertions = AssertionsFactory::factory();
+
+      return $assertions->assertAttributeEmpty($haystackAttributeName, $haystackClassOrObject, $message);
+
     }
 
     /**
@@ -483,9 +468,12 @@ abstract class PHPUnit_Framework_Assert {
      *
      * @throws PHPUnit_Framework_AssertionFailedError
      */
-    public static function assertNotEmpty($actual, $message = '')
-    {
-        static::assertThat($actual, static::logicalNot(static::isEmpty()), $message);
+    public static function assertNotEmpty($actual, $message = '') {
+
+      $assertions = AssertionsFactory::factory();
+
+      return $assertions->assertNotEmpty($actual, $message);
+
     }
 
     /**
@@ -498,13 +486,18 @@ abstract class PHPUnit_Framework_Assert {
      *
      * @since Method available since Release 3.5.0
      */
-    public static function assertAttributeNotEmpty($haystackAttributeName, $haystackClassOrObject, $message = '')
-    {
-        static::assertNotEmpty(
-            static::readAttribute($haystackClassOrObject, $haystackAttributeName),
-            $message
-        );
+    public static function assertAttributeNotEmpty($haystackAttributeName, $haystackClassOrObject, $message = '') {
+
+      $assertions = AssertionsFactory::factory();
+
+      return $assertions->assertAttributeNotEmpty($haystackAttributeName, $haystackClassOrObject, $message);
+
     }
+
+    //-------------------------- VVVV -INPROGRESS- PORTING VVVV ---------------------------
+    // JEO: Start Port line.
+
+
 
     /**
      * Asserts that a value is greater than another value.
@@ -575,6 +568,9 @@ abstract class PHPUnit_Framework_Assert {
             $message
         );
     }
+
+    // JEO: END Port line.
+    //-------------------------- VVVV -REALLY- NOT PORTED VVVV ---------------------------
 
     /**
      * Asserts that a value is smaller than another value.
@@ -2302,9 +2298,8 @@ abstract class PHPUnit_Framework_Assert {
      *
      * @since Method available since Release 3.5.0
      */
-    public static function isEmpty()
-    {
-        return new PHPUnit_Framework_Constraint_IsEmpty;
+    public static function isEmpty() {
+      throw new AssertionFailedException('isEmpty is deprecated');
     }
 
     /**

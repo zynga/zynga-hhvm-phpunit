@@ -25,18 +25,23 @@ use SebastianBergmann\PHPUnit\Assertions\AssertArraySubset;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeCount;
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeEmpty;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeEquals;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotCount;
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotEmpty;
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotEquals;
 use SebastianBergmann\PHPUnit\Assertions\AssertContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnlyInstancesOf;
 use SebastianBergmann\PHPUnit\Assertions\AssertCount;
+use SebastianBergmann\PHPUnit\Assertions\AssertEmpty;
 use SebastianBergmann\PHPUnit\Assertions\AssertEquals;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotCount;
+use SebastianBergmann\PHPUnit\Assertions\AssertNotEmpty;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotEquals;
 use SebastianBergmann\PHPUnit\Assertions\AssertThat;
 use SebastianBergmann\PHPUnit\Assertions\AssertTrue;
@@ -590,6 +595,124 @@ class Assertions {
       $maxDepth,
       $canonicalize,
       $ignoreCase,
+    );
+
+  }
+
+  /**
+   * Asserts that a variable is not equal to an attribute of an object.
+   *
+   * @param mixed         $expected
+   * @param string        $actualAttributeName
+   * @param string|object $actualClassOrObject
+   * @param string        $message
+   * @param float         $delta
+   * @param int           $maxDepth
+   * @param bool          $canonicalize
+   * @param bool          $ignoreCase
+   */
+  final public function assertAttributeNotEquals(
+    mixed $expected,
+    string $actualAttributeName,
+    mixed $actualClassOrObject,
+    string $message = '',
+    float $delta = 0.0,
+    int $maxDepth = 10,
+    bool $canonicalize = false,
+    bool $ignoreCase = false,
+  ): bool {
+
+    return AssertAttributeNotEquals::evaluate(
+      $this,
+      $expected,
+      $actualAttributeName,
+      $actualClassOrObject,
+      $message,
+      $delta,
+      $maxDepth,
+      $canonicalize,
+      $ignoreCase,
+    );
+
+  }
+
+  /**
+   * Asserts that a variable is empty.
+   *
+   * @param mixed  $actual
+   * @param string $message
+   *
+   * @throws PHPUnit_Framework_AssertionFailedError
+   */
+  final public function assertEmpty(
+    mixed $actual,
+    string $message = '',
+  ): bool {
+
+    return AssertEmpty::evaluate($this, $actual, $message);
+
+  }
+
+  /**
+   * Asserts that a static attribute of a class or an attribute of an object
+   * is empty.
+   *
+   * @param string        $haystackAttributeName
+   * @param string|object $haystackClassOrObject
+   * @param string        $message
+   *
+   * @since Method available since Release 3.5.0
+   */
+  final public function assertAttributeEmpty(
+    string $haystackAttributeName,
+    mixed $haystackClassOrObject,
+    string $message = '',
+  ): bool {
+
+    return AssertAttributeEmpty::evaluate(
+      $this,
+      $haystackAttributeName,
+      $haystackClassOrObject,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that a variable is not empty.
+   *
+   * @param mixed  $actual
+   * @param string $message
+   *
+   * @throws PHPUnit_Framework_AssertionFailedError
+   */
+  public function assertNotEmpty(mixed $actual, string $message = ''): bool {
+
+    return AssertNotEmpty::evaluate($this, $actual, $message);
+
+  }
+
+  /**
+   * Asserts that a static attribute of a class or an attribute of an object
+   * is not empty.
+   *
+   * @param string        $haystackAttributeName
+   * @param string|object $haystackClassOrObject
+   * @param string        $message
+   *
+   * @since Method available since Release 3.5.0
+   */
+  public function assertAttributeNotEmpty(
+    string $haystackAttributeName,
+    mixed $haystackClassOrObject,
+    string $message = '',
+  ): bool {
+
+    return AssertAttributeNotEmpty::evaluate(
+      $this,
+      $haystackAttributeName,
+      $haystackClassOrObject,
+      $message,
     );
 
   }

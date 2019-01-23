@@ -1918,9 +1918,6 @@ XML;
 
   // JEO: invalid test function sig untyped, string
   // /**
-  //  * @covers            PHPUnit_Framework_Assert::readAttribute
-  //  * @covers            PHPUnit_Framework_Assert::getStaticAttribute
-  //  * @covers            PHPUnit_Framework_Assert::getObjectAttribute
   //  * @expectedException PHPUnit_Framework_Exception
   //  */
   // public function testReadAttribute3()
@@ -1929,9 +1926,6 @@ XML;
   // }
 
   /**
-   * @covers            PHPUnit_Framework_Assert::readAttribute
-   * @covers            PHPUnit_Framework_Assert::getStaticAttribute
-   * @covers            PHPUnit_Framework_Assert::getObjectAttribute
    * @expectedException PHPUnit_Framework_Exception
    */
   public function testReadAttribute4() {
@@ -1939,9 +1933,6 @@ XML;
   }
 
   /**
-   * @covers            PHPUnit_Framework_Assert::readAttribute
-   * @covers            PHPUnit_Framework_Assert::getStaticAttribute
-   * @covers            PHPUnit_Framework_Assert::getObjectAttribute
    * @expectedException PHPUnit_Framework_Exception
    */
   public function testReadAttribute5() {
@@ -1949,9 +1940,6 @@ XML;
   }
 
   /**
-   * @covers            PHPUnit_Framework_Assert::readAttribute
-   * @covers            PHPUnit_Framework_Assert::getStaticAttribute
-   * @covers            PHPUnit_Framework_Assert::getObjectAttribute
    * @expectedException PHPUnit_Framework_Exception
    */
   public function testReadAttributeIfAttributeNameIsNotValid() {
@@ -1960,7 +1948,6 @@ XML;
 
   // JEO: invalid test function sig classname<T>, string
   // /**
-  //  * @covers PHPUnit_Framework_Assert::getStaticAttribute
   //  * @expectedException PHPUnit_Framework_Exception
   //  */
   // public function testGetStaticAttributeRaisesExceptionForInvalidFirstArgument()
@@ -1971,7 +1958,6 @@ XML;
   // JEO: invalid test, function signature has classname<T> typechecker borks on
   // invalid use.
   // /**
-  //  * @covers PHPUnit_Framework_Assert::getStaticAttribute
   //  * @expectedException PHPUnit_Framework_Exception
   //  */
   // public function testGetStaticAttributeRaisesExceptionForInvalidFirstArgument2()
@@ -1981,7 +1967,6 @@ XML;
 
   // JEO: invalid test function sig classname<T>, string
   // /**
-  //  * @covers PHPUnit_Framework_Assert::getStaticAttribute
   //  * @expectedException PHPUnit_Framework_Exception
   //  */
   // public function testGetStaticAttributeRaisesExceptionForInvalidSecondArgument()
@@ -1990,7 +1975,6 @@ XML;
   // }
 
   /**
-   * @covers PHPUnit_Framework_Assert::getStaticAttribute
    * @expectedException PHPUnit_Framework_Exception
    */
   public function testGetStaticAttributeRaisesExceptionForInvalidSecondArgument2(
@@ -1999,7 +1983,6 @@ XML;
   }
 
   /**
-   * @covers PHPUnit_Framework_Assert::getStaticAttribute
    * @expectedException PHPUnit_Framework_Exception
    */
   public function testGetStaticAttributeRaisesExceptionForInvalidSecondArgument3(
@@ -2008,7 +1991,6 @@ XML;
   }
 
   /**
-   * @covers PHPUnit_Framework_Assert::getObjectAttribute
    * @expectedException PHPUnit_Framework_Exception
    */
   public function testGetObjectAttributeRaisesExceptionForInvalidFirstArgument(
@@ -2018,7 +2000,6 @@ XML;
 
   // JEO: invalid test function sig untyped, string
   // /**
-  //  * @covers PHPUnit_Framework_Assert::getObjectAttribute
   //  * @expectedException PHPUnit_Framework_Exception
   //  */
   // public function testGetObjectAttributeRaisesExceptionForInvalidSecondArgument()
@@ -2027,7 +2008,6 @@ XML;
   // }
 
   /**
-   * @covers PHPUnit_Framework_Assert::getObjectAttribute
    * @expectedException PHPUnit_Framework_Exception
    */
   public function testGetObjectAttributeRaisesExceptionForInvalidSecondArgument2(
@@ -2036,7 +2016,6 @@ XML;
   }
 
   /**
-   * @covers PHPUnit_Framework_Assert::getObjectAttribute
    * @expectedException PHPUnit_Framework_Exception
    */
   public function testGetObjectAttributeRaisesExceptionForInvalidSecondArgument3(
@@ -2044,9 +2023,6 @@ XML;
     static::getObjectAttribute(new stdClass(), 'foo');
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::getObjectAttribute
-   */
   public function testGetObjectAttributeWorksForInheritedAttributes() {
     $this->assertEquals(
       'bar',
@@ -2094,9 +2070,6 @@ XML;
 
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertAttributeNotContains
-   */
   public function testAssertPublicAttributeNotContains() {
     $obj = new ClassWithNonPublicAttributes();
 
@@ -3116,12 +3089,14 @@ XML;
     $this->assertThat('string', $this->isType('string'));
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::isEmpty
-   */
   public function testAssertThatIsEmpty() {
-    $this->assertThat([], $this->isEmpty());
+
+    try {
+      $this->isEmpty();
+    } catch (AssertionFailedException $e) {
+      $this->assertTrue(true);
+    }
+
   }
 
   /**
@@ -3486,14 +3461,13 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertEmpty
-   */
   public function testAssertEmpty() {
     $this->assertEmpty([]);
 
     try {
       $this->assertEmpty(['foo']);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -3501,14 +3475,13 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertNotEmpty
-   */
   public function testAssertNotEmpty() {
     $this->assertNotEmpty(['foo']);
 
     try {
       $this->assertNotEmpty([]);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -3516,9 +3489,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertAttributeEmpty
-   */
   public function testAssertAttributeEmpty() {
     $o = new stdClass();
     $o->a = [];
@@ -3528,6 +3498,8 @@ XML;
     try {
       $o->a = ['b'];
       $this->assertAttributeEmpty('a', $o);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -3535,9 +3507,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertAttributeNotEmpty
-   */
   public function testAssertAttributeNotEmpty() {
     $o = new stdClass();
     $o->a = ['b'];
@@ -3547,6 +3516,8 @@ XML;
     try {
       $o->a = [];
       $this->assertAttributeNotEmpty('a', $o);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
