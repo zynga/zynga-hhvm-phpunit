@@ -1733,6 +1733,8 @@ XML;
 
     try {
       $this->assertGreaterThan(2, 1);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -1753,6 +1755,8 @@ XML;
         'foo',
         new ClassWithNonPublicAttributes(),
       );
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }

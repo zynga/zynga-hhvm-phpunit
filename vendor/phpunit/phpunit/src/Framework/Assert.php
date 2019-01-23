@@ -494,11 +494,6 @@ abstract class PHPUnit_Framework_Assert {
 
     }
 
-    //-------------------------- VVVV -INPROGRESS- PORTING VVVV ---------------------------
-    // JEO: Start Port line.
-
-
-
     /**
      * Asserts that a value is greater than another value.
      *
@@ -508,10 +503,17 @@ abstract class PHPUnit_Framework_Assert {
      *
      * @since Method available since Release 3.1.0
      */
-    public static function assertGreaterThan($expected, $actual, $message = '')
-    {
-        static::assertThat($actual, static::greaterThan($expected), $message);
+    public static function assertGreaterThan($expected, $actual, $message = '') {
+
+      $assertions = AssertionsFactory::factory();
+
+      return $assertions->assertGreaterThan($expected, $actual, $message);
+
     }
+
+
+        //-------------------------- VVVV -INPROGRESS- PORTING VVVV ---------------------------
+        // JEO: Start Port line.
 
     /**
      * Asserts that an attribute is greater than another value.
@@ -2325,6 +2327,7 @@ abstract class PHPUnit_Framework_Assert {
      */
     public static function greaterThan($value)
     {
+      var_dump('this-is-deprecated');
         return new PHPUnit_Framework_Constraint_GreaterThan($value);
     }
 

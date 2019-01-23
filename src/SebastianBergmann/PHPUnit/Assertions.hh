@@ -38,6 +38,7 @@ use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnlyInstancesOf;
 use SebastianBergmann\PHPUnit\Assertions\AssertCount;
 use SebastianBergmann\PHPUnit\Assertions\AssertEmpty;
 use SebastianBergmann\PHPUnit\Assertions\AssertEquals;
+use SebastianBergmann\PHPUnit\Assertions\AssertGreaterThan;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotCount;
@@ -702,7 +703,7 @@ class Assertions {
    *
    * @since Method available since Release 3.5.0
    */
-  public function assertAttributeNotEmpty(
+  final public function assertAttributeNotEmpty(
     string $haystackAttributeName,
     mixed $haystackClassOrObject,
     string $message = '',
@@ -714,6 +715,25 @@ class Assertions {
       $haystackClassOrObject,
       $message,
     );
+
+  }
+
+  /**
+   * Asserts that a value is greater than another value.
+   *
+   * @param mixed  $expected
+   * @param mixed  $actual
+   * @param string $message
+   *
+   * @since Method available since Release 3.1.0
+   */
+  final public function assertGreaterThan(
+    mixed $expected,
+    mixed $actual,
+    string $message = '',
+  ): bool {
+
+    return AssertGreaterThan::evaluate($this, $expected, $actual, $message);
 
   }
 
