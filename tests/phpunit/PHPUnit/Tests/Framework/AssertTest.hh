@@ -1805,6 +1805,8 @@ XML;
 
     try {
       $this->assertLessThan(1, 2);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -1825,6 +1827,8 @@ XML;
         'bar',
         new ClassWithNonPublicAttributes(),
       );
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -1837,6 +1841,8 @@ XML;
 
     try {
       $this->assertLessThanOrEqual(1, 2);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -1857,6 +1863,8 @@ XML;
         'bar',
         new ClassWithNonPublicAttributes(),
       );
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -3119,6 +3127,7 @@ XML;
   }
 
   public function testAssertThatGreaterThan() {
+
     try {
       $this->greaterThan(1);
     } catch (AssertionFailedException $e) {
@@ -3130,12 +3139,17 @@ XML;
 
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::greaterThanOrEqual
-   */
   public function testAssertThatGreaterThanOrEqual() {
-    $this->assertThat(2, $this->greaterThanOrEqual(1));
+
+    try {
+      $this->greaterThanOrEqual(1);
+    } catch (AssertionFailedException $e) {
+      $this->assertTrue(true);
+      return;
+    }
+
+    $this->fail('greaterThan is deprecated and should be tossing exceptions');
+
   }
 
   /**

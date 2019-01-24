@@ -31,6 +31,11 @@ class OrConstraint extends Base {
     return false;
   }
 
+  public function addConstraint(ConstraintInterface $constraint): bool {
+    $this->constraints->add($constraint);
+    return true;
+  }
+
   private function setConstraints(
     Vector<ConstraintInterface> $constraints,
   ): bool {

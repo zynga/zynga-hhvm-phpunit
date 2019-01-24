@@ -806,13 +806,6 @@ abstract class PHPUnit_Framework_Assert {
 
   }
 
-  //-------------------------- VVVV -INPROGRESS- PORTING VVVV ---------------------------
-  // JEO: Start Port line.
-
-
-  // JEO: END Port line.
-  //-------------------------- VVVV -REALLY- NOT PORTED VVVV ---------------------------
-
   /**
    * Asserts that a value is smaller than another value.
    *
@@ -823,7 +816,11 @@ abstract class PHPUnit_Framework_Assert {
    * @since Method available since Release 3.1.0
    */
   public static function assertLessThan($expected, $actual, $message = '') {
-    static::assertThat($actual, static::lessThan($expected), $message);
+
+    $assertions = AssertionsFactory::factory();
+
+    return $assertions->assertLessThan($expected, $actual, $message);
+
   }
 
   /**
@@ -842,11 +839,11 @@ abstract class PHPUnit_Framework_Assert {
     $actualClassOrObject,
     $message = ''
   ) {
-    static::assertLessThan(
-      $expected,
-      static::readAttribute($actualClassOrObject, $actualAttributeName),
-      $message
-    );
+
+    $assertions = AssertionsFactory::factory();
+
+    return $assertions->assertAttributeLessThan($expected, $actualAttributeName, $actualClassOrObject, $message);
+
   }
 
   /**
@@ -863,7 +860,11 @@ abstract class PHPUnit_Framework_Assert {
     $actual,
     $message = ''
   ) {
-    static::assertThat($actual, static::lessThanOrEqual($expected), $message);
+
+    $assertions = AssertionsFactory::factory();
+
+    return $assertions->assertLessThanOrEqual($expected, $actual, $message);
+
   }
 
   /**
@@ -882,12 +883,15 @@ abstract class PHPUnit_Framework_Assert {
     $actualClassOrObject,
     $message = ''
   ) {
-    static::assertLessThanOrEqual(
-      $expected,
-      static::readAttribute($actualClassOrObject, $actualAttributeName),
-      $message
-    );
+
+    $assertions = AssertionsFactory::factory();
+
+    return $assertions->assertAttributeLessThanOrEqual($expected, $actualAttributeName, $actualClassOrObject, $message);
+
   }
+
+  //-------------------------- VVVV -INPROGRESS- PORTING VVVV ---------------------------
+  // JEO: Start Port line.
 
   /**
    * Asserts that the contents of one file is equal to the contents of another
@@ -1166,6 +1170,9 @@ abstract class PHPUnit_Framework_Assert {
   public static function assertNan($actual, $message = '') {
     static::assertThat($actual, static::isNan(), $message);
   }
+
+  // JEO: END Port line.
+  //-------------------------- VVVV -REALLY- NOT PORTED VVVV ---------------------------
 
   /**
    * Asserts that a class has a specified attribute.
@@ -2788,10 +2795,7 @@ abstract class PHPUnit_Framework_Assert {
    * @since Method available since Release 3.1.0
    */
   public static function greaterThanOrEqual($value) {
-    return static::logicalOr(
-      new PHPUnit_Framework_Constraint_IsEqual($value),
-      new PHPUnit_Framework_Constraint_GreaterThan($value)
-    );
+    throw new AssertionFailedException('deprecated greaterThan');
   }
 
   /**

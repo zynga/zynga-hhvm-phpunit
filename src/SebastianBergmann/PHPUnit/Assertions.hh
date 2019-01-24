@@ -29,6 +29,8 @@ use SebastianBergmann\PHPUnit\Assertions\AssertAttributeEmpty;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeEquals;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeGreaterThan;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeGreaterThanOrEqual;
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeLessThan;
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeLessThanOrEqual;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotCount;
@@ -42,6 +44,8 @@ use SebastianBergmann\PHPUnit\Assertions\AssertEmpty;
 use SebastianBergmann\PHPUnit\Assertions\AssertEquals;
 use SebastianBergmann\PHPUnit\Assertions\AssertGreaterThan;
 use SebastianBergmann\PHPUnit\Assertions\AssertGreaterThanOrEqual;
+use SebastianBergmann\PHPUnit\Assertions\AssertLessThan;
+use SebastianBergmann\PHPUnit\Assertions\AssertLessThanOrEqual;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotCount;
@@ -805,6 +809,99 @@ class Assertions {
   ): bool {
 
     return AssertAttributeGreaterThanOrEqual::evaluate(
+      $this,
+      $expected,
+      $actualAttributeName,
+      $actualClassOrObject,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that a value is smaller than another value.
+   *
+   * @param mixed  $expected
+   * @param mixed  $actual
+   * @param string $message
+   *
+   * @since Method available since Release 3.1.0
+   */
+  final public function assertLessThan(
+    mixed $expected,
+    mixed $actual,
+    string $message = '',
+  ): bool {
+
+    return AssertLessThan::evaluate($this, $expected, $actual, $message);
+
+  }
+
+  /**
+   * Asserts that an attribute is smaller than another value.
+   *
+   * @param mixed         $expected
+   * @param string        $actualAttributeName
+   * @param string|object $actualClassOrObject
+   * @param string        $message
+   *
+   * @since Method available since Release 3.1.0
+   */
+  final public function assertAttributeLessThan(
+    mixed $expected,
+    string $actualAttributeName,
+    mixed $actualClassOrObject,
+    string $message = '',
+  ): bool {
+
+    return AssertAttributeLessThan::evaluate(
+      $this,
+      $expected,
+      $actualAttributeName,
+      $actualClassOrObject,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that a value is smaller than or equal to another value.
+   *
+   * @param mixed  $expected
+   * @param mixed  $actual
+   * @param string $message
+   *
+   * @since Method available since Release 3.1.0
+   */
+  final public function assertLessThanOrEqual(
+    mixed $expected,
+    mixed $actual,
+    string $message = '',
+  ): bool {
+
+    return
+      AssertLessThanOrEqual::evaluate($this, $expected, $actual, $message);
+
+  }
+
+  /**
+   * Asserts that an attribute is smaller than or equal to another value.
+   *
+   * @param mixed         $expected
+   * @param string        $actualAttributeName
+   * @param string|object $actualClassOrObject
+   * @param string        $message
+   *
+   * @since Method available since Release 3.1.0
+   */
+  final public function assertAttributeLessThanOrEqual(
+    mixed $expected,
+    string $actualAttributeName,
+    mixed $actualClassOrObject,
+    string $message = '',
+  ): bool {
+
+    return AssertAttributeLessThanOrEqual::evaluate(
       $this,
       $expected,
       $actualAttributeName,
