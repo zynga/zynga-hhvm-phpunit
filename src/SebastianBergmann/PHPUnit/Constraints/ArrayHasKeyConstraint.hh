@@ -60,7 +60,7 @@ class ArrayHasKeyConstraint extends Base {
    *
    * @return bool
    */
-  protected function matches(mixed $other): bool {
+  public function matches(mixed $other): bool {
 
     if (is_array($other)) {
       return array_key_exists($this->key, $other);

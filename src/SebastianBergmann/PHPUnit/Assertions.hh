@@ -27,6 +27,8 @@ use SebastianBergmann\PHPUnit\Assertions\AssertAttributeContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeCount;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeEmpty;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeEquals;
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeGreaterThan;
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeGreaterThanOrEqual;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotCount;
@@ -39,6 +41,7 @@ use SebastianBergmann\PHPUnit\Assertions\AssertCount;
 use SebastianBergmann\PHPUnit\Assertions\AssertEmpty;
 use SebastianBergmann\PHPUnit\Assertions\AssertEquals;
 use SebastianBergmann\PHPUnit\Assertions\AssertGreaterThan;
+use SebastianBergmann\PHPUnit\Assertions\AssertGreaterThanOrEqual;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotCount;
@@ -734,6 +737,80 @@ class Assertions {
   ): bool {
 
     return AssertGreaterThan::evaluate($this, $expected, $actual, $message);
+
+  }
+
+  /**
+   * Asserts that an attribute is greater than another value.
+   *
+   * @param mixed         $expected
+   * @param string        $actualAttributeName
+   * @param string|object $actualClassOrObject
+   * @param string        $message
+   *
+   * @since Method available since Release 3.1.0
+   */
+  final public function assertAttributeGreaterThan(
+    mixed $expected,
+    string $actualAttributeName,
+    mixed $actualClassOrObject,
+    string $message = '',
+  ): bool {
+
+    return AssertAttributeGreaterThan::evaluate(
+      $this,
+      $expected,
+      $actualAttributeName,
+      $actualClassOrObject,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that a value is greater than or equal to another value.
+   *
+   * @param mixed  $expected
+   * @param mixed  $actual
+   * @param string $message
+   *
+   * @since Method available since Release 3.1.0
+   */
+  final public function assertGreaterThanOrEqual(
+    mixed $expected,
+    mixed $actual,
+    string $message = '',
+  ): bool {
+
+    return
+      AssertGreaterThanOrEqual::evaluate($this, $expected, $actual, $message);
+
+  }
+
+  /**
+   * Asserts that an attribute is greater than or equal to another value.
+   *
+   * @param mixed         $expected
+   * @param string        $actualAttributeName
+   * @param string|object $actualClassOrObject
+   * @param string        $message
+   *
+   * @since Method available since Release 3.1.0
+   */
+  final public function assertAttributeGreaterThanOrEqual(
+    mixed $expected,
+    string $actualAttributeName,
+    mixed $actualClassOrObject,
+    string $message = '',
+  ): bool {
+
+    return AssertAttributeGreaterThanOrEqual::evaluate(
+      $this,
+      $expected,
+      $actualAttributeName,
+      $actualClassOrObject,
+      $message,
+    );
 
   }
 

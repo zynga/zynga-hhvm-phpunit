@@ -39,7 +39,7 @@ class StringEndsWith extends Base {
    *
    * @return bool
    */
-  protected function matches(mixed $other): bool {
+  public function matches(mixed $other): bool {
     return substr($other, 0 - strlen($this->suffix)) == $this->suffix;
   }
 

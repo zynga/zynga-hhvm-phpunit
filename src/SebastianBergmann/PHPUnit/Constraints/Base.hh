@@ -76,7 +76,7 @@ abstract class Base
    *
    * @return bool
    */
-  protected function matches(mixed $other): bool {
+  public function matches(mixed $other): bool {
     return false;
   }
 

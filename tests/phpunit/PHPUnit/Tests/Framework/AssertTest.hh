@@ -1769,6 +1769,8 @@ XML;
 
     try {
       $this->assertGreaterThanOrEqual(2, 1);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -1789,6 +1791,8 @@ XML;
         'foo',
         new ClassWithNonPublicAttributes(),
       );
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -3099,7 +3103,10 @@ XML;
       $this->isEmpty();
     } catch (AssertionFailedException $e) {
       $this->assertTrue(true);
+      return;
     }
+
+    $this->fail('isEmpty is deprecated and should be tossing exceptions');
 
   }
 
@@ -3111,12 +3118,16 @@ XML;
     $this->assertThat(__FILE__, $this->fileExists());
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::greaterThan
-   */
   public function testAssertThatGreaterThan() {
-    $this->assertThat(2, $this->greaterThan(1));
+    try {
+      $this->greaterThan(1);
+    } catch (AssertionFailedException $e) {
+      $this->assertTrue(true);
+      return;
+    }
+
+    $this->fail('greaterThan is deprecated and should be tossing exceptions');
+
   }
 
   /**
