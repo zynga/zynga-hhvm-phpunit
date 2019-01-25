@@ -1428,6 +1428,8 @@ XML;
 
     try {
       $this->assertFileExists(__DIR__.DIRECTORY_SEPARATOR.'NotExisting');
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -1513,6 +1515,8 @@ XML;
 
     try {
       $this->assertNan(1);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -1549,6 +1553,8 @@ XML;
 
     try {
       $this->assertTrue(false);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -4027,12 +4033,16 @@ XML;
     $this->assertAttributeNotInternalType('string', 'a', $o);
   }
 
-  /**
-   * @expectedException PHPUnit_Framework_Exception
-   */
   public function testAssertStringMatchesFormatFileThrowsExceptionForInvalidArgument(
   ) {
-    $this->assertStringMatchesFormatFile('not_existing_file', '');
+    try {
+      $this->assertStringMatchesFormatFile('not_existing_file', '');
+    } catch (AssertionFailedException $e) {
+      return;
+    } catch (PHPUnit_Framework_Exception $e) {
+      return;
+    }
+    $this->fail();
   }
 
   // JEO: This test is invalid as the signature due to hhi is string, string, string
@@ -4062,12 +4072,16 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @expectedException PHPUnit_Framework_Exception
-   */
   public function testAssertStringNotMatchesFormatFileThrowsExceptionForInvalidArgument(
   ) {
-    $this->assertStringNotMatchesFormatFile('not_existing_file', '');
+    try {
+      $this->assertStringNotMatchesFormatFile('not_existing_file', '');
+    } catch (AssertionFailedException $e) {
+      return;
+    } catch (PHPUnit_Framework_Exception $e) {
+      return;
+    }
+    $this->fail();
   }
 
   // JEO: This test is invalidated as the hhi for the function has been changed to string, string, string

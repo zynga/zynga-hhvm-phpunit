@@ -42,10 +42,14 @@ use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnlyInstancesOf;
 use SebastianBergmann\PHPUnit\Assertions\AssertCount;
 use SebastianBergmann\PHPUnit\Assertions\AssertEmpty;
 use SebastianBergmann\PHPUnit\Assertions\AssertEquals;
+use SebastianBergmann\PHPUnit\Assertions\AssertFileEquals;
+use SebastianBergmann\PHPUnit\Assertions\AssertFileExists;
+use SebastianBergmann\PHPUnit\Assertions\AssertFileNotEquals;
 use SebastianBergmann\PHPUnit\Assertions\AssertGreaterThan;
 use SebastianBergmann\PHPUnit\Assertions\AssertGreaterThanOrEqual;
 use SebastianBergmann\PHPUnit\Assertions\AssertLessThan;
 use SebastianBergmann\PHPUnit\Assertions\AssertLessThanOrEqual;
+use SebastianBergmann\PHPUnit\Assertions\AssertNan;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotCount;
@@ -908,6 +912,114 @@ class Assertions {
       $actualClassOrObject,
       $message,
     );
+
+  }
+
+  /**
+   * Asserts that the contents of one file is equal to the contents of another
+   * file.
+   *
+   * @param string $expected
+   * @param string $actual
+   * @param string $message
+   * @param bool   $canonicalize
+   * @param bool   $ignoreCase
+   *
+   * @since Method available since Release 3.2.14
+   */
+  final public function assertFileEquals(
+    string $expected,
+    string $actual,
+    string $message = '',
+    bool $canonicalize = false,
+    bool $ignoreCase = false,
+  ): bool {
+
+    return AssertFileEquals::evaluate(
+      $this,
+      $expected,
+      $actual,
+      $message,
+      $canonicalize,
+      $ignoreCase,
+    );
+
+  }
+
+  /**
+   * Asserts that the contents of one file is not equal to the contents of
+   * another file.
+   *
+   * @param string $expected
+   * @param string $actual
+   * @param string $message
+   * @param bool   $canonicalize
+   * @param bool   $ignoreCase
+   *
+   * @since Method available since Release 3.2.14
+   */
+  final public function assertFileNotEquals(
+    string $expected,
+    string $actual,
+    string $message = '',
+    bool $canonicalize = false,
+    bool $ignoreCase = false,
+  ): bool {
+
+    return AssertFileNotEquals::evaluate(
+      $this,
+      $expected,
+      $actual,
+      $message,
+      $canonicalize,
+      $ignoreCase,
+    );
+
+  }
+
+  /**
+   * Asserts that a file exists.
+   *
+   * @param string $filename
+   * @param string $message
+   *
+   * @since Method available since Release 3.0.0
+   */
+  final public function assertFileExists(
+    string $filename,
+    string $message = '',
+  ): bool {
+
+    return AssertFileExists::evaluate($this, $filename, $message);
+
+  }
+
+  /**
+   * Asserts that a condition is true.
+   *
+   * @param bool   $condition
+   * @param string $message
+   *
+   * @throws PHPUnit_Framework_AssertionFailedError
+   */
+  final public function assertTrue(
+    bool $condition,
+    string $message = '',
+  ): bool {
+
+    return AssertTrue::evaluate($this, $condition, $message);
+
+  }
+
+  /**
+   * Asserts that a variable is nan.
+   *
+   * @param mixed  $actual
+   * @param string $message
+   */
+  final public function assertNan(mixed $actual, string $message = ''): bool {
+
+    return AssertNan::evaluate($this, $actual, $message);
 
   }
 

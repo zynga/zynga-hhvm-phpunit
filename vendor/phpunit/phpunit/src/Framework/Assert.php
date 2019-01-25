@@ -890,9 +890,6 @@ abstract class PHPUnit_Framework_Assert {
 
   }
 
-  //-------------------------- VVVV -INPROGRESS- PORTING VVVV ---------------------------
-  // JEO: Start Port line.
-
   /**
    * Asserts that the contents of one file is equal to the contents of another
    * file.
@@ -912,19 +909,15 @@ abstract class PHPUnit_Framework_Assert {
     $canonicalize = false,
     $ignoreCase = false
   ) {
-    static::assertFileExists($expected, $message);
-    static::assertFileExists($actual, $message);
 
-    static::assertEquals(
-      file_get_contents($expected),
-      file_get_contents($actual),
-      $message,
-      0,
-      10,
-      $canonicalize,
-      $ignoreCase
-    );
+    $assertions = AssertionsFactory::factory();
+
+    return $assertions->assertFileEquals($expected, $actual, $message, $canonicalize, $ignoreCase);
+
   }
+
+  //-------------------------- VVVV -INPROGRESS- PORTING VVVV ---------------------------
+  // JEO: Start Port line.
 
   /**
    * Asserts that the contents of one file is not equal to the contents of
@@ -945,18 +938,11 @@ abstract class PHPUnit_Framework_Assert {
     $canonicalize = false,
     $ignoreCase = false
   ) {
-    static::assertFileExists($expected, $message);
-    static::assertFileExists($actual, $message);
 
-    static::assertNotEquals(
-      file_get_contents($expected),
-      file_get_contents($actual),
-      $message,
-      0,
-      10,
-      $canonicalize,
-      $ignoreCase
-    );
+    $assertions = AssertionsFactory::factory();
+
+    return $assertions->assertFileNotEquals($expected, $actual, $message, $canonicalize, $ignoreCase);
+
   }
 
   /**
@@ -1032,13 +1018,11 @@ abstract class PHPUnit_Framework_Assert {
    * @since Method available since Release 3.0.0
    */
   public static function assertFileExists($filename, $message = '') {
-    if (!is_string($filename)) {
-      throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'string');
-    }
 
-    $constraint = new PHPUnit_Framework_Constraint_FileExists();
+    $assertions = AssertionsFactory::factory();
 
-    static::assertThat($filename, $constraint, $message);
+    return $assertions->assertFileExists($filename, $message);
+
   }
 
   /**
@@ -1070,7 +1054,8 @@ abstract class PHPUnit_Framework_Assert {
    * @throws PHPUnit_Framework_AssertionFailedError
    */
   public static function assertTrue($condition, $message = '') {
-    static::assertThat($condition, static::isTrue(), $message);
+    $assertions = AssertionsFactory::factory();
+    return $assertions->assertTrue($condition, $message);
   }
 
   /**
@@ -1168,7 +1153,11 @@ abstract class PHPUnit_Framework_Assert {
    * @param string $message
    */
   public static function assertNan($actual, $message = '') {
-    static::assertThat($actual, static::isNan(), $message);
+
+    $assertions = AssertionsFactory::factory();
+
+    return $assertions->assertNan($actual, $message);
+
   }
 
   // JEO: END Port line.
@@ -2602,7 +2591,7 @@ abstract class PHPUnit_Framework_Assert {
    * @since Method available since Release 5.0.0
    */
   public static function isNan() {
-    return new PHPUnit_Framework_Constraint_IsNan();
+    throw new AssertionFailedException('isNan is deprecated');
   }
 
   /**
