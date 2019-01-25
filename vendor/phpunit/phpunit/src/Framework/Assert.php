@@ -916,9 +916,6 @@ abstract class PHPUnit_Framework_Assert {
 
   }
 
-  //-------------------------- VVVV -INPROGRESS- PORTING VVVV ---------------------------
-  // JEO: Start Port line.
-
   /**
    * Asserts that the contents of one file is not equal to the contents of
    * another file.
@@ -964,17 +961,11 @@ abstract class PHPUnit_Framework_Assert {
     $canonicalize = false,
     $ignoreCase = false
   ) {
-    static::assertFileExists($expectedFile, $message);
 
-    static::assertEquals(
-      file_get_contents($expectedFile),
-      $actualString,
-      $message,
-      0,
-      10,
-      $canonicalize,
-      $ignoreCase
-    );
+    $assertions = AssertionsFactory::factory();
+
+    return $assertions->assertStringEqualsFile($expectedFile, $actualString, $message, $canonicalize, $ignoreCase);
+
   }
 
   /**
@@ -996,17 +987,11 @@ abstract class PHPUnit_Framework_Assert {
     $canonicalize = false,
     $ignoreCase = false
   ) {
-    static::assertFileExists($expectedFile, $message);
 
-    static::assertNotEquals(
-      file_get_contents($expectedFile),
-      $actualString,
-      $message,
-      0,
-      10,
-      $canonicalize,
-      $ignoreCase
-    );
+    $assertions = AssertionsFactory::factory();
+
+    return $assertions->assertStringNotEqualsFile($expectedFile, $actualString, $message, $canonicalize, $ignoreCase);
+
   }
 
   /**
@@ -1034,15 +1019,11 @@ abstract class PHPUnit_Framework_Assert {
    * @since Method available since Release 3.0.0
    */
   public static function assertFileNotExists($filename, $message = '') {
-    if (!is_string($filename)) {
-      throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'string');
-    }
 
-    $constraint = new PHPUnit_Framework_Constraint_Not(
-      new PHPUnit_Framework_Constraint_FileExists()
-    );
+    $assertions = AssertionsFactory::factory();
 
-    static::assertThat($filename, $constraint, $message);
+    return $assertions->assertFileNotExists($filename, $message);
+
   }
 
   /**
@@ -1057,6 +1038,9 @@ abstract class PHPUnit_Framework_Assert {
     $assertions = AssertionsFactory::factory();
     return $assertions->assertTrue($condition, $message);
   }
+
+  //-------------------------- VVVV -INPROGRESS- PORTING VVVV ---------------------------
+  // JEO: Start Port line.
 
   /**
    * Asserts that a condition is not true.

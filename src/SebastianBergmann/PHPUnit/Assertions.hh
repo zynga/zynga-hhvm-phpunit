@@ -45,6 +45,7 @@ use SebastianBergmann\PHPUnit\Assertions\AssertEquals;
 use SebastianBergmann\PHPUnit\Assertions\AssertFileEquals;
 use SebastianBergmann\PHPUnit\Assertions\AssertFileExists;
 use SebastianBergmann\PHPUnit\Assertions\AssertFileNotEquals;
+use SebastianBergmann\PHPUnit\Assertions\AssertFileNotExists;
 use SebastianBergmann\PHPUnit\Assertions\AssertGreaterThan;
 use SebastianBergmann\PHPUnit\Assertions\AssertGreaterThanOrEqual;
 use SebastianBergmann\PHPUnit\Assertions\AssertLessThan;
@@ -55,6 +56,8 @@ use SebastianBergmann\PHPUnit\Assertions\AssertNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotCount;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotEmpty;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotEquals;
+use SebastianBergmann\PHPUnit\Assertions\AssertStringEqualsFile;
+use SebastianBergmann\PHPUnit\Assertions\AssertStringNotEqualsFile;
 use SebastianBergmann\PHPUnit\Assertions\AssertThat;
 use SebastianBergmann\PHPUnit\Assertions\AssertTrue;
 use SebastianBergmann\PHPUnit\Assertions\GetObjectAttribute;
@@ -978,6 +981,68 @@ class Assertions {
   }
 
   /**
+   * Asserts that the contents of a string is equal
+   * to the contents of a file.
+   *
+   * @param string $expectedFile
+   * @param string $actualString
+   * @param string $message
+   * @param bool   $canonicalize
+   * @param bool   $ignoreCase
+   *
+   * @since Method available since Release 3.3.0
+   */
+  final public function assertStringEqualsFile(
+    string $expectedFile,
+    string $actualString,
+    string $message = '',
+    bool $canonicalize = false,
+    bool $ignoreCase = false,
+  ): bool {
+
+    return AssertStringEqualsFile::evaluate(
+      $this,
+      $expectedFile,
+      $actualString,
+      $message,
+      $canonicalize,
+      $ignoreCase,
+    );
+
+  }
+
+  /**
+   * Asserts that the contents of a string is not equal
+   * to the contents of a file.
+   *
+   * @param string $expectedFile
+   * @param string $actualString
+   * @param string $message
+   * @param bool   $canonicalize
+   * @param bool   $ignoreCase
+   *
+   * @since Method available since Release 3.3.0
+   */
+  final public function assertStringNotEqualsFile(
+    string $expectedFile,
+    string $actualString,
+    string $message = '',
+    bool $canonicalize = false,
+    bool $ignoreCase = false,
+  ): bool {
+
+    return AssertStringNotEqualsFile::evaluate(
+      $this,
+      $expectedFile,
+      $actualString,
+      $message,
+      $canonicalize,
+      $ignoreCase,
+    );
+
+  }
+
+  /**
    * Asserts that a file exists.
    *
    * @param string $filename
@@ -991,6 +1056,23 @@ class Assertions {
   ): bool {
 
     return AssertFileExists::evaluate($this, $filename, $message);
+
+  }
+
+  /**
+   * Asserts that a file does not exist.
+   *
+   * @param string $filename
+   * @param string $message
+   *
+   * @since Method available since Release 3.0.0
+   */
+  final public function assertFileNotExists(
+    string $filename,
+    string $message = '',
+  ): bool {
+
+    return AssertFileNotExists::evaluate($this, $filename, $message);
 
   }
 

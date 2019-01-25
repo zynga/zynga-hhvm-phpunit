@@ -1451,6 +1451,8 @@ XML;
 
     try {
       $this->assertFileNotExists(__FILE__);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
