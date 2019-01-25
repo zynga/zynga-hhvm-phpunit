@@ -1039,9 +1039,6 @@ abstract class PHPUnit_Framework_Assert {
     return $assertions->assertTrue($condition, $message);
   }
 
-  //-------------------------- VVVV -INPROGRESS- PORTING VVVV ---------------------------
-  // JEO: Start Port line.
-
   /**
    * Asserts that a condition is not true.
    *
@@ -1051,11 +1048,15 @@ abstract class PHPUnit_Framework_Assert {
    * @throws PHPUnit_Framework_AssertionFailedError
    */
   public static function assertNotTrue($condition, $message = '') {
-    static::assertThat(
-      $condition,
-      static::logicalNot(static::isTrue()),
-      $message
-    );
+
+    $assertions = AssertionsFactory::factory();
+
+    if ( !is_bool($condition) ) {
+      $condition = boolval($condition);
+    }
+
+    return $assertions->assertNotTrue($condition, $message);
+
   }
 
   /**
@@ -1067,8 +1068,12 @@ abstract class PHPUnit_Framework_Assert {
    * @throws PHPUnit_Framework_AssertionFailedError
    */
   public static function assertFalse($condition, $message = '') {
-    static::assertThat($condition, static::isFalse(), $message);
+    $assertions = AssertionsFactory::factory();
+    return $assertions->assertNotTrue($condition, $message);
   }
+
+  //-------------------------- VVVV -INPROGRESS- PORTING VVVV ---------------------------
+  // JEO: Start Port line.
 
   /**
    * Asserts that a condition is not false.
@@ -1079,11 +1084,20 @@ abstract class PHPUnit_Framework_Assert {
    * @throws PHPUnit_Framework_AssertionFailedError
    */
   public static function assertNotFalse($condition, $message = '') {
-    static::assertThat(
-      $condition,
-      static::logicalNot(static::isFalse()),
-      $message
-    );
+
+    $assertions = AssertionsFactory::factory();
+
+    if ( ! is_bool($condition) ) {
+      $condition = boolval($condition);
+    }
+    
+    return $assertions->assertNotFalse($condition, $message);
+
+    // static::assertThat(
+    //   $condition,
+    //   static::logicalNot(static::isFalse()),
+    //   $message
+    // );
   }
 
   /**

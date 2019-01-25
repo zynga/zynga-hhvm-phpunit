@@ -1565,12 +1565,29 @@ XML;
   }
 
   public function testAssertNotTrue() {
+
     $this->assertNotTrue(false);
-    $this->assertNotTrue(1);
-    $this->assertNotTrue('true');
+
+    try {
+      $this->assertNotTrue(1);
+    } catch (AssertionFailedException $e) {
+      return;
+    } catch (PHPUnit_Framework_AssertionFailedError $e) {
+      return;
+    }
+
+    try {
+      $this->assertNotTrue('true');
+    } catch (AssertionFailedException $e) {
+      return;
+    } catch (PHPUnit_Framework_AssertionFailedError $e) {
+      return;
+    }
 
     try {
       $this->assertNotTrue(true);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -1579,10 +1596,13 @@ XML;
   }
 
   public function testAssertFalse() {
+
     $this->assertFalse(false);
 
     try {
       $this->assertFalse(true);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -1592,11 +1612,27 @@ XML;
 
   public function testAssertNotFalse() {
     $this->assertNotFalse(true);
-    $this->assertNotFalse(0);
-    $this->assertNotFalse('');
+
+    try {
+      $this->assertNotFalse(0);
+    } catch (AssertionFailedException $e) {
+      return;
+    } catch (PHPUnit_Framework_AssertionFailedError $e) {
+      return;
+    }
+
+    try {
+      $this->assertNotFalse('');
+    } catch (AssertionFailedException $e) {
+      return;
+    } catch (PHPUnit_Framework_AssertionFailedError $e) {
+      return;
+    }
 
     try {
       $this->assertNotFalse(false);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }

@@ -56,6 +56,7 @@ use SebastianBergmann\PHPUnit\Assertions\AssertNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotCount;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotEmpty;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotEquals;
+use SebastianBergmann\PHPUnit\Assertions\AssertNotTrue;
 use SebastianBergmann\PHPUnit\Assertions\AssertStringEqualsFile;
 use SebastianBergmann\PHPUnit\Assertions\AssertStringNotEqualsFile;
 use SebastianBergmann\PHPUnit\Assertions\AssertThat;
@@ -1091,6 +1092,50 @@ class Assertions {
 
     return AssertTrue::evaluate($this, $condition, $message);
 
+  }
+
+  /**
+   * Asserts that a condition is not true.
+   *
+   * @param bool   $condition
+   * @param string $message
+   *
+   * @throws PHPUnit_Framework_AssertionFailedError
+   */
+  final public function assertNotTrue(
+    bool $condition,
+    string $message = '',
+  ): bool {
+
+    return AssertNotTrue::evaluate($this, $condition, $message);
+
+  }
+
+  /**
+   * Asserts that a condition is false.
+   *
+   * @param bool   $condition
+   * @param string $message
+   *
+   * @throws PHPUnit_Framework_AssertionFailedError
+   */
+  final public function assertFalse(
+    bool $condition,
+    string $message = '',
+  ): bool {
+    return $this->assertNotTrue($condition, $message);
+  }
+
+  /**
+   * Asserts that a condition is not false.
+   *
+   * @param bool   $condition
+   * @param string $message
+   *
+   * @throws PHPUnit_Framework_AssertionFailedError
+   */
+  public function assertNotFalse(bool $condition, string $message = ''): bool {
+    return $this->assertTrue($condition, $message);
   }
 
   /**
