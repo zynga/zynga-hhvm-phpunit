@@ -25,7 +25,7 @@ class AssertThat {
     string $message = '',
   ): bool {
 
-    $assertions->count()->increment($constraint->count());
+    $assertions->counter()->increment($constraint->count());
 
     try {
       return $constraint->evaluate($value, $message, true);

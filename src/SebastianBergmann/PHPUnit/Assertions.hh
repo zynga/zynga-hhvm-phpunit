@@ -36,6 +36,10 @@ use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotCount;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotEmpty;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotEquals;
+use SebastianBergmann\PHPUnit\Assertions\AssertClassHasAttribute;
+use SebastianBergmann\PHPUnit\Assertions\AssertClassHasStaticAttribute;
+use SebastianBergmann\PHPUnit\Assertions\AssertClassNotHasAttribute;
+use SebastianBergmann\PHPUnit\Assertions\AssertClassNotHasStaticAttribute;
 use SebastianBergmann\PHPUnit\Assertions\AssertContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnlyInstancesOf;
@@ -46,8 +50,10 @@ use SebastianBergmann\PHPUnit\Assertions\AssertFileEquals;
 use SebastianBergmann\PHPUnit\Assertions\AssertFileExists;
 use SebastianBergmann\PHPUnit\Assertions\AssertFileNotEquals;
 use SebastianBergmann\PHPUnit\Assertions\AssertFileNotExists;
+use SebastianBergmann\PHPUnit\Assertions\AssertFinite;
 use SebastianBergmann\PHPUnit\Assertions\AssertGreaterThan;
 use SebastianBergmann\PHPUnit\Assertions\AssertGreaterThanOrEqual;
+use SebastianBergmann\PHPUnit\Assertions\AssertInfinite;
 use SebastianBergmann\PHPUnit\Assertions\AssertLessThan;
 use SebastianBergmann\PHPUnit\Assertions\AssertLessThanOrEqual;
 use SebastianBergmann\PHPUnit\Assertions\AssertNan;
@@ -56,8 +62,13 @@ use SebastianBergmann\PHPUnit\Assertions\AssertNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotCount;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotEmpty;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotEquals;
+use SebastianBergmann\PHPUnit\Assertions\AssertNotNull;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotTrue;
+use SebastianBergmann\PHPUnit\Assertions\AssertNull;
+use SebastianBergmann\PHPUnit\Assertions\AssertObjectHasAttribute;
+use SebastianBergmann\PHPUnit\Assertions\AssertObjectNotHasAttribute;
 use SebastianBergmann\PHPUnit\Assertions\AssertStringEqualsFile;
+use SebastianBergmann\PHPUnit\Assertions\AssertStringMatchesFormat;
 use SebastianBergmann\PHPUnit\Assertions\AssertStringNotEqualsFile;
 use SebastianBergmann\PHPUnit\Assertions\AssertThat;
 use SebastianBergmann\PHPUnit\Assertions\AssertTrue;
@@ -71,7 +82,7 @@ class Assertions {
 
   private static ?AssertionsCount $count;
 
-  final public function count(): AssertionsCount {
+  final public function counter(): AssertionsCount {
     if (!self::$count instanceof AssertionsCount) {
       self::$count = new AssertionsCount();
     }
@@ -702,7 +713,10 @@ class Assertions {
    *
    * @throws PHPUnit_Framework_AssertionFailedError
    */
-  public function assertNotEmpty(mixed $actual, string $message = ''): bool {
+  final public function assertNotEmpty(
+    mixed $actual,
+    string $message = '',
+  ): bool {
 
     return AssertNotEmpty::evaluate($this, $actual, $message);
 
@@ -1134,8 +1148,68 @@ class Assertions {
    *
    * @throws PHPUnit_Framework_AssertionFailedError
    */
-  public function assertNotFalse(bool $condition, string $message = ''): bool {
+  final public function assertNotFalse(
+    bool $condition,
+    string $message = '',
+  ): bool {
     return $this->assertTrue($condition, $message);
+  }
+
+  /**
+   * Asserts that a variable is null.
+   *
+   * @param mixed  $actual
+   * @param string $message
+   */
+  final public function assertNull(mixed $actual, string $message = ''): bool {
+
+    return AssertNull::evaluate($this, $actual, $message);
+
+  }
+
+  /**
+   * Asserts that a variable is not null.
+   *
+   * @param mixed  $actual
+   * @param string $message
+   */
+  final public function assertNotNull(
+    mixed $actual,
+    string $message = '',
+  ): bool {
+
+    return AssertNotNull::evaluate($this, $actual, $message);
+
+  }
+
+  /**
+   * Asserts that a variable is finite.
+   *
+   * @param mixed  $actual
+   * @param string $message
+   */
+  final public function assertFinite(
+    mixed $actual,
+    string $message = '',
+  ): bool {
+
+    return AssertFinite::evaluate($this, $actual, $message);
+
+  }
+
+  /**
+   * Asserts that a variable is infinite.
+   *
+   * @param mixed  $actual
+   * @param string $message
+   */
+  final public function assertInfinite(
+    mixed $actual,
+    string $message = '',
+  ): bool {
+
+    return AssertInfinite::evaluate($this, $actual, $message);
+
   }
 
   /**
@@ -1147,6 +1221,170 @@ class Assertions {
   final public function assertNan(mixed $actual, string $message = ''): bool {
 
     return AssertNan::evaluate($this, $actual, $message);
+
+  }
+
+  /**
+   * Asserts that a string matches a given format string.
+   *
+   * @param string $format
+   * @param string $string
+   * @param string $message
+   *
+   * @since Method available since Release 3.5.0
+   */
+  final public function assertStringMatchesFormat(
+    string $format,
+    string $string,
+    string $message = '',
+  ): bool {
+
+    return
+      AssertStringMatchesFormat::evaluate($this, $format, $string, $message);
+
+  }
+
+  /**
+   * Asserts that an object does not have a specified attribute.
+   *
+   * @param string $attributeName
+   * @param object $object
+   * @param string $message
+   *
+   * @since Method available since Release 3.0.0
+   */
+  final public function assertObjectNotHasAttribute(
+    string $attributeName,
+    mixed $object,
+    string $message = '',
+  ): bool {
+
+    return AssertObjectNotHasAttribute::evaluate(
+      $this,
+      $attributeName,
+      $object,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that an object has a specified attribute.
+   *
+   * @param string $attributeName
+   * @param object $object
+   * @param string $message
+   *
+   * @since Method available since Release 3.0.0
+   */
+  final public function assertObjectHasAttribute(
+    string $attributeName,
+    mixed $object,
+    string $message = '',
+  ): bool {
+
+    return AssertObjectHasAttribute::evaluate(
+      $this,
+      $attributeName,
+      $object,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that a class does not have a specified static attribute.
+   *
+   * @param string $attributeName
+   * @param string $className
+   * @param string $message
+   *
+   * @since Method available since Release 3.1.0
+   */
+  final public function assertClassNotHasStaticAttribute(
+    string $attributeName,
+    mixed $className,
+    string $message = '',
+  ): bool {
+
+    return AssertClassNotHasStaticAttribute::evaluate(
+      $this,
+      $attributeName,
+      $className,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that a class has a specified static attribute.
+   *
+   * @param string $attributeName
+   * @param string $className
+   * @param string $message
+   *
+   * @since Method available since Release 3.1.0
+   */
+  final public function assertClassHasStaticAttribute(
+    string $attributeName,
+    string $className,
+    string $message = '',
+  ): bool {
+
+    return AssertClassHasStaticAttribute::evaluate(
+      $this,
+      $attributeName,
+      $className,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that a class does not have a specified attribute.
+   *
+   * @param string $attributeName
+   * @param string $className
+   * @param string $message
+   *
+   * @since Method available since Release 3.1.0
+   */
+  final public function assertClassNotHasAttribute(
+    string $attributeName,
+    string $className,
+    string $message = '',
+  ): bool {
+
+    return AssertClassNotHasAttribute::evaluate(
+      $this,
+      $attributeName,
+      $className,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that a class has a specified attribute.
+   *
+   * @param string $attributeName
+   * @param string $className
+   * @param string $message
+   *
+   * @since Method available since Release 3.1.0
+   */
+  final public function assertClassHasAttribute(
+    string $attributeName,
+    string $className,
+    string $message = '',
+  ): bool {
+
+    return AssertClassHasAttribute::evaluate(
+      $this,
+      $attributeName,
+      $className,
+      $message,
+    );
 
   }
 
@@ -1170,41 +1408,13 @@ class Assertions {
   }
 
   /**
-   * Returns a PHPUnit_Framework_Constraint_Not matcher object.
-   *
-   * @param PHPUnit_Framework_Constraint $constraint
-   *
-   * @return PHPUnit_Framework_Constraint_Not
-   *
-   * @since Method available since Release 3.0.0
-   */
-  //public function logicalNot(
-  //  ConstraintInterface $constraint,
-  //): ConstraintInterface {
-  //  return new NotConstraint($constraint);
-  //}
-
-  /**
-   * Asserts that a condition is true.
-   *
-   * @param bool   $condition
-   * @param string $message
-   *
-   * @throws AssertionFailedException
-   */
-  // public function assertTrue(bool $condition, string $message = ''): bool {
-  //   $constraint = ConstraintFactory::factory('IsTrue');
-  //   return $this->assertThat($condition, $constraint, $message);
-  // }
-
-  /**
    * Fails a test with the given message.
    *
    * @param string $message
    *
    * @throws PHPUnit_Framework_AssertionFailedError
    */
-  public function fail(string $message = ''): void {
+  final public function fail(string $message = ''): void {
     throw new AssertionFailedException($message);
   }
 
