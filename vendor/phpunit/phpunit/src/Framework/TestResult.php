@@ -632,7 +632,8 @@ class PHPUnit_Framework_TestResult implements Countable
      */
     public function run(PHPUnit_Framework_Test $test)
     {
-        PHPUnit_Framework_Assert::resetCount();
+
+      $test->resetCount();
 
         if ($test instanceof PHPUnit_Framework_TestCase) {
             $test->setRegisterMockObjectsFromTestArgumentsRecursively(
@@ -740,7 +741,8 @@ class PHPUnit_Framework_TestResult implements Countable
         }
 
         $time = PHP_Timer::stop();
-        $test->addToAssertionCount(PHPUnit_Framework_Assert::getCount());
+        // $test->addToAssertionCount(PHPUnit_Framework_Assert::getCount());
+        $test->addToAssertionCount($test->getCount());
 
         if ($monitorFunctions) {
             $blacklist = new PHPUnit_Util_Blacklist;

@@ -1683,6 +1683,8 @@ XML;
 
     try {
       $this->assertRegExp('/foo/', 'bar');
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -1695,6 +1697,8 @@ XML;
 
     try {
       $this->assertNotRegExp('/foo/', 'foobar');
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -3786,6 +3790,8 @@ XML;
 
     try {
       $this->assertSameSize([1, 2], [1, 2, 3]);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -4149,6 +4155,8 @@ XML;
         $this->getFilesDirectory().'expectedFileFormat.txt',
         "BAR\n",
       );
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }

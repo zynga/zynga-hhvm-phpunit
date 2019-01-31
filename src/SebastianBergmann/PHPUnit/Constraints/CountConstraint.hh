@@ -50,7 +50,7 @@ class CountConstraint extends Base {
    *
    * @return bool
    */
-  protected function getCountOf(mixed $other): int {
+  public function getCountOf(mixed $other): int {
 
     if ($other instanceof Countable) {
       return count($other);

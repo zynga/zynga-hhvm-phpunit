@@ -73,15 +73,21 @@ use SebastianBergmann\PHPUnit\Assertions\AssertNotEquals;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotInstanceOf;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotInternalType;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotNull;
+use SebastianBergmann\PHPUnit\Assertions\AssertNotRegExp;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotSame;
+use SebastianBergmann\PHPUnit\Assertions\AssertNotSameSize;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotTrue;
 use SebastianBergmann\PHPUnit\Assertions\AssertNull;
 use SebastianBergmann\PHPUnit\Assertions\AssertObjectHasAttribute;
 use SebastianBergmann\PHPUnit\Assertions\AssertObjectNotHasAttribute;
+use SebastianBergmann\PHPUnit\Assertions\AssertRegExp;
 use SebastianBergmann\PHPUnit\Assertions\AssertSame;
+use SebastianBergmann\PHPUnit\Assertions\AssertSameSize;
 use SebastianBergmann\PHPUnit\Assertions\AssertStringEqualsFile;
 use SebastianBergmann\PHPUnit\Assertions\AssertStringMatchesFormat;
+use SebastianBergmann\PHPUnit\Assertions\AssertStringMatchesFormatFile;
 use SebastianBergmann\PHPUnit\Assertions\AssertStringNotEqualsFile;
+use SebastianBergmann\PHPUnit\Assertions\AssertStringNotMatchesFormat;
 use SebastianBergmann\PHPUnit\Assertions\AssertThat;
 use SebastianBergmann\PHPUnit\Assertions\AssertTrue;
 use SebastianBergmann\PHPUnit\Assertions\GetObjectAttribute;
@@ -1676,6 +1682,126 @@ class Assertions {
   }
 
   /**
+   * Asserts that a string matches a given regular expression.
+   *
+   * @param string $pattern
+   * @param string $string
+   * @param string $message
+   */
+  final public function assertRegExp(
+    string $pattern,
+    string $string,
+    string $message = '',
+  ): bool {
+
+    return AssertRegExp::evaluate($this, $pattern, $string, $message);
+
+  }
+
+  /**
+   * Asserts that a string does not match a given regular expression.
+   *
+   * @param string $pattern
+   * @param string $string
+   * @param string $message
+   *
+   * @since Method available since Release 2.1.0
+   */
+  final public function assertNotRegExp(
+    string $pattern,
+    string $string,
+    string $message = '',
+  ): bool {
+
+    return AssertNotRegExp::evaluate($this, $pattern, $string, $message);
+
+  }
+
+  /**
+   * Assert that the size of two arrays (or `Countable` or `Traversable` objects)
+   * is the same.
+   *
+   * @param array|Countable|Traversable $expected
+   * @param array|Countable|Traversable $actual
+   * @param string                      $message
+   */
+  final public function assertSameSize(
+    mixed $expected,
+    mixed $actual,
+    string $message = '',
+  ): bool {
+
+    return AssertSameSize::evaluate($this, $expected, $actual, $message);
+
+  }
+
+  /**
+   * Assert that the size of two arrays (or `Countable` or `Traversable` objects)
+   * is not the same.
+   *
+   * @param array|Countable|Traversable $expected
+   * @param array|Countable|Traversable $actual
+   * @param string                      $message
+   */
+  final public function assertNotSameSize(
+    mixed $expected,
+    mixed $actual,
+    string $message = '',
+  ): bool {
+
+    return AssertNotSameSize::evaluate($this, $expected, $actual, $message);
+
+  }
+
+  /**
+   * Asserts that a string does not match a given format string.
+   *
+   * @param string $format
+   * @param string $string
+   * @param string $message
+   *
+   * @since Method available since Release 3.5.0
+   */
+  final public function assertStringNotMatchesFormat(
+    string $format,
+    string $string,
+    string $message = '',
+  ): bool {
+
+    return AssertStringNotMatchesFormat::evaluate(
+      $this,
+      $format,
+      $string,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that a string matches a given format file.
+   *
+   * @param string $formatFile
+   * @param string $string
+   * @param string $message
+   *
+   * @since Method available since Release 3.5.0
+   */
+  final public function assertStringMatchesFormatFile(
+    string $formatFile,
+    string $string,
+    string $message = '',
+  ): bool {
+
+    return AssertStringMatchesFormatFile::evaluate(
+      $this,
+      $formatFile,
+      $string,
+      $message,
+    );
+
+  }
+
+  /**
    * Evaluates a PHPUnit_Framework_Constraint matcher object.
    *
    * @param mixed                        $value
@@ -1767,6 +1893,26 @@ class Assertions {
 
     return GetObjectAttribute::evaluate($object, $attributeName);
 
+  }
+
+  /**
+   * Return the current assertion count.
+   *
+   * @return int
+   *
+   * @since Method available since Release 3.3.3
+   */
+  final public function getCount(): int {
+    return $this->counter()->get();
+  }
+
+  /**
+   * Reset the assertion counter.
+   *
+   * @since Method available since Release 3.3.3
+   */
+  final public function resetCount(): bool {
+    return $this->counter()->reset();
   }
 
 }
