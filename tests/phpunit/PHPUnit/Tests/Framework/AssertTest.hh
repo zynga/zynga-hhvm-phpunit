@@ -1132,6 +1132,8 @@ class AssertTest extends PHPUnit_Framework_TestCase {
   public function testAssertSameFails($a, $b) {
     try {
       $this->assertSame($a, $b);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -1152,6 +1154,8 @@ class AssertTest extends PHPUnit_Framework_TestCase {
   public function testAssertNotSameFails($a, $b) {
     try {
       $this->assertNotSame($a, $b);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -1705,6 +1709,8 @@ XML;
 
     try {
       $this->assertSame(new stdClass(), new stdClass());
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -1738,6 +1744,8 @@ XML;
 
     try {
       $this->assertNotSame($o, $o);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -1763,6 +1771,8 @@ XML;
   public function testAssertNotSameFailsNull() {
     try {
       $this->assertNotSame(null, null);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -2343,6 +2353,8 @@ XML;
 
     try {
       $this->assertAttributeSame('bar', 'publicAttribute', $obj);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -2351,12 +2363,15 @@ XML;
   }
 
   public function testAssertPublicAttributeNotSame() {
+
     $obj = new ClassWithNonPublicAttributes();
 
     $this->assertAttributeNotSame('bar', 'publicAttribute', $obj);
 
     try {
       $this->assertAttributeNotSame('foo', 'publicAttribute', $obj);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -3811,6 +3826,8 @@ XML;
 
     try {
       $this->assertNotSameSize([1, 2], [3, 4]);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -3970,6 +3987,8 @@ XML;
 
     try {
       $this->assertInstanceOf(Exception::class, new stdClass());
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -3998,6 +4017,8 @@ XML;
 
     try {
       $this->assertNotInstanceOf(stdClass::class, new stdClass());
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -4027,6 +4048,8 @@ XML;
 
     try {
       $this->assertInternalType('string', 1);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -4035,10 +4058,12 @@ XML;
   }
 
   public function testAssertInternalTypeDouble() {
-    $this->assertInternalType('double', 1.0);
+    $this->assertInternalType('double', doubleval(1.0));
 
     try {
       $this->assertInternalType('double', 1);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -4067,6 +4092,8 @@ XML;
 
     try {
       $this->assertNotInternalType('integer', 1);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }

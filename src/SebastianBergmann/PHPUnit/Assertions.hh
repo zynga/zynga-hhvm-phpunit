@@ -29,6 +29,8 @@ use SebastianBergmann\PHPUnit\Assertions\AssertAttributeEmpty;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeEquals;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeGreaterThan;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeGreaterThanOrEqual;
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeInstanceOf;
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeInternalType;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeLessThan;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeLessThanOrEqual;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotContains;
@@ -36,6 +38,10 @@ use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotCount;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotEmpty;
 use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotEquals;
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotInstanceOf;
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotInternalType;
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeNotSame;
+use SebastianBergmann\PHPUnit\Assertions\AssertAttributeSame;
 use SebastianBergmann\PHPUnit\Assertions\AssertClassHasAttribute;
 use SebastianBergmann\PHPUnit\Assertions\AssertClassHasStaticAttribute;
 use SebastianBergmann\PHPUnit\Assertions\AssertClassNotHasAttribute;
@@ -54,6 +60,8 @@ use SebastianBergmann\PHPUnit\Assertions\AssertFinite;
 use SebastianBergmann\PHPUnit\Assertions\AssertGreaterThan;
 use SebastianBergmann\PHPUnit\Assertions\AssertGreaterThanOrEqual;
 use SebastianBergmann\PHPUnit\Assertions\AssertInfinite;
+use SebastianBergmann\PHPUnit\Assertions\AssertInstanceOf;
+use SebastianBergmann\PHPUnit\Assertions\AssertInternalType;
 use SebastianBergmann\PHPUnit\Assertions\AssertLessThan;
 use SebastianBergmann\PHPUnit\Assertions\AssertLessThanOrEqual;
 use SebastianBergmann\PHPUnit\Assertions\AssertNan;
@@ -62,11 +70,15 @@ use SebastianBergmann\PHPUnit\Assertions\AssertNotContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotCount;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotEmpty;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotEquals;
+use SebastianBergmann\PHPUnit\Assertions\AssertNotInstanceOf;
+use SebastianBergmann\PHPUnit\Assertions\AssertNotInternalType;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotNull;
+use SebastianBergmann\PHPUnit\Assertions\AssertNotSame;
 use SebastianBergmann\PHPUnit\Assertions\AssertNotTrue;
 use SebastianBergmann\PHPUnit\Assertions\AssertNull;
 use SebastianBergmann\PHPUnit\Assertions\AssertObjectHasAttribute;
 use SebastianBergmann\PHPUnit\Assertions\AssertObjectNotHasAttribute;
+use SebastianBergmann\PHPUnit\Assertions\AssertSame;
 use SebastianBergmann\PHPUnit\Assertions\AssertStringEqualsFile;
 use SebastianBergmann\PHPUnit\Assertions\AssertStringMatchesFormat;
 use SebastianBergmann\PHPUnit\Assertions\AssertStringNotEqualsFile;
@@ -1383,6 +1395,281 @@ class Assertions {
       $this,
       $attributeName,
       $className,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that two variables have the same type and value.
+   * Used on objects, it asserts that two variables reference
+   * the same object.
+   *
+   * @param mixed  $expected
+   * @param mixed  $actual
+   * @param string $message
+   */
+  final public function assertSame(
+    mixed $expected,
+    mixed $actual,
+    string $message = '',
+  ): bool {
+
+    return AssertSame::evaluate($this, $expected, $actual, $message);
+
+  }
+
+  /**
+   * Asserts that a variable and an attribute of an object have the same type
+   * and value.
+   *
+   * @param mixed         $expected
+   * @param string        $actualAttributeName
+   * @param string|object $actualClassOrObject
+   * @param string        $message
+   */
+  final public function assertAttributeSame(
+    mixed $expected,
+    string $actualAttributeName,
+    mixed $actualClassOrObject,
+    string $message = '',
+  ): bool {
+
+    return AssertAttributeSame::evaluate(
+      $this,
+      $expected,
+      $actualAttributeName,
+      $actualClassOrObject,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that two variables do not have the same type and value.
+   * Used on objects, it asserts that two variables do not reference
+   * the same object.
+   *
+   * @param mixed  $expected
+   * @param mixed  $actual
+   * @param string $message
+   */
+  final public function assertNotSame(
+    mixed $expected,
+    mixed $actual,
+    string $message = '',
+  ): bool {
+
+    return AssertNotSame::evaluate($this, $expected, $actual, $message);
+
+  }
+
+  /**
+   * Asserts that a variable and an attribute of an object do not have the
+   * same type and value.
+   *
+   * @param mixed         $expected
+   * @param string        $actualAttributeName
+   * @param string|object $actualClassOrObject
+   * @param string        $message
+   */
+  final public function assertAttributeNotSame(
+    mixed $expected,
+    string $actualAttributeName,
+    mixed $actualClassOrObject,
+    string $message = '',
+  ): bool {
+
+    return AssertAttributeNotSame::evaluate(
+      $this,
+      $expected,
+      $actualAttributeName,
+      $actualClassOrObject,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that a variable is of a given type.
+   *
+   * @param string $expected
+   * @param mixed  $actual
+   * @param string $message
+   *
+   * @since Method available since Release 3.5.0
+   */
+  final public function assertInstanceOf(
+    string $expected,
+    mixed $actual,
+    string $message = '',
+  ): bool {
+
+    return AssertInstanceOf::evaluate($this, $expected, $actual, $message);
+
+  }
+
+  /**
+   * Asserts that an attribute is of a given type.
+   *
+   * @param string        $expected
+   * @param string        $attributeName
+   * @param string|object $classOrObject
+   * @param string        $message
+   *
+   * @since Method available since Release 3.5.0
+   */
+  final public function assertAttributeInstanceOf(
+    string $expected,
+    string $attributeName,
+    mixed $classOrObject,
+    string $message = '',
+  ): bool {
+
+    return AssertAttributeInstanceOf::evaluate(
+      $this,
+      $expected,
+      $attributeName,
+      $classOrObject,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that a variable is not of a given type.
+   *
+   * @param string $expected
+   * @param mixed  $actual
+   * @param string $message
+   *
+   * @since Method available since Release 3.5.0
+   */
+  final public function assertNotInstanceOf(
+    string $expected,
+    mixed $actual,
+    string $message = '',
+  ): bool {
+
+    return AssertNotInstanceOf::evaluate($this, $expected, $actual, $message);
+
+  }
+
+  /**
+   * Asserts that an attribute is of a given type.
+   *
+   * @param string        $expected
+   * @param string        $attributeName
+   * @param string|object $classOrObject
+   * @param string        $message
+   *
+   * @since Method available since Release 3.5.0
+   */
+  final public function assertAttributeNotInstanceOf(
+    string $expected,
+    string $attributeName,
+    mixed $classOrObject,
+    string $message = '',
+  ): bool {
+
+    return AssertAttributeNotInstanceOf::evaluate(
+      $this,
+      $expected,
+      $attributeName,
+      $classOrObject,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that a variable is of a given type.
+   *
+   * @param string $expected
+   * @param mixed  $actual
+   * @param string $message
+   *
+   * @since Method available since Release 3.5.0
+   */
+  final public function assertInternalType(
+    string $expected,
+    mixed $actual,
+    string $message = '',
+  ): bool {
+
+    return AssertInternalType::evaluate($this, $expected, $actual, $message);
+
+  }
+
+  /**
+   * Asserts that an attribute is of a given type.
+   *
+   * @param string        $expected
+   * @param string        $attributeName
+   * @param string|object $classOrObject
+   * @param string        $message
+   *
+   * @since Method available since Release 3.5.0
+   */
+  final public function assertAttributeInternalType(
+    string $expected,
+    string $attributeName,
+    mixed $classOrObject,
+    string $message = '',
+  ): bool {
+
+    return AssertAttributeInternalType::evaluate(
+      $this,
+      $expected,
+      $attributeName,
+      $classOrObject,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that a variable is not of a given type.
+   *
+   * @param string $expected
+   * @param mixed  $actual
+   * @param string $message
+   *
+   * @since Method available since Release 3.5.0
+   */
+  final public function assertNotInternalType(
+    string $expected,
+    mixed $actual,
+    string $message = '',
+  ): bool {
+
+    return
+      AssertNotInternalType::evaluate($this, $expected, $actual, $message);
+
+  }
+
+  /**
+   * Asserts that an attribute is of a given type.
+   *
+   * @param string        $expected
+   * @param string        $attributeName
+   * @param string|object $classOrObject
+   * @param string        $message
+   *
+   * @since Method available since Release 3.5.0
+   */
+  final public function assertAttributeNotInternalType(
+    string $expected,
+    string $attributeName,
+    mixed $classOrObject,
+    string $message = '',
+  ): bool {
+
+    return AssertAttributeNotInternalType::evaluate(
+      $this,
+      $expected,
+      $attributeName,
+      $classOrObject,
       $message,
     );
 

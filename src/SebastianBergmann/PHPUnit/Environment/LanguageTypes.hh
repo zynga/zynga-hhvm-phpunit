@@ -7,6 +7,7 @@ class LanguageTypes {
   const TYPE_BOOL = 'bool';
   const TYPE_BOOL_ALIAS = 'boolean';
   const TYPE_FLOAT = 'float';
+  const TYPE_DOUBLE = 'double';
   const TYPE_INT = 'int';
   const TYPE_INT_ALIAS = 'integer';
   const TYPE_NULL = 'null';
@@ -22,6 +23,7 @@ class LanguageTypes {
       self::TYPE_ARRAY,
       self::TYPE_BOOL,
       self::TYPE_BOOL_ALIAS,
+      self::TYPE_DOUBLE,
       self::TYPE_FLOAT,
       self::TYPE_INT,
       self::TYPE_INT_ALIAS,

@@ -62,6 +62,7 @@ class IsNativeTypeConstraint extends Base {
   public function matches(mixed $other): bool {
 
     switch ($this->type) {
+
       case 'numeric':
         return is_numeric($other);
 
