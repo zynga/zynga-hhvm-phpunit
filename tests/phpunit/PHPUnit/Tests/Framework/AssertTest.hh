@@ -2187,9 +2187,6 @@ XML;
     );
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertAttributeNotContainsOnly
-   */
   public function testAssertPublicAttributeNotContainsOnly() {
     $obj = new ClassWithNonPublicAttributes();
 
@@ -3039,18 +3036,6 @@ XML;
   /**
    * @covers PHPUnit_Framework_Assert::assertThat
    * @covers PHPUnit_Framework_Assert::anything
-   * @covers PHPUnit_Framework_Assert::logicalAnd
-   */
-  public function testAssertThatAnythingAndAnything() {
-    self::legacyAssertThat(
-      'anything',
-      $this->logicalAnd($this->anything(), $this->anything()),
-    );
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::anything
    * @covers PHPUnit_Framework_Assert::logicalOr
    */
   public function testAssertThatAnythingOrAnything() {
@@ -3179,53 +3164,6 @@ XML;
    */
   public function testAssertThatIsType() {
     self::legacyAssertThat('string', $this->isType('string'));
-  }
-
-  public function testAssertThatIsEmpty() {
-
-    try {
-      $this->isEmpty();
-    } catch (AssertionFailedException $e) {
-      $this->assertTrue(true);
-      return;
-    }
-
-    $this->fail('isEmpty is deprecated and should be tossing exceptions');
-
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::fileExists
-   */
-  public function testAssertThatFileExists() {
-    self::legacyAssertThat(__FILE__, $this->fileExists());
-  }
-
-  public function testAssertThatGreaterThan() {
-
-    try {
-      $this->greaterThan(1);
-    } catch (AssertionFailedException $e) {
-      $this->assertTrue(true);
-      return;
-    }
-
-    $this->fail('greaterThan is deprecated and should be tossing exceptions');
-
-  }
-
-  public function testAssertThatGreaterThanOrEqual() {
-
-    try {
-      $this->greaterThanOrEqual(1);
-    } catch (AssertionFailedException $e) {
-      $this->assertTrue(true);
-      return;
-    }
-
-    $this->fail('greaterThan is deprecated and should be tossing exceptions');
-
   }
 
   /**
@@ -3439,14 +3377,13 @@ XML;
   //     $this->assertStringEndsNotWith('', null);
   // }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertStringStartsWith
-   */
   public function testAssertStringStartsWith() {
     $this->assertStringStartsWith('prefix', 'prefixfoo');
 
     try {
       $this->assertStringStartsWith('prefix', 'foo');
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -3454,14 +3391,13 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertStringStartsNotWith
-   */
   public function testAssertStringStartsNotWith() {
     $this->assertStringStartsNotWith('prefix', 'foo');
 
     try {
       $this->assertStringStartsNotWith('prefix', 'prefixfoo');
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -3469,14 +3405,13 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertStringEndsWith
-   */
   public function testAssertStringEndsWith() {
     $this->assertStringEndsWith('suffix', 'foosuffix');
 
     try {
       $this->assertStringEndsWith('suffix', 'foo');
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -3484,14 +3419,13 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertStringEndsNotWith
-   */
   public function testAssertStringEndsNotWith() {
     $this->assertStringEndsNotWith('suffix', 'foo');
 
     try {
       $this->assertStringEndsNotWith('suffix', 'foosuffix');
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -3501,7 +3435,6 @@ XML;
 
   // JEO: invalid test function sig string, string, string
   // /**
-  //  * @covers PHPUnit_Framework_Assert::assertStringMatchesFormat
   //  * @expectedException PHPUnit_Framework_Exception
   //  */
   // public function testAssertStringMatchesFormatRaisesExceptionForInvalidFirstArgument()
@@ -3511,7 +3444,6 @@ XML;
 
   // JEO: invalid test function sig string, string, string
   // /**
-  //  * @covers PHPUnit_Framework_Assert::assertStringMatchesFormat
   //  * @expectedException PHPUnit_Framework_Exception
   //  */
   // public function testAssertStringMatchesFormatRaisesExceptionForInvalidSecondArgument()
@@ -3537,7 +3469,6 @@ XML;
 
   // JEO: invalid test function sig string, string, string
   // /**
-  //  * @covers PHPUnit_Framework_Assert::assertStringNotMatchesFormat
   //  * @expectedException PHPUnit_Framework_Exception
   //  */
   // public function testAssertStringNotMatchesFormatRaisesExceptionForInvalidFirstArgument()
@@ -3547,7 +3478,6 @@ XML;
 
   // JEO: invalid test function sig string, string, string
   // /**
-  //  * @covers PHPUnit_Framework_Assert::assertStringNotMatchesFormat
   //  * @expectedException PHPUnit_Framework_Exception
   //  */
   // public function testAssertStringNotMatchesFormatRaisesExceptionForInvalidSecondArgument()
@@ -3555,10 +3485,8 @@ XML;
   //     $this->assertStringNotMatchesFormat('', null);
   // }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertStringNotMatchesFormat
-   */
   public function testAssertStringNotMatchesFormat() {
+
     $this->assertStringNotMatchesFormat('*%s*', '**');
 
     try {
@@ -3636,9 +3564,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::markTestIncomplete
-   */
   public function testMarkTestIncomplete() {
     try {
       $this->markTestIncomplete('incomplete');
@@ -3651,9 +3576,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::markTestSkipped
-   */
   public function testMarkTestSkipped() {
     try {
       $this->markTestSkipped('skipped');
@@ -3666,9 +3588,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertCount
-   */
   public function testAssertCount() {
     $this->assertCount(2, [1, 2]);
 
@@ -3889,6 +3808,8 @@ XML;
   ) {
     try {
       $this->assertJsonStringEqualsJsonString($expected, $actual);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -3912,6 +3833,8 @@ XML;
   ) {
     try {
       $this->assertJsonStringNotEqualsJsonString($expected, $actual);
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
@@ -3932,6 +3855,13 @@ XML;
     $message = '';
     try {
       $this->assertJsonStringEqualsJsonFile($file, $actual, $message);
+    } catch (AssertionFailedException $e) {
+      $this->assertEquals(
+        'Failed asserting that \'{"Mascott":"Beastie"}\' matches JSON string "{"Mascott":"Tux"}".',
+        $e->getMessage(),
+      );
+
+      return;
     } catch (PHPUnit_Framework_ExpectationFailedException $e) {
       $this->assertEquals(
         'Failed asserting that \'{"Mascott":"Beastie"}\' matches JSON string "{"Mascott":"Tux"}".',
@@ -3948,6 +3878,8 @@ XML;
     $file = $this->getFilesDirectory().'/JsonData/simpleObject.json';
     try {
       $this->assertJsonStringEqualsJsonFile($file, '');
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_Exception $e) {
       return;
     }
@@ -3965,6 +3897,8 @@ XML;
     $file = $this->getFilesDirectory().'/JsonData/simpleObject.json';
     try {
       $this->assertJsonStringNotEqualsJsonFile($file, '');
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_Exception $e) {
       return;
     }
@@ -4196,6 +4130,8 @@ XML;
         $this->getFilesDirectory().'expectedFileFormat.txt',
         "FOO\n",
       );
+    } catch (AssertionFailedException $e) {
+      return;
     } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }

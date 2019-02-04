@@ -1,8 +1,6 @@
 <?hh // strict
 
-namespace SebastianBergmann\PHPUnit\Constriants;
-
-use SebastianBergmann\PHPUnit\Constraints\Base;
+namespace SebastianBergmann\PHPUnit\Constraints;
 
 /*
  * This file is part of PHPUnit.
@@ -13,22 +11,26 @@ use SebastianBergmann\PHPUnit\Constraints\Base;
  * file that was distributed with this source code.
  */
 
+use SebastianBergmann\PHPUnit\Constraints\Base;
+
 /**
  * Constraint that asserts that the string it is evaluated for ends with a given
  * suffix.
  *
  * @since Class available since Release 3.4.0
  */
-class StringEndsWith extends Base {
+class StringEndsWithConstraint extends Base {
 
-  private string $suffix;
+  private string $suffix = '';
 
-  /**
-   * @param string $suffix
-   */
-  public function __construct(string $suffix) {
-    parent::__construct();
-    $this->suffix = $suffix;
+  public function setExpected(mixed $expected): bool {
+    $this->suffix = strval($expected);
+    return true;
+  }
+
+  public function resetExpected(): bool {
+    $this->suffix = '';
+    return true;
   }
 
   /**
@@ -50,16 +52,6 @@ class StringEndsWith extends Base {
    */
   public function toString(): string {
     return 'ends with "'.$this->suffix.'"';
-  }
-
-  public function setExpected(mixed $expected): bool {
-    $this->suffix = strval($expected);
-    return true;
-  }
-
-  public function resetExpected(): bool {
-    $this->suffix = '';
-    return true;
   }
 
 }

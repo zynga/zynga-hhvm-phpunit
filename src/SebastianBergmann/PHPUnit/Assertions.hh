@@ -52,6 +52,7 @@ use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnlyInstancesOf;
 use SebastianBergmann\PHPUnit\Assertions\AssertCount;
 use SebastianBergmann\PHPUnit\Assertions\AssertEmpty;
 use SebastianBergmann\PHPUnit\Assertions\AssertEquals;
+use SebastianBergmann\PHPUnit\Assertions\AssertEqualXMLStructure;
 use SebastianBergmann\PHPUnit\Assertions\AssertFileEquals;
 use SebastianBergmann\PHPUnit\Assertions\AssertFileExists;
 use SebastianBergmann\PHPUnit\Assertions\AssertFileNotEquals;
@@ -62,6 +63,13 @@ use SebastianBergmann\PHPUnit\Assertions\AssertGreaterThanOrEqual;
 use SebastianBergmann\PHPUnit\Assertions\AssertInfinite;
 use SebastianBergmann\PHPUnit\Assertions\AssertInstanceOf;
 use SebastianBergmann\PHPUnit\Assertions\AssertInternalType;
+use SebastianBergmann\PHPUnit\Assertions\AssertJson;
+use SebastianBergmann\PHPUnit\Assertions\AssertJsonFileEqualsJsonFile;
+use SebastianBergmann\PHPUnit\Assertions\AssertJsonFileNotEqualsJsonFile;
+use SebastianBergmann\PHPUnit\Assertions\AssertJsonStringEqualsJsonString;
+use SebastianBergmann\PHPUnit\Assertions\AssertJsonStringEqualsJsonFile;
+use SebastianBergmann\PHPUnit\Assertions\AssertJsonStringNotEqualsJsonFile;
+use SebastianBergmann\PHPUnit\Assertions\AssertJsonStringNotEqualsJsonString;
 use SebastianBergmann\PHPUnit\Assertions\AssertLessThan;
 use SebastianBergmann\PHPUnit\Assertions\AssertLessThanOrEqual;
 use SebastianBergmann\PHPUnit\Assertions\AssertNan;
@@ -83,18 +91,31 @@ use SebastianBergmann\PHPUnit\Assertions\AssertObjectNotHasAttribute;
 use SebastianBergmann\PHPUnit\Assertions\AssertRegExp;
 use SebastianBergmann\PHPUnit\Assertions\AssertSame;
 use SebastianBergmann\PHPUnit\Assertions\AssertSameSize;
+use SebastianBergmann\PHPUnit\Assertions\AssertStringEndsWith;
+use SebastianBergmann\PHPUnit\Assertions\AssertStringEndsNotWith;
 use SebastianBergmann\PHPUnit\Assertions\AssertStringEqualsFile;
 use SebastianBergmann\PHPUnit\Assertions\AssertStringMatchesFormat;
 use SebastianBergmann\PHPUnit\Assertions\AssertStringMatchesFormatFile;
 use SebastianBergmann\PHPUnit\Assertions\AssertStringNotEqualsFile;
 use SebastianBergmann\PHPUnit\Assertions\AssertStringNotMatchesFormat;
+use SebastianBergmann\PHPUnit\Assertions\AssertStringNotMatchesFormatFile;
+use SebastianBergmann\PHPUnit\Assertions\AssertStringStartsWith;
+use SebastianBergmann\PHPUnit\Assertions\AssertStringStartsNotWith;
 use SebastianBergmann\PHPUnit\Assertions\AssertThat;
 use SebastianBergmann\PHPUnit\Assertions\AssertTrue;
+use SebastianBergmann\PHPUnit\Assertions\AssertXmlFileEqualsXmlFile;
+use SebastianBergmann\PHPUnit\Assertions\AssertXmlFileNotEqualsXmlFile;
+use SebastianBergmann\PHPUnit\Assertions\AssertXmlStringEqualsXmlFile;
+use SebastianBergmann\PHPUnit\Assertions\AssertXmlStringEqualsXmlString;
+use SebastianBergmann\PHPUnit\Assertions\AssertXmlStringNotEqualsXmlFile;
+use SebastianBergmann\PHPUnit\Assertions\AssertXmlStringNotEqualsXmlString;
 use SebastianBergmann\PHPUnit\Assertions\GetObjectAttribute;
 use SebastianBergmann\PHPUnit\Assertions\GetStaticAttribute;
 use SebastianBergmann\PHPUnit\Assertions\ReadAttribute;
 use SebastianBergmann\PHPUnit\Interfaces\ConstraintInterface;
 use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
+
+use \DOMElement;
 
 class Assertions {
 
@@ -1796,6 +1817,429 @@ class Assertions {
       $this,
       $formatFile,
       $string,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that a string does not match a given format string.
+   *
+   * @param string $formatFile
+   * @param string $string
+   * @param string $message
+   *
+   * @since Method available since Release 3.5.0
+   */
+  final public function assertStringNotMatchesFormatFile(
+    string $formatFile,
+    string $string,
+    string $message = '',
+  ): bool {
+
+    return AssertStringNotMatchesFormatFile::evaluate(
+      $this,
+      $formatFile,
+      $string,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that a string starts with a given prefix.
+   *
+   * @param string $prefix
+   * @param string $string
+   * @param string $message
+   *
+   * @since Method available since Release 3.4.0
+   */
+  final public function assertStringStartsWith(
+    string $prefix,
+    string $string,
+    string $message = '',
+  ): bool {
+
+    return
+      AssertStringStartsWith::evaluate($this, $prefix, $string, $message);
+
+  }
+
+  /**
+   * Asserts that a string starts not with a given prefix.
+   *
+   * @param string $prefix
+   * @param string $string
+   * @param string $message
+   *
+   * @since Method available since Release 3.4.0
+   */
+  final public function assertStringStartsNotWith(
+    string $prefix,
+    string $string,
+    string $message = '',
+  ): bool {
+
+    return
+      AssertStringStartsNotWith::evaluate($this, $prefix, $string, $message);
+
+  }
+
+  /**
+   * Asserts that a string ends with a given suffix.
+   *
+   * @param string $suffix
+   * @param string $string
+   * @param string $message
+   *
+   * @since Method available since Release 3.4.0
+   */
+  final public function assertStringEndsWith(
+    string $suffix,
+    string $string,
+    string $message = '',
+  ): bool {
+
+    return AssertStringEndsWith::evaluate($this, $suffix, $string, $message);
+
+  }
+
+  /**
+   * Asserts that a string ends not with a given suffix.
+   *
+   * @param string $suffix
+   * @param string $string
+   * @param string $message
+   *
+   * @since Method available since Release 3.4.0
+   */
+  final public function assertStringEndsNotWith(
+    string $suffix,
+    string $string,
+    string $message = '',
+  ): bool {
+
+    return
+      AssertStringEndsNotWith::evaluate($this, $suffix, $string, $message);
+
+  }
+
+  /**
+   * Asserts that two XML files are equal.
+   *
+   * @param string $expectedFile
+   * @param string $actualFile
+   * @param string $message
+   *
+   * @since Method available since Release 3.1.0
+   */
+  final public function assertXmlFileEqualsXmlFile(
+    string $expectedFile,
+    string $actualFile,
+    string $message = '',
+  ): bool {
+
+    return AssertXmlFileEqualsXmlFile::evaluate(
+      $this,
+      $expectedFile,
+      $actualFile,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that two XML files are not equal.
+   *
+   * @param string $expectedFile
+   * @param string $actualFile
+   * @param string $message
+   *
+   * @since Method available since Release 3.1.0
+   */
+  final public function assertXmlFileNotEqualsXmlFile(
+    string $expectedFile,
+    string $actualFile,
+    string $message = '',
+  ): bool {
+
+    return AssertXmlFileNotEqualsXmlFile::evaluate(
+      $this,
+      $expectedFile,
+      $actualFile,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that two XML documents are equal.
+   *
+   * @param string $expectedFile
+   * @param string $actualXml
+   * @param string $message
+   *
+   * @since Method available since Release 3.3.0
+   */
+  final public function assertXmlStringEqualsXmlFile(
+    string $expectedFile,
+    string $actualXml,
+    string $message = '',
+  ): bool {
+
+    return AssertXmlStringEqualsXmlFile::evaluate(
+      $this,
+      $expectedFile,
+      $actualXml,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that two XML documents are not equal.
+   *
+   * @param string $expectedFile
+   * @param string $actualXml
+   * @param string $message
+   *
+   * @since Method available since Release 3.3.0
+   */
+  final public function assertXmlStringNotEqualsXmlFile(
+    string $expectedFile,
+    string $actualXml,
+    string $message = '',
+  ): bool {
+
+    return AssertXmlStringNotEqualsXmlFile::evaluate(
+      $this,
+      $expectedFile,
+      $actualXml,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that two XML documents are equal.
+   *
+   * @param string $expectedXml
+   * @param string $actualXml
+   * @param string $message
+   *
+   * @since Method available since Release 3.1.0
+   */
+  final public function assertXmlStringEqualsXmlString(
+    string $expectedXml,
+    string $actualXml,
+    string $message = '',
+  ): bool {
+
+    return AssertXmlStringEqualsXmlString::evaluate(
+      $this,
+      $expectedXml,
+      $actualXml,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that a hierarchy of DOMElements matches.
+   *
+   * @param DOMElement $expectedElement
+   * @param DOMElement $actualElement
+   * @param bool       $checkAttributes
+   * @param string     $message
+   *
+   * @since Method available since Release 3.3.0
+   */
+  public function assertEqualXMLStructure(
+    DOMElement $expectedElement,
+    DOMElement $actualElement,
+    bool $checkAttributes = false,
+    string $message = '',
+  ): bool {
+
+    return AssertEqualXMLStructure::evaluate(
+      $this,
+      $expectedElement,
+      $actualElement,
+      $checkAttributes,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that two XML documents are not equal.
+   *
+   * @param string $expectedXml
+   * @param string $actualXml
+   * @param string $message
+   *
+   * @since Method available since Release 3.1.0
+   */
+  final public function assertXmlStringNotEqualsXmlString(
+    string $expectedXml,
+    string $actualXml,
+    string $message = '',
+  ): bool {
+
+    return AssertXmlStringNotEqualsXmlString::evaluate(
+      $this,
+      $expectedXml,
+      $actualXml,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that a string is a valid JSON string.
+   *
+   * @param string $actualJson
+   * @param string $message
+   *
+   * @since Method available since Release 3.7.20
+   */
+  final public function assertJson(
+    string $actualJson,
+    string $message = '',
+  ): bool {
+
+    return AssertJson::evaluate($this, $actualJson, $message);
+
+  }
+
+  /**
+   * Asserts that two given JSON encoded objects or arrays are equal.
+   *
+   * @param string $expectedJson
+   * @param string $actualJson
+   * @param string $message
+   */
+  final public function assertJsonStringEqualsJsonString(
+    string $expectedJson,
+    string $actualJson,
+    string $message = '',
+  ): bool {
+
+    return AssertJsonStringEqualsJsonString::evaluate(
+      $this,
+      $expectedJson,
+      $actualJson,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that two given JSON encoded objects or arrays are not equal.
+   *
+   * @param string $expectedJson
+   * @param string $actualJson
+   * @param string $message
+   */
+  final public function assertJsonStringNotEqualsJsonString(
+    string $expectedJson,
+    string $actualJson,
+    string $message = '',
+  ): bool {
+
+    return AssertJsonStringNotEqualsJsonString::evaluate(
+      $this,
+      $expectedJson,
+      $actualJson,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that the generated JSON encoded object and the content of the given file are equal.
+   *
+   * @param string $expectedFile
+   * @param string $actualJson
+   * @param string $message
+   */
+  final public function assertJsonStringEqualsJsonFile(
+    string $expectedFile,
+    string $actualJson,
+    string $message = '',
+  ): bool {
+
+    return AssertJsonStringEqualsJsonFile::evaluate(
+      $this,
+      $expectedFile,
+      $actualJson,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that the generated JSON encoded object and the content of the given file are not equal.
+   *
+   * @param string $expectedFile
+   * @param string $actualJson
+   * @param string $message
+   */
+  final public function assertJsonStringNotEqualsJsonFile(
+    string $expectedFile,
+    string $actualJson,
+    string $message = '',
+  ): bool {
+
+    return AssertJsonStringNotEqualsJsonFile::evaluate(
+      $this,
+      $expectedFile,
+      $actualJson,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that two JSON files are equal.
+   *
+   * @param string $expectedFile
+   * @param string $actualFile
+   * @param string $message
+   */
+  final public function assertJsonFileEqualsJsonFile(
+    string $expectedFile,
+    string $actualFile,
+    string $message = '',
+  ): bool {
+
+    return AssertJsonFileEqualsJsonFile::evaluate(
+      $this,
+      $expectedFile,
+      $actualFile,
+      $message,
+    );
+
+  }
+
+  /**
+   * Asserts that two JSON files are not equal.
+   *
+   * @param string $expectedFile
+   * @param string $actualFile
+   * @param string $message
+   */
+  final public function assertJsonFileNotEqualsJsonFile(
+    string $expectedFile,
+    string $actualFile,
+    string $message = '',
+  ): bool {
+
+    return AssertJsonFileNotEqualsJsonFile::evaluate(
+      $this,
+      $expectedFile,
+      $actualFile,
       $message,
     );
 

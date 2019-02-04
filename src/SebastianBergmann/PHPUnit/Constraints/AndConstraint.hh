@@ -69,13 +69,15 @@ class AndConstraint extends Base {
     $constraint = null;
 
     foreach ($this->constraints as $constraint) {
-      if (!$constraint->evaluate($other, $description, true)) {
+      if (!$constraint->evaluate($other, $description, false)) {
+        var_dump($constraint);
+        var_dump($other);
         $success = false;
         break;
       }
     }
 
-    if ($doThrowException && !$success) {
+    if ($doThrowException == true && $success !== true) {
       $this->fail($other, $description);
     }
 
