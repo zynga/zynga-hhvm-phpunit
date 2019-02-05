@@ -42,7 +42,7 @@ class AssertEqualXMLStructure {
       $message,
     );
 
-    if ($checkAttributes) {
+    if ($checkAttributes == true) {
       $assertions->assertEquals(
         $expectedElement->attributes->length,
         $actualElement->attributes->length,

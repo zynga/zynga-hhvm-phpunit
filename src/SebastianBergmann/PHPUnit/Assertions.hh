@@ -114,6 +114,8 @@ use SebastianBergmann\PHPUnit\Assertions\GetStaticAttribute;
 use SebastianBergmann\PHPUnit\Assertions\ReadAttribute;
 use SebastianBergmann\PHPUnit\Interfaces\ConstraintInterface;
 use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
+use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
+use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
 
 use \DOMElement;
 
@@ -2357,6 +2359,34 @@ class Assertions {
    */
   final public function resetCount(): bool {
     return $this->counter()->reset();
+  }
+
+  /**
+   * Mark the test as incomplete.
+   *
+   * @param string $message
+   *
+   * @throws PHPUnit_Framework_IncompleteTestError
+   *
+   * @since Method available since Release 3.0.0
+   */
+  final public function markTestIncomplete(string $message = ''): void {
+    // throw new PHPUnit_Framework_IncompleteTestError($message);
+    throw new IncompleteException($message);
+  }
+
+  /**
+   * Mark the test as skipped.
+   *
+   * @param string $message
+   *
+   * @throws PHPUnit_Framework_SkippedTestError
+   *
+   * @since Method available since Release 3.0.0
+   */
+  final public function markTestSkipped(string $message = ''): void {
+    // throw new PHPUnit_Framework_SkippedTestError($message);
+    throw new SkippedException($message);
   }
 
 }

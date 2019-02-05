@@ -24,6 +24,8 @@ use Zynga\Framework\Environment\CodePath\V1\CodePath;
 use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
 use SebastianBergmann\PHPUnit\Exceptions\AttributeNotFoundException;
 use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentException;
+use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
+use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
 
 use \PHPUnit_Framework_AssertionFailedError;
 use \PHPUnit_Framework_ExpectationFailedException;
@@ -38,6 +40,7 @@ use \ArrayIterator;
 use \DateTime;
 use \DateTimeZone;
 use \DOMDocument;
+use \DOMElement;
 use \Exception;
 use \SplObjectStorage;
 use \stdClass;
@@ -1312,11 +1315,23 @@ XML;
     $actual = new DOMDocument();
     $actual->load($this->getFilesDirectory().'structureExpected.xml');
 
-    $this->assertEqualXMLStructure(
-      $expected->firstChild,
-      $actual->firstChild,
-      true,
-    );
+    $expectedFirstChild = $expected->firstChild;
+    $actualFirstChild = $actual->firstChild;
+
+    if ($expectedFirstChild instanceof DOMElement &&
+        $actualFirstChild instanceof DOMElement) {
+
+      $this->assertEqualXMLStructure(
+        $expectedFirstChild,
+        $actualFirstChild,
+        true,
+      );
+
+      return;
+    }
+
+    $this->fail('assertEqualXMLStructure not called');
+
   }
 
   public function testXMLStructureWrongNumberOfAttributes() {
@@ -1330,11 +1345,25 @@ XML;
         $this->getFilesDirectory().'structureWrongNumberOfAttributes.xml',
       );
 
-      $this->assertEqualXMLStructure(
-        $expected->firstChild,
-        $actual->firstChild,
-        true,
-      );
+      $expectedFirstChild = $expected->firstChild;
+      $actualFirstChild = $actual->firstChild;
+
+      //var_dump(get_class($expectedFirstChild));
+      //var_dump(get_class($actualFirstChild));
+
+      if ($expectedFirstChild instanceof DOMElement &&
+          $actualFirstChild instanceof DOMElement) {
+
+        $this->assertEqualXMLStructure(
+          $expectedFirstChild,
+          $actualFirstChild,
+          true,
+        );
+
+        return;
+      }
+
+      $this->fail();
 
     } catch (AssertionFailedException $e) {
       $this->assertTrue(true);
@@ -1358,17 +1387,28 @@ XML;
         $this->getFilesDirectory().'structureWrongNumberOfNodes.xml',
       );
 
-      $this->assertEqualXMLStructure(
-        $expected->firstChild,
-        $actual->firstChild,
-        true,
-      );
+      $expectedFirstChild = $expected->firstChild;
+      $actualFirstChild = $actual->firstChild;
+
+      if ($expectedFirstChild instanceof DOMElement &&
+          $actualFirstChild instanceof DOMElement) {
+
+        $this->assertEqualXMLStructure(
+          $expectedFirstChild,
+          $actualFirstChild,
+          true,
+        );
+
+      }
+
     } catch (AssertionFailedException $e) {
       return;
     } catch (PHPUnit_Framework_ExpectationFailedException $e) {
       return;
     }
-    $this->fail('Did not emit expected assertion failure');
+
+    $this->fail('assertEqualXMLStructure did not run');
+
   }
 
   public function testXMLStructureIsSameButDataIsNot() {
@@ -1380,11 +1420,27 @@ XML;
       $this->getFilesDirectory().'structureIsSameButDataIsNot.xml',
     );
 
-    $this->assertEqualXMLStructure(
-      $expected->firstChild,
-      $actual->firstChild,
-      true,
-    );
+    $expectedFirstChild = $expected->firstChild;
+    $actualFirstChild = $actual->firstChild;
+
+    // var_dump(get_class($expectedFirstChild));
+    // var_dump(get_class($actualFirstChild));
+
+    if ($expectedFirstChild instanceof DOMElement &&
+        $actualFirstChild instanceof DOMElement) {
+
+      $this->assertEqualXMLStructure(
+        $expectedFirstChild,
+        $actualFirstChild,
+        true,
+      );
+
+      return;
+
+    }
+
+    $this->fail('assertEqualXMLStructure was not called');
+
   }
 
   public function testXMLStructureAttributesAreSameButValuesAreNot() {
@@ -1397,11 +1453,24 @@ XML;
       'structureAttributesAreSameButValuesAreNot.xml',
     );
 
-    $this->assertEqualXMLStructure(
-      $expected->firstChild,
-      $actual->firstChild,
-      true,
-    );
+    $expectedFirstChild = $expected->firstChild;
+    $actualFirstChild = $actual->firstChild;
+
+    //var_dump(get_class($expectedFirstChild));
+    //var_dump(get_class($actualFirstChild));
+
+    if ($expectedFirstChild instanceof DOMElement &&
+        $actualFirstChild instanceof DOMElement) {
+      $this->assertEqualXMLStructure(
+        $expectedFirstChild,
+        $actualFirstChild,
+        true,
+      );
+      return;
+    }
+
+    $this->fail('assertEqualXMLStructure was not ran');
+
   }
 
   public function testXMLStructureIgnoreTextNodes() {
@@ -1411,11 +1480,24 @@ XML;
     $actual = new DOMDocument();
     $actual->load($this->getFilesDirectory().'structureIgnoreTextNodes.xml');
 
-    $this->assertEqualXMLStructure(
-      $expected->firstChild,
-      $actual->firstChild,
-      true,
-    );
+    $expectedFirstChild = $expected->firstChild;
+    $actualFirstChild = $actual->firstChild;
+
+    //var_dump(get_class($expectedFirstChild));
+    //var_dump(get_class($actualFirstChild));
+
+    if ($expectedFirstChild instanceof DOMElement &&
+        $actualFirstChild instanceof DOMElement) {
+      $this->assertEqualXMLStructure(
+        $expectedFirstChild,
+        $actualFirstChild,
+        true,
+      );
+      return;
+    }
+
+    $this->fail('assertEqualXMLStructure was not called');
+
   }
 
   public function testAssertStringEqualsNumeric() {
@@ -3001,221 +3083,6 @@ XML;
     $this->fail();
   }
 
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::anything
-   */
-  public function testAssertThatAnything() {
-    self::legacyAssertThat('anything', $this->anything());
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::isTrue
-   */
-  public function testAssertThatIsTrue() {
-    self::legacyAssertThat(true, $this->isTrue());
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::isFalse
-   */
-  public function testAssertThatIsFalse() {
-    self::legacyAssertThat(false, $this->isFalse());
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::isJson
-   */
-  public function testAssertThatIsJson() {
-    self::legacyAssertThat('{}', $this->isJson());
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::anything
-   * @covers PHPUnit_Framework_Assert::logicalOr
-   */
-  public function testAssertThatAnythingOrAnything() {
-    self::legacyAssertThat(
-      'anything',
-      $this->logicalOr($this->anything(), $this->anything()),
-    );
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::anything
-   * @covers PHPUnit_Framework_Assert::logicalNot
-   * @covers PHPUnit_Framework_Assert::logicalXor
-   */
-  public function testAssertThatAnythingXorNotAnything() {
-    self::legacyAssertThat(
-      'anything',
-      $this->logicalXor(
-        $this->anything(),
-        $this->logicalNot($this->anything()),
-      ),
-    );
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::contains
-   */
-  public function testAssertThatContains() {
-    self::legacyAssertThat(['foo'], $this->contains('foo'));
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::stringContains
-   */
-  public function testAssertThatStringContains() {
-    self::legacyAssertThat('barfoobar', $this->stringContains('foo'));
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::containsOnly
-   */
-  public function testAssertThatContainsOnly() {
-    self::legacyAssertThat(['foo'], $this->containsOnly('string'));
-  }
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::containsOnlyInstancesOf
-   */
-  public function testAssertThatContainsOnlyInstancesOf() {
-    self::legacyAssertThat(
-      [new Book()],
-      $this->containsOnlyInstancesOf(Book::class),
-    );
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::arrayHasKey
-   */
-  public function testAssertThatArrayHasKey() {
-    self::legacyAssertThat(['foo' => 'bar'], $this->arrayHasKey('foo'));
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::classHasAttribute
-   */
-  public function testAssertThatClassHasAttribute() {
-    self::legacyAssertThat(
-      new ClassWithNonPublicAttributes(),
-      $this->classHasAttribute('publicAttribute'),
-    );
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::classHasStaticAttribute
-   */
-  public function testAssertThatClassHasStaticAttribute() {
-    self::legacyAssertThat(
-      new ClassWithNonPublicAttributes(),
-      $this->classHasStaticAttribute('publicStaticAttribute'),
-    );
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::objectHasAttribute
-   */
-  public function testAssertThatObjectHasAttribute() {
-    self::legacyAssertThat(
-      new ClassWithNonPublicAttributes(),
-      $this->objectHasAttribute('publicAttribute'),
-    );
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::identicalTo
-   */
-  public function testAssertThatIdenticalTo() {
-    $value = new stdClass();
-    $constraint = $this->identicalTo($value);
-
-    self::legacyAssertThat($value, $constraint);
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::isInstanceOf
-   */
-  public function testAssertThatIsInstanceOf() {
-    self::legacyAssertThat(
-      new stdClass(),
-      $this->isInstanceOf(stdClass::class),
-    );
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::isType
-   */
-  public function testAssertThatIsType() {
-    self::legacyAssertThat('string', $this->isType('string'));
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::lessThan
-   */
-  public function testAssertThatLessThan() {
-    self::legacyAssertThat(1, $this->lessThan(2));
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::lessThanOrEqual
-   */
-  public function testAssertThatLessThanOrEqual() {
-    self::legacyAssertThat(1, $this->lessThanOrEqual(2));
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::matchesRegularExpression
-   */
-  public function testAssertThatMatchesRegularExpression() {
-    self::legacyAssertThat(
-      'foobar',
-      $this->matchesRegularExpression('/foo/'),
-    );
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::callback
-   */
-  public function testAssertThatCallback() {
-    self::legacyAssertThat(
-      null,
-      $this->callback(
-        function($other) {
-          return true;
-        },
-      ),
-    );
-  }
-
-  /**
-   * @covers PHPUnit_Framework_Assert::assertThat
-   * @covers PHPUnit_Framework_Assert::countOf
-   */
-  public function testAssertThatCountOf() {
-    self::legacyAssertThat([1], $this->countOf(1));
-  }
-
   public function testAssertFileEquals() {
     $this->assertFileEquals(
       $this->getFilesDirectory().'foo.xml',
@@ -3567,9 +3434,11 @@ XML;
   public function testMarkTestIncomplete() {
     try {
       $this->markTestIncomplete('incomplete');
+    } catch (IncompleteException $e) {
+      $this->assertEquals('incomplete', $e->getMessage());
+      return;
     } catch (PHPUnit_Framework_IncompleteTestError $e) {
       $this->assertEquals('incomplete', $e->getMessage());
-
       return;
     }
 
@@ -3579,9 +3448,11 @@ XML;
   public function testMarkTestSkipped() {
     try {
       $this->markTestSkipped('skipped');
+    } catch (SkippedException $e) {
+      $this->assertEquals('skipped', $e->getMessage());
+      return;
     } catch (PHPUnit_Framework_SkippedTestError $e) {
       $this->assertEquals('skipped', $e->getMessage());
-
       return;
     }
 
