@@ -53,6 +53,9 @@ use SebastianBergmann\PHPUnit\Assertions\AssertCount;
 use SebastianBergmann\PHPUnit\Assertions\AssertEmpty;
 use SebastianBergmann\PHPUnit\Assertions\AssertEquals;
 use SebastianBergmann\PHPUnit\Assertions\AssertEqualXMLStructure;
+use SebastianBergmann\PHPUnit\Assertions\AssertExceptionRegexpMessage;
+use SebastianBergmann\PHPUnit\Assertions\AssertExceptionSameClass;
+use SebastianBergmann\PHPUnit\Assertions\AssertExceptionSameMessage;
 use SebastianBergmann\PHPUnit\Assertions\AssertFileEquals;
 use SebastianBergmann\PHPUnit\Assertions\AssertFileExists;
 use SebastianBergmann\PHPUnit\Assertions\AssertFileNotEquals;
@@ -2248,6 +2251,74 @@ class Assertions {
   }
 
   /**
+   * Determines if a given exception, matches another exception's class.
+   *
+   * @param mixed                        $expected
+   * @param mixed                        $actual
+   * @param string                       $message
+   *
+   * @since Method available since Release 2.1.5-darkseid
+   */
+  final public function assertExceptionSameClass(
+    mixed $expected,
+    mixed $actual,
+    string $message = '',
+  ): bool {
+
+    return
+      AssertExceptionSameClass::evaluate($this, $expected, $actual, $message);
+
+  }
+
+  /**
+   * Determines if a given exception, matches another exception's message.
+   *
+   * @param mixed                        $expected
+   * @param mixed                        $actual
+   * @param string                       $message
+   *
+   * @since Method available since Release 2.1.5-darkseid
+   */
+  final public function assertExceptionSameMessage(
+    mixed $expected,
+    mixed $actual,
+    string $message = '',
+  ): bool {
+
+    return AssertExceptionSameMessage::evaluate(
+      $this,
+      $expected,
+      $actual,
+      $message,
+    );
+
+  }
+
+  /**
+   * Determines if a given exception, matches another exception's message.
+   *
+   * @param mixed                        $expected
+   * @param mixed                        $actual
+   * @param string                       $message
+   *
+   * @since Method available since Release 2.1.5-darkseid
+   */
+  final public function assertExceptionRegexpMessage(
+    string $expected,
+    mixed $actual,
+    string $message = '',
+  ): bool {
+
+    return AssertExceptionRegexpMessage::evaluate(
+      $this,
+      $expected,
+      $actual,
+      $message,
+    );
+
+  }
+
+  /**
    * Evaluates a PHPUnit_Framework_Constraint matcher object.
    *
    * @param mixed                        $value
@@ -2371,7 +2442,6 @@ class Assertions {
    * @since Method available since Release 3.0.0
    */
   final public function markTestIncomplete(string $message = ''): void {
-    // throw new PHPUnit_Framework_IncompleteTestError($message);
     throw new IncompleteException($message);
   }
 
@@ -2385,7 +2455,6 @@ class Assertions {
    * @since Method available since Release 3.0.0
    */
   final public function markTestSkipped(string $message = ''): void {
-    // throw new PHPUnit_Framework_SkippedTestError($message);
     throw new SkippedException($message);
   }
 

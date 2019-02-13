@@ -12,6 +12,7 @@ use Doctrine\Instantiator\Instantiator;
 use Doctrine\Instantiator\Exception\InvalidArgumentException as InstantiatorInvalidArgumentException;
 use Doctrine\Instantiator\Exception\UnexpectedValueException as InstantiatorUnexpectedValueException;
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+use SebastianBergmann\TextTemplate\Template as Text_Template;
 
 /**
  * Mock Object Code Generator

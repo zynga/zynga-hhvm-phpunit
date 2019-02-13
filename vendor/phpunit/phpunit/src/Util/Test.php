@@ -178,10 +178,11 @@ class PHPUnit_Util_Test
      */
     public static function getRequirements($className, $methodName)
     {
-        $reflector  = ReflectionClasses::getReflection($className);
-        $docComment = $reflector->getDocComment();
-        $reflector  = ReflectionMethods::getReflection($className, $methodName);
-        $docComment .= "\n" . $reflector->getDocComment();
+        $classReflection  = ReflectionClasses::getReflection($className);
+        $docComment = $classReflection->getDocComment();
+
+        $methodReflection  = ReflectionMethods::getReflection($className, $methodName);
+        $docComment .= "\n" . $methodReflection->getDocComment();
         $requires   = [];
 
         if ($count = preg_match_all(self::REGEX_REQUIRES_OS, $docComment, $matches)) {
@@ -234,15 +235,16 @@ class PHPUnit_Util_Test
      */
     public static function getMissingRequirements($className, $methodName)
     {
+
         $required = static::getRequirements($className, $methodName);
         $missing  = [];
 
         $operator = empty($required['PHP']['operator']) ? '>=' : $required['PHP']['operator'];
-        if (!empty($required['PHP']) && !version_compare(PHP_VERSION, $required['PHP']['version'], $operator)) {
+        if (isset($required['PHP']) && count($required['PHP']) > 0&& !version_compare(PHP_VERSION, $required['PHP']['version'], $operator)) {
             $missing[] = sprintf('PHP %s %s is required.', $operator, $required['PHP']['version']);
         }
 
-        if (!empty($required['PHPUnit'])) {
+        if (isset($required['PHPUnit']) && count($required['PHPUnit']) > 0) {
             $phpunitVersion = PHPUnit_Runner_Version::id();
 
             $operator = empty($required['PHPUnit']['operator']) ? '>=' : $required['PHPUnit']['operator'];
@@ -251,11 +253,14 @@ class PHPUnit_Util_Test
             }
         }
 
-        if (!empty($required['OS']) && !preg_match($required['OS'], PHP_OS)) {
+        if (isset($required['OS']) && count($required['OS']) > 0 && !preg_match($required['OS'], PHP_OS)) {
             $missing[] = sprintf('Operating system matching %s is required.', $required['OS']);
         }
 
-        if (!empty($required['functions'])) {
+
+        if (isset($required['functions']) && count($required['functions']) > 0) {
+
+
             foreach ($required['functions'] as $function) {
                 $pieces = explode('::', $function);
                 if (2 === count($pieces) && method_exists($pieces[0], $pieces[1])) {
@@ -268,7 +273,9 @@ class PHPUnit_Util_Test
             }
         }
 
-        if (!empty($required['extensions'])) {
+        if (isset($required['extensions']) && count($required['extensions']) > 0) {
+
+
             foreach ($required['extensions'] as $extension) {
                 if (isset($required['extension_versions'][$extension])) {
                     continue;
@@ -279,7 +286,7 @@ class PHPUnit_Util_Test
             }
         }
 
-        if (!empty($required['extension_versions'])) {
+        if (isset($required['extension_versions']) && count($required['extension_versions']) > 0) {
             foreach ($required['extension_versions'] as $extension => $required) {
                 $actualVersion = phpversion($extension);
 
@@ -289,6 +296,8 @@ class PHPUnit_Util_Test
                 }
             }
         }
+
+
 
         return $missing;
     }
@@ -305,6 +314,11 @@ class PHPUnit_Util_Test
      */
     public static function getExpectedException($className, $methodName)
     {
+
+      if ( ! is_string($className) || ! is_string($methodName) ) {
+        return false;
+      }
+      
         $reflector  = ReflectionMethods::getReflection($className, $methodName);
         $docComment = $reflector->getDocComment();
         $docComment = substr($docComment, 3, -2);

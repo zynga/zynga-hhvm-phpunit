@@ -150,7 +150,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
             $argumentsValid = true;
         } elseif (is_string($theClass) &&
                  $theClass !== '' &&
-                 class_exists($theClass, false)) {
+                 class_exists($theClass, true)) {
             $argumentsValid = true;
 
             if ($name == '') {
@@ -159,6 +159,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
 
             $theClass = ReflectionClasses::getReflection($theClass);
         } elseif (is_string($theClass)) {
+
             $this->setName($theClass);
 
             return;
@@ -197,7 +198,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
         }
 
         foreach ($theClass->getMethods() as $method) {
-            $this->addTestMethod($theClass, $method);
+          $this->addTestMethod($theClass, $method);
         }
 
         if (empty($this->tests)) {
@@ -701,8 +702,11 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                 if ($this->testCase === true &&
                     class_exists($this->name, false) &&
                     method_exists($this->name, $beforeClassMethod)) {
-                    if ($missingRequirements = PHPUnit_Util_Test::getMissingRequirements($this->name, $beforeClassMethod)) {
-                        $this->markTestSuiteSkipped(implode(PHP_EOL, $missingRequirements));
+
+                    $missingRequirements = PHPUnit_Util_Test::getMissingRequirements($this->name, $beforeClassMethod);
+
+                    if (count($missingRequirements) > 0 ) {
+                      $this->markTestSuiteSkipped(implode(PHP_EOL, $missingRequirements));
                     }
 
                     call_user_func([$this->name, $beforeClassMethod]);

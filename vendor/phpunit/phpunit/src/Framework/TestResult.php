@@ -17,9 +17,10 @@ use SebastianBergmann\ResourceOperations\ResourceOperations;
 use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 
-
 use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
+use SebastianBergmann\PHPUnit\Exceptions\ExpectationFailedException;
 use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentException;
+use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
 
 /**
  * A TestResult collects the results of executing a test case.
@@ -241,6 +242,13 @@ class PHPUnit_Framework_TestResult implements Countable
             if ($this->stopOnIncomplete) {
                 $this->stop();
             }
+        } else if ($t instanceof SkippedException ) {
+          $this->skipped[] = new PHPUnit_Framework_TestFailure($test, $t);
+          $notifyMethod    = 'addSkippedTest';
+
+          if ($this->stopOnSkipped) {
+              $this->stop();
+          }
         } elseif ($t instanceof PHPUnit_Framework_SkippedTest) {
             $this->skipped[] = new PHPUnit_Framework_TestFailure($test, $t);
             $notifyMethod    = 'addSkippedTest';
@@ -263,6 +271,7 @@ class PHPUnit_Framework_TestResult implements Countable
         }
 
         foreach ($this->listeners as $listener) {
+
             $listener->$notifyMethod($test, $t, $time);
         }
 
@@ -309,6 +318,13 @@ class PHPUnit_Framework_TestResult implements Countable
      */
     public function addFailure(PHPUnit_Framework_Test $test, Exception $e, $time)
     {
+      // if ( preg_match('/Requirements/', get_class($test))) {
+      //   var_dump($test->getName());
+      //   var_dump(get_class($test));
+      //   var_dump($e);
+      //   exit();
+      // }
+
         if ($e instanceof PHPUnit_Framework_RiskyTest ||
             $e instanceof PHPUnit_Framework_OutputError) {
             $this->risky[] = new PHPUnit_Framework_TestFailure($test, $e);
@@ -324,6 +340,13 @@ class PHPUnit_Framework_TestResult implements Countable
             if ($this->stopOnIncomplete) {
                 $this->stop();
             }
+        } elseif ($e instanceof SkippedException) {
+          $this->skipped[] = new PHPUnit_Framework_TestFailure($test, $e);
+          $notifyMethod    = 'addSkippedTest';
+
+          if ($this->stopOnSkipped) {
+              $this->stop();
+          }
         } elseif ($e instanceof PHPUnit_Framework_SkippedTest) {
             $this->skipped[] = new PHPUnit_Framework_TestFailure($test, $e);
             $notifyMethod    = 'addSkippedTest';
@@ -684,29 +707,29 @@ class PHPUnit_Framework_TestResult implements Countable
         PHP_Timer::start();
 
         try {
-            if (!$test instanceof PHPUnit_Framework_WarningTestCase &&
-                $test->getSize() != PHPUnit_Util_Test::UNKNOWN &&
-                $this->enforceTimeLimit &&
-                extension_loaded('pcntl') && class_exists('PHP_Invoker')) {
-                switch ($test->getSize()) {
-                    case PHPUnit_Util_Test::SMALL:
-                        $_timeout = $this->timeoutForSmallTests;
-                        break;
-
-                    case PHPUnit_Util_Test::MEDIUM:
-                        $_timeout = $this->timeoutForMediumTests;
-                        break;
-
-                    case PHPUnit_Util_Test::LARGE:
-                        $_timeout = $this->timeoutForLargeTests;
-                        break;
-                }
-
-                $invoker = new PHP_Invoker;
-                $invoker->invoke([$test, 'runBare'], [], $_timeout);
-            } else {
+            // if (!$test instanceof PHPUnit_Framework_WarningTestCase &&
+            //     $test->getSize() != PHPUnit_Util_Test::UNKNOWN &&
+            //     $this->enforceTimeLimit &&
+            //     extension_loaded('pcntl') && class_exists('PHP_Invoker')) {
+            //     switch ($test->getSize()) {
+            //         case PHPUnit_Util_Test::SMALL:
+            //             $_timeout = $this->timeoutForSmallTests;
+            //             break;
+            //
+            //         case PHPUnit_Util_Test::MEDIUM:
+            //             $_timeout = $this->timeoutForMediumTests;
+            //             break;
+            //
+            //         case PHPUnit_Util_Test::LARGE:
+            //             $_timeout = $this->timeoutForLargeTests;
+            //             break;
+            //     }
+            //
+            //     $invoker = new PHP_Invoker;
+            //     $invoker->invoke([$test, 'runBare'], [], $_timeout);
+            // } else {
                 $test->runBare();
-            }
+            // }
 
         } catch (PHPUnit_Framework_MockObject_Exception $e) {
             $e = new PHPUnit_Framework_Warning(
@@ -718,6 +741,11 @@ class PHPUnit_Framework_TestResult implements Countable
           $failure = true;
         } catch (InvalidArgumentException $e) {
           $error = true;
+        } catch (SkippedException $e) {
+          $failure = true;
+          $skipped = true;
+        } catch (ExpectationFailedException $e) {
+          $failure = true;
         } catch (PHPUnit_Framework_AssertionFailedError $e) {
             $failure = true;
 
@@ -736,6 +764,12 @@ class PHPUnit_Framework_TestResult implements Countable
             $e     = new PHPUnit_Framework_ExceptionWrapper($e);
             $error = true;
         } catch (Exception $e) {
+          // var_dump('TestResult::Exception trap');
+          // var_dump(get_class($e));
+          // var_dump($e->getMessage());
+          // // var_dump(debug_backtrace(2));
+          // var_dump($e->getTrace());
+          // exit();
             $e     = new PHPUnit_Framework_ExceptionWrapper($e);
             $error = true;
         }
@@ -861,6 +895,17 @@ class PHPUnit_Framework_TestResult implements Countable
             restore_error_handler();
         }
 
+
+        // if ( preg_match('/ThrowExceptionTestCase/', get_class($test)) && $test->getName(false) == 'test' ) {
+        //   var_dump('ThrowExceptionTestCase::trap');
+        //   var_dump($test->getName(false));
+        //   var_dump(get_class($e));
+        //   var_dump($e->getTrace());
+        //   var_dump($error);
+        //   var_dump($failure);
+        //   var_dump($skipped);
+        //   exit();
+        // }
         if ($error === true) {
             $this->addError($test, $e, $time);
         } elseif ($failure === true) {
