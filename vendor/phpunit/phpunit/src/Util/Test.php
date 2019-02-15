@@ -318,8 +318,20 @@ class PHPUnit_Util_Test
       if ( ! is_string($className) || ! is_string($methodName) ) {
         return false;
       }
-      
+
+      if ($className == '' || $methodName == '' ) {
+        return false;
+      }
+
         $reflector  = ReflectionMethods::getReflection($className, $methodName);
+
+        if ( $reflector == null ) {
+          var_dump($className);
+          var_dump($methodName);
+          var_dump(debug_backtrace(2));
+          exit();
+        }
+
         $docComment = $reflector->getDocComment();
         $docComment = substr($docComment, 3, -2);
 

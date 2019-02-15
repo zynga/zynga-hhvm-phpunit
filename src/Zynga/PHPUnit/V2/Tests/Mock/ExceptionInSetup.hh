@@ -12,12 +12,12 @@ class ExceptionInSetUp extends PHPUnit_Framework_TestCase {
   public $tearDown = false;
   public $testSomething = false;
 
-  protected function setUp() {
+  public function setUp() {
     $this->setUp = true;
     throw new Exception();
   }
 
-  protected function assertPreConditions() {
+  public function assertPreConditions() {
     $this->assertPreConditions = true;
   }
 
@@ -25,11 +25,11 @@ class ExceptionInSetUp extends PHPUnit_Framework_TestCase {
     $this->testSomething = true;
   }
 
-  protected function assertPostConditions() {
+  public function assertPostConditions() {
     $this->assertPostConditions = true;
   }
 
-  protected function tearDown() {
+  public function tearDown() {
     $this->tearDown = true;
   }
 }

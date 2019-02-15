@@ -658,12 +658,6 @@ class PHPUnit_Framework_TestResult implements Countable
 
       $test->resetCount();
 
-        if ($test instanceof PHPUnit_Framework_TestCase) {
-            $test->setRegisterMockObjectsFromTestArgumentsRecursively(
-                $this->registerMockObjectsFromTestArgumentsRecursively
-            );
-        }
-
         $error      = false;
         $failure    = false;
         $warning    = false;

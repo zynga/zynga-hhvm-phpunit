@@ -88,50 +88,40 @@ class TestCaseTest extends PHPUnit_Framework_TestCase {
     int $failureCount = 0,
     int $skippedCount = 0,
   ): void {
-    if ($debug == true) {
-
-      $actualErrorCount = $result->errorCount();
-      $actualErrors = $result->errors();
-
-      var_dump(
-        'errorCount expected='.$errorCount.' actual='.$actualErrorCount,
-      );
-
-      if ($errorCount != $actualErrorCount) {
-        var_dump($actualErrors);
-      }
-
-      $actualFailureCount = $result->failureCount();
-      $actualFailures = $result->failures();
-
-      var_dump(
-        'failureCount'.
-        ' expected='.
-        $failureCount.
-        ' actual='.
-        $actualFailureCount,
-      );
-
-      if ($failureCount != $actualFailureCount) {
-        var_dump($actualFailures);
-      }
-
-      $actualSkippedCount = $result->skippedCount();
-      $actualSkipped = $result->skipped();
-
-      var_dump(
-        'skippedCount'.
-        ' expected='.
-        $skippedCount.
-        ' actual='.
-        $actualSkippedCount,
-      );
-
-      if ($skippedCount != $actualSkippedCount) {
-        var_dump($actualSkipped);
-      }
-
+    if ($debug != true) {
+      return;
     }
+
+    $actualErrorCount = $result->errorCount();
+    $actualErrors = $result->errors();
+
+    var_dump('errorCount expected='.$errorCount.' actual='.$actualErrorCount);
+    var_dump($actualErrors);
+
+    $actualFailureCount = $result->failureCount();
+    $actualFailures = $result->failures();
+
+    var_dump(
+      'failureCount'.
+      ' expected='.
+      $failureCount.
+      ' actual='.
+      $actualFailureCount,
+    );
+    var_dump($actualFailures);
+
+    $actualSkippedCount = $result->skippedCount();
+    $actualSkipped = $result->skipped();
+
+    var_dump(
+      'skippedCount'.
+      ' expected='.
+      $skippedCount.
+      ' actual='.
+      $actualSkippedCount,
+    );
+    var_dump($actualSkipped);
+
   }
 
   private function _verifyTestResult(
@@ -654,11 +644,24 @@ class TestCaseTest extends PHPUnit_Framework_TestCase {
   // }
 
   public function testExpectOutputStringFooActualFoo() {
+
     $test = new OutputTestCase('testExpectOutputStringFooActualFoo');
+
     $result = $test->run();
 
     $this->assertEquals(1, count($result));
-    $this->assertTrue($result->wasSuccessful());
+
+    $this->_verifyTest(
+      $test,
+      $result,
+      false,
+      PHPUnit_Runner_BaseTestRunner::STATUS_PASSED,
+      '',
+      0,
+      0,
+      0,
+    );
+
   }
 
   public function testExpectOutputStringFooActualBar() {
