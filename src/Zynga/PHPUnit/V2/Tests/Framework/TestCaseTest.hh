@@ -18,6 +18,7 @@ use Zynga\PHPUnit\V2\Tests\Framework\BaseTest;
 use Zynga\PHPUnit\V2\Tests\Mock\ChangeCurrentWorkingDirectory;
 use Zynga\PHPUnit\V2\Tests\Mock\ExceptionInAssertPreConditions;
 use Zynga\PHPUnit\V2\Tests\Mock\ExceptionInAssertPostConditions;
+use Zynga\PHPUnit\V2\Tests\Mock\ExceptionInButExpected;
 use Zynga\PHPUnit\V2\Tests\Mock\ExceptionInSetUp;
 use Zynga\PHPUnit\V2\Tests\Mock\ExceptionInTearDown;
 use Zynga\PHPUnit\V2\Tests\Mock\ExceptionIn;
@@ -41,6 +42,8 @@ use \PHPUnit_Framework_TestResult;
 use \PHPUnit_Framework_TestSuite;
 use \PHPUnit_Runner_BaseTestRunner;
 
+use \Exception;
+use \Throwable;
 use \RuntimeException;
 
 // $GLOBALS['a']  = 'a';
@@ -81,6 +84,46 @@ class TestCaseTest extends PHPUnit_Framework_TestCase {
     );
   }
 
+  private function _debugException(Exception $e) {
+
+    print 'message='."\n";
+    var_dump($e->getMessage());
+    print 'file='.$e->getFile().'('.$e->getLine().')'."\n";
+    print 'trace='."\n";
+    $offset = 0;
+    foreach ($e->getTrace() as $traceFrame) {
+      $file = '';
+      $class = '';
+      $function = '';
+      $line = '';
+
+      if (array_key_exists('file', $traceFrame)) {
+        $file = $traceFrame['file'];
+      }
+      if (array_key_exists('class', $traceFrame)) {
+        $class = $traceFrame['class'].'::';
+      }
+      if (array_key_exists('function', $traceFrame)) {
+        $function = $traceFrame['function'];
+      }
+
+      if (array_key_exists('line', $traceFrame)) {
+        $line = $traceFrame['line'];
+      }
+
+      print 'frame='.$offset."\n";
+      print '  file='.$file.'('.$line.') '.$class.$function."\n";
+
+      $offset++;
+    }
+  }
+
+  private function _debugExceptions(array $exceptions) {
+    foreach ($exceptions as $exception) {
+      $this->_debugException($exception->thrownException());
+    }
+  }
+
   private function _debugTestResult(
     PHPUnit_Framework_TestResult $result,
     bool $debug,
@@ -88,6 +131,7 @@ class TestCaseTest extends PHPUnit_Framework_TestCase {
     int $failureCount = 0,
     int $skippedCount = 0,
   ): void {
+
     if ($debug != true) {
       return;
     }
@@ -95,20 +139,24 @@ class TestCaseTest extends PHPUnit_Framework_TestCase {
     $actualErrorCount = $result->errorCount();
     $actualErrors = $result->errors();
 
-    var_dump('errorCount expected='.$errorCount.' actual='.$actualErrorCount);
-    var_dump($actualErrors);
+    print
+      'errorCount expected='.$errorCount.' actual='.$actualErrorCount."\n"
+    ;
+    $this->_debugExceptions($actualErrors);
 
     $actualFailureCount = $result->failureCount();
     $actualFailures = $result->failures();
 
-    var_dump(
+    print
       'failureCount'.
       ' expected='.
       $failureCount.
       ' actual='.
-      $actualFailureCount,
-    );
-    var_dump($actualFailures);
+      $actualFailureCount.
+      "\n"
+    ;
+
+    $this->_debugExceptions($actualFailures);
 
     $actualSkippedCount = $result->skippedCount();
     $actualSkipped = $result->skipped();
@@ -192,6 +240,18 @@ class TestCaseTest extends PHPUnit_Framework_TestCase {
 
       var_dump('statusMessage actual=');
       var_dump($test->getStatusMessage());
+
+      print 'expectedException='.$test->getExpectedException()."\n";
+      print
+        'expectedExceptionMessage='.
+        $test->getExpectedExceptionMessage().
+        "\n"
+      ;
+      print
+        'expectedExceptionMessageRegExp='.
+        $test->getExpectedExceptionMessageRegExp().
+        "\n"
+      ;
 
       $this->_debugTestResult(
         $result,
@@ -810,14 +870,24 @@ class TestCaseTest extends PHPUnit_Framework_TestCase {
     $this->assertSame($expectedCwd, getcwd());
   }
 
-  // /**
-  //  * @requires PHP 7
-  //  * @expectedException TypeError
-  //  */
-  // public function testTypeErrorCanBeExpected() {
-  //   $o = new ClassWithScalarTypeDeclarations();
-  //   $o->foo(null, null);
-  // }
+  public function testExpectedExceptionInComments() {
+
+    $test = new ExceptionInButExpected('testSomething');
+
+    $result = $test->run();
+
+    $this->_verifyTest(
+      $test,
+      $result,
+      false,
+      PHPUnit_Runner_BaseTestRunner::STATUS_PASSED,
+      '',
+      0,
+      0,
+      0,
+    );
+
+  }
 
   // --
   // JEO: createMock is deprecated

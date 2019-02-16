@@ -9,18 +9,12 @@
  * file that was distributed with this source code.
  */
 
-use SebastianBergmann\GlobalState\Snapshot;
-use SebastianBergmann\GlobalState\Restorer;
-use SebastianBergmann\GlobalState\Blacklist;
-use SebastianBergmann\Diff\Differ;
 use SebastianBergmann\Exporter\Exporter;
-use SebastianBergmann\ObjectEnumerator\Enumerator;
 use SebastianBergmann\PHPUnit\Environment\OutputBuffering;
 use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
 use Prophecy\Exception\Prediction\PredictionException;
-use Prophecy\Prophet;
 use DeepCopy\DeepCopy;
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 use Zynga\PHPUnit\V2\TestCase;
@@ -80,57 +74,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
   private PHPUnit_Framework_Test $_test = null;
 
     /**
-     * Enable or disable the backup and restoration of the $GLOBALS array.
-     * Overwrite this attribute in a child class of TestCase.
-     * Setting this attribute in setUp() has no effect!
-     *
-     * @var bool
-     */
-    protected $backupGlobals = null;
-
-    /**
-     * @var array
-     */
-    protected $backupGlobalsBlacklist = [];
-
-    /**
-     * Enable or disable the backup and restoration of static attributes.
-     * Overwrite this attribute in a child class of TestCase.
-     * Setting this attribute in setUp() has no effect!
-     *
-     * @var bool
-     */
-    protected $backupStaticAttributes = null;
-
-    /**
-     * @var array
-     */
-    protected $backupStaticAttributesBlacklist = [];
-
-    /**
-     * Whether or not this test is to be run in a separate PHP process.
-     *
-     * @var bool
-     */
-    protected $runTestInSeparateProcess = null;
-
-    /**
-     * Whether or not this test should preserve the global state when
-     * running in a separate PHP process.
-     *
-     * @var bool
-     */
-    protected $preserveGlobalState = false; // JEO: Changed this to default to off
-
-
-    /**
-     * Whether or not this test is running in a separate PHP process.
-     *
-     * @var bool
-     */
-    private $inIsolation = false;
-
-    /**
      * @var array
      */
     private $data = [];
@@ -144,35 +87,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
      * @var bool
      */
     private $useErrorHandler = null;
-
-    /**
-     * The name of the expected Exception.
-     *
-     * @var string
-     */
-    private $expectedException = '';
-
-    /**
-     * The message of the expected Exception.
-     *
-     * @var string
-     */
-    private $expectedExceptionMessage = '';
-
-    /**
-     * The regex pattern to validate the expected Exception message.
-     *
-     * @var string
-     */
-    private $expectedExceptionMessageRegExp = '';
-
-    /**
-     * The code of the expected Exception
-     *
-     * @var int
-     */
-    // @TODO: JEO we should work on this not using null as a value.
-    private $expectedExceptionCode = null;
 
     /**
      * The name of the test case.
@@ -232,24 +146,9 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
     private $outputCallback = false;
 
     /**
-     * @var SebastianBergmann\GlobalState\Snapshot
-     */
-    private $snapshot;
-
-    /**
-     * @var bool
-     */
-    private $beStrictAboutChangesToGlobalState = false;
-
-    /**
      * @var string[]
      */
     private $warnings = [];
-
-    /**
-     * @var array
-     */
-    private $groups = [];
 
     /**
      * Constructs a test case with the given name.
@@ -291,36 +190,14 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
      */
     public function toString() {
 
-      $test = $this->getTest();
+      $buffer = sprintf(
+        '%s::%s',
+        $this->getClass(),
+        $this->getName(false)
+      );
 
-        $class = ReflectionClasses::getReflection($test);
+      return $buffer . $this->getDataSetAsString();
 
-        $buffer = sprintf(
-            '%s::%s',
-            $class->name,
-            $test->getName(false)
-        );
-
-        return $buffer . $this->getDataSetAsString();
-    }
-
-
-    /**
-     * @since Method available since Release 5.4.0
-     */
-    public function getGroups()
-    {
-        return $this->groups;
-    }
-
-    /**
-     * @param array $groups
-     *
-     * @since Method available since Release 5.4.0
-     */
-    public function setGroups(array $groups)
-    {
-        $this->groups = $groups;
     }
 
     /**
@@ -333,7 +210,7 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
     public function getSize()
     {
           return PHPUnit_Util_Test::getSize(
-            get_class($this->getTest()),
+            $this->getClass(),
             $this->getName(false)
         );
     }
@@ -453,151 +330,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
     }
 
     /**
-     * @return string
-     *
-     * @since Method available since Release 3.2.0
-     */
-    public function getExpectedException()
-    {
-        return $this->expectedException;
-    }
-
-    /**
-     * @param mixed      $exception
-     * @param string     $message
-     * @param int|string $code
-     *
-     * @throws PHPUnit_Framework_Exception
-     *
-     * @since      Method available since Release 3.2.0
-     * @deprecated Method deprecated since Release 5.2.0
-     */
-    public function setExpectedException($exception, $message = '', $code = null)
-    {
-        $this->expectedException = $exception;
-
-        if ($message !== null && $message !== '') {
-            $this->expectExceptionMessage($message);
-        }
-
-        if ($code !== null) {
-            $this->expectExceptionCode($code);
-        }
-    }
-
-    /**
-     * @param mixed  $exception
-     * @param string $messageRegExp
-     * @param int    $code
-     *
-     * @throws PHPUnit_Framework_Exception
-     *
-     * @since Method available since Release 4.3.0
-     */
-    public function setExpectedExceptionRegExp($exception, $messageRegExp = '', $code = null)
-    {
-        if (!is_string($messageRegExp)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(2, 'string');
-        }
-
-        $this->expectedException              = $exception;
-        $this->expectedExceptionMessageRegExp = $messageRegExp;
-
-        if ($code !== null) {
-            $this->expectExceptionCode($code);
-        }
-    }
-
-    /**
-     * @param mixed $exception
-     *
-     * @since Method available since Release 5.2.0
-     */
-    public function expectException($exception)
-    {
-        $this->expectedException = $exception;
-    }
-
-    /**
-     * @param int|string $code
-     *
-     * @throws PHPUnit_Framework_Exception
-     *
-     * @since Method available since Release 5.2.0
-     */
-    public function expectExceptionCode($code)
-    {
-        if (!is_int($code) && !is_string($code)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'integer or string');
-        }
-
-        $this->expectedExceptionCode = $code;
-    }
-
-    /**
-     * @param string $message
-     *
-     * @throws PHPUnit_Framework_Exception
-     *
-     * @since Method available since Release 5.2.0
-     */
-    public function expectExceptionMessage($message)
-    {
-        if (!is_string($message)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'string');
-        }
-
-        $this->expectedExceptionMessage = $message;
-    }
-
-    /**
-     * @param string $messageRegExp
-     *
-     * @throws PHPUnit_Framework_Exception
-     *
-     * @since Method available since Release 5.2.0
-     */
-    public function expectExceptionMessageRegExp($messageRegExp)
-    {
-        if (!is_string($messageRegExp)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'string');
-        }
-
-        $this->expectedExceptionMessageRegExp = $messageRegExp;
-    }
-
-    /**
-     * @since Method available since Release 3.4.0
-     */
-    protected function setExpectedExceptionFromAnnotation()
-    {
-        try {
-
-          $test = $this->getTest();
-
-            $expectedException = PHPUnit_Util_Test::getExpectedException(
-                get_class($test),
-                $test->getName(false)
-            );
-
-            if ($expectedException !== false) {
-                $this->expectException($expectedException['class']);
-
-                if ($expectedException['code'] !== null) {
-                    $this->expectExceptionCode($expectedException['code']);
-                }
-
-                if ($expectedException['message'] !== '') {
-                    $this->expectExceptionMessage($expectedException['message']);
-                } elseif ($expectedException['message_regex'] !== '') {
-                    $this->expectExceptionMessageRegExp($expectedException['message_regex']);
-                }
-            }
-        } catch (ReflectionException $e) {
-        }
-    }
-
-    /**
      * @param bool $useErrorHandler
      *
      * @since Method available since Release 3.4.0
@@ -616,8 +348,8 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
           $test = $this->getTest();
 
           $useErrorHandler = PHPUnit_Util_Test::getErrorHandlerSettings(
-                get_class($test),
-                $test->getName(false)
+                $this->getClass(),
+                $this->getName(false)
             );
 
             if ($useErrorHandler !== null) {
@@ -633,43 +365,19 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
     protected function checkRequirements()
     {
       $test = $this->getTest();
-      $name = $test->getName(false);
+      $name = $this->getName(false);
         if (! $name || !method_exists($test, $name)) {
             return;
         }
 
         $missingRequirements = PHPUnit_Util_Test::getMissingRequirements(
-            get_class($test),
+            $test->getClass(),
             $name
         );
 
         if (count($missingRequirements) > 0) {
             $this->markTestSkipped(implode(PHP_EOL, $missingRequirements));
         }
-    }
-
-    /**
-     * Returns the status of this test.
-     *
-     * @return int
-     *
-     * @since Method available since Release 3.1.0
-     */
-    public function getStatus()
-    {
-        return $this->status()->getCode();
-    }
-
-    /**
-     * Returns the status message of this test.
-     *
-     * @return string
-     *
-     * @since Method available since Release 3.3.0
-     */
-    public function getStatusMessage() {
-      //var_dump(__LINE__ . ' getStatusMessage: ' . $this->status()->getMessage());
-      return $this->status()->getMessage();
     }
 
     /**
@@ -702,6 +410,9 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
     {
 
       $test = $this->getTest();
+
+        // var_dump('run=' . get_class($this) . ' test=' . get_class($test));
+
 
         if ($result === null) {
             $result = $this->createResult();
@@ -740,6 +451,8 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
     {
       $test = $this->getTest();
 
+      // var_dump('runBare=' . get_class($this) . ' test=' . get_class($test));
+
         $this->numAssertions = 0;
 
         $this->startOutputBuffering();
@@ -748,19 +461,14 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
 
         $currentWorkingDirectory = getcwd();
 
-        $hookMethods = PHPUnit_Util_Test::getHookMethods(get_class($test));
+        $hookMethods = PHPUnit_Util_Test::getHookMethods($test->getClass());
 
         try {
             $hasMetRequirements = false;
             $this->checkRequirements();
             $hasMetRequirements = true;
-            if ($this->inIsolation) {
-                foreach ($hookMethods['beforeClass'] as $method) {
-                    $test->$method();
-                }
-            }
 
-            $this->setExpectedExceptionFromAnnotation();
+            $test->setExpectedExceptionFromAnnotation();
 
             foreach ($hookMethods['before'] as $method) {
               if ( method_exists($test, $method) ) {
@@ -849,12 +557,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
                 foreach ($hookMethods['after'] as $method) {
                     $test->$method();
                 }
-
-                if ($this->inIsolation) {
-                    foreach ($hookMethods['afterClass'] as $method) {
-                        $test->$method();
-                    }
-                }
             }
         } catch (Throwable $_e) {
             if (!isset($e)) {
@@ -902,7 +604,7 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
               } elseif ($this->outputExpectedString !== null) {
                 $this->assertEquals($this->outputExpectedString, $output);
               }
-              
+
             } catch (Throwable $_e) {
                 $e = $_e;
             } catch (Exception $_e) {
@@ -963,7 +665,7 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
 
         $checkException = false;
 
-        if ( $this->expectedException != '' ) {
+        if ( $this->getExpectedException() != '' ) {
           $checkException = true;
         }
 
@@ -997,19 +699,19 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
           try {
 
 
-            $this->assertExceptionSameClass($this->expectedException, $e);
+            $this->assertExceptionSameClass($this->getExpectedException(), $e);
 
-            if ($this->expectedExceptionMessage != '') {
-              $this->assertExceptionSameMessage($this->expectedExceptionMessage, $e);
+            if ($this->getExpectedExceptionMessage() != '') {
+              $this->assertExceptionSameMessage($this->getExpectedExceptionMessage(), $e);
             }
 
-            if ($this->expectedExceptionMessageRegExp != '') {
-              $this->assertExceptionRegexpMessage($this->expectedExceptionMessageRegExp, $e);
+            if ($this->getExpectedExceptionMessageRegExp() != '') {
+              $this->assertExceptionRegexpMessage($this->getExpectedExceptionMessageRegExp(), $e);
             }
 
-            if ($this->expectedExceptionCode !== null) {
+            if ($this->getExpectedExceptionCode() !== -1) {
               $this->assertEquals(
-                $this->expectedExceptionCode,
+                $this->getExpectedExceptionCode(),
                 $e->getCode()
               );
             }
@@ -1068,108 +770,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
     public function setDependencyInput(array $dependencyInput)
     {
         $this->dependencyInput = $dependencyInput;
-    }
-
-    /**
-     * @param bool $beStrictAboutChangesToGlobalState
-     *
-     * @since Method available since Release 4.6.0
-     */
-    public function setBeStrictAboutChangesToGlobalState($beStrictAboutChangesToGlobalState)
-    {
-        $this->beStrictAboutChangesToGlobalState = $beStrictAboutChangesToGlobalState;
-    }
-
-    /**
-     * Calling this method in setUp() has no effect!
-     *
-     * @param bool $backupGlobals
-     *
-     * @since Method available since Release 3.3.0
-     */
-    public function setBackupGlobals($backupGlobals)
-    {
-        if (is_null($this->backupGlobals) && is_bool($backupGlobals)) {
-            $this->backupGlobals = $backupGlobals;
-        }
-    }
-
-    /**
-     * Calling this method in setUp() has no effect!
-     *
-     * @param bool $backupStaticAttributes
-     *
-     * @since Method available since Release 3.4.0
-     */
-    public function setBackupStaticAttributes($backupStaticAttributes)
-    {
-        if (is_null($this->backupStaticAttributes) &&
-            is_bool($backupStaticAttributes)) {
-            $this->backupStaticAttributes = $backupStaticAttributes;
-        }
-    }
-
-    /**
-     * @param bool $runTestInSeparateProcess
-     *
-     * @throws PHPUnit_Framework_Exception
-     *
-     * @since Method available since Release 3.4.0
-     */
-    public function setRunTestInSeparateProcess($runTestInSeparateProcess)
-    {
-        if (is_bool($runTestInSeparateProcess)) {
-            if ($this->runTestInSeparateProcess === null) {
-                $this->runTestInSeparateProcess = $runTestInSeparateProcess;
-            }
-        } else {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
-        }
-    }
-
-    /**
-     * @param bool $preserveGlobalState
-     *
-     * @throws PHPUnit_Framework_Exception
-     *
-     * @since Method available since Release 3.4.0
-     */
-    public function setPreserveGlobalState($preserveGlobalState)
-    {
-      $this->preserveGlobalState = false;
-      /*
-        if (is_bool($preserveGlobalState)) {
-            $this->preserveGlobalState = $preserveGlobalState;
-        } else {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
-        }
-       */
-    }
-
-    /**
-     * @param bool $inIsolation
-     *
-     * @throws PHPUnit_Framework_Exception
-     *
-     * @since Method available since Release 3.4.0
-     */
-    public function setInIsolation($inIsolation)
-    {
-        if (is_bool($inIsolation)) {
-            $this->inIsolation = $inIsolation;
-        } else {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
-        }
-    }
-
-    /**
-     * @return bool
-     *
-     * @since Method available since Release 4.3.0
-     */
-    public function isInIsolation()
-    {
-        return $this->inIsolation;
     }
 
     /**
@@ -1313,20 +913,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
     }
 
     /**
-     * @param string|null $classOrInterface
-     *
-     * @return \Prophecy\Prophecy\ObjectProphecy
-     *
-     * @throws \LogicException
-     *
-     * @since Method available since Release 4.5.0
-     */
-    protected function prophesize($classOrInterface = null)
-    {
-        return $this->getProphet()->prophesize($classOrInterface);
-    }
-
-    /**
      * Adds a value to the assertion counter.
      *
      * @param int $count
@@ -1417,8 +1003,8 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
     {
       $test = $this->getTest();
 
-        if (!empty($this->dependencies) && !$this->inIsolation) {
-            $className  = get_class($test);
+        if (!empty($this->dependencies)) {
+            $className  = $test->getClass();
             //$passed     = $this->result->passed();
             $passed = $test->getTestResultObject()->passed();
 
@@ -1520,17 +1106,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
             1,
             'Throwable or Exception'
         );
-    }
-
-    /**
-     * Performs custom preparations on the process isolation template.
-     *
-     * @param Text_Template $template
-     *
-     * @since Method available since Release 3.4.0
-     */
-    protected function prepareTemplate(Text_Template $template)
-    {
     }
 
 }

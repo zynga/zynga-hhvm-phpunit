@@ -40,8 +40,11 @@ class Annotations {
       $numMatches = count($matches[0]);
 
       for ($i = 0; $i < $numMatches; ++$i) {
-        $annotations[$matches['name'][$i]][] = $matches['value'][$i];
+        $key = $matches['name'][$i];
+        $value = $matches['value'][$i];
+        $annotations->set($key, $value);
       }
+
     }
 
     return $annotations;

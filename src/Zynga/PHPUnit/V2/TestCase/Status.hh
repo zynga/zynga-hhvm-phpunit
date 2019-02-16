@@ -3,6 +3,14 @@
 namespace Zynga\PHPUnit\V2\TestCase;
 
 class Status {
+  const int STATUS_PASSED = 0;
+  const int STATUS_SKIPPED = 1;
+  const int STATUS_INCOMPLETE = 2;
+  const int STATUS_FAILURE = 3;
+  const int STATUS_ERROR = 4;
+  const int STATUS_RISKY = 5;
+  const int STATUS_WARNING = 6;
+
   private string $message = '';
   private int $code = 0;
 

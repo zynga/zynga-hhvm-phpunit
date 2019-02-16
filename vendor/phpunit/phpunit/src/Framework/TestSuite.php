@@ -257,7 +257,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
             }
 
             if ($test instanceof ZyngaTestCaseBase || $test instanceof PHPUnit_Framework_TestCase) {
-                $test->setGroups($groups);
+              $test->setGroups($groups);
             }
         }
     }

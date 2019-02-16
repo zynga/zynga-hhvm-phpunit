@@ -44,7 +44,7 @@ class PHPUnit_Framework_TestFailure
             $this->testName = get_class($failedTest);
         }
 
-        if (!$failedTest instanceof PHPUnit_Framework_TestCase || !$failedTest->isInIsolation()) {
+        if (!$failedTest instanceof PHPUnit_Framework_TestCase ) {
             $this->failedTest = $failedTest;
         }
 
