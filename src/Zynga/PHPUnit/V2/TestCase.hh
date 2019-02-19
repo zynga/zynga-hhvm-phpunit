@@ -12,17 +12,38 @@ use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentException;
 
 class TestCase extends Assertions {
 
+  // The status for this test.
   private Status $_status;
+  // The function name for the test
   private string $_name;
+  // The class name for the test
   private string $_class;
+  // output buffer management
   private OutputBuffer $_outputBuffer;
+  // the test groups a testcase belongs to
   private Vector<string> $_groups;
+  // expectedException* are a family of variables for providing assertion control
+  // for a test that throws exceptions.
   private string $_expectedException;
   private string $_expectedExceptionMessage;
   private string $_expectedExceptionMessageRegExp;
   private int $_expectedExceptionCode;
+
+  // expectedOutput are a family of variables for providing assertion control
+  // for a test that does output to stdout.
+  private ?string $_expectedOutput;
+  private ?string $_expectedOutputRegExp;
+
+  // test size
   private int $_size;
+  // local local state, save upon set call.
   private Map<int, string> $_locale;
+  // local ini settings, save upon set call
+  private Map<string, string> $_iniSettings;
+  // enables error handler conversion
+  private bool $_useErrorHandler;
+  // number of assertions fired by this test
+  private int $_numAssertions;
 
   public function __construct(string $name = '') {
 
@@ -35,8 +56,13 @@ class TestCase extends Assertions {
     $this->_expectedExceptionMessage = '';
     $this->_expectedExceptionMessageRegExp = '';
     $this->_expectedExceptionCode = -1;
+    $this->_expectedOutput = null;
+    $this->_expectedOutputRegExp = null;
     $this->_size = Size::UNDETERMINED;
     $this->_locale = Map {};
+    $this->_iniSettings = Map {};
+    $this->_useErrorHandler = false;
+    $this->_numAssertions = 0;
 
     if ($name != '') {
       $this->_name = $name;
@@ -357,7 +383,7 @@ class TestCase extends Assertions {
    *
    * @since Method available since Release 3.6.0
    */
-  public function getSize(): int {
+  final public function getSize(): int {
     $this->setSizeFromAnnotation();
     return $this->_size;
   }
@@ -512,6 +538,231 @@ class TestCase extends Assertions {
 
   final public function getLocales(): Map<int, string> {
     return $this->_locale;
+  }
+
+  final public function clearLocales(): bool {
+
+    foreach ($this->getLocales() as $category => $locale) {
+      setlocale($category, $locale);
+    }
+
+    $this->_locale->clear();
+
+    return true;
+
+  }
+
+  /**
+   * This method is a wrapper for the ini_set() function that automatically
+   * resets the modified php.ini setting to its original value after the
+   * test is run.
+   *
+   * @param string $varName
+   * @param string $newValue
+   *
+   * @throws PHPUnit_Framework_Exception
+   *
+   * @since Method available since Release 3.0.0
+   */
+  final public function iniSet(string $varName, string $newValue): bool {
+
+    $currentValue = ini_set($varName, $newValue);
+
+    if ($currentValue !== false) {
+      $this->_iniSettings->set($varName, $currentValue);
+    } else {
+      throw new ErrorException(
+        sprintf(
+          'INI setting "%s" could not be set to "%s".',
+          $varName,
+          $newValue,
+        ),
+        -888,
+        __FILE__,
+        __LINE__,
+      );
+    }
+
+    return true;
+
+  }
+
+  final public function getIniSettings(): Map<string, string> {
+    return $this->_iniSettings;
+  }
+
+  final public function clearIniSettings(): bool {
+
+    foreach ($this->getIniSettings() as $varName => $oldValue) {
+      ini_set($varName, $oldValue);
+    }
+
+    $this->_iniSettings->clear();
+
+    return true;
+  }
+
+  /**
+   * @param string $expectedRegex
+   *
+   * @since Method available since Release 3.6.0
+   *
+   * @throws PHPUnit_Framework_Exception
+   */
+  final public function expectOutputRegex(string $expectedRegex): bool {
+    // if ($this->outputExpectedString !== null) {
+    //   throw new PHPUnit_Framework_Exception();
+    // }
+    $this->_expectedOutputRegExp = $expectedRegex;
+    return true;
+  }
+
+  final public function getExpectedOutputRegex(): ?string {
+    return $this->_expectedOutputRegExp;
+  }
+
+  /**
+   * @param string $expectedString
+   *
+   * @since Method available since Release 3.6.0
+   */
+  final public function expectOutputString(string $expectedString): bool {
+    // if ($this->outputExpectedRegex !== null) {
+    //   throw new PHPUnit_Framework_Exception();
+    // }
+    $this->_expectedOutput = $expectedString;
+    return true;
+
+  }
+
+  final public function getExpectedOutput(): ?string {
+    return $this->_expectedOutput;
+  }
+
+  /**
+   * @return bool
+   *
+   * @since Method available since Release 4.3.3
+   */
+  final public function hasExpectationOnOutput(): bool {
+    return
+      is_string($this->_expectedOutput) ||
+      is_string($this->_expectedOutputRegExp);
+  }
+
+  /**
+   * @return bool
+   *
+   * @since Method available since Release 3.6.5
+   * @deprecated
+   */
+  final public function hasPerformedExpectationsOnOutput(): bool {
+    return $this->hasExpectationOnOutput();
+  }
+
+  /**
+   * @return bool
+   *
+   * @since Method available since Release 3.6.0
+   */
+  final public function hasOutput(): bool {
+
+    if (strlen($this->getActualOutput()) === 0) {
+      return false;
+    }
+
+    if ($this->hasExpectationOnOutput()) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * @param bool $useErrorHandler
+   *
+   * @since Method available since Release 3.4.0
+   */
+  final public function setUseErrorHandler(bool $useErrorHandler): bool {
+    $this->_useErrorHandler = $useErrorHandler;
+    return true;
+  }
+
+  final public function getUseErrorHandler(): bool {
+    return $this->_useErrorHandler;
+  }
+
+  /**
+   * @since Method available since Release 3.4.0
+   */
+  final public function setUseErrorHandlerFromAnnotation(): bool {
+
+    $annotations = $this->getAnnotations();
+
+    // echo "annotations=\n";
+    // var_dump($annotations);
+
+    $classAnnotations = $annotations->get('class');
+
+    if ($classAnnotations instanceof Map) {
+      $useErrorHandler = $classAnnotations->get('errorHandler');
+      if ($useErrorHandler !== null) {
+        $this->setUseErrorHandler(boolval($useErrorHandler));
+        return true;
+      }
+    }
+
+    $methodAnnotations = $annotations->get('method');
+
+    if ($methodAnnotations instanceof Map) {
+      $useErrorHandler = $methodAnnotations->get('errorHandler');
+      if ($useErrorHandler !== null) {
+        $this->setUseErrorHandler(boolval($useErrorHandler));
+        return true;
+      }
+    }
+
+    return true;
+
+  }
+
+  /**
+   * Returns whether or not this test has failed.
+   *
+   * @return bool
+   *
+   * @since Method available since Release 3.0.0
+   */
+  final public function hasFailed(): bool {
+
+    $status = $this->getStatus();
+
+    return
+      $status == Status::STATUS_FAILURE || $status == Status::STATUS_ERROR;
+
+  }
+
+  /**
+   * Adds a value to the assertion counter.
+   *
+   * @param int $count
+   *
+   * @since Method available since Release 3.3.3
+   */
+  final public function addToAssertionCount(int $count): bool {
+    $this->_numAssertions += $count;
+    return true;
+  }
+
+  /**
+   * Returns the number of assertions performed by this test.
+   *
+   * @return int
+   *
+   * @since Method available since Release 3.3.0
+   */
+  final public function getNumAssertions(): int {
+    return $this->_numAssertions;
   }
 
   // --

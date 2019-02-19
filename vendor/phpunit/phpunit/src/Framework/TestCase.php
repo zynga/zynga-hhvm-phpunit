@@ -84,18 +84,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
     private $dataName = '';
 
     /**
-     * @var bool
-     */
-    private $useErrorHandler = null;
-
-    /**
-     * The name of the test case.
-     *
-     * @var string
-     */
-    private $name = null;
-
-    /**
      * @var array
      */
     private $dependencies = [];
@@ -106,16 +94,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
     private $dependencyInput = [];
 
     /**
-     * @var array
-     */
-    private $iniSettings = [];
-
-    /**
-     * @var int
-     */
-    private $numAssertions = 0;
-
-    /**
      * @var PHPUnit_Framework_TestResult
      */
     private $result;
@@ -124,21 +102,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
      * @var mixed
      */
     private $testResult;
-
-    /**
-     * @var string
-     */
-    private $outputExpectedRegex = null;
-
-    /**
-     * @var string
-     */
-    private $outputExpectedString = null;
-
-    /**
-     * @var mixed
-     */
-    private $outputCallback = false;
 
     /**
      * @var string[]
@@ -196,109 +159,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
     }
 
     /**
-     * @return bool
-     *
-     * @since Method available since Release 3.6.0
-     */
-    public function hasOutput()
-    {
-        if (strlen($this->getActualOutput()) === 0) {
-            return false;
-        }
-
-        if ($this->hasExpectationOnOutput()) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param string $expectedRegex
-     *
-     * @since Method available since Release 3.6.0
-     *
-     * @throws PHPUnit_Framework_Exception
-     */
-    public function expectOutputRegex($expectedRegex)
-    {
-        if ($this->outputExpectedString !== null) {
-            throw new PHPUnit_Framework_Exception();
-        }
-
-        if (is_string($expectedRegex) || is_null($expectedRegex)) {
-            $this->outputExpectedRegex = $expectedRegex;
-        }
-    }
-
-    /**
-     * @param string $expectedString
-     *
-     * @since Method available since Release 3.6.0
-     */
-    public function expectOutputString($expectedString)
-    {
-        if ($this->outputExpectedRegex !== null) {
-            throw new PHPUnit_Framework_Exception();
-        }
-
-        if (is_string($expectedString) || is_null($expectedString)) {
-            $this->outputExpectedString = $expectedString;
-        }
-    }
-
-    /**
-     * @return bool
-     *
-     * @since Method available since Release 3.6.5
-     * @deprecated
-     */
-    public function hasPerformedExpectationsOnOutput()
-    {
-        return $this->hasExpectationOnOutput();
-    }
-
-    /**
-     * @return bool
-     *
-     * @since Method available since Release 4.3.3
-     */
-    public function hasExpectationOnOutput()
-    {
-        return is_string($this->outputExpectedString) || is_string($this->outputExpectedRegex);
-    }
-
-    /**
-     * @param bool $useErrorHandler
-     *
-     * @since Method available since Release 3.4.0
-     */
-    public function setUseErrorHandler($useErrorHandler)
-    {
-        $this->useErrorHandler = $useErrorHandler;
-    }
-
-    /**
-     * @since Method available since Release 3.4.0
-     */
-    protected function setUseErrorHandlerFromAnnotation()
-    {
-        try {
-          $test = $this->getTest();
-
-          $useErrorHandler = PHPUnit_Util_Test::getErrorHandlerSettings(
-                $this->getClass(),
-                $this->getName(false)
-            );
-
-            if ($useErrorHandler !== null) {
-                $this->setUseErrorHandler($useErrorHandler);
-            }
-        } catch (ReflectionException $e) {
-        }
-    }
-
-    /**
      * @since Method available since Release 3.6.0
      */
     protected function checkRequirements()
@@ -317,21 +177,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
         if (count($missingRequirements) > 0) {
             $this->markTestSkipped(implode(PHP_EOL, $missingRequirements));
         }
-    }
-
-    /**
-     * Returns whether or not this test has failed.
-     *
-     * @return bool
-     *
-     * @since Method available since Release 3.0.0
-     */
-    public function hasFailed()
-    {
-        $status = $this->getStatus();
-
-        return $status == PHPUnit_Runner_BaseTestRunner::STATUS_FAILURE ||
-               $status == PHPUnit_Runner_BaseTestRunner::STATUS_ERROR;
     }
 
     /**
@@ -362,9 +207,11 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
             $this->setUseErrorHandlerFromAnnotation($test);
         }
 
-        if ($this->useErrorHandler !== null) {
+        $oldErrorHandlerSetting = null;
+
+        if ($this->getUseErrorHandler() !== null) {
             $oldErrorHandlerSetting = $result->getConvertErrorsToExceptions();
-            $result->convertErrorsToExceptions($this->useErrorHandler);
+            $result->convertErrorsToExceptions($this->getUseErrorHandler());
         }
 
         if (!$this instanceof PHPUnit_Framework_WarningTestCase && !$this->handleDependencies()) {
@@ -374,7 +221,7 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
         // Pass on the test into the run function for result.
         $result->run($test);
 
-        if ($this->useErrorHandler !== null) {
+        if (is_bool($oldErrorHandlerSetting)) {
             $result->convertErrorsToExceptions($oldErrorHandlerSetting);
         }
 
@@ -391,8 +238,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
       $test = $this->getTest();
 
       // var_dump('runBare=' . get_class($this) . ' test=' . get_class($test));
-
-        $this->numAssertions = 0;
 
         $this->startOutputBuffering();
 
@@ -522,16 +367,10 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
         }
 
         // Clean up INI settings.
-        foreach ($this->iniSettings as $varName => $oldValue) {
-            ini_set($varName, $oldValue);
-        }
-
-        $this->iniSettings = [];
+        $this->clearIniSettings();
 
         // Clean up locale settings.
-        foreach ($this->getLocales() as $category => $locale) {
-            setlocale($category, $locale);
-        }
+        $this->clearLocales();
 
         // Perform assertion on output.
         if (!isset($e)) {
@@ -539,10 +378,13 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
             try {
               $output = $this->getActualOutput();
 
-              if ($this->outputExpectedRegex !== null) {
-                $this->assertRegExp($this->outputExpectedRegex, $output);
-              } elseif ($this->outputExpectedString !== null) {
-                $this->assertEquals($this->outputExpectedString, $output);
+              $expectedOutputRegex = $this->getExpectedOutputRegex();
+              $expectedOutput = $this->getExpectedOutput();
+
+              if (is_string($expectedOutputRegex)) {
+                $this->assertRegExp($expectedOutputRegex, $output);
+              } elseif (is_string($expectedOutput)) {
+                $this->assertEquals($expectedOutput, $output);
               }
 
             } catch (Throwable $_e) {
@@ -641,12 +483,15 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
 
             $this->assertExceptionSameClass($this->getExpectedException(), $e);
 
-            if ($this->getExpectedExceptionMessage() != '') {
-              $this->assertExceptionSameMessage($this->getExpectedExceptionMessage(), $e);
+            $expectedExceptionMessage = $this->getExpectedExceptionMessage();
+            $expectedExceptionMessageRegExp = $this->getExpectedExceptionMessageRegExp();
+
+            if ($expectedExceptionMessage != '') {
+              $this->assertExceptionSameMessage($expectedExceptionMessage, $e);
             }
 
-            if ($this->getExpectedExceptionMessageRegExp() != '') {
-              $this->assertExceptionRegexpMessage($this->getExpectedExceptionMessageRegExp(), $e);
+            if ($expectedExceptionMessageRegExp != '') {
+              $this->assertExceptionRegexpMessage($expectedExceptionMessageRegExp, $e);
             }
 
             if ($this->getExpectedExceptionCode() !== -1) {
@@ -733,22 +578,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
     }
 
     /**
-     * @param callable $callback
-     *
-     * @throws PHPUnit_Framework_Exception
-     *
-     * @since Method available since Release 3.6.0
-     */
-    public function setOutputCallback($callback)
-    {
-        if (!is_callable($callback)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'callback');
-        }
-
-        $this->outputCallback = $callback;
-    }
-
-    /**
      * @return PHPUnit_Framework_TestResult
      *
      * @since Method available since Release 3.5.7
@@ -768,64 +597,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
         $this->result = $result;
     }
 
-    /**
-     * This method is a wrapper for the ini_set() function that automatically
-     * resets the modified php.ini setting to its original value after the
-     * test is run.
-     *
-     * @param string $varName
-     * @param string $newValue
-     *
-     * @throws PHPUnit_Framework_Exception
-     *
-     * @since Method available since Release 3.0.0
-     */
-    protected function iniSet($varName, $newValue)
-    {
-        if (!is_string($varName)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'string');
-        }
-
-        $currentValue = ini_set($varName, $newValue);
-
-        if ($currentValue !== false) {
-            $this->iniSettings[$varName] = $currentValue;
-        } else {
-            throw new PHPUnit_Framework_Exception(
-                sprintf(
-                    'INI setting "%s" could not be set to "%s".',
-                    $varName,
-                    $newValue
-                )
-            );
-        }
-    }
-
-
-
-    /**
-     * Adds a value to the assertion counter.
-     *
-     * @param int $count
-     *
-     * @since Method available since Release 3.3.3
-     */
-    public function addToAssertionCount($count)
-    {
-        $this->numAssertions += $count;
-    }
-
-    /**
-     * Returns the number of assertions performed by this test.
-     *
-     * @return int
-     *
-     * @since Method available since Release 3.3.0
-     */
-    public function getNumAssertions()
-    {
-        return $this->numAssertions;
-    }
 
     /**
      * @return bool
