@@ -781,6 +781,7 @@ class PHPUnit_Util_Test
      */
     public static function getSize($className, $methodName)
     {
+      var_dump('getSize::ran');
         $groups = array_flip(self::getGroups($className, $methodName));
         $size   = self::UNKNOWN;
         $class  = ReflectionClasses::getReflection($className);

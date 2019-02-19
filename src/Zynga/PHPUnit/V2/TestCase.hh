@@ -4,8 +4,11 @@ namespace Zynga\PHPUnit\V2;
 
 use Zynga\PHPUnit\V2\Annotations;
 use Zynga\PHPUnit\V2\TestCase\OutputBuffer;
+use Zynga\PHPUnit\V2\TestCase\Size;
 use Zynga\PHPUnit\V2\TestCase\Status;
 use SebastianBergmann\PHPUnit\Assertions;
+use SebastianBergmann\PHPUnit\Exceptions\ErrorException;
+use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentException;
 
 class TestCase extends Assertions {
 
@@ -18,6 +21,8 @@ class TestCase extends Assertions {
   private string $_expectedExceptionMessage;
   private string $_expectedExceptionMessageRegExp;
   private int $_expectedExceptionCode;
+  private int $_size;
+  private Map<int, string> $_locale;
 
   public function __construct(string $name = '') {
 
@@ -30,6 +35,8 @@ class TestCase extends Assertions {
     $this->_expectedExceptionMessage = '';
     $this->_expectedExceptionMessageRegExp = '';
     $this->_expectedExceptionCode = -1;
+    $this->_size = Size::UNDETERMINED;
+    $this->_locale = Map {};
 
     if ($name != '') {
       $this->_name = $name;
@@ -341,6 +348,170 @@ class TestCase extends Assertions {
 
   final public function getExpectedExceptionMessageRegExp(): string {
     return $this->_expectedExceptionMessageRegExp;
+  }
+
+  /**
+   * Returns the size of the test.
+   *
+   * @return int
+   *
+   * @since Method available since Release 3.6.0
+   */
+  public function getSize(): int {
+    $this->setSizeFromAnnotation();
+    return $this->_size;
+  }
+
+  final public function setSizeFromAnnotation(): bool {
+
+    if ($this->_size != Size::UNDETERMINED) {
+      return true;
+    }
+
+    $groups = $this->getGroups();
+
+    foreach ($groups as $group) {
+      if ($group == 'large') {
+        $this->_size = Size::LARGE;
+        return true;
+      }
+      if ($group == 'medium') {
+        $this->_size = Size::MEDIUM;
+        return true;
+      }
+      if ($group == 'small') {
+        $this->_size = Size::SMALL;
+        return true;
+      }
+    }
+
+    $annotations = $this->getAnnotations();
+
+    // echo "annotations=\n";
+    // var_dump($annotations);
+
+    $methodAnnotations = $annotations->get('method');
+
+    if (!$methodAnnotations instanceof Map) {
+      return false;
+    }
+
+    $large = $methodAnnotations->get('large');
+
+    if ($large !== null) {
+      $this->_size = Size::LARGE;
+      return true;
+    }
+
+    $medium = $methodAnnotations->get('medium');
+
+    if ($medium !== null) {
+      $this->_size = Size::MEDIUM;
+      return true;
+    }
+
+    $small = $methodAnnotations->get('small');
+
+    if ($small !== null) {
+      $this->_size = Size::SMALL;
+      return true;
+    }
+
+    $this->_size = Size::UNKNOWN;
+
+    return true;
+
+  }
+
+  /**
+   * @return bool
+   *
+   * @since Method available since Release 5.3.4
+   */
+  final public function hasSize(): bool {
+    return $this->getSize() !== Size::UNKNOWN;
+  }
+
+  /**
+   * @return bool
+   *
+   * @since Method available since Release 5.3.4
+   */
+  final public function isSmall(): bool {
+    return $this->getSize() === Size::SMALL;
+  }
+
+  /**
+   * @return bool
+   *
+   * @since Method available since Release 5.3.4
+   */
+  final public function isMedium(): bool {
+    return $this->getSize() === Size::MEDIUM;
+  }
+
+  /**
+   * @return bool
+   *
+   * @since Method available since Release 5.3.4
+   */
+  final public function isLarge(): bool {
+    return $this->getSize() === Size::LARGE;
+  }
+
+  /**
+   * This method is a wrapper for the setlocale() function that automatically
+   * resets the locale to its original value after the test is run.
+   *
+   * @param int    $category
+   * @param string $locale
+   *
+   * @throws PHPUnit_Framework_Exception
+   *
+   * @since Method available since Release 3.1.0
+   */
+  final public function setLocale(int $category, string $locale): bool {
+
+    $categories = array(
+      LC_ALL,
+      LC_COLLATE,
+      LC_CTYPE,
+      LC_MONETARY,
+      LC_NUMERIC,
+      LC_TIME,
+    );
+
+    if (defined('LC_MESSAGES')) {
+      $categories[] = LC_MESSAGES;
+    }
+
+    if (!in_array($category, $categories)) {
+      throw new InvalidArgumentException('category='.$category.' is invalid');
+    }
+
+    $this->_locale->set($category, setlocale($category, 0));
+
+    $localeArgs = array($category, $locale);
+
+    $result = call_user_func_array('setlocale', $localeArgs);
+
+    if ($result === false) {
+      throw new ErrorException(
+        'The locale functionality is not implemented on your platform, '.
+        'the specified locale does not exist or the category name is '.
+        'invalid.',
+        -888, // JEO: the dreaded 888
+        __FILE__,
+        __LINE__,
+      );
+    }
+
+    return true;
+
+  }
+
+  final public function getLocales(): Map<int, string> {
+    return $this->_locale;
   }
 
   // --

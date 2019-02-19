@@ -436,7 +436,7 @@ class PHPUnit_Framework_TestResult implements Countable
 
             $this->passed[$key] = [
                 'result' => $test->getResult(),
-                'size'   => PHPUnit_Util_Test::getSize(
+                'size'   => $test->getSize(
                     $class,
                     $test->getName(false)
                 )

@@ -111,11 +111,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
     private $iniSettings = [];
 
     /**
-     * @var array
-     */
-    private $locale = [];
-
-    /**
      * @var int
      */
     private $numAssertions = 0;
@@ -199,62 +194,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
       return $buffer . $this->getDataSetAsString();
 
     }
-
-    /**
-     * Returns the size of the test.
-     *
-     * @return int
-     *
-     * @since Method available since Release 3.6.0
-     */
-    public function getSize()
-    {
-          return PHPUnit_Util_Test::getSize(
-            $this->getClass(),
-            $this->getName(false)
-        );
-    }
-
-    /**
-     * @return bool
-     *
-     * @since Method available since Release 5.3.4
-     */
-    public function hasSize()
-    {
-        return $this->getSize() !== PHPUnit_Util_Test::UNKNOWN;
-    }
-
-    /**
-     * @return bool
-     *
-     * @since Method available since Release 5.3.4
-     */
-    public function isSmall()
-    {
-        return $this->getSize() === PHPUnit_Util_Test::SMALL;
-    }
-
-    /**
-     * @return bool
-     *
-     * @since Method available since Release 5.3.4
-     */
-    public function isMedium()
-    {
-        return $this->getSize() === PHPUnit_Util_Test::MEDIUM;
-    }
-
-    /**
-     * @return bool
-     *
-     * @since Method available since Release 5.3.4
-     */
-    public function isLarge()
-    {
-        return $this->getSize() === PHPUnit_Util_Test::LARGE;
-    }
-
 
     /**
      * @return bool
@@ -590,12 +529,13 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
         $this->iniSettings = [];
 
         // Clean up locale settings.
-        foreach ($this->locale as $category => $locale) {
+        foreach ($this->getLocales() as $category => $locale) {
             setlocale($category, $locale);
         }
 
         // Perform assertion on output.
         if (!isset($e)) {
+
             try {
               $output = $this->getActualOutput();
 
@@ -861,56 +801,7 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
         }
     }
 
-    /**
-     * This method is a wrapper for the setlocale() function that automatically
-     * resets the locale to its original value after the test is run.
-     *
-     * @param int    $category
-     * @param string $locale
-     *
-     * @throws PHPUnit_Framework_Exception
-     *
-     * @since Method available since Release 3.1.0
-     */
-    protected function setLocale()
-    {
-        $args = func_get_args();
 
-        if (count($args) < 2) {
-            throw new PHPUnit_Framework_Exception();
-        }
-
-        $category = $args[0];
-        $locale   = $args[1];
-
-        $categories = [
-            LC_ALL, LC_COLLATE, LC_CTYPE, LC_MONETARY, LC_NUMERIC, LC_TIME
-        ];
-
-        if (defined('LC_MESSAGES')) {
-            $categories[] = LC_MESSAGES;
-        }
-
-        if (!in_array($category, $categories)) {
-            throw new PHPUnit_Framework_Exception();
-        }
-
-        if (!is_array($locale) && !is_string($locale)) {
-            throw new PHPUnit_Framework_Exception();
-        }
-
-        $this->locale[$category] = setlocale($category, 0);
-
-        $result = call_user_func_array('setlocale', $args);
-
-        if ($result === false) {
-            throw new PHPUnit_Framework_Exception(
-                'The locale functionality is not implemented on your platform, ' .
-                'the specified locale does not exist or the category name is ' .
-                'invalid.'
-            );
-        }
-    }
 
     /**
      * Adds a value to the assertion counter.
