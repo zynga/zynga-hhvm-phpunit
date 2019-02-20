@@ -701,7 +701,7 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
                 if (!isset($passedKeys[$dependency])) {
                     $this->result->addError(
                         $this,
-                        new PHPUnit_Framework_SkippedTestError(
+                        new SkippedException(
                             sprintf(
                                 'This test depends on "%s" to pass.',
                                 $dependency
@@ -719,7 +719,7 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
                         $passed[$dependency]['size'] > $this->getSize()) {
                         $this->result->addError(
                             $this,
-                            new PHPUnit_Framework_SkippedTestError(
+                            new SkippedException(
                                 'This test depends on a test that is larger than itself.'
                             ),
                             0

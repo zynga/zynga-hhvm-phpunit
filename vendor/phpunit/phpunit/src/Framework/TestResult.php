@@ -389,7 +389,7 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable
       $this->listeners()->endTest($test, $time);
 
         if (!$this->lastTestFailed && ($test instanceof ZyngaTestCaseBase || $test instanceof \PHPUnit_Framework_TestCase)) {
-            $class  = get_class($test);
+            $class  = $test->getClass();
             $key    = $class . '::' . $test->getName();
 
             $this->passed[$key] = [
@@ -659,29 +659,7 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable
         PHP_Timer::start();
 
         try {
-            // if (!$test instanceof PHPUnit_Framework_WarningTestCase &&
-            //     $test->getSize() != PHPUnit_Util_Test::UNKNOWN &&
-            //     $this->enforceTimeLimit &&
-            //     extension_loaded('pcntl') && class_exists('PHP_Invoker')) {
-            //     switch ($test->getSize()) {
-            //         case PHPUnit_Util_Test::SMALL:
-            //             $_timeout = $this->timeoutForSmallTests;
-            //             break;
-            //
-            //         case PHPUnit_Util_Test::MEDIUM:
-            //             $_timeout = $this->timeoutForMediumTests;
-            //             break;
-            //
-            //         case PHPUnit_Util_Test::LARGE:
-            //             $_timeout = $this->timeoutForLargeTests;
-            //             break;
-            //     }
-            //
-            //     $invoker = new PHP_Invoker;
-            //     $invoker->invoke([$test, 'runBare'], [], $_timeout);
-            // } else {
                 $test->runBare();
-            // }
 
         } catch (PHPUnit_Framework_MockObject_Exception $e) {
             $e = new PHPUnit_Framework_Warning(
@@ -705,8 +683,6 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable
                 $risky = true;
             } elseif ($e instanceof PHPUnit_Framework_IncompleteTestError) {
                 $incomplete = true;
-            } elseif ($e instanceof PHPUnit_Framework_SkippedTestError) {
-                $skipped = true;
             }
         } catch (PHPUnit_Framework_Warning $e) {
             $warning = true;
@@ -767,12 +743,12 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable
                 try {
 
                     $linesToBeCovered = PHPUnit_Util_Test::getLinesToBeCovered(
-                        get_class($test),
+                        $test->getClass(),
                         $test->getName(false)
                     );
 
                     $linesToBeUsed = PHPUnit_Util_Test::getLinesToBeUsed(
-                        get_class($test),
+                        $test->getClass(),
                         $test->getName(false)
                     );
 

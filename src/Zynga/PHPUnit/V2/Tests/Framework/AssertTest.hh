@@ -30,7 +30,6 @@ use \PHPUnit_Framework_AssertionFailedError;
 use \PHPUnit_Framework_ExpectationFailedException;
 use \PHPUnit_Framework_Exception;
 use \PHPUnit_Framework_IncompleteTestError;
-use \PHPUnit_Framework_SkippedTestError;
 use \PHPUnit_Framework_TestCase;
 use \PHPUnit_Util_XML;
 
@@ -3450,11 +3449,7 @@ XML;
     } catch (SkippedException $e) {
       $this->assertEquals('skipped', $e->getMessage());
       return;
-    } catch (PHPUnit_Framework_SkippedTestError $e) {
-      $this->assertEquals('skipped', $e->getMessage());
-      return;
     }
-
     $this->fail();
   }
 

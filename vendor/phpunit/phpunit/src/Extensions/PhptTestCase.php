@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
+
 /**
  * Runner for PHPT test cases.
  *
@@ -165,7 +167,7 @@ class PHPUnit_Extensions_PhptTestCase implements PHPUnit_Framework_Test, PHPUnit
                     $message = '';
                 }
 
-                $result->addFailure($this, new PHPUnit_Framework_SkippedTestError($message), 0);
+                $result->addFailure($this, new SkippedException($message), 0);
 
                 $skip = true;
             }

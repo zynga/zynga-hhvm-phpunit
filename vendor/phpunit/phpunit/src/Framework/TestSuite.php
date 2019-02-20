@@ -9,6 +9,7 @@
  */
 
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
 
 /**
  * A TestSuite is a composite of Tests. It runs a collection of test cases.
@@ -506,7 +507,8 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                     }
 
                     $data = self::incompleteTest($className, $name, $message);
-                } catch (PHPUnit_Framework_SkippedTestError $e) {
+                } catch (SkippedException $e) {
+
                     $message = sprintf(
                         'Test for %s::%s skipped by data provider',
                         $className,

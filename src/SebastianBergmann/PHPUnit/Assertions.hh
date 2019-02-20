@@ -2450,7 +2450,7 @@ class Assertions {
    *
    * @param string $message
    *
-   * @throws PHPUnit_Framework_SkippedTestError
+   * @throws SkippedException
    *
    * @since Method available since Release 3.0.0
    */
