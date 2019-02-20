@@ -21,6 +21,7 @@ use SebastianBergmann\CodeCoverage\Report\PHP as PhpReport;
 use SebastianBergmann\CodeCoverage\Report\Text as TextReport;
 use SebastianBergmann\CodeCoverage\Report\Xml\Facade as XmlReport;
 use SebastianBergmann\Environment\Runtime;
+use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
 
 /**
  * A TestRunner for the Command Line Interface (CLI)
@@ -230,10 +231,6 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
 
         if ($arguments['stopOnSkipped']) {
             $result->stopOnSkipped(true);
-        }
-
-        if ($arguments['registerMockObjectsFromTestArgumentsRecursively']) {
-            $result->setRegisterMockObjectsFromTestArgumentsRecursively(true);
         }
 
         if ($this->printer === null) {
@@ -901,7 +898,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
                         );
                     }
 
-                    if ($listener instanceof PHPUnit_Framework_TestListener) {
+                    if ($listener instanceof TestListenerInterface) {
                         $arguments['listeners'][] = $listener;
                     }
                 }

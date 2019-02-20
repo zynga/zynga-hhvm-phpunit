@@ -13,6 +13,7 @@ namespace Zynga\PHPUnit\V2\Tests\Framework;
 
 use Zynga\PHPUnit\V2\Tests\Mock\BaseTestListenerSample;
 use Zynga\PHPUnit\V2\Tests\Mock\Success;
+use Zynga\PHPUnit\V2\TestResult;
 
 use \PHPUnit_Framework_TestCase;
 use \PHPUnit_Framework_TestResult;
@@ -37,7 +38,7 @@ class BaseTestListenerTest extends PHPUnit_Framework_TestCase {
 
     $result = new PHPUnit_Framework_TestResult();
     $listener = new BaseTestListenerSample();
-    $result->addListener($listener);
+    $result->listeners()->add($listener);
     $test = new Success();
     $test->run($result);
     $this->assertEquals(1, $listener->endCount);

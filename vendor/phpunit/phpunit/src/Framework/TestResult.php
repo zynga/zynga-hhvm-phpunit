@@ -17,6 +17,9 @@ use SebastianBergmann\ResourceOperations\ResourceOperations;
 use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 
+use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
+use Zynga\PHPUnit\V2\TestResult;
+
 use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
 use SebastianBergmann\PHPUnit\Exceptions\ExpectationFailedException;
 use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentException;
@@ -27,7 +30,7 @@ use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
  *
  * @since Class available since Release 2.0.0
  */
-class PHPUnit_Framework_TestResult implements Countable
+class PHPUnit_Framework_TestResult extends TestResult implements Countable
 {
     /**
      * @var array
@@ -63,11 +66,6 @@ class PHPUnit_Framework_TestResult implements Countable
      * @var array
      */
     protected $skipped = [];
-
-    /**
-     * @var array
-     */
-    protected $listeners = [];
 
     /**
      * @var int
@@ -177,49 +175,6 @@ class PHPUnit_Framework_TestResult implements Countable
     protected $lastTestFailed = false;
 
     /**
-     * @var bool
-     */
-    private $registerMockObjectsFromTestArgumentsRecursively = false;
-
-    /**
-     * Registers a TestListener.
-     *
-     * @param  PHPUnit_Framework_TestListener
-     */
-    public function addListener(PHPUnit_Framework_TestListener $listener)
-    {
-        $this->listeners[] = $listener;
-    }
-
-    /**
-     * Unregisters a TestListener.
-     *
-     * @param PHPUnit_Framework_TestListener $listener
-     */
-    public function removeListener(PHPUnit_Framework_TestListener $listener)
-    {
-        foreach ($this->listeners as $key => $_listener) {
-            if ($listener === $_listener) {
-                unset($this->listeners[$key]);
-            }
-        }
-    }
-
-    /**
-     * Flushes all flushable TestListeners.
-     *
-     * @since Method available since Release 3.0.0
-     */
-    public function flushListeners()
-    {
-        foreach ($this->listeners as $listener) {
-            if ($listener instanceof PHPUnit_Util_Printer) {
-                $listener->flush();
-            }
-        }
-    }
-
-    /**
      * Adds an error to the list of errors.
      *
      * @param PHPUnit_Framework_Test $test
@@ -229,36 +184,48 @@ class PHPUnit_Framework_TestResult implements Countable
     public function addError(PHPUnit_Framework_Test $test, $t, $time)
     {
         if ($t instanceof PHPUnit_Framework_RiskyTest) {
+
             $this->risky[] = new PHPUnit_Framework_TestFailure($test, $t);
-            $notifyMethod  = 'addRiskyTest';
+
+            $this->listeners()->addRiskyTest($test, $t, $time);
 
             if ($this->stopOnRisky) {
                 $this->stop();
             }
+
         } elseif ($t instanceof PHPUnit_Framework_IncompleteTest) {
             $this->notImplemented[] = new PHPUnit_Framework_TestFailure($test, $t);
-            $notifyMethod           = 'addIncompleteTest';
+
+            $this->listeners()->addIncompleteTest($test, $t, $time);
 
             if ($this->stopOnIncomplete) {
                 $this->stop();
             }
+
         } else if ($t instanceof SkippedException ) {
+
           $this->skipped[] = new PHPUnit_Framework_TestFailure($test, $t);
-          $notifyMethod    = 'addSkippedTest';
+
+          $this->listeners()->addSkippedTest($test, $t, $time);
 
           if ($this->stopOnSkipped) {
               $this->stop();
           }
+
         } elseif ($t instanceof PHPUnit_Framework_SkippedTest) {
+
             $this->skipped[] = new PHPUnit_Framework_TestFailure($test, $t);
-            $notifyMethod    = 'addSkippedTest';
+
+            $this->listeners()->addSkippedTest($test, $t, $time);
 
             if ($this->stopOnSkipped) {
                 $this->stop();
             }
+
         } else {
             $this->errors[] = new PHPUnit_Framework_TestFailure($test, $t);
-            $notifyMethod   = 'addError';
+
+            $this->listeners()->addError($test, $t, $time);
 
             if ($this->stopOnError || $this->stopOnFailure) {
                 $this->stop();
@@ -268,11 +235,6 @@ class PHPUnit_Framework_TestResult implements Countable
         // @see https://github.com/sebastianbergmann/phpunit/issues/1953
         if ($t instanceof Error) {
             $t = new PHPUnit_Framework_ExceptionWrapper($t);
-        }
-
-        foreach ($this->listeners as $listener) {
-
-            $listener->$notifyMethod($test, $t, $time);
         }
 
         $this->lastTestFailed = true;
@@ -297,13 +259,7 @@ class PHPUnit_Framework_TestResult implements Countable
 
         $this->warnings[] = new PHPUnit_Framework_TestFailure($test, $e);
 
-        foreach ($this->listeners as $listener) {
-            // @todo Remove check for PHPUnit 6.0.0
-            // @see  https://github.com/sebastianbergmann/phpunit/pull/1840#issuecomment-162535997
-            if (method_exists($listener, 'addWarning')) {
-                $listener->addWarning($test, $e, $time);
-            }
-        }
+        $this->listeners()->addWarning($test, $e, $time);
 
         $this->time += $time;
     }
@@ -327,44 +283,54 @@ class PHPUnit_Framework_TestResult implements Countable
 
         if ($e instanceof PHPUnit_Framework_RiskyTest ||
             $e instanceof PHPUnit_Framework_OutputError) {
+
             $this->risky[] = new PHPUnit_Framework_TestFailure($test, $e);
-            $notifyMethod  = 'addRiskyTest';
+            $this->listeners()->addRiskyTest($test, $e, $time);
 
             if ($this->stopOnRisky) {
                 $this->stop();
             }
+
         } elseif ($e instanceof PHPUnit_Framework_IncompleteTest) {
+
             $this->notImplemented[] = new PHPUnit_Framework_TestFailure($test, $e);
-            $notifyMethod           = 'addIncompleteTest';
+
+            $this->listeners()->addIncompleteTest($test, $e, $time);
 
             if ($this->stopOnIncomplete) {
                 $this->stop();
             }
+
         } elseif ($e instanceof SkippedException) {
+
           $this->skipped[] = new PHPUnit_Framework_TestFailure($test, $e);
-          $notifyMethod    = 'addSkippedTest';
+
+          $this->listeners()->addSkippedTest($test, $e, $time);
 
           if ($this->stopOnSkipped) {
               $this->stop();
           }
+
         } elseif ($e instanceof PHPUnit_Framework_SkippedTest) {
+
             $this->skipped[] = new PHPUnit_Framework_TestFailure($test, $e);
-            $notifyMethod    = 'addSkippedTest';
+
+            $this->listeners()->addSkippedTest($test, $e, $time);
 
             if ($this->stopOnSkipped) {
                 $this->stop();
             }
+
         } else {
+
             $this->failures[] = new PHPUnit_Framework_TestFailure($test, $e);
-            $notifyMethod     = 'addFailure';
+
+            $this->listeners()->addFailure($test, $e, $time);
 
             if ($this->stopOnFailure) {
                 $this->stop();
             }
-        }
 
-        foreach ($this->listeners as $listener) {
-            $listener->$notifyMethod($test, $e, $time);
         }
 
         $this->lastTestFailed = true;
@@ -384,9 +350,7 @@ class PHPUnit_Framework_TestResult implements Countable
             $this->topTestSuite = $suite;
         }
 
-        foreach ($this->listeners as $listener) {
-            $listener->startTestSuite($suite);
-        }
+        $this->listeners()->startTestSuite($suite);
     }
 
     /**
@@ -398,9 +362,7 @@ class PHPUnit_Framework_TestResult implements Countable
      */
     public function endTestSuite(PHPUnit_Framework_TestSuite $suite)
     {
-        foreach ($this->listeners as $listener) {
-            $listener->endTestSuite($suite);
-        }
+      $this->listeners()->endTestSuite($suite);
     }
 
     /**
@@ -413,9 +375,7 @@ class PHPUnit_Framework_TestResult implements Countable
         $this->lastTestFailed = false;
         $this->runTests      += count($test);
 
-        foreach ($this->listeners as $listener) {
-            $listener->startTest($test);
-        }
+        $this->listeners()->startTest($test);
     }
 
     /**
@@ -426,9 +386,7 @@ class PHPUnit_Framework_TestResult implements Countable
      */
     public function endTest(PHPUnit_Framework_Test $test, $time)
     {
-        foreach ($this->listeners as $listener) {
-            $listener->endTest($test, $time);
-        }
+      $this->listeners()->endTest($test, $time);
 
         if (!$this->lastTestFailed && ($test instanceof ZyngaTestCaseBase || $test instanceof \PHPUnit_Framework_TestCase)) {
             $class  = get_class($test);
@@ -1348,60 +1306,5 @@ class PHPUnit_Framework_TestResult implements Countable
         return $this->timeoutForLargeTests;
     }
 
-    /**
-     * @param bool $flag
-     *
-     * @since Method available since Release 5.4.0
-     */
-    public function setRegisterMockObjectsFromTestArgumentsRecursively($flag)
-    {
-        if (!is_bool($flag)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
-        }
 
-        $this->registerMockObjectsFromTestArgumentsRecursively = $flag;
-    }
-
-    /**
-     * Returns the class hierarchy for a given class.
-     *
-     * @param string $className
-     * @param bool   $asReflectionObjects
-     *
-     * @return array
-     */
-    protected function getHierarchy($className, $asReflectionObjects = false)
-    {
-        if ($asReflectionObjects) {
-            $classes = [ReflectionClasses::getReflection($className)];
-        } else {
-            $classes = [$className];
-        }
-
-        $done = false;
-
-        while (!$done) {
-            if ($asReflectionObjects) {
-                $class = ReflectionClasses::getReflection(
-                    $classes[count($classes) - 1]->getName()
-                );
-            } else {
-                $class = ReflectionClasses::getReflection($classes[count($classes) - 1]);
-            }
-
-            $parent = $class->getParentClass();
-
-            if ($parent !== false) {
-                if ($asReflectionObjects) {
-                    $classes[] = $parent;
-                } else {
-                    $classes[] = $parent->getName();
-                }
-            } else {
-                $done = true;
-            }
-        }
-
-        return $classes;
-    }
 }

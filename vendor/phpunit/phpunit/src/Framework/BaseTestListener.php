@@ -1,4 +1,5 @@
-<?php
+<?hh // strict
+
 /*
  * This file is part of PHPUnit.
  *
@@ -8,52 +9,64 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
+use \PHPUnit_Framework_TestSuite;
+use \PHPUnit_Framework_Test;
+
 /**
  * An empty Listener that can be extended to implement TestListener
  * with just a few lines of code.
  *
- * @see PHPUnit_Framework_TestListener for documentation on the API methods.
+ * @see TestListenerInterface for documentation on the API methods.
  * @since Class available since Release 4.0.0
  */
-abstract class PHPUnit_Framework_BaseTestListener implements PHPUnit_Framework_TestListener
-{
-    public function addError(PHPUnit_Framework_Test $test, Exception $e, $time)
-    {
-    }
+abstract class PHPUnit_Framework_BaseTestListener
+  implements TestListenerInterface {
 
-    public function addWarning(PHPUnit_Framework_Test $test, PHPUnit_Framework_Warning $e, $time)
-    {
-    }
+  public function addError(
+    PHPUnit_Framework_Test $test,
+    Exception $e,
+    float $time,
+  ): void {}
 
-    public function addFailure(PHPUnit_Framework_Test $test, Exception $e, $time)
-    {
-    }
+  public function addWarning(
+    PHPUnit_Framework_Test $test,
+    Exception $e,
+    float $time,
+  ): void {}
 
-    public function addIncompleteTest(PHPUnit_Framework_Test $test, Exception $e, $time)
-    {
-    }
+  public function addFailure(
+    PHPUnit_Framework_Test $test,
+    Exception $e,
+    float $time,
+  ): void {}
 
-    public function addRiskyTest(PHPUnit_Framework_Test $test, Exception $e, $time)
-    {
-    }
+  public function addIncompleteTest(
+    PHPUnit_Framework_Test $test,
+    Exception $e,
+    float $time,
+  ): void {}
 
-    public function addSkippedTest(PHPUnit_Framework_Test $test, Exception $e, $time)
-    {
-    }
+  public function addRiskyTest(
+    PHPUnit_Framework_Test $test,
+    Exception $e,
+    float $time,
+  ): void {}
 
-    public function startTestSuite(PHPUnit_Framework_TestSuite $suite)
-    {
-    }
+  public function addSkippedTest(
+    PHPUnit_Framework_Test $test,
+    Exception $e,
+    float $time,
+  ): void {}
 
-    public function endTestSuite(PHPUnit_Framework_TestSuite $suite)
-    {
-    }
+  public function startTestSuite(PHPUnit_Framework_TestSuite $suite): void {}
 
-    public function startTest(PHPUnit_Framework_Test $test)
-    {
-    }
+  public function endTestSuite(PHPUnit_Framework_TestSuite $suite): void {}
 
-    public function endTest(PHPUnit_Framework_Test $test, $time)
-    {
-    }
+  public function startTest(PHPUnit_Framework_Test $test): void {}
+
+  public function endTest(PHPUnit_Framework_Test $test, float $time): void {}
+
+  public function flush(): void {}
+
 }

@@ -45,7 +45,7 @@ All notable changes of the PHPUnit 5.1 release series are documented in this fil
 
 ### Fixed
 
-* Fixed a backwards compatibility break in the `PHPUnit_Framework_TestListener` interface introduced in PHPUnit 5.1.0
+* Fixed a backwards compatibility break in the `TestListenerInterface` interface introduced in PHPUnit 5.1.0
 
 ## [5.1.0] - 2015-12-04
 
@@ -65,4 +65,3 @@ All notable changes of the PHPUnit 5.1 release series are documented in this fil
 [5.1.2]: https://github.com/sebastianbergmann/phpunit/compare/5.1.1...5.1.2
 [5.1.1]: https://github.com/sebastianbergmann/phpunit/compare/5.1.0...5.1.1
 [5.1.0]: https://github.com/sebastianbergmann/phpunit/compare/5.0...5.1.0
-

@@ -9,6 +9,7 @@
  */
 
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
 
 /**
  * A TestRunner for the Command Line Interface (CLI)
@@ -853,7 +854,7 @@ class PHPUnit_TextUI_Command
         if (class_exists($printerClass)) {
             $class = ReflectionClasses::getReflection($printerClass);
 
-            if ($class->implementsInterface('PHPUnit_Framework_TestListener') &&
+            if ($class->implementsInterface('TestListenerInterface') &&
                 $class->isSubclassOf('PHPUnit_Util_Printer') &&
                 $class->isInstantiable()) {
                 if ($class->isSubclassOf('PHPUnit_TextUI_ResultPrinter')) {
