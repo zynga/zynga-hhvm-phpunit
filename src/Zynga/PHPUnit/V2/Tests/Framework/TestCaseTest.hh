@@ -130,6 +130,7 @@ class TestCaseTest extends PHPUnit_Framework_TestCase {
     int $errorCount = 0,
     int $failureCount = 0,
     int $skippedCount = 0,
+    int $incompleteCount = 0,
   ): void {
 
     if ($debug != true) {
@@ -168,7 +169,22 @@ class TestCaseTest extends PHPUnit_Framework_TestCase {
       ' actual='.
       $actualSkippedCount,
     );
-    var_dump($actualSkipped);
+
+    $this->_debugExceptions($actualSkipped);
+
+    $actualIncompleteCount = $result->notImplementedCount();
+    $actualIncomplete = $result->notImplemented();
+
+    print
+      'incompleteCount'.
+      'expected='.
+      $incompleteCount.
+      ' actual='.
+      $actualIncompleteCount.
+      "\n"
+    ;
+
+    $this->_debugExceptions($actualIncomplete);
 
   }
 
@@ -178,11 +194,13 @@ class TestCaseTest extends PHPUnit_Framework_TestCase {
     int $errorCount = 0,
     int $failureCount = 0,
     int $skippedCount = 0,
+    int $incompleteCount = 0,
   ): void {
 
     $this->assertEquals($errorCount, $result->errorCount());
     $this->assertEquals($failureCount, $result->failureCount());
     $this->assertEquals($skippedCount, $result->skippedCount());
+    $this->assertEquals($incompleteCount, $result->notImplementedCount());
 
   }
 
@@ -193,6 +211,7 @@ class TestCaseTest extends PHPUnit_Framework_TestCase {
     int $errorCount = 0,
     int $failureCount = 0,
     int $skippedCount = 0,
+    int $incompleteCount = 0,
   ): void {
 
     $this->_debugTestResult(
@@ -201,6 +220,7 @@ class TestCaseTest extends PHPUnit_Framework_TestCase {
       $errorCount,
       $failureCount,
       $skippedCount,
+      $incompleteCount,
     );
 
     $this->_verifyTestResult(
@@ -209,6 +229,7 @@ class TestCaseTest extends PHPUnit_Framework_TestCase {
       $errorCount,
       $failureCount,
       $skippedCount,
+      $incompleteCount,
     );
 
   }
@@ -222,6 +243,7 @@ class TestCaseTest extends PHPUnit_Framework_TestCase {
     int $errorCount = 0,
     int $failureCount = 0,
     int $skippedCount = 0,
+    int $incompleteCount = 0,
   ): void {
 
     if ($debug == true) {
@@ -259,6 +281,7 @@ class TestCaseTest extends PHPUnit_Framework_TestCase {
         $errorCount,
         $failureCount,
         $skippedCount,
+        $incompleteCount,
       );
 
     }
@@ -272,6 +295,7 @@ class TestCaseTest extends PHPUnit_Framework_TestCase {
       $errorCount,
       $failureCount,
       $skippedCount,
+      $incompleteCount,
     );
 
   }
@@ -371,8 +395,9 @@ class TestCaseTest extends PHPUnit_Framework_TestCase {
       PHPUnit_Runner_BaseTestRunner::STATUS_INCOMPLETE,
       'Incomplete test',
       0,
-      1,
       0,
+      0,
+      1,
     );
 
   }

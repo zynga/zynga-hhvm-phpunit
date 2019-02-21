@@ -196,7 +196,7 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable
                 $this->stop();
             }
 
-        } elseif ($t instanceof PHPUnit_Framework_IncompleteTest) {
+        } elseif ($t instanceof IncompleteException) {
             $this->notImplemented[] = new PHPUnit_Framework_TestFailure($test, $t);
 
             $this->listeners()->addIncompleteTest($test, $t, $time);
@@ -278,10 +278,10 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable
     public function addFailure(PHPUnit_Framework_Test $test, Exception $e, $time)
     {
       // if ( preg_match('/Requirements/', get_class($test))) {
-      //   var_dump($test->getName());
-      //   var_dump(get_class($test));
-      //   var_dump($e);
-      //   exit();
+         // var_dump($test->getName());
+         // var_dump(get_class($test));
+         // var_dump($e);
+         // exit();
       // }
 
         if ($e instanceof PHPUnit_Framework_RiskyTest ||
@@ -294,7 +294,7 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable
                 $this->stop();
             }
 
-        } elseif ($e instanceof PHPUnit_Framework_IncompleteTest) {
+        } elseif ($e instanceof IncompleteException) {
 
             $this->notImplemented[] = new PHPUnit_Framework_TestFailure($test, $e);
 
@@ -670,8 +670,6 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable
             );
 
             $warning = true;
-        } catch (AssertionFailedException $e) {
-          $failure = true;
         } catch (InvalidArgumentException $e) {
           $error = true;
         } catch (SkippedException $e) {
@@ -683,12 +681,14 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable
         } catch (IncompleteException $e) {
           $failure = true;
           $incomplete = true;
+        } catch (WarningException $e) {
+          $warning = true;
+        } catch (PHPUnit_Framework_Exception $e) {
+          $error = true;
+        } catch (AssertionFailedException $e) {
+          $failure = true;
         } catch (ExpectationFailedException $e) {
           $failure = true;
-        } catch (WarningException $e) {
-            $warning = true;
-        } catch (PHPUnit_Framework_Exception $e) {
-            $error = true;
         } catch (Throwable $e) {
             $e     = new PHPUnit_Framework_ExceptionWrapper($e);
             $error = true;
