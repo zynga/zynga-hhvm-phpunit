@@ -215,16 +215,6 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable
               $this->stop();
           }
 
-        } elseif ($t instanceof PHPUnit_Framework_SkippedTest) {
-
-            $this->skipped[] = new PHPUnit_Framework_TestFailure($test, $t);
-
-            $this->listeners()->addSkippedTest($test, $t, $time);
-
-            if ($this->stopOnSkipped) {
-                $this->stop();
-            }
-
         } else {
             $this->errors[] = new PHPUnit_Framework_TestFailure($test, $t);
 
@@ -313,16 +303,6 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable
           if ($this->stopOnSkipped) {
               $this->stop();
           }
-
-        } elseif ($e instanceof PHPUnit_Framework_SkippedTest) {
-
-            $this->skipped[] = new PHPUnit_Framework_TestFailure($test, $e);
-
-            $this->listeners()->addSkippedTest($test, $e, $time);
-
-            if ($this->stopOnSkipped) {
-                $this->stop();
-            }
 
         } else {
 

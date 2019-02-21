@@ -11,6 +11,7 @@
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
+use SebastianBergmann\PHPUnit\Exceptions\TestSuiteError\SkippedException as TestSuiteSkippedException;
 
 /**
  * A TestSuite is a composite of Tests. It runs a collection of test cases.
@@ -495,7 +496,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                         $name
                     );
                 } catch (IncompleteException $e) {
-                  
+
                     $message = sprintf(
                         'Test for %s::%s marked incomplete by data provider',
                         $className,
@@ -734,7 +735,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
               $firstTest->setUpBeforeClass();
             }
 
-        } catch (PHPUnit_Framework_SkippedTestSuiteError $e) {
+        } catch (TestSuiteSkippedException $e) {
             $numTests = count($this);
 
             for ($i = 0; $i < $numTests; $i++) {
@@ -874,13 +875,13 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      *
      * @param string $message
      *
-     * @throws PHPUnit_Framework_SkippedTestSuiteError
+     * @throws TestSuiteSkippedException
      *
      * @since Method available since Release 3.0.0
      */
     public function markTestSuiteSkipped($message = '')
     {
-        throw new PHPUnit_Framework_SkippedTestSuiteError($message);
+        throw new TestSuiteSkippedException($message);
     }
 
     /**

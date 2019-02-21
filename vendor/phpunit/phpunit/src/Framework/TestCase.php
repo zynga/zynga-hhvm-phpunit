@@ -290,11 +290,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
             $e->getMessage(),
             PHPUnit_Runner_BaseTestRunner::STATUS_SKIPPED
           );
-        } catch (PHPUnit_Framework_SkippedTest $e) {
-          $this->status()->setMessageAndCode(
-            $e->getMessage(),
-            PHPUnit_Runner_BaseTestRunner::STATUS_SKIPPED
-          );
         } catch (WarningException $e) {
           $this->status()->setMessageAndCode(
             $e->getMessage(),
