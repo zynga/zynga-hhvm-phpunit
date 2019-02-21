@@ -46,6 +46,7 @@ use SebastianBergmann\PHPUnit\Assertions\AssertClassHasAttribute;
 use SebastianBergmann\PHPUnit\Assertions\AssertClassHasStaticAttribute;
 use SebastianBergmann\PHPUnit\Assertions\AssertClassNotHasAttribute;
 use SebastianBergmann\PHPUnit\Assertions\AssertClassNotHasStaticAttribute;
+use SebastianBergmann\PHPUnit\Assertions\AssertClearStatCache;
 use SebastianBergmann\PHPUnit\Assertions\AssertContains;
 use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnly;
 use SebastianBergmann\PHPUnit\Assertions\AssertContainsOnlyInstancesOf;
@@ -2315,6 +2316,12 @@ class Assertions {
       $actual,
       $message,
     );
+
+  }
+
+  final public function assertClearStatCache(string $message = ''): bool {
+
+    return AssertClearStatCache::evaluate($this, $message);
 
   }
 

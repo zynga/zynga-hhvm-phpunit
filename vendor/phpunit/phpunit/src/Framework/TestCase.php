@@ -242,8 +242,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
 
         $this->startOutputBuffering();
 
-        clearstatcache();
-
         $currentWorkingDirectory = getcwd();
 
         $hookMethods = PHPUnit_Util_Test::getHookMethods($test->getClass());
@@ -338,8 +336,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
                 $e = $_e;
             }
         }
-
-        clearstatcache();
 
         if ($currentWorkingDirectory != getcwd()) {
             chdir($currentWorkingDirectory);
