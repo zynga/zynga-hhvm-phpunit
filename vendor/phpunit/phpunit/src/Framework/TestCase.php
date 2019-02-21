@@ -16,7 +16,6 @@ use SebastianBergmann\PHPUnit\Exceptions\WarningException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\RiskyException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
-use Prophecy\Exception\Prediction\PredictionException;
 use DeepCopy\DeepCopy;
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 use Zynga\PHPUnit\V2\TestCase;
@@ -301,13 +300,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
             $e->getMessage(),
             PHPUnit_Runner_BaseTestRunner::STATUS_FAILURE
           );
-        } catch (PredictionException $e) {
-          // var_dump('JEO PredictionException triggered ' . get_class($_e));
-          // var_dump($e->getMessage());
-          $this->status()->setMessageAndCode(
-            $e->getMessage(),
-            PHPUnit_Runner_BaseTestRunner::STATUS_FAILURE
-          );
         } catch (Throwable $_e) {
           $e = $_e;
         } catch (Exception $_e) {
@@ -383,11 +375,7 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
 
         // Workaround for missing "finally".
         if (isset($e)) {
-            if ($e instanceof PredictionException) {
-                $e = new AssertionFailedException($e->getMessage());
-            }
-
-            $this->onNotSuccessfulTest($e);
+          $this->onNotSuccessfulTest($e);
         }
     }
 
