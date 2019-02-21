@@ -9,7 +9,7 @@
  */
 
 /**
- * Extension to PHPUnit_Framework_AssertionFailedError to mark the special
+ * Extension to PHPUnit_Framework_RiskyTestError to mark the special
  * case of a test that unintentionally covers code.
  *
  * @since Class available since Release 4.0.0

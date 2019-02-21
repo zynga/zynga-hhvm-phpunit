@@ -9,6 +9,7 @@
  */
 
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
 
 /**
@@ -42,7 +43,7 @@ use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
  * @since Class available since Release 2.0.0
  */
 
- use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
+use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
 
 class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Framework_SelfDescribing, IteratorAggregate
 {
@@ -493,7 +494,8 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                         $className,
                         $name
                     );
-                } catch (PHPUnit_Framework_IncompleteTestError $e) {
+                } catch (IncompleteException $e) {
+                  
                     $message = sprintf(
                         'Test for %s::%s marked incomplete by data provider',
                         $className,

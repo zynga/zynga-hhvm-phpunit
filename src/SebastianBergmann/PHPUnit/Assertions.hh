@@ -713,7 +713,7 @@ class Assertions {
    * @param mixed  $actual
    * @param string $message
    *
-   * @throws PHPUnit_Framework_AssertionFailedError
+   * @throws AssertionFailedException
    */
   final public function assertEmpty(
     mixed $actual,
@@ -755,7 +755,7 @@ class Assertions {
    * @param mixed  $actual
    * @param string $message
    *
-   * @throws PHPUnit_Framework_AssertionFailedError
+   * @throws AssertionFailedException
    */
   final public function assertNotEmpty(
     mixed $actual,
@@ -1141,7 +1141,7 @@ class Assertions {
    * @param bool   $condition
    * @param string $message
    *
-   * @throws PHPUnit_Framework_AssertionFailedError
+   * @throws AssertionFailedException
    */
   final public function assertTrue(
     bool $condition,
@@ -1158,7 +1158,7 @@ class Assertions {
    * @param bool   $condition
    * @param string $message
    *
-   * @throws PHPUnit_Framework_AssertionFailedError
+   * @throws AssertionFailedException
    */
   final public function assertNotTrue(
     bool $condition,
@@ -1175,7 +1175,7 @@ class Assertions {
    * @param bool   $condition
    * @param string $message
    *
-   * @throws PHPUnit_Framework_AssertionFailedError
+   * @throws AssertionFailedException
    */
   final public function assertFalse(
     bool $condition,
@@ -1190,7 +1190,7 @@ class Assertions {
    * @param bool   $condition
    * @param string $message
    *
-   * @throws PHPUnit_Framework_AssertionFailedError
+   * @throws AssertionFailedException
    */
   final public function assertNotFalse(
     bool $condition,
@@ -2342,7 +2342,7 @@ class Assertions {
    *
    * @param string $message
    *
-   * @throws PHPUnit_Framework_AssertionFailedError
+   * @throws AssertionFailedException
    */
   final public function fail(string $message = ''): void {
     throw new AssertionFailedException($message);
@@ -2437,7 +2437,7 @@ class Assertions {
    *
    * @param string $message
    *
-   * @throws PHPUnit_Framework_IncompleteTestError
+   * @throws IncompleteException
    *
    * @since Method available since Release 3.0.0
    */

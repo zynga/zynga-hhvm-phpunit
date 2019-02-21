@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
+
 /**
  * A TestFailure collects a failed test together with the caught exception.
  *
@@ -164,6 +166,6 @@ class PHPUnit_Framework_TestFailure
      */
     public function isFailure()
     {
-        return ($this->thrownException() instanceof PHPUnit_Framework_AssertionFailedError);
+        return ($this->thrownException() instanceof AssertionFailedException);
     }
 }

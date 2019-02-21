@@ -370,8 +370,8 @@ class TestCaseTest extends PHPUnit_Framework_TestCase {
       false,
       PHPUnit_Runner_BaseTestRunner::STATUS_INCOMPLETE,
       'Incomplete test',
-      1,
       0,
+      1,
       0,
     );
 

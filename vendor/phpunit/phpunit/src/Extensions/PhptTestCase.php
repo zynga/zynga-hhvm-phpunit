@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
+use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
 
 /**
@@ -193,11 +195,11 @@ class PHPUnit_Extensions_PhptTestCase implements PHPUnit_Framework_Test, PHPUnit
 
             try {
                 $this->assertPhptExpectation($sections, $jobResult['stdout']);
-            } catch (PHPUnit_Framework_AssertionFailedError $e) {
+            } catch (AssertionFailedException $e) {
                 if ($xfail !== false) {
                     $result->addFailure(
                         $this,
-                        new PHPUnit_Framework_IncompleteTestError(
+                        new IncompleteException(
                             $xfail,
                             0,
                             $e
@@ -216,7 +218,7 @@ class PHPUnit_Extensions_PhptTestCase implements PHPUnit_Framework_Test, PHPUnit
             if ($result->allCompletelyImplemented() && $xfail !== false) {
                 $result->addFailure(
                     $this,
-                    new PHPUnit_Framework_IncompleteTestError(
+                    new IncompleteException(
                         'XFAIL section but test passes'
                     ),
                     $time

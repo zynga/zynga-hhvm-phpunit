@@ -13,7 +13,7 @@ class AssertNotTrue {
    * @param bool   $condition
    * @param string $message
    *
-   * @throws PHPUnit_Framework_AssertionFailedError
+   * @throws AssertionFailedException
    */
   public static function evaluate(
     Assertions $assertions,

@@ -309,11 +309,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
             $e->getMessage(),
             PHPUnit_Runner_BaseTestRunner::STATUS_FAILURE
           );
-        } catch (PHPUnit_Framework_AssertionFailedError $e) {
-          $this->status()->setMessageAndCode(
-            $e->getMessage(),
-            PHPUnit_Runner_BaseTestRunner::STATUS_FAILURE
-          );
         } catch (PredictionException $e) {
           // var_dump('JEO PredictionException triggered ' . get_class($_e));
           // var_dump($e->getMessage());
@@ -397,7 +392,7 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
         // Workaround for missing "finally".
         if (isset($e)) {
             if ($e instanceof PredictionException) {
-                $e = new PHPUnit_Framework_AssertionFailedError($e->getMessage());
+                $e = new AssertionFailedException($e->getMessage());
             }
 
             $this->onNotSuccessfulTest($e);

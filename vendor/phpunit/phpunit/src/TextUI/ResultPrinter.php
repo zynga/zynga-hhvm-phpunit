@@ -444,7 +444,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
    * A failure occurred.
    *
    * @param PHPUnit_Framework_Test                 $test
-   * @param PHPUnit_Framework_AssertionFailedError $e
+   * @param Exception $e
    * @param float                                  $time
    */
   public function addFailure(
@@ -460,7 +460,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
    * A warning occurred.
    *
    * @param PHPUnit_Framework_Test    $test
-   * @param PHPUnit_Framework_Warning $e
+   * @param Exception $e
    * @param float                     $time
    *
    * @since Method available since Release 5.1.0

@@ -23,6 +23,8 @@ use Zynga\PHPUnit\V2\TestResult;
 use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
 use SebastianBergmann\PHPUnit\Exceptions\ExpectationFailedException;
 use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentException;
+use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
+use SebastianBergmann\PHPUnit\Exceptions\TestError\RiskyException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
 
 /**
@@ -269,7 +271,7 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable
      * The passed in exception caused the failure.
      *
      * @param PHPUnit_Framework_Test                 $test
-     * @param PHPUnit_Framework_AssertionFailedError $e
+     * @param Exception $e
      * @param float                                  $time
      */
     public function addFailure(PHPUnit_Framework_Test $test, Exception $e, $time)
@@ -674,16 +676,14 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable
         } catch (SkippedException $e) {
           $failure = true;
           $skipped = true;
+        } catch (RiskyException $e) {
+          $failure = true;
+          $risky = true;
+        } catch (IncompleteException $e) {
+          $failure = true;
+          $incomplete = true;
         } catch (ExpectationFailedException $e) {
           $failure = true;
-        } catch (PHPUnit_Framework_AssertionFailedError $e) {
-            $failure = true;
-
-            if ($e instanceof PHPUnit_Framework_RiskyTestError) {
-                $risky = true;
-            } elseif ($e instanceof PHPUnit_Framework_IncompleteTestError) {
-                $incomplete = true;
-            }
         } catch (PHPUnit_Framework_Warning $e) {
             $warning = true;
         } catch (PHPUnit_Framework_Exception $e) {

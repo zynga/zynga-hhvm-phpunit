@@ -78,10 +78,10 @@ class PHPUnit_Util_Log_TAP extends PHPUnit_Util_Printer implements TestListenerI
      * A failure occurred.
      *
      * @param PHPUnit_Framework_Test                 $test
-     * @param PHPUnit_Framework_AssertionFailedError $e
+     * @param Exception $e
      * @param float                                  $time
      */
-    public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e, $time)
+    public function addFailure(PHPUnit_Framework_Test $test, Exception $e, $time)
     {
         $this->writeNotOk($test, 'Failure');
 

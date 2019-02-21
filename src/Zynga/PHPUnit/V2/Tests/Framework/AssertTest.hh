@@ -26,10 +26,8 @@ use Zynga\PHPUnit\V2\Tests\Mock\SampleClass;
 use Zynga\PHPUnit\V2\Tests\Mock\Struct;
 use Zynga\PHPUnit\V2\Tests\Mock\TestIterator;
 
-use \PHPUnit_Framework_AssertionFailedError;
 use \PHPUnit_Framework_ExpectationFailedException;
 use \PHPUnit_Framework_Exception;
-use \PHPUnit_Framework_IncompleteTestError;
 use \PHPUnit_Framework_TestCase;
 use \PHPUnit_Util_XML;
 
@@ -80,9 +78,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     } catch (AssertionFailedException $e) {
       $this->assertTrue(true);
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      $this->assertTrue(true);
-      return;
     }
     throw new AssertionFailedException('Fail did not throw fail exception');
   }
@@ -99,8 +94,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
       $this->assertContains($b, $c);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -116,8 +109,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
       $this->assertContains($a, [$b]);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail('Expected exceptions for test were not thrown');
@@ -130,8 +121,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
       $this->assertContains('foo', ['bar']);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -143,8 +132,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     try {
       $this->assertContains('foo', [true], '', false, true, true);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -161,8 +148,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
       $this->assertContainsOnlyInstancesOf(Book::class, $test2);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
     $this->fail();
   }
@@ -173,8 +158,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     try {
       $this->assertArrayHasKey(1, ['foo']);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -201,7 +184,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     try {
       $this->assertArraySubset(['a' => 'bad value'], $array);
     } catch (AssertionFailedException $e) {
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
     }
 
     try {
@@ -210,8 +192,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
         $array,
       );
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -235,8 +215,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
         $array,
       );
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -262,8 +240,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     try {
       $this->assertArraySubset(['a' => new stdClass()], $array, true);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -322,8 +298,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
       $this->assertArrayNotHasKey(0, ['foo']);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -335,8 +309,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     try {
       $this->assertArrayHasKey('bar', ['foo' => 'bar']);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -350,8 +322,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     try {
       $this->assertArrayNotHasKey('foo', ['foo' => 'bar']);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -368,7 +338,7 @@ class AssertTest extends PHPUnit_Framework_TestCase {
 
   // JEO: invalid test function sig arraykey, array, string
   // /**
-  //  * @expectedException PHPUnit_Framework_AssertionFailedError
+  //  * @expectedException AssertionFailedException
   //  */
   // public function testAssertArrayHasKeyProperlyFailsWithArrayObjectValue()
   // {
@@ -387,7 +357,7 @@ class AssertTest extends PHPUnit_Framework_TestCase {
 
   // JEO: invalid test function sig arraykey, array, string
   // /**
-  //  * @expectedException PHPUnit_Framework_AssertionFailedError
+  //  * @expectedException AssertionFailedException
   //  */
   // public function testAssertArrayHasKeyProperlyFailsWithArrayAccessValue()
   // {
@@ -407,7 +377,7 @@ class AssertTest extends PHPUnit_Framework_TestCase {
 
   // JEO: invalid test function sig arraykey, array, string
   // /**
-  //  * @expectedException PHPUnit_Framework_AssertionFailedError
+  //  * @expectedException AssertionFailedException
   //  */
   // public function testAssertArrayNotHasKeyPropertlyFailsWithArrayAccessValue()
   // {
@@ -439,8 +409,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
       $this->assertContains($foo, new TestIterator([new stdClass()]));
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -454,8 +422,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
       $this->assertContains('foo', new TestIterator(['bar']));
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -467,8 +433,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     try {
       $this->assertContains('foo', 'bar');
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -500,8 +464,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
       $this->assertNotContains($a, $c);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -517,8 +479,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
       $this->assertNotContains($a, [$a]);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -530,8 +490,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     try {
       $this->assertNotContains('foo', ['foo']);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -545,8 +503,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
       $this->assertNotContains('foo', [true]);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -558,8 +514,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     try {
       $this->assertNotContains('foo', 'foo');
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -600,8 +554,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
       $this->assertContainsOnly('integer', ['1', 2, 3]);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail('Failed to catch appropriate exceptions.');
@@ -614,8 +566,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
       $this->assertNotContainsOnly('integer', [1, 2, 3]);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -626,8 +576,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
 
     try {
       $this->assertContainsOnly('StdClass', ['StdClass']);
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     } catch (AssertionFailedException $e) {
       return;
     }
@@ -642,8 +590,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     try {
       $this->assertNotContainsOnly('StdClass', [new stdClass()]);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -1057,8 +1003,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
       $this->assertEquals($a, $b, '', $delta, 10, $canonicalize, $ignoreCase);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -1113,8 +1057,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
       );
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -1134,8 +1076,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     try {
       $this->assertSame($a, $b);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -1157,8 +1097,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
       $this->assertNotSame($a, $b);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -1176,8 +1114,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
         $this->getFilesDirectory().'bar.xml',
       );
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -1197,8 +1133,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
       );
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -1216,8 +1150,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
         file_get_contents($this->getFilesDirectory().'bar.xml'),
       );
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -1237,8 +1169,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
       );
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -1250,8 +1180,6 @@ class AssertTest extends PHPUnit_Framework_TestCase {
     try {
       $this->assertXmlStringEqualsXmlString('<foo/>', '<bar/>');
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -1298,8 +1226,6 @@ XML;
     try {
       $this->assertXmlStringNotEqualsXmlString('<root/>', '<root/>');
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -1505,8 +1431,6 @@ XML;
       $this->assertEquals('0', 1);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -1532,8 +1456,6 @@ XML;
       $this->assertFileExists(__DIR__.DIRECTORY_SEPARATOR.'NotExisting');
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -1555,8 +1477,6 @@ XML;
       $this->assertFileNotExists(__FILE__);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -1570,8 +1490,6 @@ XML;
     try {
       $this->assertObjectHasAttribute('foo', $o);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -1587,8 +1505,6 @@ XML;
       $this->assertObjectNotHasAttribute('name', $o);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -1600,8 +1516,6 @@ XML;
     try {
       $this->assertFinite(INF);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -1615,8 +1529,6 @@ XML;
       $this->assertInfinite(1);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -1628,8 +1540,6 @@ XML;
     try {
       $this->assertNan(1);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -1643,8 +1553,6 @@ XML;
       $this->assertNull(new stdClass());
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -1657,8 +1565,6 @@ XML;
       $this->assertNotNull(null);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -1670,8 +1576,6 @@ XML;
     try {
       $this->assertTrue(false);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -1686,8 +1590,6 @@ XML;
       $this->assertNotTrue(true);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -1701,8 +1603,6 @@ XML;
       $this->assertFalse(true);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -1714,8 +1614,6 @@ XML;
     try {
       $this->assertNotFalse(false);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -1765,8 +1663,6 @@ XML;
       $this->assertRegExp('/foo/', 'bar');
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -1778,8 +1674,6 @@ XML;
     try {
       $this->assertNotRegExp('/foo/', 'foobar');
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -1795,8 +1689,6 @@ XML;
       $this->assertSame(new stdClass(), new stdClass());
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -1809,8 +1701,6 @@ XML;
     try {
       $this->assertSame(true, false);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -1830,8 +1720,6 @@ XML;
       $this->assertNotSame($o, $o);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -1845,8 +1733,6 @@ XML;
       $this->assertNotSame(true, true);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -1856,8 +1742,6 @@ XML;
     try {
       $this->assertNotSame(null, null);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -1870,8 +1754,6 @@ XML;
     try {
       $this->assertGreaterThan(2, 1);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -1893,8 +1775,6 @@ XML;
       );
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -1906,8 +1786,6 @@ XML;
     try {
       $this->assertGreaterThanOrEqual(2, 1);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -1929,8 +1807,6 @@ XML;
       );
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -1942,8 +1818,6 @@ XML;
     try {
       $this->assertLessThan(1, 2);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -1965,8 +1839,6 @@ XML;
       );
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -1978,8 +1850,6 @@ XML;
     try {
       $this->assertLessThanOrEqual(1, 2);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -2000,8 +1870,6 @@ XML;
         new ClassWithNonPublicAttributes(),
       );
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -2221,8 +2089,6 @@ XML;
       $this->assertAttributeContains('bar', 'publicArray', $obj);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail(
@@ -2238,8 +2104,6 @@ XML;
     try {
       $this->assertAttributeContainsOnly('integer', 'publicArray', $obj);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -2258,8 +2122,6 @@ XML;
       $this->assertAttributeNotContains('foo', 'publicArray', $obj);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail(
@@ -2276,8 +2138,6 @@ XML;
       $this->assertAttributeNotContainsOnly('string', 'publicArray', $obj);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -2291,8 +2151,6 @@ XML;
     try {
       $this->assertAttributeContains('foo', 'protectedArray', $obj);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -2308,8 +2166,6 @@ XML;
       $this->assertAttributeNotContains('bar', 'protectedArray', $obj);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -2324,8 +2180,6 @@ XML;
       $this->assertAttributeContains('foo', 'privateArray', $obj);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -2339,8 +2193,6 @@ XML;
     try {
       $this->assertAttributeNotContains('baz', 'privateArray', $obj);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -2364,8 +2216,6 @@ XML;
       );
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -2388,8 +2238,6 @@ XML;
       $this->assertAttributeNotContains(true, 'privateArray', $obj);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -2403,8 +2251,6 @@ XML;
     try {
       $this->assertAttributeEquals('bar', 'publicAttribute', $obj);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -2420,8 +2266,6 @@ XML;
       $this->assertAttributeNotEquals('foo', 'publicAttribute', $obj);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -2435,8 +2279,6 @@ XML;
     try {
       $this->assertAttributeSame('bar', 'publicAttribute', $obj);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -2453,8 +2295,6 @@ XML;
       $this->assertAttributeNotSame('foo', 'publicAttribute', $obj);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -2468,8 +2308,6 @@ XML;
     try {
       $this->assertAttributeEquals('foo', 'protectedAttribute', $obj);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -2485,8 +2323,6 @@ XML;
       $this->assertAttributeNotEquals('bar', 'protectedAttribute', $obj);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -2501,8 +2337,6 @@ XML;
       $this->assertAttributeEquals('foo', 'privateAttribute', $obj);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -2516,8 +2350,6 @@ XML;
     try {
       $this->assertAttributeNotEquals('baz', 'privateAttribute', $obj);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -2539,8 +2371,6 @@ XML;
       );
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -2560,8 +2390,6 @@ XML;
         ClassWithNonPublicAttributes::class,
       );
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -2583,8 +2411,6 @@ XML;
       );
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -2604,8 +2430,6 @@ XML;
         ClassWithNonPublicAttributes::class,
       );
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -2627,8 +2451,6 @@ XML;
       );
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -2648,8 +2470,6 @@ XML;
         ClassWithNonPublicAttributes::class,
       );
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -2884,8 +2704,6 @@ XML;
       );
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -2903,8 +2721,6 @@ XML;
         ClassWithNonPublicAttributes::class,
       );
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -2924,8 +2740,6 @@ XML;
       );
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -2944,8 +2758,6 @@ XML;
       );
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -2960,8 +2772,6 @@ XML;
       $this->assertObjectHasAttribute('attribute', $obj);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -2975,8 +2785,6 @@ XML;
     try {
       $this->assertObjectNotHasAttribute('publicAttribute', $obj);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -2993,8 +2801,6 @@ XML;
       $this->assertObjectHasAttribute('bar', $obj);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -3010,8 +2816,6 @@ XML;
       $this->assertObjectNotHasAttribute('foo', $obj);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -3025,8 +2829,6 @@ XML;
     try {
       $this->assertObjectHasAttribute('attribute', $obj);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -3042,8 +2844,6 @@ XML;
       $this->assertObjectNotHasAttribute('protectedAttribute', $obj);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -3058,8 +2858,6 @@ XML;
       $this->assertObjectHasAttribute('attribute', $obj);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -3073,8 +2871,6 @@ XML;
     try {
       $this->assertObjectNotHasAttribute('privateAttribute', $obj);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -3094,8 +2890,6 @@ XML;
       );
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -3113,8 +2907,6 @@ XML;
         $this->getFilesDirectory().'foo.xml',
       );
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -3135,8 +2927,6 @@ XML;
       );
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail('Did not trap AssertionFailedException on differing files');
@@ -3154,8 +2944,6 @@ XML;
         file_get_contents($this->getFilesDirectory().'foo.xml'),
       );
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -3249,8 +3037,6 @@ XML;
       $this->assertStringStartsWith('prefix', 'foo');
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -3262,8 +3048,6 @@ XML;
     try {
       $this->assertStringStartsNotWith('prefix', 'prefixfoo');
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -3277,8 +3061,6 @@ XML;
       $this->assertStringEndsWith('suffix', 'foo');
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -3290,8 +3072,6 @@ XML;
     try {
       $this->assertStringEndsNotWith('suffix', 'foosuffix');
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -3326,9 +3106,6 @@ XML;
     } catch (AssertionFailedException $e) {
       $this->assertTrue(true);
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      $this->assertTrue(true);
-      return;
     }
   }
 
@@ -3358,8 +3135,6 @@ XML;
       $this->assertStringMatchesFormat('*%s*', '**');
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -3372,8 +3147,6 @@ XML;
       $this->assertEmpty(['foo']);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -3385,8 +3158,6 @@ XML;
     try {
       $this->assertNotEmpty([]);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -3404,8 +3175,6 @@ XML;
       $this->assertAttributeEmpty('a', $o);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -3422,20 +3191,16 @@ XML;
       $this->assertAttributeNotEmpty('a', $o);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
   }
 
   public function testMarkTestIncomplete() {
+
     try {
       $this->markTestIncomplete('incomplete');
     } catch (IncompleteException $e) {
-      $this->assertEquals('incomplete', $e->getMessage());
-      return;
-    } catch (PHPUnit_Framework_IncompleteTestError $e) {
       $this->assertEquals('incomplete', $e->getMessage());
       return;
     }
@@ -3460,8 +3225,6 @@ XML;
       $this->assertCount(2, [1, 2, 3]);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -3473,8 +3236,6 @@ XML;
     try {
       $this->assertCount(2, new ArrayIterator([1, 2, 3]));
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -3531,8 +3292,6 @@ XML;
       $this->assertNotCount(2, [1, 2]);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -3576,8 +3335,6 @@ XML;
       $this->assertSameSize([1, 2], [1, 2, 3]);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -3617,8 +3374,6 @@ XML;
     try {
       $this->assertNotSameSize([1, 2], [3, 4]);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -3675,8 +3430,6 @@ XML;
       $this->assertJsonStringEqualsJsonString($expected, $actual);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
     $this->fail('Expected exception not found');
   }
@@ -3699,8 +3452,6 @@ XML;
     try {
       $this->assertJsonStringNotEqualsJsonString($expected, $actual);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
     $this->fail('Expected exception not found');
@@ -3794,8 +3545,6 @@ XML;
       $this->assertInstanceOf(Exception::class, new stdClass());
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -3823,8 +3572,6 @@ XML;
     try {
       $this->assertNotInstanceOf(stdClass::class, new stdClass());
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -3855,8 +3602,6 @@ XML;
       $this->assertInternalType('string', 1);
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -3868,8 +3613,6 @@ XML;
     try {
       $this->assertInternalType('double', 1);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -3898,8 +3641,6 @@ XML;
     try {
       $this->assertNotInternalType('integer', 1);
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
@@ -3956,8 +3697,6 @@ XML;
       );
     } catch (AssertionFailedException $e) {
       return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
-      return;
     }
 
     $this->fail();
@@ -3996,8 +3735,6 @@ XML;
         "FOO\n",
       );
     } catch (AssertionFailedException $e) {
-      return;
-    } catch (PHPUnit_Framework_AssertionFailedError $e) {
       return;
     }
 
