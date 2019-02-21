@@ -9,6 +9,7 @@
  */
 
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
+use \Exception;
 
 /**
  * Base class for printers of TestDox documentation.
@@ -135,12 +136,12 @@ abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer i
      * A warning occurred.
      *
      * @param PHPUnit_Framework_Test    $test
-     * @param PHPUnit_Framework_Warning $e
+     * @param Exception $e
      * @param float                     $time
      *
      * @since Method available since Release 5.1.0
      */
-    public function addWarning(PHPUnit_Framework_Test $test, PHPUnit_Framework_Warning $e, $time)
+    public function addWarning(PHPUnit_Framework_Test $test, Exception $e, $time)
     {
         if (!$this->isOfInterest($test)) {
             return;

@@ -51,7 +51,7 @@ class Listeners implements TestListenerInterface {
    * A warning occurred.
    *
    * @param PHPUnit_Framework_Test    $test
-   * @param PHPUnit_Framework_Warning $e
+   * @param Exception $e
    * @param float                     $time
    *
    * @since Method available since Release 6.0.0

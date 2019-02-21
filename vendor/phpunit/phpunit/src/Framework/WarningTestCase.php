@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use SebastianBergmann\PHPUnit\Exceptions\WarningException;
+
 /**
  * A warning.
  *
@@ -54,7 +56,7 @@ class PHPUnit_Framework_WarningTestCase extends PHPUnit_Framework_TestCase
      */
     protected function runTest()
     {
-        throw new PHPUnit_Framework_Warning($this->message);
+        throw new WarningException($this->message);
     }
 
     /**

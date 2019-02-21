@@ -23,6 +23,7 @@ use Zynga\PHPUnit\V2\TestResult;
 use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
 use SebastianBergmann\PHPUnit\Exceptions\ExpectationFailedException;
 use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentException;
+use SebastianBergmann\PHPUnit\Exceptions\WarningException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\RiskyException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
@@ -248,12 +249,12 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable
      * The passed in exception caused the warning.
      *
      * @param PHPUnit_Framework_Test    $test
-     * @param PHPUnit_Framework_Warning $e
+     * @param Exception $e
      * @param float                     $time
      *
      * @since Method available since Release 5.1.0
      */
-    public function addWarning(PHPUnit_Framework_Test $test, PHPUnit_Framework_Warning $e, $time)
+    public function addWarning(PHPUnit_Framework_Test $test, Exception $e, $time)
     {
         if ($this->stopOnWarning) {
             $this->stop();
@@ -664,7 +665,7 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable
                 $test->runBare();
 
         } catch (PHPUnit_Framework_MockObject_Exception $e) {
-            $e = new PHPUnit_Framework_Warning(
+            $e = new WarningException(
                 $e->getMessage()
             );
 
@@ -684,7 +685,7 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable
           $incomplete = true;
         } catch (ExpectationFailedException $e) {
           $failure = true;
-        } catch (PHPUnit_Framework_Warning $e) {
+        } catch (WarningException $e) {
             $warning = true;
         } catch (PHPUnit_Framework_Exception $e) {
             $error = true;
@@ -755,7 +756,7 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable
                 } catch (PHPUnit_Framework_InvalidCoversTargetException $cce) {
                     $this->addWarning(
                         $test,
-                        new PHPUnit_Framework_Warning(
+                        new WarningException(
                             $cce->getMessage()
                         ),
                         $time

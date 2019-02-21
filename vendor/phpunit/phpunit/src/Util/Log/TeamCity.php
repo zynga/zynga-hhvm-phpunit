@@ -10,6 +10,7 @@
 
 use SebastianBergmann\Comparator\ComparisonFailure;
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+use \Exception;
 
 /**
  * A TestListener that generates a logfile of the test execution using the
@@ -73,12 +74,12 @@ class PHPUnit_Util_Log_TeamCity extends PHPUnit_TextUI_ResultPrinter
      * A warning occurred.
      *
      * @param PHPUnit_Framework_Test    $test
-     * @param PHPUnit_Framework_Warning $e
+     * @param Exception $e
      * @param float                     $time
      *
      * @since Method available since Release 5.1.0
      */
-    public function addWarning(PHPUnit_Framework_Test $test, PHPUnit_Framework_Warning $e, $time)
+    public function addWarning(PHPUnit_Framework_Test $test, Exception $e, $time)
     {
         $this->printEvent(
             'testFailed',

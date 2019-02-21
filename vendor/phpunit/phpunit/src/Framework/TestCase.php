@@ -12,6 +12,7 @@
 use SebastianBergmann\Exporter\Exporter;
 use SebastianBergmann\PHPUnit\Environment\OutputBuffering;
 use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
+use SebastianBergmann\PHPUnit\Exceptions\WarningException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
 use Prophecy\Exception\Prediction\PredictionException;
@@ -266,7 +267,7 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
             $this->assertPostConditions();
 
             if (!empty($this->warnings)) {
-                throw new PHPUnit_Framework_Warning(
+                throw new WarningException(
                     implode(
                         "\n",
                         array_unique($this->warnings)
@@ -299,7 +300,7 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
             $e->getMessage(),
             PHPUnit_Runner_BaseTestRunner::STATUS_SKIPPED
           );
-        } catch (PHPUnit_Framework_Warning $e) {
+        } catch (WarningException $e) {
           $this->status()->setMessageAndCode(
             $e->getMessage(),
             PHPUnit_Runner_BaseTestRunner::STATUS_WARNING

@@ -9,6 +9,7 @@
  */
 
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
+use \Exception;
 
 /**
  * A TestListener that generates JSON messages.
@@ -56,12 +57,12 @@ class PHPUnit_Util_Log_JSON extends PHPUnit_Util_Printer implements TestListener
      * A warning occurred.
      *
      * @param PHPUnit_Framework_Test    $test
-     * @param PHPUnit_Framework_Warning $e
+     * @param Exception $e
      * @param float                     $time
      *
      * @since Method available since Release 5.1.0
      */
-    public function addWarning(PHPUnit_Framework_Test $test, PHPUnit_Framework_Warning $e, $time)
+    public function addWarning(PHPUnit_Framework_Test $test, Exception $e, $time)
     {
         $this->writeCase(
             'warning',
