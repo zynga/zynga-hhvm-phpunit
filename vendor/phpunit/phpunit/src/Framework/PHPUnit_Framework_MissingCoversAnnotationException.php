@@ -8,12 +8,14 @@
  * file that was distributed with this source code.
  */
 
+use SebastianBergmann\PHPUnit\Exceptions\TestError\RiskyException;
+
 /**
- * Extension to PHPUnit_Framework_RiskyTestError to mark a test as risky
+ * Extension to RiskyException to mark a test as risky
  * when it does not have a @covers annotation but is expected to have one.
  *
  * @since Class available since Release 5.3.0
  */
-class PHPUnit_Framework_MissingCoversAnnotationException extends PHPUnit_Framework_RiskyTestError
+class PHPUnit_Framework_MissingCoversAnnotationException extends RiskyException
 {
 }

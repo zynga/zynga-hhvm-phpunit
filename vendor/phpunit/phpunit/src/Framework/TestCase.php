@@ -14,6 +14,7 @@ use SebastianBergmann\PHPUnit\Environment\OutputBuffering;
 use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
 use SebastianBergmann\PHPUnit\Exceptions\WarningException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
+use SebastianBergmann\PHPUnit\Exceptions\TestError\RiskyException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
 use Prophecy\Exception\Prediction\PredictionException;
 use DeepCopy\DeepCopy;
@@ -340,7 +341,7 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
 
         try {
             $this->stopOutputBuffering();
-        } catch (PHPUnit_Framework_RiskyTestError $_e) {
+        } catch (RiskyException $_e) {
             if (!isset($e)) {
                 $e = $_e;
             }

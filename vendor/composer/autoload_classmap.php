@@ -83,7 +83,6 @@ return array(
     'PHPUnit_Framework_MockObject_Verifiable' => $vendorDir . '/phpunit/phpunit-mock-objects/src/Framework/MockObject/Verifiable.php',
     'PHPUnit_Framework_OutputError' => $vendorDir . '/phpunit/phpunit/src/Framework/OutputError.php',
     'PHPUnit_Framework_RiskyTest' => $vendorDir . '/phpunit/phpunit/src/Framework/RiskyTest.php',
-    'PHPUnit_Framework_RiskyTestError' => $vendorDir . '/phpunit/phpunit/src/Framework/RiskyTestError.php',
     'PHPUnit_Framework_SelfDescribing' => $vendorDir . '/phpunit/phpunit/src/Framework/SelfDescribing.php',
     'PHPUnit_Framework_SkippedTestCase' => $vendorDir . '/phpunit/phpunit/src/Framework/SkippedTestCase.php',
     'PHPUnit_Framework_SyntheticError' => $vendorDir . '/phpunit/phpunit/src/Framework/SyntheticError.php',

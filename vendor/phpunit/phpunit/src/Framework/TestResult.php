@@ -696,7 +696,7 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable
                 if (!$blacklist->isBlacklisted($function['filename'])) {
                     $this->addFailure(
                         $test,
-                        new PHPUnit_Framework_RiskyTestError(
+                        new RiskyException(
                             sprintf(
                                 '%s() used in %s:%s',
                                 $function['function'],
@@ -825,7 +825,7 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable
                  $test->getNumAssertions() == 0) {
             $this->addFailure(
                 $test,
-                new PHPUnit_Framework_RiskyTestError(
+                new RiskyException(
                     'This test did not perform any assertions'
                 ),
                 $time
@@ -847,7 +847,7 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable
             if (isset($annotations['method']['todo'])) {
                 $this->addFailure(
                     $test,
-                    new PHPUnit_Framework_RiskyTestError(
+                    new RiskyException(
                         'Test method is annotated with @todo'
                     ),
                     $time

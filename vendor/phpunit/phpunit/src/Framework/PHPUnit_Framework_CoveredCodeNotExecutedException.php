@@ -8,12 +8,14 @@
  * file that was distributed with this source code.
  */
 
+use SebastianBergmann\PHPUnit\Exceptions\TestError\RiskyException;
+
 /**
- * Extension to PHPUnit_Framework_AssertionFailedError to mark the special
+ * Extension to RiskyException to mark the special
  * case of a test that does not execute the code it wants to cover.
  *
  * @since Class available since Release 5.2.0
  */
-class PHPUnit_Framework_CoveredCodeNotExecutedException extends PHPUnit_Framework_RiskyTestError
+class PHPUnit_Framework_CoveredCodeNotExecutedException extends RiskyException
 {
 }
