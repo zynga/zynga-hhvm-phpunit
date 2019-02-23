@@ -36,6 +36,7 @@ use Zynga\PHPUnit\V2\Tests\Mock\TestSkipped;
 use Zynga\PHPUnit\V2\Tests\Mock\ThrowExceptionTestCase;
 use Zynga\PHPUnit\V2\Tests\Mock\ThrowNoExceptionTestCase;
 use Zynga\PHPUnit\V2\Tests\Mock\WasRun;
+use Zynga\PHPUnit\V2\Version;
 
 use \PHPUnit_Framework_TestCase;
 use \PHPUnit_Framework_TestResult;
@@ -777,88 +778,149 @@ class TestCaseTest extends PHPUnit_Framework_TestCase {
     $test = new Requirements('testAlwaysSkip');
     $result = $test->run();
 
-    $this->assertEquals(1, $result->skippedCount());
-    $this->assertEquals(
-      'PHPUnit >= 1111111 is required.',
-      $test->getStatusMessage(),
+    $this->_verifyTest(
+      $test,
+      $result,
+      false,
+      PHPUnit_Runner_BaseTestRunner::STATUS_SKIPPED,
+      'PHPUnit version '.Version::VERSION_NUMBER.' >= 1111111 is required.',
+      0,
+      0,
+      1,
+      0,
     );
+
   }
 
   public function testSkipsIfRequiresHigherVersionOfPHP() {
+
     $test = new Requirements('testAlwaysSkip2');
+
     $result = $test->run();
 
-    $this->assertEquals(1, $result->skippedCount());
-    $this->assertEquals(
-      'PHP >= 9999999 is required.',
-      $test->getStatusMessage(),
+    $this->_verifyTest(
+      $test,
+      $result,
+      false,
+      PHPUnit_Runner_BaseTestRunner::STATUS_SKIPPED,
+      'PHP version '.PHP_VERSION.' >= 9999999 is required.',
+      0,
+      0,
+      1,
+      0,
     );
+
   }
 
   public function testSkipsIfRequiresNonExistingOs() {
     $test = new Requirements('testAlwaysSkip3');
     $result = $test->run();
 
-    $this->assertEquals(1, $result->skippedCount());
-    $this->assertEquals(
-      'Operating system matching /DOESNOTEXIST/i is required.',
-      $test->getStatusMessage(),
+    $this->_verifyTest(
+      $test,
+      $result,
+      false,
+      PHPUnit_Runner_BaseTestRunner::STATUS_SKIPPED,
+      'Operating system '.PHP_OS.' expected /DOESNOTEXIST/i is required.',
+      0,
+      0,
+      1,
+      0,
     );
+
   }
 
   public function testSkipsIfRequiresNonExistingFunction() {
     $test = new Requirements('testNine');
     $result = $test->run();
 
-    $this->assertEquals(1, $result->skippedCount());
-    $this->assertEquals(
+    $this->_verifyTest(
+      $test,
+      $result,
+      false,
+      PHPUnit_Runner_BaseTestRunner::STATUS_SKIPPED,
       'Function testFuncThatDoesNotExist is required.',
-      $test->getStatusMessage(),
+      0,
+      0,
+      1,
+      0,
     );
+
   }
 
   public function testSkipsIfRequiresNonExistingExtension() {
     $test = new Requirements('testTen');
     $result = $test->run();
 
-    $this->assertEquals(
+    $this->_verifyTest(
+      $test,
+      $result,
+      false,
+      PHPUnit_Runner_BaseTestRunner::STATUS_SKIPPED,
       'Extension testExt is required.',
-      $test->getStatusMessage(),
+      0,
+      0,
+      1,
+      0,
     );
+
   }
 
   public function testSkipsIfRequiresExtensionWithAMinimumVersion() {
+
     $test = new Requirements('testSpecificExtensionVersion');
+
     $result = $test->run();
 
-    $this->assertEquals(
-      'Extension testExt >= 1.8.0 is required.',
-      $test->getStatusMessage(),
+    $this->_verifyTest(
+      $test,
+      $result,
+      false,
+      PHPUnit_Runner_BaseTestRunner::STATUS_SKIPPED,
+      'Extension testExt is required to be >= 1.8.0.',
+      0,
+      0,
+      1,
+      0,
     );
+
   }
 
   public function testSkipsProvidesMessagesForAllSkippingReasons() {
     $test = new Requirements('testAllPossibleRequirements');
     $result = $test->run();
 
-    $this->assertEquals(
-      'PHP >= 99-dev is required.'.
-      PHP_EOL.
-      'PHPUnit >= 9-dev is required.'.
-      PHP_EOL.
-      'Operating system matching /DOESNOTEXIST/i is required.'.
-      PHP_EOL.
-      'Function testFuncOne is required.'.
-      PHP_EOL.
-      'Function testFuncTwo is required.'.
-      PHP_EOL.
-      'Extension testExtOne is required.'.
-      PHP_EOL.
-      'Extension testExtTwo is required.'.
-      PHP_EOL.
-      'Extension testExtThree >= 2.0 is required.',
-      $test->getStatusMessage(),
+    $expectedOutput = '';
+    $expectedOutput .=
+      'PHP version '.PHP_VERSION.' >= 99-dev is required.'.PHP_EOL;
+    $expectedOutput .=
+      'PHPUnit version '.
+      Version::VERSION_NUMBER.
+      ' >= 9-dev is required.'.
+      PHP_EOL;
+    $expectedOutput .=
+      'Operating system '.
+      PHP_OS.
+      ' expected /DOESNOTEXIST/i is required.'.
+      PHP_EOL;
+    $expectedOutput .= 'Function testFuncOne is required.'.PHP_EOL;
+    $expectedOutput .= 'Function testFuncTwo is required.'.PHP_EOL;
+    $expectedOutput .= 'Extension testExtOne is required.'.PHP_EOL;
+    $expectedOutput .= 'Extension testExtTwo is required.'.PHP_EOL;
+    $expectedOutput .= 'Extension testExtThree is required to be >= 2.0.';
+
+    $this->_verifyTest(
+      $test,
+      $result,
+      false,
+      PHPUnit_Runner_BaseTestRunner::STATUS_SKIPPED,
+      $expectedOutput,
+      0,
+      0,
+      1,
+      0,
     );
+
   }
 
   public function testRequiringAnExistingMethodDoesNotSkip() {

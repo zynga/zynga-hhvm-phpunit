@@ -127,19 +127,8 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
 
     }
 
-
-    // @TODO: Save for later as we will need to be almost completely ported.
-    public function setTest(PHPUnit_Framework_Test $test) {
-      $this->_test = $test;
-      return true;
-    }
-
-    // @TODO: Save for later as we will need to be almost completely ported.
     public function getTest(): PHPUnit_Framework_Test {
-      if ( $this->_test === null ) {
-        return $this;
-      }
-      return $this->_test;
+      return $this;
     }
 
     /**
@@ -159,26 +148,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
 
     }
 
-    /**
-     * @since Method available since Release 3.6.0
-     */
-    protected function checkRequirements()
-    {
-      $test = $this->getTest();
-      $name = $this->getName(false);
-        if (! $name || !method_exists($test, $name)) {
-            return;
-        }
-
-        $missingRequirements = PHPUnit_Util_Test::getMissingRequirements(
-            $test->getClass(),
-            $name
-        );
-
-        if (count($missingRequirements) > 0) {
-            $this->markTestSkipped(implode(PHP_EOL, $missingRequirements));
-        }
-    }
 
     /**
      * Runs the test case and collects the results in a TestResult object.

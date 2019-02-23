@@ -4,6 +4,7 @@ namespace Zynga\PHPUnit\V2;
 
 use Zynga\PHPUnit\V2\Annotations;
 use Zynga\PHPUnit\V2\TestCase\OutputBuffer;
+use Zynga\PHPUnit\V2\TestCase\Requirements;
 use Zynga\PHPUnit\V2\TestCase\Size;
 use Zynga\PHPUnit\V2\TestCase\Status;
 use SebastianBergmann\PHPUnit\Assertions;
@@ -127,7 +128,8 @@ class TestCase extends Assertions {
    *
    * @since Method available since Release 3.4.0
    */
-  final public function getAnnotations(): Map<string, Map<string, string>> {
+  final public function getAnnotations(
+  ): Map<string, Map<string, Vector<string>>> {
 
     $className = $this->getClass();
     $methodName = $this->getName(false);
@@ -136,6 +138,55 @@ class TestCase extends Assertions {
     //var_dump('methodName='.$methodName);
 
     return Annotations::parseTestMethodAnnotations($className, $methodName);
+
+  }
+
+  final public function getAllAnnotationsForKey(string $key): Vector<string> {
+
+    $collapsed = Vector {};
+
+    $classValues = $this->getAnnotationsForKey('class', $key);
+
+    foreach ($classValues as $classValue) {
+      if (is_string($classValue)) {
+        $collapsed->add($classValue);
+      }
+    }
+
+    $methodValues = $this->getAnnotationsForKey('method', $key);
+
+    foreach ($methodValues as $methodValue) {
+      if (is_string($methodValue)) {
+        $collapsed->add($methodValue);
+      }
+    }
+
+    // return the stack of annotation combined
+    return $collapsed;
+
+  }
+
+  final public function getAnnotationsForKey(
+    string $context,
+    string $key,
+  ): Vector<string> {
+
+    $allAnnotations = $this->getAnnotations();
+
+    $contextAnnotations = $allAnnotations->get($context);
+
+    if ($contextAnnotations instanceof Map) {
+
+      $keyValue = $contextAnnotations->get($key);
+
+      if ($keyValue instanceof Vector) {
+        return $keyValue;
+      }
+
+    }
+
+    // not found
+    return Vector {};
 
   }
 
@@ -216,42 +267,34 @@ class TestCase extends Assertions {
    */
   final public function setExpectedExceptionFromAnnotation(): bool {
 
-    $annotations = $this->getAnnotations();
+    $expectedExceptions =
+      $this->getAnnotationsForKey('method', 'expectedException');
 
-    // echo "annotations=\n";
-    // var_dump($annotations);
-
-    $methodAnnotations = $annotations->get('method');
-
-    if (!$methodAnnotations instanceof Map) {
-      return false;
-    }
-
-    $expectedException = $methodAnnotations->get('expectedException');
-
-    if ($expectedException != null) {
+    foreach ($expectedExceptions as $expectedException) {
       $this->expectException(strval($expectedException));
     }
 
-    $expectedExceptionMessage =
-      $methodAnnotations->get('expectedExceptionMessage');
+    $expectedExceptionMessages =
+      $this->getAnnotationsForKey('method', 'expectedExceptionMessage');
 
-    if ($expectedExceptionMessage != null) {
+    foreach ($expectedExceptionMessages as $expectedExceptionMessage) {
       $this->expectExceptionMessage(strval($expectedExceptionMessage));
     }
 
-    $expectedExceptionMessageRegExp =
-      $methodAnnotations->get('expectedExceptionMessageRegExp');
+    $expectedExceptionMessageRegExps =
+      $this->getAnnotationsForKey('method', 'expectedExceptionMessageRegExp');
 
-    if ($expectedExceptionMessageRegExp != null) {
+    foreach ($expectedExceptionMessageRegExps as
+             $expectedExceptionMessageRegExp) {
       $this->expectExceptionMessageRegExp(
         strval($expectedExceptionMessageRegExp),
       );
     }
 
-    $expectedExceptionCode = $methodAnnotations->get('expectedExceptionCode');
+    $expectedExceptionCodes =
+      $this->getAnnotationsForKey('method', 'expectedExceptionCode');
 
-    if ($expectedExceptionCode != null) {
+    foreach ($expectedExceptionCodes as $expectedExceptionCode) {
       $this->expectExceptionCode(intval($expectedExceptionCode));
     }
 
@@ -763,6 +806,26 @@ class TestCase extends Assertions {
    */
   final public function getNumAssertions(): int {
     return $this->_numAssertions;
+  }
+
+  /**
+   * @since Method available since Release 3.6.0
+   */
+  final protected function checkRequirements(): void {
+
+    $name = $this->getName(false);
+
+    // if the test moethod doesn't exist stop.
+    if (!$name || !method_exists($this, $name)) {
+      return;
+    }
+
+    $missingRequirements = Requirements::getMissingRequirements($this);
+
+    if ($missingRequirements->count() > 0) {
+      $this->markTestSkipped(implode(PHP_EOL, $missingRequirements));
+    }
+
   }
 
   // --

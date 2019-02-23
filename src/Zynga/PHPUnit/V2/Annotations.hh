@@ -11,8 +11,10 @@ use \ReflectionMethod;
 
 class Annotations {
 
-  private static Map<string, Map<string, string>> $_classCache = Map {};
-  private static Map<string, Map<string, string>> $_methodCache = Map {};
+  private static Map<string, Map<string, Vector<string>>>
+    $_classCache = Map {};
+  private static Map<string, Map<string, Vector<string>>>
+    $_methodCache = Map {};
 
   /**
    * @param string $docblock
@@ -23,7 +25,7 @@ class Annotations {
    */
   private static function parseAnnotations(
     string $docblock,
-  ): Map<string, string> {
+  ): Map<string, Vector<string>> {
 
     $annotations = Map {};
 
@@ -42,7 +44,16 @@ class Annotations {
       for ($i = 0; $i < $numMatches; ++$i) {
         $key = $matches['name'][$i];
         $value = $matches['value'][$i];
-        $annotations->set($key, $value);
+
+        $currentValue = $annotations->get($key);
+
+        if ($currentValue == null) {
+          $currentValue = Vector {};
+          $currentValue->add($value);
+        } else {
+          $currentValue->add($value);
+        }
+        $annotations->set($key, $currentValue);
       }
 
     }
@@ -53,7 +64,7 @@ class Annotations {
 
   public static function parseClassAnnotations(
     string $className,
-  ): Map<string, string> {
+  ): Map<string, Vector<string>> {
 
     $key = $className;
 
@@ -78,7 +89,7 @@ class Annotations {
   public static function parseMethodAnnotations(
     string $className,
     string $methodName,
-  ): Map<string, string> {
+  ): Map<string, Vector<string>> {
 
     $key = $className.'::'.$methodName;
 
@@ -114,7 +125,7 @@ class Annotations {
   public static function parseTestMethodAnnotations(
     string $className,
     string $methodName = '',
-  ): Map<string, Map<string, string>> {
+  ): Map<string, Map<string, Vector<string>>> {
 
     if ($methodName == '') {
       return Map {
