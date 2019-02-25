@@ -45,6 +45,8 @@ class TestCase extends Assertions {
   private bool $_useErrorHandler;
   // number of assertions fired by this test
   private int $_numAssertions;
+  private Vector<string> $_dependencies;
+  private bool $_hasDependencies;
 
   public function __construct(string $name = '') {
 
@@ -64,6 +66,8 @@ class TestCase extends Assertions {
     $this->_iniSettings = Map {};
     $this->_useErrorHandler = false;
     $this->_numAssertions = 0;
+    $this->_dependencies = Vector {};
+    $this->_hasDependencies = false;
 
     if ($name != '') {
       $this->_name = $name;
@@ -826,6 +830,30 @@ class TestCase extends Assertions {
       $this->markTestSkipped(implode(PHP_EOL, $missingRequirements));
     }
 
+  }
+
+  /**
+   * Sets the dependencies of a TestCase.
+   *
+   * @param array $dependencies
+   *
+   * @since Method available since Release 3.4.0
+   */
+  final public function setDependencies(Vector<string> $dependencies): bool {
+    $this->_dependencies = $dependencies;
+    $this->_hasDependencies = $dependencies->count() > 0;
+    return true;
+  }
+
+  /**
+   * Returns true if the tests has dependencies
+   *
+   * @return bool
+   *
+   * @since Method available since Release 4.0.0
+   */
+  final public function hasDependencies(): bool {
+    return $this->_hasDependencies;
   }
 
   // --

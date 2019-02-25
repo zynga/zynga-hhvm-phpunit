@@ -1,4 +1,5 @@
-<?php
+<?hh // decl
+
 /*
  * This file is part of PHPUnit.
  *
@@ -46,7 +47,8 @@ use SebastianBergmann\PHPUnit\Exceptions\TestSuiteError\SkippedException as Test
 
 use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
 
-class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Framework_SelfDescribing, IteratorAggregate
+// JEO: removed iterator aggregate IteratorAggregate as it expectx <T>
+class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Framework_SelfDescribing
 {
     /**
      * Last count of tests in this suite.
@@ -169,7 +171,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
         }
 
         if (!$argumentsValid) {
-            throw new PHPUnit_Framework_Exception;
+            throw new PHPUnit_Framework_Exception();
         }
 
         if (!$theClass->isSubClassOf(ZyngaTestCaseBase::class) && !$theClass->isSubClassOf(PHPUnit_Framework_TestCase::class) ) {
@@ -216,6 +218,10 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
         }
 
         $this->testCase = true;
+    }
+
+    public function setDependencies(Vector<string> $deps): bool {
+      return true;
     }
 
     /**
@@ -310,7 +316,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                 $this->addTest(new self($testClass));
             }
         } else {
-            throw new PHPUnit_Framework_Exception;
+            throw new PHPUnit_Framework_Exception();
         }
     }
 
@@ -437,14 +443,18 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
         } else {
             $numTests = 0;
 
-            foreach ($this as $test) {
-                $numTests += count($test);
+            foreach ($this->tests as $test) {
+                $numTests += $test->count();
             }
 
             $this->cachedNumTests = $numTests;
         }
 
         return $numTests;
+    }
+
+    public function getCount(bool $preferCache = false): int {
+      return $this->count($preferCache);
     }
 
     /**
@@ -596,7 +606,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
                         }
                     }
                 } else {
-                    $test = new $className;
+                    $test = new $className();
                 }
             }
         }
@@ -637,7 +647,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      */
     protected function createResult()
     {
-        return new PHPUnit_Framework_TestResult;
+        return new PHPUnit_Framework_TestResult();
     }
 
     /**
@@ -686,13 +696,13 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
      *
      * @return PHPUnit_Framework_TestResult
      */
-    public function run(PHPUnit_Framework_TestResult $result = null)
+    public function run(?PHPUnit_Framework_TestResult $result = null)
     {
         if ($result === null) {
             $result = $this->createResult();
         }
 
-        if (count($this) == 0) {
+        if ($this->getCount() == 0) {
             return $result;
         }
 
@@ -736,7 +746,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
             }
 
         } catch (TestSuiteSkippedException $e) {
-            $numTests = count($this);
+            $numTests = $this->getCount();
 
             for ($i = 0; $i < $numTests; $i++) {
                 $result->startTest($this);
@@ -755,12 +765,12 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
         }
 
         if (isset($t)) {
-            $numTests = count($this);
+            $numTests = $this->getCount();
 
             for ($i = 0; $i < $numTests; $i++) {
                 $result->startTest($this);
-                $result->addError($this, $t, 0);
-                $result->endTest($this, 0);
+                $result->addError($this, $t, 0.0);
+                $result->endTest($this, 0.0);
             }
 
             $this->tearDown();
@@ -769,7 +779,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
             return $result;
         }
 
-        foreach ($this as $test) {
+        foreach ($this->tests as $test) {
 
             if ($result->shouldStop()) {
                 break;
@@ -914,9 +924,10 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
 
         if (($test instanceof ZyngaTestCaseBase || $test instanceof PHPUnit_Framework_TestCase) ||
             $test instanceof PHPUnit_Framework_TestSuite_DataProvider) {
-            $test->setDependencies(
-                PHPUnit_Util_Test::getDependencies($class->getName(), $name)
-            );
+
+            $deps = PHPUnit_Util_Test::getDependencies($class->getName(), $name);
+            $v_deps = Vector::fromArray($deps);
+            $test->setDependencies($v_deps);
         }
 
         $this->addTest(
@@ -1040,7 +1051,7 @@ class PHPUnit_Framework_TestSuite implements PHPUnit_Framework_Test, PHPUnit_Fra
     public function injectFilter(PHPUnit_Runner_Filter_Factory $filter)
     {
         $this->iteratorFilter = $filter;
-        foreach ($this as $test) {
+        foreach ($this->tests as $test) {
             if ($test instanceof self) {
                 $test->injectFilter($filter);
             }

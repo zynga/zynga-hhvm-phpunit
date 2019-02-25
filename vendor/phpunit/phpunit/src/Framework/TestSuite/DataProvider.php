@@ -1,4 +1,5 @@
-<?php
+<?hh // decl
+
 /*
  * This file is part of PHPUnit.
  *
@@ -18,10 +19,11 @@ class PHPUnit_Framework_TestSuite_DataProvider extends PHPUnit_Framework_TestSui
      *
      * @param array $dependencies
      */
-    public function setDependencies(array $dependencies)
+    public function setDependencies(Vector<string> $dependencies): bool
     {
         foreach ($this->tests as $test) {
             $test->setDependencies($dependencies);
         }
+        return true;
     }
 }

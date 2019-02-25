@@ -462,30 +462,6 @@ abstract class PHPUnit_Framework_TestCase extends TestCase implements PHPUnit_Fr
     }
 
     /**
-     * Sets the dependencies of a TestCase.
-     *
-     * @param array $dependencies
-     *
-     * @since Method available since Release 3.4.0
-     */
-    public function setDependencies(array $dependencies)
-    {
-        $this->dependencies = $dependencies;
-    }
-
-    /**
-     * Returns true if the tests has dependencies
-     *
-     * @return bool
-     *
-     * @since Method available since Release 4.0.0
-     */
-    public function hasDependencies()
-    {
-        return count($this->dependencies) > 0;
-    }
-
-    /**
      * Sets
      *
      * @param array $dependencyInput
