@@ -8,6 +8,7 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
 use \Exception;
 
@@ -31,90 +32,90 @@ abstract class PHPUnit_Extensions_TicketListener implements TestListenerInterfac
     /**
      * An error occurred.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                  $time
      */
-    public function addError(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addError(TestInterface $test, Exception $e, $time)
     {
     }
 
     /**
      * A failure occurred.
      *
-     * @param PHPUnit_Framework_Test                 $test
+     * @param TestInterface                 $test
      * @param Exception $e
      * @param float                                  $time
      */
-    public function addFailure(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addFailure(TestInterface $test, Exception $e, $time)
     {
     }
 
     /**
      * Incomplete test.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                  $time
      */
-    public function addIncompleteTest(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addIncompleteTest(TestInterface $test, Exception $e, $time)
     {
     }
 
     /**
      * Risky test.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                  $time
      *
      * @since Method available since Release 4.0.0
      */
-    public function addRiskyTest(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addRiskyTest(TestInterface $test, Exception $e, $time)
     {
     }
 
     /**
      * Skipped test.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                  $time
      *
      * @since Method available since Release 3.0.0
      */
-    public function addSkippedTest(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addSkippedTest(TestInterface $test, Exception $e, $time)
     {
     }
 
     /**
      * A test suite started.
      *
-     * @param PHPUnit_Framework_TestSuite $suite
+     * @param TestInterface $suite
      *
      * @since Method available since Release 2.2.0
      */
-    public function startTestSuite(PHPUnit_Framework_TestSuite $suite)
+    public function startTestSuite(TestInterface $suite)
     {
     }
 
     /**
      * A test suite ended.
      *
-     * @param PHPUnit_Framework_TestSuite $suite
+     * @param TestInterface $suite
      *
      * @since Method available since Release 2.2.0
      */
-    public function endTestSuite(PHPUnit_Framework_TestSuite $suite)
+    public function endTestSuite(TestInterface $suite)
     {
     }
 
     /**
      * A test started.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      */
-    public function startTest(PHPUnit_Framework_Test $test)
+    public function startTest(TestInterface $test)
     {
         if (!$test instanceof PHPUnit_Framework_WarningTestCase) {
             if ($this->ran) {
@@ -135,10 +136,10 @@ abstract class PHPUnit_Extensions_TicketListener implements TestListenerInterfac
     /**
      * A test ended.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param float                  $time
      */
-    public function endTest(PHPUnit_Framework_Test $test, $time)
+    public function endTest(TestInterface $test, $time)
     {
         if (!$test instanceof PHPUnit_Framework_WarningTestCase) {
             if ($test->getStatus() == PHPUnit_Runner_BaseTestRunner::STATUS_PASSED) {

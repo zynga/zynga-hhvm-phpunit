@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\PHPUnit\V2\TestCase;
+
 /**
  * We have a TestSuite object A.
  * In TestSuite object A we have Tests tagged with @group.
@@ -41,7 +43,7 @@ class PHPUnit_Extensions_GroupTestSuite extends PHPUnit_Framework_TestSuite
         );
 
         foreach ($tests as $test) {
-            if ($test instanceof PHPUnit_Framework_TestCase) {
+            if ($test instanceof TestCase) {
                 $testGroups = PHPUnit_Util_Test::getGroups(
                     get_class($test),
                     $test->getName(false)

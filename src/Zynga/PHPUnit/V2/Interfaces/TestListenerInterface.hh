@@ -11,9 +11,8 @@ namespace Zynga\PHPUnit\V2\Interfaces;
  * file that was distributed with this source code.
  */
 
+use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use \Exception;
-use \PHPUnit_Framework_Test;
-use \PHPUnit_Framework_TestSuite;
 
 /**
  * A Listener for test progress.
@@ -24,12 +23,12 @@ interface TestListenerInterface {
   /**
    * An error occurred.
    *
-   * @param PHPUnit_Framework_Test $test
+   * @param TestCase $test
    * @param Exception              $e
    * @param float                  $time
    */
   public function addError(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void;
@@ -37,14 +36,14 @@ interface TestListenerInterface {
   /**
    * A warning occurred.
    *
-   * @param PHPUnit_Framework_Test    $test
+   * @param TestCase    $test
    * @param Exception $e
    * @param float                     $time
    *
    * @since Method available since Release 6.0.0
    */
   public function addWarning(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void;
@@ -52,12 +51,12 @@ interface TestListenerInterface {
   /**
    * A failure occurred.
    *
-   * @param PHPUnit_Framework_Test                 $test
+   * @param TestCase                 $test
    * @param Exception $e
    * @param float                                  $time
    */
   public function addFailure(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void;
@@ -65,12 +64,12 @@ interface TestListenerInterface {
   /**
    * Incomplete test.
    *
-   * @param PHPUnit_Framework_Test $test
+   * @param TestInterface $test
    * @param Exception              $e
    * @param float                  $time
    */
   public function addIncompleteTest(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void;
@@ -78,14 +77,14 @@ interface TestListenerInterface {
   /**
    * Risky test.
    *
-   * @param PHPUnit_Framework_Test $test
+   * @param TestCase $test
    * @param Exception              $e
    * @param float                  $time
    *
    * @since Method available since Release 4.0.0
    */
   public function addRiskyTest(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void;
@@ -93,14 +92,14 @@ interface TestListenerInterface {
   /**
    * Skipped test.
    *
-   * @param PHPUnit_Framework_Test $test
+   * @param TestCase $test
    * @param Exception              $e
    * @param float                  $time
    *
    * @since Method available since Release 3.0.0
    */
   public function addSkippedTest(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void;
@@ -112,7 +111,7 @@ interface TestListenerInterface {
    *
    * @since Method available since Release 2.2.0
    */
-  public function startTestSuite(PHPUnit_Framework_TestSuite $suite): void;
+  public function startTestSuite(TestInterface $suite): void;
 
   /**
    * A test suite ended.
@@ -121,22 +120,22 @@ interface TestListenerInterface {
    *
    * @since Method available since Release 2.2.0
    */
-  public function endTestSuite(PHPUnit_Framework_TestSuite $suite): void;
+  public function endTestSuite(TestInterface $suite): void;
 
   /**
    * A test started.
    *
-   * @param PHPUnit_Framework_Test $test
+   * @param TestCase $test
    */
-  public function startTest(PHPUnit_Framework_Test $test): void;
+  public function startTest(TestInterface $test): void;
 
   /**
    * A test ended.
    *
-   * @param PHPUnit_Framework_Test $test
+   * @param TestCase $test
    * @param float                  $time
    */
-  public function endTest(PHPUnit_Framework_Test $test, float $time): void;
+  public function endTest(TestInterface $test, float $time): void;
 
   /**
    * Flushing of output can be accomplished via this method.

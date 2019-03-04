@@ -2,9 +2,9 @@
 
 namespace Zynga\PHPUnit\V2\Tests\Mock;
 
-use \PHPUnit_Framework_TestCase;
+use Zynga\PHPUnit\V2\TestCase;
 
-class Requirements extends PHPUnit_Framework_TestCase
+class Requirements extends TestCase
 {
     public function testOne()
     {

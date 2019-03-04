@@ -25,10 +25,10 @@ use Zynga\PHPUnit\V2\Tests\Mock\ClassWithToString;
 use Zynga\PHPUnit\V2\Tests\Mock\SampleClass;
 use Zynga\PHPUnit\V2\Tests\Mock\Struct;
 use Zynga\PHPUnit\V2\Tests\Mock\TestIterator;
+use Zynga\PHPUnit\V2\TestCase;
 
 use \PHPUnit_Framework_ExpectationFailedException;
 use \PHPUnit_Framework_Exception;
-use \PHPUnit_Framework_TestCase;
 use \PHPUnit_Util_XML;
 
 // External classes:
@@ -44,7 +44,7 @@ use \stdClass;
 /**
  * @since      Class available since Release 2.0.0
  */
-class AssertTest extends PHPUnit_Framework_TestCase {
+class AssertTest extends TestCase {
 
   public function doSetUpBeforeClass(): void {
     // noop

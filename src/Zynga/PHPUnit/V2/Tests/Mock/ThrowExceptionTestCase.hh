@@ -2,11 +2,11 @@
 
 namespace Zynga\PHPUnit\V2\Tests\Mock;
 
-use \PHPUnit_Framework_TestCase;
+use Zynga\PHPUnit\V2\TestCase;
 use \RuntimeException;
 
-class ThrowExceptionTestCase extends PHPUnit_Framework_TestCase {
+class ThrowExceptionTestCase extends TestCase {
   public function test() {
-    throw new RuntimeException('A runtime error occurred');
+    throw new RuntimeException('MOCK: A runtime error occurred');
   }
 }

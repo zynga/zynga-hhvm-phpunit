@@ -2,10 +2,10 @@
 
 namespace JohnKary\PHPUnit\Listener;
 
+use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
-use \PHPUnit_Framework_Test;
+
 use \PHPUnit_Framework_TestSuite;
-use \PHPUnit_Framework_TestCase;
 use \Exception;
 use Zynga\Framework\Testing\TestCase\V2\Base as TestingTestCaseBase;
 
@@ -58,25 +58,21 @@ class SpeedTrapListener implements TestListenerInterface {
   /**
    * An error occurred.
    *
-   * @param PHPUnit_Framework_Test $test
+   * @param TestInterface $test
    * @param Exception              $e
    * @param float                   $time
    */
-  public function addError(
-    PHPUnit_Framework_Test $test,
-    Exception $e,
-    float $time,
-  ) {}
+  public function addError(TestInterface $test, Exception $e, float $time) {}
 
   /**
    * A failure occurred.
    *
-   * @param PHPUnit_Framework_Test                 $test
+   * @param TestInterface                 $test
    * @param Exception $e
    * @param float                                   $time
    */
   public function addFailure(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {}
@@ -84,14 +80,14 @@ class SpeedTrapListener implements TestListenerInterface {
   /**
    * A warning occurred.
    *
-   * @param PHPUnit_Framework_Test    $test
+   * @param TestInterface    $test
    * @param Exception $e
    * @param float                     $time
    *
    * @since Method available since Release 6.0.0
    */
   public function addWarning(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {}
@@ -99,12 +95,12 @@ class SpeedTrapListener implements TestListenerInterface {
   /**
    * Incomplete test.
    *
-   * @param PHPUnit_Framework_Test $test
+   * @param TestInterface $test
    * @param Exception              $e
    * @param float                   $time
    */
   public function addIncompleteTest(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {}
@@ -112,13 +108,13 @@ class SpeedTrapListener implements TestListenerInterface {
   /**
    * Risky test.
    *
-   * @param PHPUnit_Framework_Test $test
+   * @param TestInterface $test
    * @param Exception              $e
    * @param float                   $time
    * @since  Method available since Release 4.0.0
    */
   public function addRiskyTest(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {}
@@ -126,12 +122,12 @@ class SpeedTrapListener implements TestListenerInterface {
   /**
    * Skipped test.
    *
-   * @param PHPUnit_Framework_Test $test
+   * @param TestInterface $test
    * @param Exception              $e
    * @param float                   $time
    */
   public function addSkippedTest(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {}
@@ -139,20 +135,19 @@ class SpeedTrapListener implements TestListenerInterface {
   /**
    * A test started.
    *
-   * @param PHPUnit_Framework_Test $test
+   * @param TestInterface $test
    */
-  public function startTest(PHPUnit_Framework_Test $test): void {}
+  public function startTest(TestInterface $test): void {}
 
   /**
    * A test ended.
    *
-   * @param PHPUnit_Framework_Test $test
+   * @param TestInterface $test
    * @param float                   $time
    */
-  public function endTest(PHPUnit_Framework_Test $test, float $time): void {
+  public function endTest(TestInterface $test, float $time): void {
 
-    if (!$test instanceof PHPUnit_Framework_TestCase &&
-        !$test instanceof TestingTestCaseBase) {
+    if (!$test instanceof TestCase && !$test instanceof TestingTestCaseBase) {
       return;
     }
 
@@ -170,7 +165,7 @@ class SpeedTrapListener implements TestListenerInterface {
    *
    * @param PHPUnit_Framework_TestSuite $suite
    */
-  public function startTestSuite(PHPUnit_Framework_TestSuite $suite): void {
+  public function startTestSuite(TestInterface $suite): void {
     $this->suites++;
   }
 
@@ -179,7 +174,7 @@ class SpeedTrapListener implements TestListenerInterface {
    *
    * @param \PHPUnit_Framework_TestSuite $suite
    */
-  public function endTestSuite(PHPUnit_Framework_TestSuite $suite) {
+  public function endTestSuite(TestInterface $suite) {
     $this->suites--;
 
     if (0 === $this->suites && $this->hasSlowTests()) {
@@ -205,10 +200,10 @@ class SpeedTrapListener implements TestListenerInterface {
   /**
    * Stores a test as slow.
    *
-   * @param \PHPUnit_Framework_Test $test
+   * @param \TestInterface $test
    * @param int                         $time Test execution time in milliseconds
    */
-  protected function addSlowTest(PHPUnit_Framework_Test $test, $time) {
+  protected function addSlowTest(TestInterface $test, $time) {
     $label = $this->makeLabel($test);
 
     $this->slow[$label] = $time;
@@ -236,11 +231,16 @@ class SpeedTrapListener implements TestListenerInterface {
   /**
    * Label for describing a test.
    *
-   * @param \PHPUnit_Framework_Test $test
+   * @param TestInterface $test
    * @return string
    */
-  protected function makeLabel(\PHPUnit_Framework_Test $test) {
-    return sprintf('%s:%s', get_class($test), $test->getName());
+  protected function makeLabel(TestInterface $test) {
+    $name = 'UNKNOWN';
+
+    if ($test instanceof TestCase) {
+      $name = $test->getName();
+    }
+    return sprintf('%s:%s', get_class($test), $name);
   }
 
   /**
@@ -324,7 +324,7 @@ class SpeedTrapListener implements TestListenerInterface {
   }
 
   /**
-   * Get slow test threshold for given test. A TestCase can override the
+   * Get slow test threshold for given test. A TestInterface can override the
    * suite-wide slow threshold by using the annotation @slowThreshold with
    * the threshold value in milliseconds.
    *
@@ -336,10 +336,15 @@ class SpeedTrapListener implements TestListenerInterface {
    * public function testLongRunningProcess() {}
    * </code>
    *
-   * @param \PHPUnit_Framework_TestCase $test
+   * @param TestInterface $test
    * @return int
    */
-  protected function getSlowThreshold(\PHPUnit_Framework_TestCase $test) {
+  protected function getSlowThreshold(TestInterface $test) {
+
+    if (!$test instanceof TestCase) {
+      return $this->slowThreshold;
+    }
+
     $ann = $test->getAnnotations();
 
     return

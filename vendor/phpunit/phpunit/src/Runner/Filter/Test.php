@@ -42,6 +42,7 @@ class PHPUnit_Runner_Filter_Test extends RecursiveFilterIterator
      */
     protected function setFilter($filter)
     {
+      // echo "filterIs=$filter\n";
         if (PHPUnit_Util_Regex::pregMatchSafe($filter, '') === false) {
             // Handles:
             //  * testAssertEqualsSucceeds#4
@@ -93,10 +94,14 @@ class PHPUnit_Runner_Filter_Test extends RecursiveFilterIterator
         $test = $this->getInnerIterator()->current();
 
         if ($test instanceof PHPUnit_Framework_TestSuite) {
+          // echo "testSuite - skip name=" .get_class($test) . "\n";
             return true;
         }
 
         $tmp = PHPUnit_Util_Test::describe($test, false);
+
+        //echo "testFiltering\n";
+        //var_dump($tmp);
 
         if ($tmp[0] != '') {
             $name = implode('::', $tmp);

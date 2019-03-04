@@ -2,9 +2,11 @@
 
 namespace Zynga\PHPUnit\V2\TestResult;
 
+use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
+use Zynga\PHPUnit\V2\TestCase;
+
 use \PHPUnit_Util_Printer;
-use \PHPUnit_Framework_Test;
 use \PHPUnit_Framework_TestSuite;
 use \Exception;
 
@@ -38,7 +40,7 @@ class Listeners implements TestListenerInterface {
   }
 
   final public function addError(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {
@@ -50,14 +52,14 @@ class Listeners implements TestListenerInterface {
   /**
    * A warning occurred.
    *
-   * @param PHPUnit_Framework_Test    $test
+   * @param TestInterface    $test
    * @param Exception $e
    * @param float                     $time
    *
    * @since Method available since Release 6.0.0
    */
   final public function addWarning(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {
@@ -67,7 +69,7 @@ class Listeners implements TestListenerInterface {
   }
 
   final public function addFailure(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {
@@ -77,7 +79,7 @@ class Listeners implements TestListenerInterface {
   }
 
   final public function addIncompleteTest(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {
@@ -87,7 +89,7 @@ class Listeners implements TestListenerInterface {
   }
 
   final public function addRiskyTest(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {
@@ -97,7 +99,7 @@ class Listeners implements TestListenerInterface {
   }
 
   final public function addSkippedTest(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {
@@ -106,32 +108,25 @@ class Listeners implements TestListenerInterface {
     }
   }
 
-  final public function startTestSuite(
-    PHPUnit_Framework_TestSuite $suite,
-  ): void {
+  final public function startTestSuite(TestInterface $suite): void {
     foreach ($this->_listeners as $listener) {
       $listener->startTestSuite($suite);
     }
   }
 
-  final public function endTestSuite(
-    PHPUnit_Framework_TestSuite $suite,
-  ): void {
+  final public function endTestSuite(TestInterface $suite): void {
     foreach ($this->_listeners as $listener) {
       $listener->endTestSuite($suite);
     }
   }
 
-  final public function startTest(PHPUnit_Framework_Test $test): void {
+  final public function startTest(TestInterface $test): void {
     foreach ($this->_listeners as $listener) {
       $listener->startTest($test);
     }
   }
 
-  final public function endTest(
-    PHPUnit_Framework_Test $test,
-    float $time,
-  ): void {
+  final public function endTest(TestInterface $test, float $time): void {
     foreach ($this->_listeners as $listener) {
       $listener->endTest($test, $time);
     }

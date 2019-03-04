@@ -11,23 +11,22 @@ namespace Zynga\PHPUnit\V2\Tests;
  * file that was distributed with this source code.
  */
 
+use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
+use Zynga\PHPUnit\V2\TestCase;
 use Zynga\PHPUnit\V2\Tests\Mock\Failure;
 use Zynga\PHPUnit\V2\Tests\Mock\Success;
 use Zynga\PHPUnit\V2\Tests\Mock\TestError;
 
-use \PHPUnit_Framework_Test;
-use \PHPUnit_Framework_TestCase;
 use \PHPUnit_Framework_TestResult;
 use \PHPUnit_Framework_TestSuite;
 use \Exception;
 
 /**
  * @since      Class available since Release 2.0.0
- * @covers     PHPUnit_Framework_TestCase
+ * @covers     TestCase
  */
-class TestListenerTest extends PHPUnit_Framework_TestCase
-  implements TestListenerInterface {
+class TestListenerTest extends TestCase implements TestListenerInterface {
   protected int $endCount = 0;
   protected int $errorCount = 0;
   protected int $failureCount = 0;
@@ -39,7 +38,7 @@ class TestListenerTest extends PHPUnit_Framework_TestCase
   protected int $startCount = 0;
 
   public function addError(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {
@@ -47,7 +46,7 @@ class TestListenerTest extends PHPUnit_Framework_TestCase
   }
 
   public function addWarning(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {
@@ -55,7 +54,7 @@ class TestListenerTest extends PHPUnit_Framework_TestCase
   }
 
   public function addFailure(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {
@@ -63,7 +62,7 @@ class TestListenerTest extends PHPUnit_Framework_TestCase
   }
 
   public function addIncompleteTest(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {
@@ -71,7 +70,7 @@ class TestListenerTest extends PHPUnit_Framework_TestCase
   }
 
   public function addRiskyTest(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {
@@ -79,22 +78,22 @@ class TestListenerTest extends PHPUnit_Framework_TestCase
   }
 
   public function addSkippedTest(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {
     $this->skippedCount++;
   }
 
-  public function startTestSuite(PHPUnit_Framework_TestSuite $suite): void {}
+  public function startTestSuite(TestInterface $suite): void {}
 
-  public function endTestSuite(PHPUnit_Framework_TestSuite $suite): void {}
+  public function endTestSuite(TestInterface $suite): void {}
 
-  public function startTest(PHPUnit_Framework_Test $test): void {
+  public function startTest(TestInterface $test): void {
     $this->startCount++;
   }
 
-  public function endTest(PHPUnit_Framework_Test $test, float $time): void {
+  public function endTest(TestInterface $test, float $time): void {
     $this->endCount++;
   }
 
@@ -104,6 +103,7 @@ class TestListenerTest extends PHPUnit_Framework_TestCase
     $result->listeners()->add($this);
 
     $this->result = $result;
+
     $this->endCount = 0;
     $this->failureCount = 0;
     $this->notImplementedCount = 0;
@@ -113,15 +113,16 @@ class TestListenerTest extends PHPUnit_Framework_TestCase
   }
 
   public function testError(): void {
-    $test = new TestError();
+    $test = new TestError('testError');
+
     $test->run($this->result);
 
-    $this->assertEquals(1, $this->errorCount);
-    $this->assertEquals(1, $this->endCount);
+    $this->assertEquals(1, $this->errorCount, 'errorCount should be 1');
+    $this->assertEquals(1, $this->endCount, 'endCount should be 1');
   }
 
   public function testFailure(): void {
-    $test = new Failure();
+    $test = new Failure('testFailure');
     $test->run($this->result);
 
     $this->assertEquals(1, $this->failureCount);
@@ -129,7 +130,7 @@ class TestListenerTest extends PHPUnit_Framework_TestCase
   }
 
   public function testStartStop(): void {
-    $test = new Success();
+    $test = new Success('testNoop');
     $test->run($this->result);
 
     $this->assertEquals(1, $this->startCount);

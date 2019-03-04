@@ -21,7 +21,7 @@ class PHPUnit_Util_TestSuiteIterator implements RecursiveIterator
     protected $position;
 
     /**
-     * @var PHPUnit_Framework_Test[]
+     * @var TestInterface[]
      */
     protected $tests;
 
@@ -64,7 +64,7 @@ class PHPUnit_Util_TestSuiteIterator implements RecursiveIterator
     /**
      * Returns the current element.
      *
-     * @return PHPUnit_Framework_Test
+     * @return TestInterface
      */
     public function current()
     {

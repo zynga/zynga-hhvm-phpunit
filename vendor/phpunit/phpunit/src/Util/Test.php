@@ -11,6 +11,8 @@
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 use Zynga\Framework\ReflectionCache\V1\ReflectionFunctions;
 use Zynga\Framework\ReflectionCache\V1\ReflectionMethods;
+use Zynga\PHPUnit\V2\Interfaces\TestInterface;
+use Zynga\PHPUnit\V2\TestCase;
 
 /**
  * Test helpers.
@@ -36,23 +38,25 @@ class PHPUnit_Util_Test
     private static $hookMethods = [];
 
     /**
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param bool                   $asString
      *
      * @return mixed
      */
-    public static function describe(PHPUnit_Framework_Test $test, $asString = true)
+    public static function describe(TestInterface $test, $asString = true)
     {
         if ($asString) {
             if ($test instanceof PHPUnit_Framework_SelfDescribing) {
                 return $test->toString();
+            } else if ($test instanceof TestCase ) {
+              return $test->toString();
             } else {
                 return get_class($test);
             }
         } else {
-            if ($test instanceof PHPUnit_Framework_TestCase) {
+            if ($test instanceof TestCase) {
                 return [
-                  get_class($test), $test->getName()
+                  $test->getClass(), $test->getName()
                 ];
             } elseif ($test instanceof PHPUnit_Framework_SelfDescribing) {
                 return ['', $test->toString()];
@@ -74,17 +78,11 @@ class PHPUnit_Util_Test
      */
     public static function getLinesToBeCovered($className, $methodName)
     {
-
-        $annotations = self::parseTestMethodAnnotations(
-            $className,
-            $methodName
-        );
-
-        if (isset($annotations['class']['coversNothing']) || isset($annotations['method']['coversNothing'])) {
-            return false;
-        }
-
-        return self::getLinesToBeCoveredOrUsed($className, $methodName, 'covers');
+      // --
+      // JEO: This is disabled on purpose, as we don't want to allow @covering
+      // of different classes.
+      // --
+      return false;
     }
 
     /**
@@ -99,7 +97,11 @@ class PHPUnit_Util_Test
      */
     public static function getLinesToBeUsed($className, $methodName)
     {
-        return self::getLinesToBeCoveredOrUsed($className, $methodName, 'uses');
+      // --
+      // JEO: This is disabled on purpose, as we don't want to allow @covering
+      // of different classes.
+      // --
+      return false;
     }
 
     /**
@@ -115,55 +117,7 @@ class PHPUnit_Util_Test
      */
     private static function getLinesToBeCoveredOrUsed($className, $methodName, $mode)
     {
-        $annotations = self::parseTestMethodAnnotations(
-            $className,
-            $methodName
-        );
-
-        $classShortcut = null;
-
-        if (!empty($annotations['class'][$mode . 'DefaultClass'])) {
-            if (count($annotations['class'][$mode . 'DefaultClass']) > 1) {
-                throw new PHPUnit_Framework_CodeCoverageException(
-                    sprintf(
-                        'More than one @%sClass annotation in class or interface "%s".',
-                        $mode,
-                        $className
-                    )
-                );
-            }
-
-            $classShortcut = $annotations['class'][$mode . 'DefaultClass'][0];
-        }
-
-        $list = [];
-
-        if (isset($annotations['class'][$mode])) {
-            $list = $annotations['class'][$mode];
-        }
-
-        if (isset($annotations['method'][$mode])) {
-            $list = array_merge($list, $annotations['method'][$mode]);
-        }
-
-        $codeList = [];
-
-        foreach (array_unique($list) as $element) {
-            if ($classShortcut && strncmp($element, '::', 2) === 0) {
-                $element = $classShortcut . $element;
-            }
-
-            $element = preg_replace('/[\s()]+$/', '', $element);
-            $element = explode(' ', $element);
-            $element = $element[0];
-
-            $codeList = array_merge(
-                $codeList,
-                self::resolveElementToReflectionObjects($element)
-            );
-        }
-
-        return self::resolveReflectionObjectsToLines($codeList);
+      return array();
     }
 
     /**
@@ -325,13 +279,6 @@ class PHPUnit_Util_Test
 
         $reflector  = ReflectionMethods::getReflection($className, $methodName);
 
-        if ( $reflector == null ) {
-          var_dump($className);
-          var_dump($methodName);
-          var_dump(debug_backtrace(2));
-          exit();
-        }
-
         $docComment = $reflector->getDocComment();
         $docComment = substr($docComment, 3, -2);
 
@@ -490,7 +437,7 @@ class PHPUnit_Util_Test
             if ($dataProviderMethod->isStatic()) {
                 $object = null;
             } else {
-                $object = $dataProviderClass->newInstance();
+                $object = $dataProviderClass->newInstance($methodName);
             }
 
             if ($dataProviderMethod->getNumberOfParameters() == 0) {
@@ -781,7 +728,6 @@ class PHPUnit_Util_Test
      */
     public static function getSize($className, $methodName)
     {
-      var_dump('getSize::ran');
         $groups = array_flip(self::getGroups($className, $methodName));
         $size   = self::UNKNOWN;
         $class  = ReflectionClasses::getReflection($className);

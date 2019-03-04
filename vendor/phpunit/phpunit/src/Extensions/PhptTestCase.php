@@ -11,13 +11,14 @@
 use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
+use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 
 /**
  * Runner for PHPT test cases.
  *
  * @since Class available since Release 3.1.4
  */
-class PHPUnit_Extensions_PhptTestCase implements PHPUnit_Framework_Test, PHPUnit_Framework_SelfDescribing
+class PHPUnit_Extensions_PhptTestCase implements TestInterface, PHPUnit_Framework_SelfDescribing
 {
     /**
      * @var string

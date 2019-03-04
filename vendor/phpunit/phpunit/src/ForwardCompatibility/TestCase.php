@@ -10,8 +10,8 @@
 
 namespace PHPUnit\Framework;
 
-use PHPUnit_Framework_TestCase;
+use Zynga\PHPUnit\V2\TestCase as ZyngaPHPUnitTestCase;
 
-class TestCase extends PHPUnit_Framework_TestCase
+class TestCase extends ZyngaPHPUnitTestCase
 {
 }

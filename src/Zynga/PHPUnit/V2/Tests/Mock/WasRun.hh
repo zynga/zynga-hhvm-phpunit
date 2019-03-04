@@ -2,12 +2,13 @@
 
 namespace Zynga\PHPUnit\V2\Tests\Mock;
 
-use \PHPUnit_Framework_TestCase;
+use Zynga\PHPUnit\V2\TestCase;
 
-class WasRun extends PHPUnit_Framework_TestCase {
+class WasRun extends TestCase {
   public $wasRun = false;
 
-  protected function runTest() {
+  public function testWasRun() {
     $this->wasRun = true;
   }
+
 }

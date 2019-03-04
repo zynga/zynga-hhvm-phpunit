@@ -2,11 +2,11 @@
 
 namespace Zynga\PHPUnit\V2\Tests\Mock;
 
-use \PHPUnit_Framework_TestCase;
+use Zynga\PHPUnit\V2\TestCase;
 use \Exception;
 
-class TestError extends PHPUnit_Framework_TestCase {
-  protected function runTest() {
-    throw new Exception();
+class TestError extends TestCase {
+  public function testError() {
+    throw new Exception('Mock-Test-Error');
   }
 }

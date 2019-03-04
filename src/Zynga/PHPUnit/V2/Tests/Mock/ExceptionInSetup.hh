@@ -2,10 +2,10 @@
 
 namespace Zynga\PHPUnit\V2\Tests\Mock;
 
-use \PHPUnit_Framework_TestCase;
+use Zynga\PHPUnit\V2\TestCase;
 use \Exception;
 
-class ExceptionInSetUp extends PHPUnit_Framework_TestCase {
+class ExceptionInSetUp extends TestCase {
   public $setUp = false;
   public $assertPreConditions = false;
   public $assertPostConditions = false;

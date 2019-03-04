@@ -2,8 +2,8 @@
 
 namespace Zynga\PHPUnit\V2\Tests\Mock;
 
-use \PHPUnit_Framework_TestCase;
+use Zynga\PHPUnit\V2\TestCase;
 
-class ThrowNoExceptionTestCase extends PHPUnit_Framework_TestCase {
+class ThrowNoExceptionTestCase extends TestCase {
   public function test() {}
 }

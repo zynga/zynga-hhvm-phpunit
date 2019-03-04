@@ -77,7 +77,7 @@ class SnapshotTest extends PHPUnit_Framework_TestCase
         $snapshot = new Snapshot($this->getBlacklist(), false, false, false, false, false, true, false, false, false);
         $interfaces = $snapshot->interfaces();
 
-        $this->assertContains('PHPUnit_Framework_Test', $interfaces);
+        $this->assertContains('TestInterface', $interfaces);
         $this->assertNotContains('Countable', $interfaces);
     }
 

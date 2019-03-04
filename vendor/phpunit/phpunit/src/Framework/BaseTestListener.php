@@ -9,9 +9,10 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
+
 use \PHPUnit_Framework_TestSuite;
-use \PHPUnit_Framework_Test;
 
 /**
  * An empty Listener that can be extended to implement TestListener
@@ -24,48 +25,48 @@ abstract class PHPUnit_Framework_BaseTestListener
   implements TestListenerInterface {
 
   public function addError(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {}
 
   public function addWarning(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {}
 
   public function addFailure(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {}
 
   public function addIncompleteTest(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {}
 
   public function addRiskyTest(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {}
 
   public function addSkippedTest(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {}
 
-  public function startTestSuite(PHPUnit_Framework_TestSuite $suite): void {}
+  public function startTestSuite(TestInterface $suite): void {}
 
-  public function endTestSuite(PHPUnit_Framework_TestSuite $suite): void {}
+  public function endTestSuite(TestInterface $suite): void {}
 
-  public function startTest(PHPUnit_Framework_Test $test): void {}
+  public function startTest(TestInterface $test): void {}
 
-  public function endTest(PHPUnit_Framework_Test $test, float $time): void {}
+  public function endTest(TestInterface $test, float $time): void {}
 
   public function flush(): void {}
 

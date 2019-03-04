@@ -8,12 +8,14 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\PHPUnit\V2\TestCase;
+
 /**
  * A skipped test case
  *
  * @since Class available since Release 4.3.0
  */
-class PHPUnit_Framework_SkippedTestCase extends PHPUnit_Framework_TestCase
+class PHPUnit_Framework_SkippedTestCase extends TestCase
 {
     /**
      * @var string

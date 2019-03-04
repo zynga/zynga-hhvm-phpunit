@@ -22,6 +22,7 @@ use SebastianBergmann\Environment\Runtime;
 
 use Zynga\Source\Cache as Zynga_Source_Cache;
 use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
+use Zynga\PHPUnit\V2\TestCase;
 
 use
   SebastianBergmann\TokenStream\Token\Stream\CachingFactory as StreamCachingFactory
@@ -321,7 +322,7 @@ class CodeCoverage {
     $status = null;
 
     if ($id instanceof ZyngaTestCaseBase ||
-        $id instanceof \PHPUnit_Framework_TestCase) {
+        $id instanceof TestCase) {
       $_size = $id->getSize();
 
       if ($_size == \PHPUnit_Util_Test::SMALL) {

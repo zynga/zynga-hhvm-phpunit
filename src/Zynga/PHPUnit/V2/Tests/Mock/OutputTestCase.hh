@@ -2,9 +2,9 @@
 
 namespace Zynga\PHPUnit\V2\Tests\Mock;
 
-use \PHPUnit_Framework_TestCase;
+use Zynga\PHPUnit\V2\TestCase;
 
-class OutputTestCase extends PHPUnit_Framework_TestCase {
+class OutputTestCase extends TestCase {
   public function testExpectOutputStringFooActualFoo() {
     $this->expectOutputString('foo');
     print 'foo';

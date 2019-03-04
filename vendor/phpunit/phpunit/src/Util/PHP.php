@@ -181,12 +181,12 @@ abstract class PHPUnit_Util_PHP
      * Runs a single test in a separate PHP process.
      *
      * @param string                       $job
-     * @param PHPUnit_Framework_Test       $test
+     * @param TestInterface       $test
      * @param PHPUnit_Framework_TestResult $result
      *
      * @throws PHPUnit_Framework_Exception
      */
-    public function runTestJob($job, PHPUnit_Framework_Test $test, PHPUnit_Framework_TestResult $result)
+    public function runTestJob($job, TestInterface $test, PHPUnit_Framework_TestResult $result)
     {
         $result->startTest($test);
 
@@ -269,14 +269,14 @@ abstract class PHPUnit_Util_PHP
     /**
      * Processes the TestResult object from an isolated process.
      *
-     * @param PHPUnit_Framework_Test       $test
+     * @param TestInterface       $test
      * @param PHPUnit_Framework_TestResult $result
      * @param string                       $stdout
      * @param string                       $stderr
      *
      * @since Method available since Release 3.5.0
      */
-    private function processChildResult(PHPUnit_Framework_Test $test, PHPUnit_Framework_TestResult $result, $stdout, $stderr)
+    private function processChildResult(TestInterface $test, PHPUnit_Framework_TestResult $result, $stdout, $stderr)
     {
         $time = 0;
 

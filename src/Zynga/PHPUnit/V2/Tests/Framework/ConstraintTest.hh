@@ -15,14 +15,14 @@ use SebastianBergmann\PHPUnit\Assertions;
 use SebastianBergmann\PHPUnit\Exceptions\ExceptionUtil;
 use SebastianBergmann\PHPUnit\Exceptions\ExpectationFailedException;
 use SebastianBergmann\PHPUnit\Constraints\Factory as ConstraintFactory;
+use Zynga\PHPUnit\V2\TestCase;
 
-use \PHPUnit_Framework_TestCase;
 use \PHPUnit_Framework_Assert;
 
 /**
  * @since      Class available since Release 3.0.0
  */
-class ConstraintTest extends PHPUnit_Framework_TestCase {
+class ConstraintTest extends TestCase {
 
   public function doSetUpBeforeClass(): void {
     // noop

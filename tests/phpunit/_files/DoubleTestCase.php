@@ -1,5 +1,8 @@
 <?php
-class DoubleTestCase implements PHPUnit_Framework_Test
+
+use Zynga\PHPUnit\V2\Interfaces\TestInterface;
+
+class DoubleTestCase implements TestInterface
 {
     protected $testCase;
 

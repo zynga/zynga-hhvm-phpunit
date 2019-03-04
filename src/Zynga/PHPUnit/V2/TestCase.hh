@@ -3,15 +3,32 @@
 namespace Zynga\PHPUnit\V2;
 
 use Zynga\PHPUnit\V2\Annotations;
+use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\TestCase\OutputBuffer;
 use Zynga\PHPUnit\V2\TestCase\Requirements;
 use Zynga\PHPUnit\V2\TestCase\Size;
 use Zynga\PHPUnit\V2\TestCase\Status;
+use SebastianBergmann\Exporter\Exporter;
 use SebastianBergmann\PHPUnit\Assertions;
+use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
 use SebastianBergmann\PHPUnit\Exceptions\ErrorException;
 use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentException;
+use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
+use SebastianBergmann\PHPUnit\Exceptions\TestError\RiskyException;
+use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
+use SebastianBergmann\PHPUnit\Exceptions\WarningException;
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+use Zynga\Framework\Dynamic\V1\DynamicMethodCall;
 
-class TestCase extends Assertions {
+// JEO: needs conversion.
+use \PHPUnit_Framework_TestResult;
+
+use \Throwable;
+use \Exception;
+use \ReflectionClass;
+use \ReflectionMethod;
+
+abstract class TestCase extends Assertions implements TestInterface {
 
   // The status for this test.
   private Status $_status;
@@ -47,8 +64,16 @@ class TestCase extends Assertions {
   private int $_numAssertions;
   private Vector<string> $_dependencies;
   private bool $_hasDependencies;
+  private ?PHPUnit_Framework_TestResult $_result;
+  private ?PHPUnit_Framework_TestResult $_testResult;
+  private Vector<mixed> $_data;
+  private string $_dataName;
 
-  public function __construct(string $name = '') {
+  public function __construct(
+    string $name,
+    mixed $data = null,
+    string $dataName = '',
+  ) {
 
     $this->_status = new Status();
     $this->_name = '';
@@ -68,10 +93,33 @@ class TestCase extends Assertions {
     $this->_numAssertions = 0;
     $this->_dependencies = Vector {};
     $this->_hasDependencies = false;
-
-    if ($name != '') {
-      $this->_name = $name;
+    $this->_result = null;
+    $this->_testResult = null;
+    $v_data = Vector {};
+    if (is_array($data)) {
+      $v_data->addAll($data);
     }
+    $this->_data = $v_data;
+    $this->_dataName = $dataName;
+
+    $this->_name = $name;
+
+  }
+
+  final public function getTest(): TestCase {
+    return $this;
+  }
+
+  /**
+   * Returns a string representation of the test case.
+   *
+   * @return string
+   */
+  final public function toString(): string {
+
+    $buffer = sprintf('%s::%s', $this->getClass(), $this->getName(false));
+
+    return $buffer.$this->getDataSetAsString();
 
   }
 
@@ -137,9 +185,6 @@ class TestCase extends Assertions {
 
     $className = $this->getClass();
     $methodName = $this->getName(false);
-
-    //var_dump('className='.$className);
-    //var_dump('methodName='.$methodName);
 
     return Annotations::parseTestMethodAnnotations($className, $methodName);
 
@@ -236,7 +281,6 @@ class TestCase extends Assertions {
    * @since Method available since Release 3.3.0
    */
   final public function getStatusMessage(): string {
-    //var_dump(__LINE__ . ' getStatusMessage: ' . $this->status()->getMessage());
     return $this->status()->getMessage();
   }
 
@@ -460,9 +504,6 @@ class TestCase extends Assertions {
 
     $annotations = $this->getAnnotations();
 
-    // echo "annotations=\n";
-    // var_dump($annotations);
-
     $methodAnnotations = $annotations->get('method');
 
     if (!$methodAnnotations instanceof Map) {
@@ -657,9 +698,6 @@ class TestCase extends Assertions {
    * @throws PHPUnit_Framework_Exception
    */
   final public function expectOutputRegex(string $expectedRegex): bool {
-    // if ($this->outputExpectedString !== null) {
-    //   throw new PHPUnit_Framework_Exception();
-    // }
     $this->_expectedOutputRegExp = $expectedRegex;
     return true;
   }
@@ -674,9 +712,6 @@ class TestCase extends Assertions {
    * @since Method available since Release 3.6.0
    */
   final public function expectOutputString(string $expectedString): bool {
-    // if ($this->outputExpectedRegex !== null) {
-    //   throw new PHPUnit_Framework_Exception();
-    // }
     $this->_expectedOutput = $expectedString;
     return true;
 
@@ -745,9 +780,6 @@ class TestCase extends Assertions {
   final public function setUseErrorHandlerFromAnnotation(): bool {
 
     $annotations = $this->getAnnotations();
-
-    // echo "annotations=\n";
-    // var_dump($annotations);
 
     $classAnnotations = $annotations->get('class');
 
@@ -845,6 +877,10 @@ class TestCase extends Assertions {
     return true;
   }
 
+  final public function getDependencies(): Vector<string> {
+    return $this->_dependencies;
+  }
+
   /**
    * Returns true if the tests has dependencies
    *
@@ -854,6 +890,537 @@ class TestCase extends Assertions {
    */
   final public function hasDependencies(): bool {
     return $this->_hasDependencies;
+  }
+
+  /**
+   * Creates a default TestResult object.
+   *
+   * @return PHPUnit_Framework_TestResult
+   */
+  final public function createResult(): PHPUnit_Framework_TestResult {
+    return new PHPUnit_Framework_TestResult();
+  }
+
+  /**
+   * @param mixed $result
+   *
+   * @since Method available since Release 3.4.0
+   */
+  final public function setResult(
+    ?PHPUnit_Framework_TestResult $result,
+  ): bool {
+    $this->_testResult = $result;
+    return true;
+  }
+
+  final public function getResult(): PHPUnit_Framework_TestResult {
+    if ($this->_testResult == null) {
+      $this->_testResult = $this->createResult();
+    }
+    return $this->_testResult;
+  }
+
+  /**
+   * @param PHPUnit_Framework_TestResult $result
+   *
+   * @since Method available since Release 3.6.0
+   */
+  final public function setTestResultObject(
+    PHPUnit_Framework_TestResult $result,
+  ): bool {
+    $this->_result = $result;
+    return true;
+  }
+
+  /**
+   * @return PHPUnit_Framework_TestResult
+   *
+   * @since Method available since Release 3.5.7
+   */
+  final public function getTestResultObject(): ?PHPUnit_Framework_TestResult {
+    return $this->_result;
+  }
+
+  final public function freeResult(): bool {
+    $this->_result = null;
+    return true;
+  }
+
+  final public function getDataName(): string {
+    return $this->_dataName;
+  }
+
+  /**
+   * @return string
+   *
+   * @since Method available since Release 5.4.0
+   */
+  final public function dataDescription(): string {
+    return $this->getDataName();
+  }
+
+  final public function getData(): Vector<mixed> {
+    return $this->_data;
+  }
+
+  /**
+   * Gets the data set description of a TestCase.
+   *
+   * @param bool $includeData
+   *
+   * @return string
+   *
+   * @since Method available since Release 3.3.0
+   */
+  final public function getDataSetAsString(bool $includeData = true): string {
+    $buffer = '';
+
+    if ($this->usesDataProvider()) {
+      $buffer .= sprintf(' with data set "%s"', $this->getDataName());
+
+      $exporter = new Exporter();
+
+      if ($includeData) {
+        $buffer .= sprintf(
+          ' (%s)',
+          $exporter->shortenedRecursiveExport($this->getData()),
+        );
+      }
+    }
+
+    return $buffer;
+  }
+
+  /**
+   * @return bool
+   *
+   * @since Method available since Release 5.4.0
+   */
+  final public function usesDataProvider(): bool {
+    if ($this->_data->count() > 0) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * @since Method available since Release 3.5.4
+   */
+  final public function handleDependencies(): bool {
+
+    if ($this->hasDependencies()) {
+
+      $className = $this->getClass();
+      $tr = $this->getTestResultObject();
+
+      $passed = array();
+      if ($tr instanceof PHPUnit_Framework_TestResult) {
+        $passed = $tr->passed();
+      }
+
+      $passedKeys = array_keys($passed);
+      $numKeys = count($passedKeys);
+
+      for ($i = 0; $i < $numKeys; $i++) {
+        $pos = strpos($passedKeys[$i], ' with data set');
+
+        if ($pos !== false) {
+          $passedKeys[$i] = substr($passedKeys[$i], 0, $pos);
+        }
+      }
+
+      $passedKeys = array_flip(array_unique($passedKeys));
+
+      foreach ($this->getDependencies() as $dependency) {
+        $clone = false;
+
+        if (strpos($dependency, 'clone ') === 0) {
+          $clone = true;
+          $dependency = substr($dependency, strlen('clone '));
+        } else if (strpos($dependency, '!clone ') === 0) {
+          $clone = false;
+          $dependency = substr($dependency, strlen('!clone '));
+        }
+
+        if (strpos($dependency, '::') === false) {
+          $dependency = $className.'::'.$dependency;
+        }
+
+        if (!array_key_exists($dependency, $passedKeys)) {
+          $this->getResult()->addError(
+            $this,
+            new SkippedException(
+              sprintf('This test depends on "%s" to pass.', $dependency),
+            ),
+            0.0,
+          );
+
+          return false;
+        }
+
+        if (array_key_exists($dependency, $passed)) {
+          if ($passed[$dependency]['size'] != Size::UNKNOWN &&
+              $this->getSize() != Size::UNKNOWN &&
+              $passed[$dependency]['size'] > $this->getSize()) {
+            $this->getResult()->addError(
+              $this,
+              new SkippedException(
+                'This test depends on a test that is larger than itself.',
+              ),
+              0.0,
+            );
+
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Runs the test case and collects the results in a TestResult object.
+   * If no TestResult object is passed a new one will be created.
+   *
+   * @param PHPUnit_Framework_TestResult $result
+   *
+   * @return PHPUnit_Framework_TestResult
+   *
+   * @throws PHPUnit_Framework_Exception
+   */
+  final public function run(
+    ?PHPUnit_Framework_TestResult $result = null,
+  ): PHPUnit_Framework_TestResult {
+
+    if ($result === null) {
+      $result = $this->createResult();
+    }
+
+    // WarningTestCase is probably dead now that Mocks are dead.
+    // if (!$this instanceof PHPUnit_Framework_WarningTestCase) {
+    $this->setTestResultObject($result);
+    $this->setUseErrorHandlerFromAnnotation();
+    //}
+
+    $oldErrorHandlerSetting = null;
+
+    if ($this->getUseErrorHandler() !== null) {
+      $oldErrorHandlerSetting = $result->getConvertErrorsToExceptions();
+      $result->convertErrorsToExceptions($this->getUseErrorHandler());
+    }
+
+    // if (!$this instanceof PHPUnit_Framework_WarningTestCase &&
+    if (!$this->handleDependencies()) {
+      return $result;
+    }
+
+    // Pass on the test into the run function for result.
+    $test = $this;
+    if ($test instanceof TestInterface) {
+      $result->run($test);
+    }
+
+    if (is_bool($oldErrorHandlerSetting)) {
+      $result->convertErrorsToExceptions($oldErrorHandlerSetting);
+    }
+
+    $this->freeResult();
+
+    return $result;
+
+  }
+
+  final private function runTest_Handle_Exception_Trapping(
+    ?Exception $e,
+  ): bool {
+
+    $expectedException = $this->getExpectedException();
+
+    if ($expectedException == '') {
+      return true;
+    }
+
+    if (!$e instanceof Exception) {
+      $this->fail(
+        'Expected='.$expectedException.' was presented e='.json_encode($e),
+      );
+      return false;
+    }
+
+    try {
+
+      $this->assertExceptionSameClass($expectedException, $e);
+
+      $expectedExceptionMessage = $this->getExpectedExceptionMessage();
+      $expectedExceptionMessageRegExp =
+        $this->getExpectedExceptionMessageRegExp();
+
+      if ($expectedExceptionMessage != '') {
+        $this->assertExceptionSameMessage($expectedExceptionMessage, $e);
+      }
+
+      if ($expectedExceptionMessageRegExp != '') {
+        $this->assertExceptionRegexpMessage(
+          $expectedExceptionMessageRegExp,
+          $e,
+        );
+      }
+
+      if ($this->getExpectedExceptionCode() !== -1) {
+        $this->assertEquals($this->getExpectedExceptionCode(), $e->getCode());
+      }
+
+      return true;
+
+    } catch (AssertionFailedException $expectedError) {
+
+      $this->fail($expectedError->getMessage());
+      return false;
+
+    }
+
+    return true;
+
+  }
+
+  /**
+   * Override to run the test and assert its state.
+   *
+   * @return mixed
+   *
+   * @throws Exception|PHPUnit_Framework_Exception
+   * @throws PHPUnit_Framework_Exception
+   */
+  final public function runTest(): mixed {
+
+    $testName = $this->getName(false);
+
+    $e = null;
+    $testResult = null;
+
+    try {
+      $class = ReflectionClasses::getReflection($this);
+
+      if ($class instanceof ReflectionClass) {
+        $method = $class->getMethod($testName);
+        $testArguments = $this->getData();
+        $testResult = $method->invokeArgs($this, $testArguments->toArray());
+      } else {
+        $this->fail('ReflectionError class='.$class);
+      }
+    } catch (Exception $_e) {
+      $e = $_e;
+    }
+
+    // --
+    // Handle user space exception trapping, if it's not handled / failed
+    // return void / null.
+    // --
+    if ($this->runTest_Handle_Exception_Trapping($e) == true) {
+      // We have handled the exception.
+      return null;
+    } else if ($e instanceof Exception) {
+      // So we have a non-monitored exception, re-throw.
+      throw $e;
+    }
+
+    return $testResult;
+
+  }
+
+  final public function mergeHooks(
+    Vector<string> $template,
+    Vector<string> $userDefined,
+  ): Vector<string> {
+
+    $combinedMap = Map {};
+
+    foreach ($template as $hook) {
+      $combinedMap->set($hook, true);
+    }
+
+    foreach ($userDefined as $hook) {
+      $combinedMap->set($hook, true);
+    }
+
+    return $combinedMap->keys();
+
+  }
+
+  final public function getHookMethods(): Map<string, Vector<string>> {
+
+    $beforeClassMethods = $this->mergeHooks(
+      Vector {'setUpBeforeClass'},
+      $this->getAllAnnotationsForKey('beforeClass'),
+    );
+
+    $afterClassMethods = $this->mergeHooks(
+      Vector {'tearDownAfterClass'},
+      $this->getAllAnnotationsForKey('afterClass'),
+    );
+
+    $beforeMethods = $this->mergeHooks(
+      Vector {'setUp'},
+      $this->getAllAnnotationsForKey('before'),
+    );
+
+    $afterMethods = $this->mergeHooks(
+      Vector {'tearDown'},
+      $this->getAllAnnotationsForKey('after'),
+    );
+
+    $hooks = Map {
+      'beforeClass' => $beforeClassMethods,
+      'before' => $beforeMethods,
+      'after' => $afterMethods,
+      'afterClass' => $afterClassMethods,
+    };
+
+    return $hooks;
+
+  }
+
+  /**
+   * Runs the bare test sequence.
+   */
+  final public function runBare(): void {
+
+    $this->startOutputBuffering();
+
+    $currentWorkingDirectory = getcwd();
+
+    $hookMethods = $this->getHookMethods();
+
+    $e = null;
+    $_e = null;
+    $hasMetRequirements = false;
+
+    try {
+
+      $this->checkRequirements();
+
+      $hasMetRequirements = true;
+
+      $this->setExpectedExceptionFromAnnotation();
+
+      foreach ($hookMethods['before'] as $method) {
+        // JEO: make this be dynamic calling.
+        DynamicMethodCall::callMethodOnObject($this, $method, Vector {});
+      }
+
+      $this->assertPreConditions();
+
+      $t_result = $this->runTest();
+
+      if ($t_result instanceof PHPUnit_Framework_TestResult) {
+        $this->setResult($t_result);
+      }
+
+      $this->assertPostConditions();
+
+      $this->status()->setMessageAndCode('', Status::STATUS_PASSED);
+
+    } catch (IncompleteException $e) {
+      $this->status()
+        ->setMessageAndCode($e->getMessage(), Status::STATUS_INCOMPLETE);
+    } catch (SkippedException $e) {
+      $this->status()
+        ->setMessageAndCode($e->getMessage(), Status::STATUS_SKIPPED);
+    } catch (WarningException $e) {
+      $this->status()
+        ->setMessageAndCode($e->getMessage(), Status::STATUS_WARNING);
+    } catch (AssertionFailedException $e) {
+      $this->status()
+        ->setMessageAndCode($e->getMessage(), Status::STATUS_FAILURE);
+    } catch (Exception $_e) {
+      $e = $_e;
+    }
+
+    if ($_e instanceof Exception) {
+      $this->status()
+        ->setMessageAndCode($_e->getMessage(), Status::STATUS_ERROR);
+    }
+
+    // Tear down the fixture. An exception raised in tearDown() will be
+    // caught and passed on when no exception was raised before.
+    try {
+      if ($hasMetRequirements) {
+        foreach ($hookMethods['after'] as $method) {
+          DynamicMethodCall::callMethodOnObject($this, $method, Vector {});
+        }
+      }
+    } catch (Exception $_e) {
+      if ($e == null) {
+        $e = $_e;
+      }
+    }
+
+    try {
+      $this->stopOutputBuffering();
+    } catch (RiskyException $_e) {
+      if ($e == null) {
+        $e = $_e;
+      }
+    }
+
+    if ($currentWorkingDirectory != getcwd()) {
+      chdir($currentWorkingDirectory);
+    }
+
+    // Clean up INI settings.
+    $this->clearIniSettings();
+
+    // Clean up locale settings.
+    $this->clearLocales();
+
+    // Perform assertion on output.
+
+    try {
+      $output = $this->getActualOutput();
+
+      $expectedOutputRegex = $this->getExpectedOutputRegex();
+      $expectedOutput = $this->getExpectedOutput();
+
+      // var_dump(get_class($this));
+      // var_dump('expectedOutputRegex');
+      // var_dump($expectedOutputRegex);
+      // var_dump('output');
+      // var_dump($output);
+      // var_dump('output-END');
+
+      if (is_string($expectedOutputRegex)) {
+        $this->assertRegExp($expectedOutputRegex, $output);
+      } else if (is_string($expectedOutput)) {
+        $this->assertEquals($expectedOutput, $output);
+      }
+
+    } catch (AssertionFailedException $_e) {
+      // Any asserts at this point are for output trapping.
+      $e = $_e;
+      $this->status()
+        ->setMessageAndCode($e->getMessage(), Status::STATUS_FAILURE);
+    } catch (Exception $_e) {
+      $e = $_e;
+    }
+
+    // Workaround for missing "finally".
+    if ($e instanceof Exception) {
+      $this->onNotSuccessfulTest($e);
+    }
+  }
+
+  /**
+   * This method is called when a test method did not execute successfully.
+   *
+   * @param Exception|Throwable $e
+   *
+   * @since Method available since Release 3.4.0
+   *
+   * @throws Exception|Throwable
+   */
+  final public function onNotSuccessfulTest(Exception $e): void {
+    throw $e;
   }
 
   // --

@@ -10,6 +10,8 @@
 
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
+use Zynga\PHPUnit\V2\TestCase;
+
 use \Exception;
 
 /**
@@ -120,11 +122,11 @@ class PHPUnit_Util_Log_JUnit extends PHPUnit_Util_Printer implements TestListene
     /**
      * An error occurred.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                  $time
      */
-    public function addError(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addError(TestInterface $test, Exception $e, $time)
     {
         $this->doAddFault($test, $e, $time, 'error');
         $this->testSuiteErrors[$this->testSuiteLevel]++;
@@ -133,13 +135,13 @@ class PHPUnit_Util_Log_JUnit extends PHPUnit_Util_Printer implements TestListene
     /**
      * A warning occurred.
      *
-     * @param PHPUnit_Framework_Test    $test
+     * @param TestInterface    $test
      * @param Exception $e
      * @param float                     $time
      *
      * @since Method available since Release 5.1.0
      */
-    public function addWarning(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addWarning(TestInterface $test, Exception $e, $time)
     {
         $this->doAddFault($test, $e, $time, 'warning');
         $this->testSuiteFailures[$this->testSuiteLevel]++;
@@ -148,11 +150,11 @@ class PHPUnit_Util_Log_JUnit extends PHPUnit_Util_Printer implements TestListene
     /**
      * A failure occurred.
      *
-     * @param PHPUnit_Framework_Test                 $test
+     * @param TestInterface                 $test
      * @param Exception $e
      * @param float                                  $time
      */
-    public function addFailure(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addFailure(TestInterface $test, Exception $e, $time)
     {
         $this->doAddFault($test, $e, $time, 'failure');
         $this->testSuiteFailures[$this->testSuiteLevel]++;
@@ -161,11 +163,11 @@ class PHPUnit_Util_Log_JUnit extends PHPUnit_Util_Printer implements TestListene
     /**
      * Incomplete test.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                  $time
      */
-    public function addIncompleteTest(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addIncompleteTest(TestInterface $test, Exception $e, $time)
     {
         if ($this->logIncompleteSkipped && $this->currentTestCase !== null) {
             $error = $this->document->createElement(
@@ -189,13 +191,13 @@ class PHPUnit_Util_Log_JUnit extends PHPUnit_Util_Printer implements TestListene
     /**
      * Risky test.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                  $time
      *
      * @since  Method available since Release 4.0.0
      */
-    public function addRiskyTest(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addRiskyTest(TestInterface $test, Exception $e, $time)
     {
         if ($this->logIncompleteSkipped && $this->currentTestCase !== null) {
             $error = $this->document->createElement(
@@ -219,13 +221,13 @@ class PHPUnit_Util_Log_JUnit extends PHPUnit_Util_Printer implements TestListene
     /**
      * Skipped test.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                  $time
      *
      * @since  Method available since Release 3.0.0
      */
-    public function addSkippedTest(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addSkippedTest(TestInterface $test, Exception $e, $time)
     {
         if ($this->logIncompleteSkipped && $this->currentTestCase !== null) {
             $error = $this->document->createElement(
@@ -249,11 +251,11 @@ class PHPUnit_Util_Log_JUnit extends PHPUnit_Util_Printer implements TestListene
     /**
      * A testsuite started.
      *
-     * @param PHPUnit_Framework_TestSuite $suite
+     * @param TestInterface $suite
      *
      * @since  Method available since Release 2.2.0
      */
-    public function startTestSuite(PHPUnit_Framework_TestSuite $suite)
+    public function startTestSuite(TestInterface $suite)
     {
         $testSuite = $this->document->createElement('testsuite');
         $testSuite->setAttribute('name', $suite->getName());
@@ -285,11 +287,11 @@ class PHPUnit_Util_Log_JUnit extends PHPUnit_Util_Printer implements TestListene
     /**
      * A testsuite ended.
      *
-     * @param PHPUnit_Framework_TestSuite $suite
+     * @param TestInterface $suite
      *
      * @since  Method available since Release 2.2.0
      */
-    public function endTestSuite(PHPUnit_Framework_TestSuite $suite)
+    public function endTestSuite(TestInterface $suite)
     {
         $this->testSuites[$this->testSuiteLevel]->setAttribute(
             'tests',
@@ -330,14 +332,14 @@ class PHPUnit_Util_Log_JUnit extends PHPUnit_Util_Printer implements TestListene
     /**
      * A test started.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      */
-    public function startTest(PHPUnit_Framework_Test $test)
+    public function startTest(TestInterface $test)
     {
         $testCase = $this->document->createElement('testcase');
         $testCase->setAttribute('name', $test->getName());
 
-        if ($test instanceof PHPUnit_Framework_TestCase) {
+        if ($test instanceof TestCase) {
             $class      = ReflectionClasses::getReflection($test);
             $methodName = $test->getName();
 
@@ -356,13 +358,13 @@ class PHPUnit_Util_Log_JUnit extends PHPUnit_Util_Printer implements TestListene
     /**
      * A test ended.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param float                  $time
      */
-    public function endTest(PHPUnit_Framework_Test $test, $time)
+    public function endTest(TestInterface $test, $time)
     {
         if ($this->attachCurrentTestCase) {
-            if ($test instanceof PHPUnit_Framework_TestCase) {
+            if ($test instanceof TestCase) {
                 $numAssertions = $test->getNumAssertions();
                 $this->testSuiteAssertions[$this->testSuiteLevel] += $numAssertions;
 
@@ -430,12 +432,12 @@ class PHPUnit_Util_Log_JUnit extends PHPUnit_Util_Printer implements TestListene
     /**
      * Method which generalizes addError() and addFailure()
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                  $time
      * @param string                 $type
      */
-    private function doAddFault(PHPUnit_Framework_Test $test, Exception $e, $time, $type)
+    private function doAddFault(TestInterface $test, Exception $e, $time, $type)
     {
         if ($this->currentTestCase === null) {
             return;

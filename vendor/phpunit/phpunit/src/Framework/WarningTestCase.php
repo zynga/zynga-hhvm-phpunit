@@ -9,13 +9,14 @@
  */
 
 use SebastianBergmann\PHPUnit\Exceptions\WarningException;
+use Zynga\PHPUnit\V2\TestCase;
 
 /**
  * A warning.
  *
  * @since Class available since Release 2.0.0
  */
-class PHPUnit_Framework_WarningTestCase extends PHPUnit_Framework_TestCase
+class PHPUnit_Framework_WarningTestCase extends TestCase
 {
     /**
      * @var string

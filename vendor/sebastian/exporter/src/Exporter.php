@@ -52,7 +52,7 @@ class Exporter
      * @param  Context $context
      * @return string
      */
-    public function shortenedRecursiveExport(&$data, Context $context = null)
+    public function shortenedRecursiveExport($data, Context $context = null)
     {
         $result   = array();
         $exporter = new self();
@@ -202,7 +202,7 @@ class Exporter
      * @return string
      * @see    SebastianBergmann\Exporter\Exporter::export
      */
-    protected function recursiveExport(&$value, $indentation, $processed = null)
+    protected function recursiveExport($value, $indentation, $processed = null)
     {
         if ($value === null) {
             return 'null';

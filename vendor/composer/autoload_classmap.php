@@ -86,7 +86,7 @@ return array(
     'PHPUnit_Framework_SelfDescribing' => $vendorDir . '/phpunit/phpunit/src/Framework/SelfDescribing.php',
     'PHPUnit_Framework_SkippedTestCase' => $vendorDir . '/phpunit/phpunit/src/Framework/SkippedTestCase.php',
     'PHPUnit_Framework_SyntheticError' => $vendorDir . '/phpunit/phpunit/src/Framework/SyntheticError.php',
-    'PHPUnit_Framework_Test' => $vendorDir . '/phpunit/phpunit/src/Framework/Test.php',
+    'TestInterface' => $vendorDir . '/phpunit/phpunit/src/Framework/Test.php',
     'PHPUnit_Framework_TestCase' => $vendorDir . '/phpunit/phpunit/src/Framework/TestCase.php',
     'PHPUnit_Framework_TestFailure' => $vendorDir . '/phpunit/phpunit/src/Framework/TestFailure.php',
     'PHPUnit_Framework_TestListener' => $vendorDir . '/phpunit/phpunit/src/Framework/TestListener.php',

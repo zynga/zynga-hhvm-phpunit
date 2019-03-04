@@ -9,6 +9,8 @@
  */
 
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
+use Zynga\PHPUnit\V2\TestCase;
+
 use \Exception;
 
 /**
@@ -118,11 +120,11 @@ abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer i
     /**
      * An error occurred.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                  $time
      */
-    public function addError(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addError(TestInterface $test, Exception $e, $time)
     {
         if (!$this->isOfInterest($test)) {
             return;
@@ -135,13 +137,13 @@ abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer i
     /**
      * A warning occurred.
      *
-     * @param PHPUnit_Framework_Test    $test
+     * @param TestInterface    $test
      * @param Exception $e
      * @param float                     $time
      *
      * @since Method available since Release 5.1.0
      */
-    public function addWarning(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addWarning(TestInterface $test, Exception $e, $time)
     {
         if (!$this->isOfInterest($test)) {
             return;
@@ -154,11 +156,11 @@ abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer i
     /**
      * A failure occurred.
      *
-     * @param PHPUnit_Framework_Test                 $test
+     * @param TestInterface                 $test
      * @param Exception $e
      * @param float                                  $time
      */
-    public function addFailure(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addFailure(TestInterface $test, Exception $e, $time)
     {
         if (!$this->isOfInterest($test)) {
             return;
@@ -171,11 +173,11 @@ abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer i
     /**
      * Incomplete test.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                  $time
      */
-    public function addIncompleteTest(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addIncompleteTest(TestInterface $test, Exception $e, $time)
     {
         if (!$this->isOfInterest($test)) {
             return;
@@ -188,13 +190,13 @@ abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer i
     /**
      * Risky test.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                  $time
      *
      * @since Method available since Release 4.0.0
      */
-    public function addRiskyTest(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addRiskyTest(TestInterface $test, Exception $e, $time)
     {
         if (!$this->isOfInterest($test)) {
             return;
@@ -207,13 +209,13 @@ abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer i
     /**
      * Skipped test.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                  $time
      *
      * @since Method available since Release 3.0.0
      */
-    public function addSkippedTest(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addSkippedTest(TestInterface $test, Exception $e, $time)
     {
         if (!$this->isOfInterest($test)) {
             return;
@@ -248,9 +250,9 @@ abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer i
     /**
      * A test started.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      */
-    public function startTest(PHPUnit_Framework_Test $test)
+    public function startTest(TestInterface $test)
     {
         if (!$this->isOfInterest($test)) {
             return;
@@ -284,7 +286,7 @@ abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer i
             $this->currentTestMethodPrettified = $this->prettifier->prettifyTestMethod($test->getName(false));
         }
 
-        if ($test instanceof PHPUnit_Framework_TestCase && $test->usesDataProvider()) {
+        if ($test instanceof TestCase && $test->usesDataProvider()) {
             $this->currentTestMethodPrettified .= ' ' . $test->dataDescription();
         }
 
@@ -294,10 +296,10 @@ abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer i
     /**
      * A test ended.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param float                  $time
      */
-    public function endTest(PHPUnit_Framework_Test $test, $time)
+    public function endTest(TestInterface $test, $time)
     {
         if (!$this->isOfInterest($test)) {
             return;
@@ -378,13 +380,13 @@ abstract class PHPUnit_Util_TestDox_ResultPrinter extends PHPUnit_Util_Printer i
     }
 
     /**
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      *
      * @return bool
      */
-    private function isOfInterest(PHPUnit_Framework_Test $test)
+    private function isOfInterest(TestInterface $test)
     {
-        if (!$test instanceof PHPUnit_Framework_TestCase) {
+        if (!$test instanceof TestCase) {
             return false;
         }
 

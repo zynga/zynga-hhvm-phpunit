@@ -2,10 +2,10 @@
 
 namespace Zynga\PHPUnit\V2\Tests\Mock;
 
-use \PHPUnit_Framework_TestCase;
+use Zynga\PHPUnit\V2\TestCase;
 
-class TestIncomplete extends PHPUnit_Framework_TestCase {
-  protected function runTest() {
+class TestIncomplete extends TestCase {
+  public function testMarkIncomplete() {
     $this->markTestIncomplete('Incomplete test');
   }
 }

@@ -2,11 +2,8 @@
 
 namespace Zynga\PHPUnit\V2\Tests\Mock;
 
-use \PHPUnit_Framework_TestCase;
+use Zynga\PHPUnit\V2\TestCase;
 
-class Success extends PHPUnit_Framework_TestCase
-{
-    protected function runTest()
-    {
-    }
+class Success extends TestCase {
+  public function testNoop() {}
 }

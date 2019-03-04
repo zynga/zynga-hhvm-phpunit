@@ -13,15 +13,15 @@ namespace Zynga\PHPUnit\V2\Tests\Framework;
 
 use Zynga\PHPUnit\V2\Tests\Mock\BaseTestListenerSample;
 use Zynga\PHPUnit\V2\Tests\Mock\Success;
+use Zynga\PHPUnit\V2\TestCase;
 use Zynga\PHPUnit\V2\TestResult;
 
-use \PHPUnit_Framework_TestCase;
 use \PHPUnit_Framework_TestResult;
 
 /**
  * @since      Class available since Release 4.0.0
  */
-class BaseTestListenerTest extends PHPUnit_Framework_TestCase {
+class BaseTestListenerTest extends TestCase {
 
   public function doSetUpBeforeClass(): void {
     // noop
@@ -39,7 +39,7 @@ class BaseTestListenerTest extends PHPUnit_Framework_TestCase {
     $result = new PHPUnit_Framework_TestResult();
     $listener = new BaseTestListenerSample();
     $result->listeners()->add($listener);
-    $test = new Success();
+    $test = new Success('testNoop');
     $test->run($result);
     $this->assertEquals(1, $listener->endCount);
 

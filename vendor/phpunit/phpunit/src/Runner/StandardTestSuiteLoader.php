@@ -9,6 +9,7 @@
  */
 
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+use Zynga\PHPUnit\V2\TestCase;
 
 /**
  * The standard test suite loader.
@@ -27,6 +28,12 @@ class PHPUnit_Runner_StandardTestSuiteLoader implements PHPUnit_Runner_TestSuite
      */
     public function load($suiteClassName, $suiteClassFile = '')
     {
+
+      if ( is_object($suiteClassName) ) {
+        $class = ReflectionClasses::getReflection(get_class($suiteClassName));
+        return $class;
+      }
+
         $suiteClassName = str_replace('.php', '', $suiteClassName);
 
         if (empty($suiteClassFile)) {
@@ -59,7 +66,7 @@ class PHPUnit_Runner_StandardTestSuiteLoader implements PHPUnit_Runner_TestSuite
         }
 
         if (!class_exists($suiteClassName, false) && !empty($loadedClasses)) {
-            $testCaseClass = 'PHPUnit_Framework_TestCase';
+            $testCaseClass = 'TestCase';
 
             foreach ($loadedClasses as $loadedClass) {
                 $class     = ReflectionClasses::getReflection($loadedClass);

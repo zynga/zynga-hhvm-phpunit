@@ -2,9 +2,9 @@
 
 namespace Zynga\PHPUnit\V2\Tests\Mock;
 
-use \PHPUnit_Framework_TestCase;
+use Zynga\PHPUnit\V2\TestCase;
 
-class ChangeCurrentWorkingDirectory extends PHPUnit_Framework_TestCase {
+class ChangeCurrentWorkingDirectory extends TestCase {
   public function testSomethingThatChangesTheCwd() {
     chdir('../');
     $this->assertTrue(true);

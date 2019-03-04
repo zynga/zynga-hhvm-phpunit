@@ -8,7 +8,10 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
+use Zynga\PHPUnit\V2\TestCase;
+
 use \Exception;
 
 /**
@@ -52,11 +55,11 @@ class PHPUnit_Util_Log_TAP extends PHPUnit_Util_Printer implements TestListenerI
     /**
      * An error occurred.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                  $time
      */
-    public function addError(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addError(TestInterface $test, Exception $e, $time)
     {
         $this->writeNotOk($test, 'Error');
     }
@@ -64,13 +67,13 @@ class PHPUnit_Util_Log_TAP extends PHPUnit_Util_Printer implements TestListenerI
     /**
      * A warning occurred.
      *
-     * @param PHPUnit_Framework_Test    $test
+     * @param TestInterface    $test
      * @param Exception $e
      * @param float                     $time
      *
      * @since Method available since Release 5.1.0
      */
-    public function addWarning(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addWarning(TestInterface $test, Exception $e, $time)
     {
         $this->writeNotOk($test, 'Warning');
     }
@@ -78,11 +81,11 @@ class PHPUnit_Util_Log_TAP extends PHPUnit_Util_Printer implements TestListenerI
     /**
      * A failure occurred.
      *
-     * @param PHPUnit_Framework_Test                 $test
+     * @param TestInterface                 $test
      * @param Exception $e
      * @param float                                  $time
      */
-    public function addFailure(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addFailure(TestInterface $test, Exception $e, $time)
     {
         $this->writeNotOk($test, 'Failure');
 
@@ -120,11 +123,11 @@ class PHPUnit_Util_Log_TAP extends PHPUnit_Util_Printer implements TestListenerI
     /**
      * Incomplete test.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                  $time
      */
-    public function addIncompleteTest(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addIncompleteTest(TestInterface $test, Exception $e, $time)
     {
         $this->writeNotOk($test, '', 'TODO Incomplete Test');
     }
@@ -132,13 +135,13 @@ class PHPUnit_Util_Log_TAP extends PHPUnit_Util_Printer implements TestListenerI
     /**
      * Risky test.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                  $time
      *
      * @since Method available since Release 4.0.0
      */
-    public function addRiskyTest(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addRiskyTest(TestInterface $test, Exception $e, $time)
     {
         $this->write(
             sprintf(
@@ -154,13 +157,13 @@ class PHPUnit_Util_Log_TAP extends PHPUnit_Util_Printer implements TestListenerI
     /**
      * Skipped test.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param Exception              $e
      * @param float                  $time
      *
      * @since Method available since Release 3.0.0
      */
-    public function addSkippedTest(PHPUnit_Framework_Test $test, Exception $e, $time)
+    public function addSkippedTest(TestInterface $test, Exception $e, $time)
     {
         $this->write(
             sprintf(
@@ -176,9 +179,9 @@ class PHPUnit_Util_Log_TAP extends PHPUnit_Util_Printer implements TestListenerI
     /**
      * A testsuite started.
      *
-     * @param PHPUnit_Framework_TestSuite $suite
+     * @param TestInterface $suite
      */
-    public function startTestSuite(PHPUnit_Framework_TestSuite $suite)
+    public function startTestSuite(TestInterface $suite)
     {
         $this->testSuiteLevel++;
     }
@@ -186,9 +189,9 @@ class PHPUnit_Util_Log_TAP extends PHPUnit_Util_Printer implements TestListenerI
     /**
      * A testsuite ended.
      *
-     * @param PHPUnit_Framework_TestSuite $suite
+     * @param TestInterface $suite
      */
-    public function endTestSuite(PHPUnit_Framework_TestSuite $suite)
+    public function endTestSuite(TestInterface $suite)
     {
         $this->testSuiteLevel--;
 
@@ -200,9 +203,9 @@ class PHPUnit_Util_Log_TAP extends PHPUnit_Util_Printer implements TestListenerI
     /**
      * A test started.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      */
-    public function startTest(PHPUnit_Framework_Test $test)
+    public function startTest(TestInterface $test)
     {
         $this->testNumber++;
         $this->testSuccessful = true;
@@ -211,10 +214,10 @@ class PHPUnit_Util_Log_TAP extends PHPUnit_Util_Printer implements TestListenerI
     /**
      * A test ended.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param float                  $time
      */
-    public function endTest(PHPUnit_Framework_Test $test, $time)
+    public function endTest(TestInterface $test, $time)
     {
         if ($this->testSuccessful === true) {
             $this->write(
@@ -230,11 +233,11 @@ class PHPUnit_Util_Log_TAP extends PHPUnit_Util_Printer implements TestListenerI
     }
 
     /**
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      * @param string                 $prefix
      * @param string                 $directive
      */
-    protected function writeNotOk(PHPUnit_Framework_Test $test, $prefix = '', $directive = '')
+    protected function writeNotOk(TestInterface $test, $prefix = '', $directive = '')
     {
         $this->write(
             sprintf(
@@ -250,11 +253,11 @@ class PHPUnit_Util_Log_TAP extends PHPUnit_Util_Printer implements TestListenerI
     }
 
     /**
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      */
-    private function writeDiagnostics(PHPUnit_Framework_Test $test)
+    private function writeDiagnostics(TestInterface $test)
     {
-        if (!$test instanceof PHPUnit_Framework_TestCase) {
+        if (!$test instanceof TestCase) {
             return;
         }
 

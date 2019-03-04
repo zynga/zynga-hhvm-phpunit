@@ -21,6 +21,7 @@ use SebastianBergmann\CodeCoverage\Report\PHP as PhpReport;
 use SebastianBergmann\CodeCoverage\Report\Text as TextReport;
 use SebastianBergmann\CodeCoverage\Report\Xml\Facade as XmlReport;
 use SebastianBergmann\Environment\Runtime;
+use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
 
 /**
@@ -83,7 +84,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
     }
 
     /**
-     * @param PHPUnit_Framework_Test|ReflectionClass $test
+     * @param TestInterface|ReflectionClass $test
      * @param array                                  $arguments
      *
      * @return PHPUnit_Framework_TestResult
@@ -92,11 +93,12 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
      */
     public static function run($test, array $arguments = [])
     {
+
         if ($test instanceof ReflectionClass) {
             $test = new PHPUnit_Framework_TestSuite($test);
         }
 
-        if ($test instanceof PHPUnit_Framework_Test) {
+        if ($test instanceof TestInterface) {
             $aTestRunner = new self;
 
             return $aTestRunner->doRun(
@@ -143,6 +145,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
         }
 
         if ($arguments['filter']) {
+          // echo "injectingTestFilter?\n";
             $filterFactory->addFilter(
                 ReflectionClasses::getReflection('PHPUnit_Runner_Filter_Test'),
                 $arguments['filter']
@@ -152,13 +155,13 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
     }
 
     /**
-     * @param PHPUnit_Framework_Test $suite
+     * @param TestInterface $suite
      * @param array                  $arguments
      * @param bool                   $exit
      *
      * @return PHPUnit_Framework_TestResult
      */
-    public function doRun(PHPUnit_Framework_Test $suite, array $arguments = [], $exit = true)
+    public function doRun(TestInterface $suite, array $arguments = [], $exit = true)
     {
         if (isset($arguments['configuration'])) {
             $GLOBALS['__PHPUNIT_CONFIGURATION_FILE'] = $arguments['configuration'];

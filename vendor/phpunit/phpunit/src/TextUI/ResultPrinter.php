@@ -11,7 +11,9 @@
 
 use SebastianBergmann\Environment\Console;
 use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCase;
+use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
+use Zynga\PHPUnit\V2\TestCase;
 
 /**
  * Prints the result of a TextUI TestRunner run.
@@ -213,7 +215,10 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
    * @param array  $defects
    * @param string $type
    */
-  protected function printDefects(array $defects, $type) {
+  protected function printDefects(
+    Vector<PHPUnit_Framework_TestFailure> $defects,
+    $type,
+  ) {
     $count = count($defects);
 
     if ($count == 0) {
@@ -427,12 +432,12 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
   /**
    * An error occurred.
    *
-   * @param PHPUnit_Framework_Test $test
+   * @param TestInterface $test
    * @param Exception              $e
    * @param float                  $time
    */
   public function addError(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {
@@ -443,12 +448,12 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
   /**
    * A failure occurred.
    *
-   * @param PHPUnit_Framework_Test                 $test
+   * @param TestInterface                 $test
    * @param Exception $e
    * @param float                                  $time
    */
   public function addFailure(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {
@@ -459,14 +464,14 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
   /**
    * A warning occurred.
    *
-   * @param PHPUnit_Framework_Test    $test
+   * @param TestInterface    $test
    * @param Exception $e
    * @param float                     $time
    *
    * @since Method available since Release 5.1.0
    */
   public function addWarning(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {
@@ -477,12 +482,12 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
   /**
    * Incomplete test.
    *
-   * @param PHPUnit_Framework_Test $test
+   * @param TestInterface $test
    * @param Exception              $e
    * @param float                  $time
    */
   public function addIncompleteTest(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {
@@ -493,14 +498,14 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
   /**
    * Risky test.
    *
-   * @param PHPUnit_Framework_Test $test
+   * @param TestInterface $test
    * @param Exception              $e
    * @param float                  $time
    *
    * @since Method available since Release 4.0.0
    */
   public function addRiskyTest(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {
@@ -511,14 +516,14 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
   /**
    * Skipped test.
    *
-   * @param PHPUnit_Framework_Test $test
+   * @param TestInterface $test
    * @param Exception              $e
    * @param float                  $time
    *
    * @since Method available since Release 3.0.0
    */
   public function addSkippedTest(
-    PHPUnit_Framework_Test $test,
+    TestInterface $test,
     Exception $e,
     float $time,
   ): void {
@@ -533,7 +538,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
    *
    * @since Method available since Release 2.2.0
    */
-  public function startTestSuite(PHPUnit_Framework_TestSuite $suite): void {
+  public function startTestSuite(TestInterface $suite): void {
     if ($this->numTests == -1) {
       $this->numTests = count($suite);
       $this->numTestsWidth = strlen((string) $this->numTests);
@@ -551,14 +556,14 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
    *
    * @since Method available since Release 2.2.0
    */
-  public function endTestSuite(PHPUnit_Framework_TestSuite $suite): void {}
+  public function endTestSuite(TestInterface $suite): void {}
 
   /**
    * A test started.
    *
-   * @param PHPUnit_Framework_Test $test
+   * @param TestInterface $test
    */
-  public function startTest(PHPUnit_Framework_Test $test): void {
+  public function startTest(TestInterface $test): void {
     if ($this->debug) {
       $this->write(
         "\n".
@@ -574,15 +579,15 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
   /**
    * A test ended.
    *
-   * @param PHPUnit_Framework_Test $test
+   * @param TestInterface $test
    * @param float                  $time
    */
-  public function endTest(PHPUnit_Framework_Test $test, float $time): void {
+  public function endTest(TestInterface $test, float $time): void {
     if (!$this->lastTestFailed) {
       $this->writeProgress('.');
     }
 
-    if ($test instanceof PHPUnit_Framework_TestCase) {
+    if ($test instanceof TestCase) {
       $this->numAssertions += $test->getNumAssertions();
     } else if ($test instanceof ZyngaTestCase) {
       $this->numAssertions += $test->getNumAssertions();
@@ -592,7 +597,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
 
     $this->lastTestFailed = false;
 
-    if ($test instanceof PHPUnit_Framework_TestCase) {
+    if ($test instanceof TestCase) {
       if (!$test->hasExpectationOnOutput()) {
         $this->write($test->getActualOutput());
       }

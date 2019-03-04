@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\PHPUnit\V2\Interfaces\TestInterface;
+
 /**
  * A Decorator for Tests.
  *
@@ -17,7 +19,7 @@
  *
  * @since Class available since Release 2.0.0
  */
-class PHPUnit_Extensions_TestDecorator extends PHPUnit_Framework_Assert implements PHPUnit_Framework_Test, PHPUnit_Framework_SelfDescribing
+class PHPUnit_Extensions_TestDecorator extends PHPUnit_Framework_Assert implements TestInterface, PHPUnit_Framework_SelfDescribing
 {
     /**
      * The Test to be decorated.
@@ -29,9 +31,9 @@ class PHPUnit_Extensions_TestDecorator extends PHPUnit_Framework_Assert implemen
     /**
      * Constructor.
      *
-     * @param PHPUnit_Framework_Test $test
+     * @param TestInterface $test
      */
-    public function __construct(PHPUnit_Framework_Test $test)
+    public function __construct(TestInterface $test)
     {
         $this->test = $test;
     }
@@ -81,7 +83,7 @@ class PHPUnit_Extensions_TestDecorator extends PHPUnit_Framework_Assert implemen
     /**
      * Returns the test to be run.
      *
-     * @return PHPUnit_Framework_Test
+     * @return TestInterface
      */
     public function getTest()
     {
