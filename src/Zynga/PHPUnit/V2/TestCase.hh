@@ -1357,7 +1357,10 @@ abstract class TestCase extends Assertions implements TestInterface {
     }
 
     try {
+
+      // error_log('JEO stopOutputBuffering');
       $this->stopOutputBuffering();
+
     } catch (RiskyException $_e) {
       if ($e == null) {
         $e = $_e;
@@ -1383,11 +1386,14 @@ abstract class TestCase extends Assertions implements TestInterface {
       $expectedOutput = $this->getExpectedOutput();
 
       // var_dump(get_class($this));
-      // var_dump('expectedOutputRegex');
-      // var_dump($expectedOutputRegex);
-      // var_dump('output');
-      // var_dump($output);
-      // var_dump('output-END');
+      // error_log('JEO expectedOutputRegex=' . $expectedOutputRegex);
+      // error_log('JEO output=' . $output);
+      // if ( $e instanceof Exception ) {
+      //   error_log('JEO e=' . $e->getMessage() . ' eClass=' . get_class($e));
+      // } else {
+      //   error_log('JEO unknown e=' . json_encode($e));
+      // }
+      // error_log('JEO output-END');
 
       if (is_string($expectedOutputRegex)) {
         $this->assertRegExp($expectedOutputRegex, $output);

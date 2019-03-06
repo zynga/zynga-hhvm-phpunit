@@ -37,6 +37,8 @@ class OutputBuffer {
    */
   public function stopOutputBuffering(): bool {
 
+    // error_log('JEO bufferingLevel=' . OutputBuffering::getCurrentLevel() . ' _savedLevel=' . $this->_outputBufferingLevel);
+
     if (OutputBuffering::getCurrentLevel() != $this->_outputBufferingLevel) {
       throw new RiskyException(
         'Test code or tested code did not (only) close its own output buffers',
@@ -47,15 +49,17 @@ class OutputBuffer {
       return false;
     }
 
-    $this->_output = OutputBuffering::get();
+    $output = OutputBuffering::get();
 
-    //if ($this->outputCallback === false) {
-    //$this->_output = $output;
-    // } else {
-    //   $this->output = call_user_func_array($this->outputCallback, [$output]);
-    // }
+    if ( $output != '' ) {
+      $this->_output = $output;
+    }
+
+    // error_log('JEO outputSaved len=' . strlen($this->_output) . ' output=' . $this->_output);
 
     OutputBuffering::end();
+
+    $this->_outputBufferingLevel = OutputBuffering::getCurrentLevel();
 
     return true;
 

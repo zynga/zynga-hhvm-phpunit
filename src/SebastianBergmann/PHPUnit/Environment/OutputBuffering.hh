@@ -36,7 +36,9 @@ class OutputBuffering {
 
   public static function get(): string {
 
-    return ob_get_contents();
+    $contents = ob_get_contents();
+    
+    return $contents;
 
   }
 

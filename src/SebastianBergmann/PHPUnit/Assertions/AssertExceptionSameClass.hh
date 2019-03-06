@@ -17,6 +17,11 @@ class AssertExceptionSameClass {
   ): bool {
 
     $expectedClassName = self::resolveObjectToClassName($expectedValue);
+
+    if ( is_object($actualValue) ) {
+      return $assertions->assertInstanceOf($expectedClassName, $actualValue, $message);
+    }
+
     $actualClassName = self::resolveObjectToClassName($actualValue);
 
     return $assertions->assertEquals(
