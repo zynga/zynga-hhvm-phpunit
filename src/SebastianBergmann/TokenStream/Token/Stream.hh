@@ -182,7 +182,7 @@ class Stream {
     $this->tokens->add($token);
     $this->addTokenToLine($token);
     $lineNo = $token->getLine();
-    if ( $lineNo > $this->totalLineCount ) {
+    if ($lineNo > $this->totalLineCount) {
       $this->totalLineCount = $lineNo;
     }
     return true;
@@ -192,13 +192,24 @@ class Stream {
 
     $lineNo = $token->getLine();
 
-    if (!$this->_lineToTokens->containsKey($lineNo)) {
-      $this->_lineToTokens->set($lineNo, Vector {});
+    $lineData = $this->_lineToTokens->get($lineNo);
+
+    if ($lineData instanceof Vector) {
+      $lineData->add($token);
+    } else {
+      $lineData = Vector {$token};
+      $this->_lineToTokens->set($lineNo, $lineData);
     }
 
-    $this->_lineToTokens[$lineNo]->add($token);
-
     return true;
+
+    // if (!$this->_lineToTokens->containsKey($lineNo)) {
+    //   $this->_lineToTokens->set($lineNo, Vector {});
+    // }
+    //
+    // $this->_lineToTokens[$lineNo]->add($token);
+    //
+    // return true;
 
   }
 

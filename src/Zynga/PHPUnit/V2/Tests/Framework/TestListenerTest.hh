@@ -17,8 +17,8 @@ use Zynga\PHPUnit\V2\TestCase;
 use Zynga\PHPUnit\V2\Tests\Mock\Failure;
 use Zynga\PHPUnit\V2\Tests\Mock\Success;
 use Zynga\PHPUnit\V2\Tests\Mock\TestError;
+use Zynga\PHPUnit\V2\TestResult;
 
-use \PHPUnit_Framework_TestResult;
 use \PHPUnit_Framework_TestSuite;
 use \Exception;
 
@@ -34,7 +34,7 @@ class TestListenerTest extends TestCase implements TestListenerInterface {
   protected int $notImplementedCount = 0;
   protected int $riskyCount = 0;
   protected int $skippedCount = 0;
-  protected ?PHPUnit_Framework_TestResult $result = null;
+  protected ?TestResult $result = null;
   protected int $startCount = 0;
 
   public function addError(
@@ -99,7 +99,7 @@ class TestListenerTest extends TestCase implements TestListenerInterface {
 
   public function setUp(): void {
 
-    $result = new PHPUnit_Framework_TestResult();
+    $result = new TestResult();
     $result->listeners()->add($this);
 
     $this->result = $result;

@@ -16,8 +16,6 @@ use Zynga\PHPUnit\V2\Tests\Mock\Success;
 use Zynga\PHPUnit\V2\TestCase;
 use Zynga\PHPUnit\V2\TestResult;
 
-use \PHPUnit_Framework_TestResult;
-
 /**
  * @since      Class available since Release 4.0.0
  */
@@ -36,7 +34,7 @@ class BaseTestListenerTest extends TestCase {
   // strict.
   public function testEndEventsAreCounted() {
 
-    $result = new PHPUnit_Framework_TestResult();
+    $result = new TestResult();
     $listener = new BaseTestListenerSample();
     $result->listeners()->add($listener);
     $test = new Success('testNoop');

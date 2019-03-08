@@ -9,6 +9,7 @@
  */
 
 use Zynga\PHPUnit\V2\Interfaces\TestInterface;
+use Zynga\PHPUnit\V2\TestResult;
 
 /**
  * A Decorator that runs a test repeatedly.
@@ -66,13 +67,13 @@ class PHPUnit_Extensions_RepeatedTest extends PHPUnit_Extensions_TestDecorator
      * Runs the decorated test and collects the
      * result in a TestResult.
      *
-     * @param PHPUnit_Framework_TestResult $result
+     * @param TestResult $result
      *
-     * @return PHPUnit_Framework_TestResult
+     * @return TestResult
      *
      * @throws PHPUnit_Framework_Exception
      */
-    public function run(PHPUnit_Framework_TestResult $result = null)
+    public function run(TestResult $result = null)
     {
         if ($result === null) {
             $result = $this->createResult();

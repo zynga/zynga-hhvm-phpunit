@@ -40,9 +40,9 @@ use Zynga\PHPUnit\V2\Tests\Mock\ThrowExceptionTestCase;
 use Zynga\PHPUnit\V2\Tests\Mock\ThrowNoExceptionTestCase;
 use Zynga\PHPUnit\V2\Tests\Mock\WasRun;
 use Zynga\PHPUnit\V2\TestFailure;
+use Zynga\PHPUnit\V2\TestResult;
 use Zynga\PHPUnit\V2\Version;
 
-use \PHPUnit_Framework_TestResult;
 use \PHPUnit_Framework_TestSuite;
 
 use \Exception;
@@ -121,7 +121,7 @@ class TestCaseTest extends TestCase {
   }
 
   private function _debugTestResult(
-    PHPUnit_Framework_TestResult $result,
+    TestResult $result,
     bool $debug,
     int $errorCount = 0,
     int $failureCount = 0,
@@ -185,7 +185,7 @@ class TestCaseTest extends TestCase {
   }
 
   private function _verifyTestResult(
-    PHPUnit_Framework_TestResult $result,
+    TestResult $result,
     bool $debug = false,
     int $errorCount = 0,
     int $failureCount = 0,
@@ -217,7 +217,7 @@ class TestCaseTest extends TestCase {
 
   private function _verifyTestSuite(
     PHPUnit_Framework_TestSuite $test,
-    PHPUnit_Framework_TestResult $result,
+    TestResult $result,
     bool $debug = false,
     int $errorCount = 0,
     int $failureCount = 0,
@@ -247,7 +247,7 @@ class TestCaseTest extends TestCase {
 
   private function _verifyTest(
     TestCase $test,
-    PHPUnit_Framework_TestResult $result,
+    TestResult $result,
     bool $debug = false,
     int $statusCode = Status::STATUS_PASSED,
     string $statusMessage = '',
@@ -481,11 +481,9 @@ class TestCaseTest extends TestCase {
 
   public function testNoArgTestCasePasses(): void {
 
-    $result = new PHPUnit_Framework_TestResult();
-
     $suite = new PHPUnit_Framework_TestSuite(NoArgTestCase::class);
 
-    $suite->run($result);
+    $result = $suite->run();
 
     $this->assertEquals(1, count($result));
 

@@ -12,7 +12,7 @@ namespace Zynga\PHPUnit\V2\Interfaces;
  */
 
 use \Countable;
-use \PHPUnit_Framework_TestResult;
+use Zynga\PHPUnit\V2\TestResult;
 
 /**
  * A Test can be run and collect its results.
@@ -20,16 +20,15 @@ use \PHPUnit_Framework_TestResult;
  * @since      Interface available since Release 2.0.0
  */
 interface TestInterface extends Countable {
+
   /**
    * Runs a test and collects its result in a TestResult instance.
    *
-   * @param PHPUnit_Framework_TestResult $result
+   * @param TestResult $result
    *
-   * @return PHPUnit_Framework_TestResult
+   * @return TestResult
    */
-  public function run(
-    ?PHPUnit_Framework_TestResult $result = null,
-  ): PHPUnit_Framework_TestResult;
+  public function run(?TestResult $result = null): TestResult;
 
   public function getClass(): string;
   public function getName(): string;

@@ -9,6 +9,7 @@
  */
 
 use Zynga\PHPUnit\V2\Interfaces\TestInterface;
+use Zynga\PHPUnit\V2\TestResult;
 
 /**
  * A Decorator for Tests.
@@ -52,9 +53,9 @@ class PHPUnit_Extensions_TestDecorator extends PHPUnit_Framework_Assert implemen
      * Runs the test and collects the
      * result in a TestResult.
      *
-     * @param PHPUnit_Framework_TestResult $result
+     * @param TestResult $result
      */
-    public function basicRun(PHPUnit_Framework_TestResult $result)
+    public function basicRun(TestResult $result)
     {
         $this->test->run($result);
     }
@@ -73,11 +74,11 @@ class PHPUnit_Extensions_TestDecorator extends PHPUnit_Framework_Assert implemen
     /**
      * Creates a default TestResult object.
      *
-     * @return PHPUnit_Framework_TestResult
+     * @return TestResult
      */
     protected function createResult()
     {
-        return new PHPUnit_Framework_TestResult;
+        return new TestResult;
     }
 
     /**
@@ -94,11 +95,11 @@ class PHPUnit_Extensions_TestDecorator extends PHPUnit_Framework_Assert implemen
      * Runs the decorated test and collects the
      * result in a TestResult.
      *
-     * @param PHPUnit_Framework_TestResult $result
+     * @param TestResult $result
      *
-     * @return PHPUnit_Framework_TestResult
+     * @return TestResult
      */
-    public function run(PHPUnit_Framework_TestResult $result = null)
+    public function run(TestResult $result = null)
     {
         if ($result === null) {
             $result = $this->createResult();

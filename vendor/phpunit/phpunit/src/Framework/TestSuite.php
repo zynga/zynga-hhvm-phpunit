@@ -18,6 +18,8 @@ use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
 use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\TestCase;
+use Zynga\PHPUnit\V2\TestResult;
+use Zynga\PHPUnit\V2\TestSuite;
 
 /**
  * A TestSuite is a composite of Tests. It runs a collection of test cases.
@@ -52,6 +54,7 @@ use Zynga\PHPUnit\V2\TestCase;
 
 // JEO: removed iterator aggregate IteratorAggregate as it expectx <T>
 class PHPUnit_Framework_TestSuite
+ extends TestSuite
   implements TestInterface, PHPUnit_Framework_SelfDescribing {
   /**
    * Last count of tests in this suite.
@@ -85,25 +88,12 @@ class PHPUnit_Framework_TestSuite
   protected $runTestInSeparateProcess = false;
 
   /**
-   * The name of the test suite.
-   *
-   * @var string
-   */
-  private string $_name = '';
-
-  /**
    * The test groups of the test suite.
    *
    * @var array
    */
   protected $groups = [];
 
-  /**
-   * The tests in the test suite.
-   *
-   * @var array
-   */
-  protected $tests = [];
 
   /**
    * The number of tests in the test suite.
@@ -150,6 +140,9 @@ class PHPUnit_Framework_TestSuite
    * @throws PHPUnit_Framework_Exception
    */
   public function __construct($theClass = '', $name = '') {
+
+    parent::__construct();
+
     $argumentsValid = false;
 
     if (is_object($theClass) && $theClass instanceof ReflectionClass) {
@@ -214,7 +207,7 @@ class PHPUnit_Framework_TestSuite
       $this->addTestMethod($theClass, $method);
     }
 
-    if (empty($this->tests)) {
+    if ($this->getTestCount() == 0) {
       $this->addTest(
         self::warning(
           sprintf('No tests found in class "%s".', $theClass->getName()),
@@ -236,46 +229,6 @@ class PHPUnit_Framework_TestSuite
    */
   public function toString() {
     return $this->getName();
-  }
-
-  public function getClass() {
-    return get_class($this);
-  }
-
-  /**
-   * Adds a test to the suite.
-   *
-   * @param TestInterface $test
-   * @param array                  $groups
-   */
-  public function addTest(TestInterface $test, $groups = []) {
-    $class = ReflectionClasses::getReflection($test);
-
-    if (!$class->isAbstract()) {
-
-      $this->tests[] = $test;
-      $this->numTests = -1;
-
-      if ($test instanceof self && empty($groups)) {
-        $groups = $test->getGroups();
-      }
-
-      if (empty($groups)) {
-        $groups = ['default'];
-      }
-
-      foreach ($groups as $group) {
-        if (!isset($this->groups[$group])) {
-          $this->groups[$group] = [$test];
-        } else {
-          $this->groups[$group][] = $test;
-        }
-      }
-
-      if ($test instanceof ZyngaTestCaseBase || $test instanceof TestCase) {
-        $test->setGroups($groups);
-      }
-    }
   }
 
   /**
@@ -436,29 +389,29 @@ class PHPUnit_Framework_TestSuite
     }
   }
 
-  /**
-   * Counts the number of test cases that will be run by this test.
-   *
-   * @param bool $preferCache Indicates if cache is preferred.
-   *
-   * @return int
-   */
-  public function count($preferCache = false) {
-
-    if ($preferCache && $this->cachedNumTests !== null) {
-      $numTests = $this->cachedNumTests;
-    } else {
-      $numTests = 0;
-
-      foreach ($this->tests as $test) {
-        $numTests += $test->count();
-      }
-
-      $this->cachedNumTests = $numTests;
-    }
-
-    return $numTests;
-  }
+  // /**
+  //  * Counts the number of test cases that will be run by this test.
+  //  *
+  //  * @param bool $preferCache Indicates if cache is preferred.
+  //  *
+  //  * @return int
+  //  */
+  // public function count($preferCache = false) {
+  //
+  //   if ($preferCache && $this->cachedNumTests !== null) {
+  //     $numTests = $this->cachedNumTests;
+  //   } else {
+  //     $numTests = 0;
+  //
+  //     foreach ($this->tests() as $test) {
+  //       $numTests += $test->count();
+  //     }
+  //
+  //     $this->cachedNumTests = $numTests;
+  //   }
+  //
+  //   return $numTests;
+  // }
 
   public function getCount(bool $preferCache = false): int {
     return $this->count($preferCache);
@@ -490,6 +443,8 @@ class PHPUnit_Framework_TestSuite
 
     $constructor = $theClass->getConstructor();
 
+    $test = null;
+
     if ($constructor !== null) {
       $parameters = $constructor->getParameters();
       // TestCase() or TestCase($name)
@@ -497,6 +452,8 @@ class PHPUnit_Framework_TestSuite
         $test = new $className($name);
       } // TestCase($name, $data)
       else {
+        $t = null;
+        $data = null;
         try {
           $data = PHPUnit_Util_Test::getProvidedData($className, $name);
         } catch (IncompleteException $e) {
@@ -535,7 +492,7 @@ class PHPUnit_Framework_TestSuite
           $t = $_t;
         }
 
-        if (isset($t)) {
+        if ($t instanceof Exception) {
           $message = sprintf(
             'The data provider specified for %s::%s is invalid.',
             $className,
@@ -633,34 +590,10 @@ class PHPUnit_Framework_TestSuite
   /**
    * Creates a default TestResult object.
    *
-   * @return PHPUnit_Framework_TestResult
+   * @return TestResult
    */
-  protected function createResult() {
-    return new PHPUnit_Framework_TestResult();
-  }
-
-  /**
-   * Returns the name of the suite.
-   *
-   * @return string
-   */
-  public function getName() {
-    return $this->_name;
-  }
-
-  /**
-   * Returns the test groups of the suite.
-   *
-   * @return array
-   *
-   * @since Method available since Release 3.2.0
-   */
-  public function getGroups() {
-    return array_keys($this->groups);
-  }
-
-  public function getGroupDetails() {
-    return $this->groups;
+  protected function createResult(): TestResult {
+    return new TestResult();
   }
 
   /**
@@ -677,11 +610,11 @@ class PHPUnit_Framework_TestSuite
   /**
    * Runs the tests and collects their result in a TestResult.
    *
-   * @param PHPUnit_Framework_TestResult $result
+   * @param TestResult $result
    *
-   * @return PHPUnit_Framework_TestResult
+   * @return TestResult
    */
-  public function run(?PHPUnit_Framework_TestResult $result = null) {
+  public function run(?TestResult $result = null) {
     if ($result === null) {
       $result = $this->createResult();
     }
@@ -690,7 +623,7 @@ class PHPUnit_Framework_TestSuite
       return $result;
     }
 
-    $hookMethods = PHPUnit_Util_Test::getHookMethods($this->_name);
+    $hookMethods = PHPUnit_Util_Test::getHookMethods($this->getName());
 
     $result->startTestSuite($this);
 
@@ -710,11 +643,11 @@ class PHPUnit_Framework_TestSuite
 
       foreach ($hookMethods['beforeClass'] as $beforeClassMethod) {
         if ($this->testCase === true &&
-            class_exists($this->_name, false) &&
-            method_exists($this->_name, $beforeClassMethod)) {
+            class_exists($this->getName(), false) &&
+            method_exists($this->getName(), $beforeClassMethod)) {
 
           $missingRequirements = PHPUnit_Util_Test::getMissingRequirements(
-            $this->_name,
+            $this->getName(),
             $beforeClassMethod,
           );
 
@@ -739,8 +672,8 @@ class PHPUnit_Framework_TestSuite
 
       for ($i = 0; $i < $numTests; $i++) {
         $result->startTest($this);
-        $result->addFailure($this, $e, 0);
-        $result->endTest($this, 0);
+        $result->addFailure($this, $e, 0.0);
+        $result->endTest($this, 0.0);
       }
 
       $this->tearDown();
@@ -813,57 +746,10 @@ class PHPUnit_Framework_TestSuite
    * @deprecated
    *
    * @param TestInterface       $test
-   * @param PHPUnit_Framework_TestResult $result
+   * @param TestResult $result
    */
-  public function runTest(
-    TestInterface $test,
-    PHPUnit_Framework_TestResult $result,
-  ) {
+  public function runTest(TestInterface $test, TestResult $result) {
     $test->run($result);
-  }
-
-  /**
-   * Sets the name of the suite.
-   *
-   * @param  string
-   */
-  public function setName(string $name): void {
-    $this->_name = $name;
-  }
-
-  /**
-   * Returns the test at the given index.
-   *
-   * @param  int|false
-   *
-   * @return TestInterface
-   */
-  public function testAt($index) {
-    if (isset($this->tests[$index])) {
-      return $this->tests[$index];
-    } else {
-      return false;
-    }
-  }
-
-  /**
-   * Returns the tests as an enumeration.
-   *
-   * @return array
-   */
-  public function tests() {
-    return $this->tests;
-  }
-
-  /**
-   * Set tests of the test suite
-   *
-   * @param array $tests
-   *
-   * @since Method available since Release 4.0.0
-   */
-  public function setTests(array $tests) {
-    $this->tests = $tests;
   }
 
   /**
@@ -927,6 +813,7 @@ class PHPUnit_Framework_TestSuite
       $test,
       PHPUnit_Util_Test::getGroups($class->getName(), $name),
     );
+    
   }
 
   /**
@@ -1043,7 +930,7 @@ class PHPUnit_Framework_TestSuite
 
   public function injectFilter(PHPUnit_Runner_Filter_Factory $filter) {
     $this->iteratorFilter = $filter;
-    foreach ($this->tests as $test) {
+    foreach ($this->tests() as $test) {
       if ($test instanceof self) {
         // echo "injecting! to=" . get_class($test) . ' name=' . $this->getName() . "\n";
         $test->injectFilter($filter);
@@ -1051,19 +938,4 @@ class PHPUnit_Framework_TestSuite
     }
   }
 
-  /**
-   * Template Method that is called before the tests
-   * of this test suite are run.
-   *
-   * @since Method available since Release 3.1.0
-   */
-  protected function setUp() {}
-
-  /**
-   * Template Method that is called after the tests
-   * of this test suite have finished running.
-   *
-   * @since Method available since Release 3.1.0
-   */
-  protected function tearDown() {}
 }

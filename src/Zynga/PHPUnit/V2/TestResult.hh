@@ -2,11 +2,46 @@
 
 namespace Zynga\PHPUnit\V2;
 
+use SebastianBergmann\CodeCoverage\CodeCoverage;
+use SebastianBergmann\CodeCoverage\CoveredCodeNotExecutedException;
+use SebastianBergmann\CodeCoverage\Exception as CodeCoverageException;
+use SebastianBergmann\CodeCoverage\MissingCoversAnnotationException;
+use SebastianBergmann\CodeCoverage\UnintentionallyCoveredCodeException;
+
+use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
+use SebastianBergmann\PHPUnit\Exceptions\ExpectationFailedException;
+use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentException;
+use SebastianBergmann\PHPUnit\Exceptions\WarningException;
+use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
+use SebastianBergmann\PHPUnit\Exceptions\TestError\RiskyException;
+use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
+
+use SebastianBergmann\ResourceOperations\ResourceOperations;
+
+use Zynga\Framework\Performance\V1\Tracker as PerformanceTracker;
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
+
 use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
+use Zynga\PHPUnit\V2\Profiler\XDebug;
 use Zynga\PHPUnit\V2\TestResult\Listeners;
 use Zynga\PHPUnit\V2\TestResult\TestFailures;
+use Zynga\PHPUnit\V2\TestCase\Size;
+
 use \Exception;
+use \PHPUnit_Framework_CoveredCodeNotExecutedException;
+use \PHPUnit_Framework_Exception;
+use \PHPUnit_Framework_ExceptionWrapper;
+use \PHPUnit_Framework_InvalidCoversTargetException;
+//use \PHPUnit_Framework_MockObject_Exception;
+use \PHPUnit_Framework_MissingCoversAnnotationException;
+use \PHPUnit_Framework_OutputError;
+use \PHPUnit_Framework_TestSuite;
+use \PHPUnit_Framework_WarningTestCase;
+use \PHPUnit_Framework_UnintentionallyCoveredCodeError;
+use \PHPUnit_Util_Blacklist;
+use \PHPUnit_Util_Test;
 
 class TestResult {
   private Listeners $_listeners;
@@ -21,6 +56,24 @@ class TestResult {
   private bool $_stopOnSkipped;
   private float $_time;
 
+  private bool $_beStrictAboutTestsThatDoNotTestAnything;
+  private bool $_beStrictAboutOutputDuringTests;
+  private bool $_beStrictAboutTodoAnnotatedTests;
+  private bool $_beStrictAboutResourceUsageDuringSmallTests;
+
+  private int $_runTests;
+
+  private bool $_enforceTimeLimit;
+  private int $_timeoutForSmallTests;
+  private int $_timeoutForMediumTests;
+  private int $_timeoutForLargeTests;
+  private Map<string, Map<string, mixed>> $_passed;
+  private ?PHPUnit_Framework_TestSuite $_topTestSuite;
+  private ?CodeCoverage $_codeCoverage;
+  private bool $_convertErrorsToExceptions;
+  private bool $_errorHandlerSet;
+  private mixed $_errorHandlerPrevious;
+
   public function __construct() {
     $this->_listeners = new Listeners();
     $this->_testFailures = new TestFailures();
@@ -33,6 +86,21 @@ class TestResult {
     $this->_stopOnIncomplete = false;
     $this->_stopOnSkipped = false;
     $this->_time = 0.0;
+    $this->_runTests = 0;
+    $this->_enforceTimeLimit = false;
+    $this->_timeoutForSmallTests = 1;
+    $this->_timeoutForMediumTests = 10;
+    $this->_timeoutForLargeTests = 60;
+    $this->_beStrictAboutTestsThatDoNotTestAnything = false;
+    $this->_beStrictAboutOutputDuringTests = false;
+    $this->_beStrictAboutTodoAnnotatedTests = false;
+    $this->_beStrictAboutResourceUsageDuringSmallTests = false;
+    $this->_passed = Map {};
+    $this->_topTestSuite = null;
+    $this->_codeCoverage = null;
+    $this->_convertErrorsToExceptions = true;
+    $this->_errorHandlerSet = false;
+    $this->_errorHandlerPrevious = null;
   }
 
   public function listeners(): Listeners {
@@ -404,6 +472,593 @@ class TestResult {
   final public function addToTime(float $t): bool {
     $this->_time += $t;
     return true;
+  }
+
+  /**
+   * @param bool $flag
+   *
+   * @throws PHPUnit_Framework_Exception
+   *
+   * @since Method available since Release 4.2.0
+   */
+  final public function beStrictAboutTodoAnnotatedTests(bool $flag): void {
+    $this->_beStrictAboutTodoAnnotatedTests = $flag;
+  }
+
+  /**
+   * @return bool
+   *
+   * @since Method available since Release 4.2.0
+   */
+  final public function isStrictAboutTodoAnnotatedTests(): bool {
+    return $this->_beStrictAboutTodoAnnotatedTests;
+  }
+
+  /**
+   * @param bool $flag
+   *
+   * @throws PHPUnit_Framework_Exception
+   *
+   * @since Method available since Release 5.0.0
+   */
+  final public function beStrictAboutResourceUsageDuringSmallTests(
+    bool $flag,
+  ): void {
+    $this->_beStrictAboutResourceUsageDuringSmallTests = $flag;
+  }
+
+  /**
+   * @return bool
+   *
+   * @since Method available since Release 5.0.0
+   */
+  final public function isStrictAboutResourceUsageDuringSmallTests(): bool {
+    return $this->_beStrictAboutResourceUsageDuringSmallTests;
+  }
+
+  /**
+   * @param bool $flag
+   *
+   * @throws PHPUnit_Framework_Exception
+   *
+   * @since Method available since Release 4.0.0
+   */
+  final public function beStrictAboutOutputDuringTests(bool $flag): void {
+    $this->_beStrictAboutOutputDuringTests = $flag;
+  }
+
+  /**
+   * @return bool
+   *
+   * @since Method available since Release 4.0.0
+   */
+  final public function isStrictAboutOutputDuringTests(): bool {
+    return $this->_beStrictAboutOutputDuringTests;
+  }
+
+  /**
+   * @param bool $flag
+   *
+   * @throws PHPUnit_Framework_Exception
+   *
+   * @since Method available since Release 4.0.0
+   */
+  final public function beStrictAboutTestsThatDoNotTestAnything(
+    bool $flag,
+  ): void {
+    $this->_beStrictAboutTestsThatDoNotTestAnything = $flag;
+  }
+
+  /**
+   * @return bool
+   *
+   * @since Method available since Release 4.0.0
+   */
+  final public function isStrictAboutTestsThatDoNotTestAnything(): bool {
+    return $this->_beStrictAboutTestsThatDoNotTestAnything;
+  }
+
+  /**
+   * Gets the number of run tests.
+   *
+   * @return int
+   */
+  final public function count(): int {
+    return $this->_runTests;
+  }
+
+  final public function incrementRunTest(int $amt = 0): bool {
+    $this->_runTests += $amt;
+    return true;
+  }
+
+  /**
+   * Sets the timeout for small tests.
+   *
+   * @param int $timeout
+   *
+   * @throws PHPUnit_Framework_Exception
+   *
+   * @since Method available since Release 3.6.0
+   */
+  public function setTimeoutForSmallTests(int $timeout): void {
+    $this->_timeoutForSmallTests = $timeout;
+  }
+
+  /**
+   * Sets the timeout for medium tests.
+   *
+   * @param int $timeout
+   *
+   * @throws PHPUnit_Framework_Exception
+   *
+   * @since Method available since Release 3.6.0
+   */
+  final public function setTimeoutForMediumTests(int $timeout): void {
+    $this->_timeoutForMediumTests = $timeout;
+  }
+
+  /**
+   * Sets the timeout for large tests.
+   *
+   * @param int $timeout
+   *
+   * @throws PHPUnit_Framework_Exception
+   *
+   * @since Method available since Release 3.6.0
+   */
+  final public function setTimeoutForLargeTests(int $timeout): void {
+    $this->_timeoutForLargeTests = $timeout;
+  }
+
+  /**
+   * Returns the set timeout for large tests.
+   *
+   * @return int
+   */
+  final public function getTimeoutForLargeTests(): int {
+    return $this->_timeoutForLargeTests;
+  }
+
+  /**
+   * @param bool $flag
+   *
+   * @throws PHPUnit_Framework_Exception
+   *
+   * @since Method available since Release 5.0.0
+   */
+  public function enforceTimeLimit(bool $flag): void {
+    $this->_enforceTimeLimit = $flag;
+  }
+
+  /**
+   * @return bool
+   *
+   * @since Method available since Release 5.0.0
+   */
+  public function enforcesTimeLimit(): bool {
+    return $this->_enforceTimeLimit;
+  }
+
+  /**
+   * Informs the result that a testsuite will be started.
+   *
+   * @param PHPUnit_Framework_TestSuite $suite
+   *
+   * @since Method available since Release 2.2.0
+   */
+  final public function startTestSuite(TestInterface $suite): void {
+
+    $this->listeners()->startTestSuite($suite);
+
+    if ($this->_topTestSuite === null &&
+        $suite instanceof PHPUnit_Framework_TestSuite) {
+      $this->_topTestSuite = $suite;
+    }
+
+  }
+
+  /**
+   * Informs the result that a testsuite was completed.
+   *
+   * @param PHPUnit_Framework_TestSuite $suite
+   *
+   * @since Method available since Release 2.2.0
+   */
+  final public function endTestSuite(TestInterface $suite): void {
+    $this->listeners()->endTestSuite($suite);
+  }
+
+  /**
+   * Informs the result that a test will be started.
+   *
+   * @param TestInterface $test
+   */
+  final public function startTest(TestInterface $test): void {
+
+    $this->setLastTestFailed(false);
+    $this->incrementRunTest($test->count());
+    $this->listeners()->startTest($test);
+
+  }
+
+  /**
+   * Informs the result that a test was completed.
+   *
+   * @param TestInterface $test
+   * @param float                  $time
+   */
+  final public function endTest(TestInterface $test, float $time): void {
+    $this->listeners()->endTest($test, $time);
+
+    if (!$this->getLastTestFailed() && $test instanceof TestCase) {
+      $class = $test->getClass();
+      $key = $class.'::'.$test->getName();
+
+      $data = Map {
+        'result' => $test->getResult(),
+        'size' => $test->getSize(),
+      };
+
+      $this->_passed->set($key, $data);
+
+      $this->addToTime($time);
+    }
+  }
+
+  /**
+   * Enables or disables the error-to-exception conversion.
+   *
+   * @param bool $flag
+   *
+   * @throws PHPUnit_Framework_Exception
+   *
+   * @since Method available since Release 3.2.14
+   */
+  final public function convertErrorsToExceptions(bool $flag): void {
+    $this->_convertErrorsToExceptions = $flag;
+  }
+
+  /**
+   * Returns the error-to-exception conversion setting.
+   *
+   * @return bool
+   *
+   * @since Method available since Release 3.4.0
+   */
+  final public function getConvertErrorsToExceptions(): bool {
+    return $this->_convertErrorsToExceptions;
+  }
+  /**
+   * Returns the code coverage object.
+   *
+   * @return CodeCoverage
+   *
+   * @since Method available since Release 3.5.0
+   */
+  final public function getCodeCoverage(): ?CodeCoverage {
+    return $this->_codeCoverage;
+  }
+
+  /**
+   * Sets the code coverage object.
+   *
+   * @param CodeCoverage $codeCoverage
+   *
+   * @since Method available since Release 3.6.0
+   */
+  final public function setCodeCoverage(CodeCoverage $codeCoverage): void {
+    $this->_codeCoverage = $codeCoverage;
+  }
+
+  /**
+   * Returns the names of the tests that have passed.
+   *
+   * @return array
+   *
+   * @since Method available since Release 3.4.0
+   */
+  final public function passed(): Map<string, Map<string, mixed>> {
+    return $this->_passed;
+  }
+
+  /**
+   * Returns the (top) test suite.
+   *
+   * @return PHPUnit_Framework_TestSuite
+   *
+   * @since Method available since Release 3.0.0
+   */
+  public function topTestSuite(): ?PHPUnit_Framework_TestSuite {
+    return $this->_topTestSuite;
+  }
+
+  /**
+   * Returns whether code coverage information should be collected.
+   *
+   * @return bool If code coverage should be collected
+   *
+   * @since Method available since Release 3.2.0
+   */
+  public function getCollectCodeCoverageInformation(): bool {
+    return $this->_codeCoverage !== null;
+  }
+
+  public function run_handleErrorHandler(): void {
+    if ($this->_convertErrorsToExceptions) {
+      $this->_errorHandlerPrevious = set_error_handler(
+        ['PHPUnit_Util_ErrorHandler', 'handleError'],
+        E_ALL | E_STRICT,
+      );
+
+      if ($this->_errorHandlerPrevious === null) {
+        $this->_errorHandlerSet = true;
+      } else {
+        // clear the error handler in case of bad, or failed handlers as null
+        // is reused to indicate a bad callback also (yay php).
+        restore_error_handler();
+      }
+    }
+  }
+
+  public function run_handleRestoreErrorHandler(): void {
+    if ($this->_errorHandlerSet == true) {
+      restore_error_handler();
+      $this->_errorHandlerPrevious = null;
+    }
+  }
+
+  /**
+   * Runs a TestCase.
+   *
+   * @param TestInterface $test
+   */
+  public function run(TestInterface $test): void {
+
+    // --
+    // JEO: Come up with a better refinement method than this, pretty sure I am
+    // fighting the type checker here for no solid reason.
+    // --
+    if (!$test instanceof TestCase) {
+      return;
+    }
+
+    $test->resetCount();
+
+    $e = null;
+    $error = false;
+    $failure = false;
+    $warning = false;
+    $incomplete = false;
+    $risky = false;
+    $skipped = false;
+
+    $this->startTest($test);
+
+    $this->run_handleErrorHandler();
+
+    $codeCoverage = $this->getCodeCoverage();
+
+    $collectCodeCoverage =
+      $codeCoverage !== null &&
+      !$test instanceof PHPUnit_Framework_WarningTestCase;
+
+    if ($collectCodeCoverage && $codeCoverage instanceof CodeCoverage) {
+      $codeCoverage->start($test);
+    }
+
+    $monitorFunctions =
+      $this->isStrictAboutResourceUsageDuringSmallTests() &&
+      !$test instanceof PHPUnit_Framework_WarningTestCase &&
+      $test->getSize() == Size::SMALL &&
+      function_exists('xdebug_start_function_monitor');
+
+    if ($monitorFunctions) {
+      XDebug::startMonitoringFunctions(ResourceOperations::getFunctions());
+    }
+
+    $perf = new PerformanceTracker();
+    $perf->startTimer('run');
+
+    try {
+      $test->runBare();
+
+      // @TODO: Cleanup this block.
+      // JEO: I am pretty sure mock objects don't work anymore therefor this trap
+      // is also dead.
+      // } catch (PHPUnit_Framework_MockObject_Exception $e) {
+      //   $e = new WarningException($e->getMessage());
+      //   $warning = true;
+    } catch (InvalidArgumentException $e) {
+      $error = true;
+    } catch (SkippedException $e) {
+      $failure = true;
+      $skipped = true;
+    } catch (RiskyException $e) {
+      $failure = true;
+      $risky = true;
+    } catch (IncompleteException $e) {
+      $failure = true;
+      $incomplete = true;
+    } catch (WarningException $e) {
+      $warning = true;
+    } catch (PHPUnit_Framework_Exception $e) {
+      $error = true;
+    } catch (AssertionFailedException $e) {
+      $failure = true;
+    } catch (ExpectationFailedException $e) {
+      $failure = true;
+      // @TODO: cleanup this catch as it doesn't apply anymore.
+      // JEO: you cannot bind against throwable in hack strict.
+      // } catch (Throwable $e) {
+      //   $e = new PHPUnit_Framework_ExceptionWrapper($e);
+      //   $error = true;
+    } catch (Exception $e) {
+      // var_dump('TestResult::Exception trap');
+      // var_dump(get_class($e));
+      // var_dump($e->getMessage());
+      // // var_dump(debug_backtrace(2));
+      // var_dump($e->getTrace());
+      // exit();
+      $e = new PHPUnit_Framework_ExceptionWrapper($e);
+      $error = true;
+    }
+
+    $perf->endTimer('run');
+    $runPerf = $perf->getTimer('run');
+    $time = $runPerf->getElapsedTime();
+
+    // $test->addToAssertionCount(PHPUnit_Framework_Assert::getCount());
+    $test->addToAssertionCount($test->getCount());
+
+    if ($monitorFunctions) {
+      $functions = XDebug::getMonitoredFunctions();
+
+      XDebug::stopMonitoringFunctions();
+
+      foreach ($functions as $function) {
+
+        $this->addFailure(
+          $test,
+          new RiskyException(
+            sprintf(
+              '%s() used in %s:%s',
+              $function['function'],
+              $function['filename'],
+              $function['lineno'],
+            ),
+          ),
+          $time,
+        );
+
+      }
+    }
+
+    if ($this->isStrictAboutTestsThatDoNotTestAnything() &&
+        $test->getNumAssertions() == 0) {
+      $risky = true;
+    }
+
+    if ($collectCodeCoverage) {
+
+      try {
+
+        if ($codeCoverage instanceof CodeCoverage) {
+          $codeCoverage->stop();
+          // @TODO: This function signature was here in stop(...)
+          //$codeCoverage->stop($append, $linesToBeCovered, $linesToBeUsed);
+        }
+
+      } catch (UnintentionallyCoveredCodeException $cce) {
+        if (!$test->isMedium() && !$test->isLarge()) {
+          $this->addFailure(
+            $test,
+            new PHPUnit_Framework_UnintentionallyCoveredCodeError(
+              'This test executed code that is not listed as code to be covered or used:'.
+              PHP_EOL.
+              $cce->getMessage(),
+            ),
+            $time,
+          );
+        }
+      } catch (CoveredCodeNotExecutedException $cce) {
+        $this->addFailure(
+          $test,
+          new PHPUnit_Framework_CoveredCodeNotExecutedException(
+            'This test did not execute all the code that is listed as code to be covered:'.
+            PHP_EOL.
+            $cce->getMessage(),
+          ),
+          $time,
+        );
+      } catch (MissingCoversAnnotationException $cce) {
+        $this->addFailure(
+          $test,
+          new PHPUnit_Framework_MissingCoversAnnotationException(
+            'This test does not have a @covers annotation but is expected to have one',
+          ),
+          $time,
+        );
+      } catch (Exception $ue) {
+        $error = true;
+        $e = $ue;
+        // --
+        // JEO: frame debugging.
+        // --
+        // $frame = 0;
+        //foreach ( $e->getTrace() as $traceItem ) {
+        //  echo "Trace frame=$frame\n";
+        //  var_dump($traceItem);
+        //  $frame++;
+        //}
+        //var_dump($e);
+      }
+    }
+
+    $this->run_handleRestoreErrorHandler();
+
+    // if ($e instanceof Exception) {
+    //   var_dump('ThrowExceptionTestResult::trap');
+    //   var_dump('name='.$test->getName(false));
+    //   var_dump('class='.get_class($e));
+    //   var_dump('trace=');
+    //   var_dump($e->getTrace());
+    //
+    //   var_dump('error='.$error);
+    //   var_dump('failure='.$failure);
+    //   var_dump('skipped='.$skipped);
+    //   exit();
+    // }
+
+    if ($error === true && !$e instanceof Exception) {
+      // @TODO: See if this is still true, while the code is un-typed it
+      //        is true.
+      // --
+      // Not 100% certain this cannot happen, but as we tighten up the types
+      // throughout the code, I wanted to leave this trap in.
+      // --
+      error_log(
+        'JEO WARNING - NON-Exception based error thrown e='.gettype($e),
+      );
+    } else if ($error === true && $e instanceof Exception) {
+      $this->addError($test, $e, $time);
+    } else if ($failure === true && $e instanceof Exception) {
+      $this->addFailure($test, $e, $time);
+    } else if ($warning === true && $e instanceof Exception) {
+      $this->addWarning($test, $e, $time);
+    } else if ($this->isStrictAboutTestsThatDoNotTestAnything() &&
+               $test->getNumAssertions() == 0) {
+      $this->addFailure(
+        $test,
+        new RiskyException('This test did not perform any assertions'),
+        $time,
+      );
+    } else if ($this->isStrictAboutOutputDuringTests() &&
+               $test->hasOutput()) {
+      $this->addFailure(
+        $test,
+        new PHPUnit_Framework_OutputError(
+          sprintf('This test printed output: %s', $test->getActualOutput()),
+        ),
+        $time,
+      );
+    } else if ($this->isStrictAboutTodoAnnotatedTests() &&
+               $test instanceof TestCase) {
+
+      $annotations = $test->getAnnotationsForKey('method', 'todo');
+
+      if ($annotations->count() > 0) {
+        $this->addFailure(
+          $test,
+          new RiskyException('Test method is annotated with @todo'),
+          $time,
+        );
+      }
+
+    }
+
+    $this->endTest($test, $time);
+
   }
 
 }

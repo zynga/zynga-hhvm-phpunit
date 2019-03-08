@@ -12,6 +12,7 @@ use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
 use Zynga\PHPUnit\V2\Interfaces\TestInterface;
+use Zynga\PHPUnit\V2\TestResult;
 
 /**
  * Runner for PHPT test cases.
@@ -124,17 +125,17 @@ class PHPUnit_Extensions_PhptTestCase implements TestInterface, PHPUnit_Framewor
     /**
      * Runs a test and collects its result in a TestResult instance.
      *
-     * @param PHPUnit_Framework_TestResult $result
+     * @param TestResult $result
      *
-     * @return PHPUnit_Framework_TestResult
+     * @return TestResult
      */
-    public function run(PHPUnit_Framework_TestResult $result = null)
+    public function run(TestResult $result = null)
     {
         $sections = $this->parse();
         $code     = $this->render($sections['FILE']);
 
         if ($result === null) {
-            $result = new PHPUnit_Framework_TestResult;
+            $result = new TestResult();
         }
 
         $skip     = false;

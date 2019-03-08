@@ -21,7 +21,7 @@ use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 use Zynga\Framework\Dynamic\V1\DynamicMethodCall;
 
 // JEO: needs conversion.
-use \PHPUnit_Framework_TestResult;
+use Zynga\PHPUnit\V2\TestResult;
 
 use \Throwable;
 use \Exception;
@@ -64,8 +64,8 @@ abstract class TestCase extends Assertions implements TestInterface {
   private int $_numAssertions;
   private Vector<string> $_dependencies;
   private bool $_hasDependencies;
-  private ?PHPUnit_Framework_TestResult $_result;
-  private ?PHPUnit_Framework_TestResult $_testResult;
+  private ?TestResult $_result;
+  private ?TestResult $_testResult;
   private Vector<mixed> $_data;
   private string $_dataName;
 
@@ -895,10 +895,10 @@ abstract class TestCase extends Assertions implements TestInterface {
   /**
    * Creates a default TestResult object.
    *
-   * @return PHPUnit_Framework_TestResult
+   * @return TestResult
    */
-  final public function createResult(): PHPUnit_Framework_TestResult {
-    return new PHPUnit_Framework_TestResult();
+  final public function createResult(): TestResult {
+    return new TestResult();
   }
 
   /**
@@ -906,14 +906,12 @@ abstract class TestCase extends Assertions implements TestInterface {
    *
    * @since Method available since Release 3.4.0
    */
-  final public function setResult(
-    ?PHPUnit_Framework_TestResult $result,
-  ): bool {
+  final public function setResult(?TestResult $result): bool {
     $this->_testResult = $result;
     return true;
   }
 
-  final public function getResult(): PHPUnit_Framework_TestResult {
+  final public function getResult(): TestResult {
     if ($this->_testResult == null) {
       $this->_testResult = $this->createResult();
     }
@@ -921,23 +919,21 @@ abstract class TestCase extends Assertions implements TestInterface {
   }
 
   /**
-   * @param PHPUnit_Framework_TestResult $result
+   * @param TestResult $result
    *
    * @since Method available since Release 3.6.0
    */
-  final public function setTestResultObject(
-    PHPUnit_Framework_TestResult $result,
-  ): bool {
+  final public function setTestResultObject(TestResult $result): bool {
     $this->_result = $result;
     return true;
   }
 
   /**
-   * @return PHPUnit_Framework_TestResult
+   * @return TestResult
    *
    * @since Method available since Release 3.5.7
    */
-  final public function getTestResultObject(): ?PHPUnit_Framework_TestResult {
+  final public function getTestResultObject(): ?TestResult {
     return $this->_result;
   }
 
@@ -1014,7 +1010,7 @@ abstract class TestCase extends Assertions implements TestInterface {
       $tr = $this->getTestResultObject();
 
       $passed = array();
-      if ($tr instanceof PHPUnit_Framework_TestResult) {
+      if ($tr instanceof TestResult) {
         $passed = $tr->passed();
       }
 
@@ -1083,15 +1079,13 @@ abstract class TestCase extends Assertions implements TestInterface {
    * Runs the test case and collects the results in a TestResult object.
    * If no TestResult object is passed a new one will be created.
    *
-   * @param PHPUnit_Framework_TestResult $result
+   * @param TestResult $result
    *
-   * @return PHPUnit_Framework_TestResult
+   * @return TestResult
    *
    * @throws PHPUnit_Framework_Exception
    */
-  final public function run(
-    ?PHPUnit_Framework_TestResult $result = null,
-  ): PHPUnit_Framework_TestResult {
+  final public function run(?TestResult $result = null): TestResult {
 
     if ($result === null) {
       $result = $this->createResult();
@@ -1200,6 +1194,7 @@ abstract class TestCase extends Assertions implements TestInterface {
     $testResult = null;
 
     try {
+
       $class = ReflectionClasses::getReflection($this);
 
       if ($class instanceof ReflectionClass) {
@@ -1313,7 +1308,7 @@ abstract class TestCase extends Assertions implements TestInterface {
 
       $t_result = $this->runTest();
 
-      if ($t_result instanceof PHPUnit_Framework_TestResult) {
+      if ($t_result instanceof TestResult) {
         $this->setResult($t_result);
       }
 
@@ -1358,7 +1353,6 @@ abstract class TestCase extends Assertions implements TestInterface {
 
     try {
 
-      // error_log('JEO stopOutputBuffering');
       $this->stopOutputBuffering();
 
     } catch (RiskyException $_e) {
@@ -1384,16 +1378,6 @@ abstract class TestCase extends Assertions implements TestInterface {
 
       $expectedOutputRegex = $this->getExpectedOutputRegex();
       $expectedOutput = $this->getExpectedOutput();
-
-      // var_dump(get_class($this));
-      // error_log('JEO expectedOutputRegex=' . $expectedOutputRegex);
-      // error_log('JEO output=' . $output);
-      // if ( $e instanceof Exception ) {
-      //   error_log('JEO e=' . $e->getMessage() . ' eClass=' . get_class($e));
-      // } else {
-      //   error_log('JEO unknown e=' . json_encode($e));
-      // }
-      // error_log('JEO output-END');
 
       if (is_string($expectedOutputRegex)) {
         $this->assertRegExp($expectedOutputRegex, $output);

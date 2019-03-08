@@ -23,6 +23,7 @@ use SebastianBergmann\CodeCoverage\Report\Xml\Facade as XmlReport;
 use SebastianBergmann\Environment\Runtime;
 use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
+use Zynga\PHPUnit\V2\TestResult;
 
 /**
  * A TestRunner for the Command Line Interface (CLI)
@@ -87,7 +88,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
      * @param TestInterface|ReflectionClass $test
      * @param array                                  $arguments
      *
-     * @return PHPUnit_Framework_TestResult
+     * @return TestResult
      *
      * @throws PHPUnit_Framework_Exception
      */
@@ -113,11 +114,11 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
     }
 
     /**
-     * @return PHPUnit_Framework_TestResult
+     * @return TestResult
      */
     protected function createTestResult()
     {
-        return new PHPUnit_Framework_TestResult;
+        return new TestResult;
     }
 
     private function processSuiteFilters(PHPUnit_Framework_TestSuite $suite, array $arguments)
@@ -159,7 +160,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
      * @param array                  $arguments
      * @param bool                   $exit
      *
-     * @return PHPUnit_Framework_TestResult
+     * @return TestResult
      */
     public function doRun(TestInterface $suite, array $arguments = [], $exit = true)
     {

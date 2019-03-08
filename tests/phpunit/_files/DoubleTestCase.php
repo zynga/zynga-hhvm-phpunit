@@ -1,6 +1,7 @@
 <?php
 
 use Zynga\PHPUnit\V2\Interfaces\TestInterface;
+use Zynga\PHPUnit\V2\TestResult;
 
 class DoubleTestCase implements TestInterface
 {
@@ -16,7 +17,7 @@ class DoubleTestCase implements TestInterface
         return 2;
     }
 
-    public function run(PHPUnit_Framework_TestResult $result = null)
+    public function run(TestResult $result = null)
     {
         $result->startTest($this);
 

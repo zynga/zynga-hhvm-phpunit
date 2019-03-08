@@ -10,6 +10,7 @@
 
 use SebastianBergmann\Environment\Runtime;
 use Zynga\PHPUnit\V2\TestFailure;
+use Zynga\PHPUnit\V2\TestResult;
 
 /**
  * Utility methods for PHP sub-processes.
@@ -183,11 +184,11 @@ abstract class PHPUnit_Util_PHP
      *
      * @param string                       $job
      * @param TestInterface       $test
-     * @param PHPUnit_Framework_TestResult $result
+     * @param TestResult $result
      *
      * @throws PHPUnit_Framework_Exception
      */
-    public function runTestJob($job, TestInterface $test, PHPUnit_Framework_TestResult $result)
+    public function runTestJob($job, TestInterface $test, TestResult $result)
     {
         $result->startTest($test);
 
@@ -271,13 +272,13 @@ abstract class PHPUnit_Util_PHP
      * Processes the TestResult object from an isolated process.
      *
      * @param TestInterface       $test
-     * @param PHPUnit_Framework_TestResult $result
+     * @param TestResult $result
      * @param string                       $stdout
      * @param string                       $stderr
      *
      * @since Method available since Release 3.5.0
      */
-    private function processChildResult(TestInterface $test, PHPUnit_Framework_TestResult $result, $stdout, $stderr)
+    private function processChildResult(TestInterface $test, TestResult $result, $stdout, $stderr)
     {
         $time = 0;
 
