@@ -38,27 +38,16 @@ use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
  * @since Class available since Release 2.0.0
  */
 class PHPUnit_Framework_TestResult extends TestResult implements Countable {
+
   /**
    * @var array
    */
   protected $passed = [];
 
-  private Vector<PHPUnit_Framework_TestFailure> $_errors = Vector {};
-  private Vector<PHPUnit_Framework_TestFailure> $_failures = Vector {};
-  private Vector<PHPUnit_Framework_TestFailure> $_warnings = Vector {};
-  private Vector<PHPUnit_Framework_TestFailure> $_notImplemented = Vector {};
-  private Vector<PHPUnit_Framework_TestFailure> $_risky = Vector {};
-  private Vector<PHPUnit_Framework_TestFailure> $_skipped = Vector {};
-
   /**
    * @var int
    */
   protected $runTests = 0;
-
-  /**
-   * @var float
-   */
-  protected $time = 0;
 
   /**
    * @var PHPUnit_Framework_TestSuite
@@ -117,183 +106,6 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable {
    */
   protected $timeoutForLargeTests = 60;
 
-  private bool $_lastTestFailed = false;
-
-  private bool $_stop = false;
-  private bool $_stopOnError = false;
-  private bool $_stopOnFailure = false;
-  private bool $_stopOnWarning = false;
-  private bool $_stopOnRisky = false;
-  private bool $_stopOnIncomplete = false;
-  private bool $_stopOnSkipped = false;
-
-  private function _handleTestFailure(
-    Vector<PHPUnit_Framework_TestFailure> $trackingArray,
-    bool $doStop,
-    string $listenerFunction,
-    TestInterface $test,
-    Exception $t,
-    float $time,
-  ): void {
-
-    $failure = new PHPUnit_Framework_TestFailure($test, $t);
-
-    $trackingArray->add($failure);
-
-    DynamicMethodCall::callMethodOnObject(
-      $this->listeners(),
-      $listenerFunction,
-      Vector {$test, $t, $time},
-    );
-
-    if ($doStop == true) {
-      $this->stop();
-    }
-
-  }
-
-  private function _handleRiskyTestFailure(
-    TestInterface $test,
-    $t,
-    float $time,
-  ): void {
-    $this->_handleTestFailure(
-      $this->_risky,
-      $this->_stopOnRisky,
-      'addRiskyTest',
-      $test,
-      $t,
-      $time,
-    );
-  }
-
-  private function _handleIncompleteTestFailure(
-    TestInterface $test,
-    $t,
-    float $time,
-  ): void {
-    $this->_handleTestFailure(
-      $this->_notImplemented,
-      $this->_stopOnIncomplete,
-      'addIncompleteTest',
-      $test,
-      $t,
-      $time,
-    );
-  }
-
-  private function _handleWarningTestFailure(
-    TestInterface $test,
-    $t,
-    float $time,
-  ): void {
-    $this->_handleTestFailure(
-      $this->_warnings,
-      $this->_stopOnWarning,
-      'addWarning',
-      $test,
-      $t,
-      $time,
-    );
-  }
-
-  private function _handleSkippedTestFailure(
-    TestInterface $test,
-    $t,
-    float $time,
-  ): void {
-    $this->_handleTestFailure(
-      $this->_skipped,
-      $this->_stopOnSkipped,
-      'addSkippedTest',
-      $test,
-      $t,
-      $time,
-    );
-  }
-
-  private function _handleTestFailures(
-    TestInterface $test,
-    $t,
-    float $time,
-    bool $isFailure,
-  ): void {
-
-    if ($t instanceof PHPUnit_Framework_RiskyTest) {
-      $this->_handleRiskyTestFailure($test, $t, $time);
-    } else if ($t instanceof IncompleteException) {
-      $this->_handleIncompleteTestFailure($test, $t, $time);
-    } else if ($t instanceof SkippedException) {
-      $this->_handleSkippedTestFailure($test, $t, $time);
-    } else if ($t instanceof WarningException) {
-      $this->_handleWarningTestFailure($test, $t, $time);
-    } else if ($isFailure == true) {
-      $this->_handleTestFailure(
-        $this->_failures,
-        ($this->_stopOnError || $this->_stopOnFailure),
-        'addFailure',
-        $test,
-        $t,
-        $time,
-      );
-    } else {
-      $this->_handleTestFailure(
-        $this->_errors,
-        ($this->_stopOnError || $this->_stopOnFailure),
-        'addError',
-        $test,
-        $t,
-        $time,
-      );
-    }
-
-    $this->_lastTestFailed = true;
-    $this->time += $time;
-  }
-  /**
-   * Adds an error to the list of errors.
-   *
-   * @param TestInterface $test
-   * @param Throwable              $t
-   * @param float                  $time
-   */
-  public function addError(TestInterface $test, $t, float $time) {
-    $this->_handleTestFailures($test, $t, $time, false);
-  }
-
-  /**
-   * Adds a warning to the list of warnings.
-   * The passed in exception caused the warning.
-   *
-   * @param TestInterface    $test
-   * @param Exception $e
-   * @param float                     $time
-   *
-   * @since Method available since Release 5.1.0
-   */
-  public function addWarning(TestInterface $test, Exception $e, $time) {
-    $this->_handleWarningTestFailure($test, $e, $time);
-    $this->time += $time;
-  }
-
-  /**
-   * Adds a failure to the list of failures.
-   * The passed in exception caused the failure.
-   *
-   * @param TestInterface                 $test
-   * @param Exception $e
-   * @param float                                  $time
-   */
-  public function addFailure(TestInterface $test, Exception $e, float $time) {
-    // if ( preg_match('/Requirements/', get_class($test))) {
-    // var_dump($test->getName());
-    // var_dump(get_class($test));
-    // var_dump($e);
-    // exit();
-    // }
-    $this->_handleTestFailures($test, $e, $time, true);
-  }
-
   /**
    * Informs the result that a testsuite will be started.
    *
@@ -326,7 +138,8 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable {
    * @param TestInterface $test
    */
   public function startTest(TestInterface $test) {
-    $this->_lastTestFailed = false;
+    $this->setLastTestFailed(false);
+
     $this->runTests += count($test);
 
     $this->listeners()->startTest($test);
@@ -341,166 +154,15 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable {
   public function endTest(TestInterface $test, $time) {
     $this->listeners()->endTest($test, $time);
 
-    if (!$this->_lastTestFailed && $test instanceof TestCase) {
+    if (!$this->getLastTestFailed() && $test instanceof TestCase) {
       $class = $test->getClass();
       $key = $class.'::'.$test->getName();
 
       $this->passed[$key] =
         ['result' => $test->getResult(), 'size' => $test->getSize()];
 
-      $this->time += $time;
+      $this->addToTime($time);
     }
-  }
-
-  /**
-   * Returns true if no risky test occurred.
-   *
-   * @return bool
-   *
-   * @since Method available since Release 4.0.0
-   */
-  public function allHarmless() {
-    return $this->riskyCount() == 0;
-  }
-
-  /**
-   * Gets the number of risky tests.
-   *
-   * @return int
-   *
-   * @since Method available since Release 4.0.0
-   */
-  public function riskyCount() {
-    return $this->_risky->count();
-  }
-
-  /**
-   * Returns true if no incomplete test occurred.
-   *
-   * @return bool
-   */
-  public function allCompletelyImplemented() {
-    return $this->notImplementedCount() == 0;
-  }
-
-  /**
-   * Gets the number of incomplete tests.
-   *
-   * @return int
-   */
-  public function notImplementedCount() {
-    return $this->_notImplemented->count();
-  }
-
-  /**
-   * Returns an Enumeration for the risky tests.
-   *
-   * @return array
-   *
-   * @since Method available since Release 4.0.0
-   */
-  public function risky(): Vector<PHPUnit_Framework_TestFailure> {
-    return $this->_risky;
-  }
-
-  /**
-   * Returns an Enumeration for the incomplete tests.
-   *
-   * @return array
-   */
-  public function notImplemented(): Vector<PHPUnit_Framework_TestFailure> {
-    return $this->_notImplemented;
-  }
-
-  /**
-   * Returns true if no test has been skipped.
-   *
-   * @return bool
-   *
-   * @since Method available since Release 3.0.0
-   */
-  public function noneSkipped() {
-    return $this->skippedCount() == 0;
-  }
-
-  /**
-   * Gets the number of skipped tests.
-   *
-   * @return int
-   *
-   * @since Method available since Release 3.0.0
-   */
-  public function skippedCount(): int {
-    return $this->_skipped->count();
-  }
-
-  /**
-   * Returns an Enumeration for the skipped tests.
-   *
-   * @return array
-   *
-   * @since Method available since Release 3.0.0
-   */
-  public function skipped(): Vector<PHPUnit_Framework_TestFailure> {
-    return $this->_skipped;
-  }
-
-  /**
-   * Gets the number of detected errors.
-   *
-   * @return int
-   */
-  public function errorCount() {
-    return $this->_errors->count();
-  }
-
-  /**
-   * Returns an Enumeration for the errors.
-   *
-   * @return array
-   */
-  public function errors(): Vector<PHPUnit_Framework_TestFailure> {
-    return $this->_errors;
-  }
-
-  /**
-   * Gets the number of detected failures.
-   *
-   * @return int
-   */
-  public function failureCount(): int {
-    return $this->_failures->count();
-  }
-
-  /**
-   * Returns an Enumeration for the failures.
-   *
-   * @return array
-   */
-  public function failures(): Vector<PHPUnit_Framework_TestFailure> {
-    return $this->_failures;
-  }
-
-  /**
-   * Gets the number of detected warnings.
-   *
-   * @return int
-   *
-   * @since Method available since Release 5.1.0
-   */
-  public function warningCount() {
-    return $this->_warnings->count();
-  }
-
-  /**
-   * Returns an Enumeration for the warnings.
-   *
-   * @return array
-   *
-   * @since Method available since Release 5.1.0
-   */
-  public function warnings(): Vector<PHPUnit_Framework_TestFailure> {
-    return $this->_warnings;
   }
 
   /**
@@ -775,8 +437,11 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable {
     //   exit();
     // }
 
-    if ($error === true) {
-
+    if ($error === true && !$e instanceof Exception) {
+      error_log(
+        'JEO WARNING - NON-Exception based error thrown e='.gettype($e),
+      );
+    } else if ($error === true && $e instanceof Exception) {
       $this->addError($test, $e, $time);
     } else if ($failure === true && $e instanceof Exception) {
       $this->addFailure($test, $e, $time);
@@ -821,22 +486,6 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable {
    */
   public function count(): int {
     return $this->runTests;
-  }
-
-  /**
-   * Checks whether the test run should stop.
-   *
-   * @return bool
-   */
-  public function shouldStop(): bool {
-    return $this->_stop;
-  }
-
-  /**
-   * Marks that the test run should stop.
-   */
-  public function stop(): void {
-    $this->_stop = true;
   }
 
   /**
@@ -887,57 +536,6 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable {
    */
   public function getConvertErrorsToExceptions() {
     return $this->convertErrorsToExceptions;
-  }
-
-  /**
-   * Enables or disables the stopping when an error occurs.
-   *
-   * @param bool $flag
-   *
-   * @throws PHPUnit_Framework_Exception
-   *
-   * @since Method available since Release 3.5.0
-   */
-  public function stopOnError($flag) {
-    if (!is_bool($flag)) {
-      throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
-    }
-
-    $this->_stopOnError = $flag;
-  }
-
-  /**
-   * Enables or disables the stopping when a failure occurs.
-   *
-   * @param bool $flag
-   *
-   * @throws PHPUnit_Framework_Exception
-   *
-   * @since Method available since Release 3.1.0
-   */
-  public function stopOnFailure($flag) {
-    if (!is_bool($flag)) {
-      throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
-    }
-
-    $this->_stopOnFailure = $flag;
-  }
-
-  /**
-   * Enables or disables the stopping when a warning occurs.
-   *
-   * @param bool $flag
-   *
-   * @throws PHPUnit_Framework_Exception
-   *
-   * @since Method available since Release 5.1.0
-   */
-  public function stopOnWarning($flag) {
-    if (!is_bool($flag)) {
-      throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
-    }
-
-    $this->_stopOnWarning = $flag;
   }
 
   /**
@@ -1058,78 +656,6 @@ class PHPUnit_Framework_TestResult extends TestResult implements Countable {
    */
   public function isStrictAboutTodoAnnotatedTests() {
     return $this->beStrictAboutTodoAnnotatedTests;
-  }
-
-  /**
-   * Enables or disables the stopping for risky tests.
-   *
-   * @param bool $flag
-   *
-   * @throws PHPUnit_Framework_Exception
-   *
-   * @since Method available since Release 4.0.0
-   */
-  public function stopOnRisky($flag) {
-    if (!is_bool($flag)) {
-      throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
-    }
-
-    $this->_stopOnRisky = $flag;
-  }
-
-  /**
-   * Enables or disables the stopping for incomplete tests.
-   *
-   * @param bool $flag
-   *
-   * @throws PHPUnit_Framework_Exception
-   *
-   * @since Method available since Release 3.5.0
-   */
-  public function stopOnIncomplete($flag) {
-    if (!is_bool($flag)) {
-      throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
-    }
-
-    $this->_stopOnIncomplete = $flag;
-  }
-
-  /**
-   * Enables or disables the stopping for skipped tests.
-   *
-   * @param bool $flag
-   *
-   * @throws PHPUnit_Framework_Exception
-   *
-   * @since Method available since Release 3.1.0
-   */
-  public function stopOnSkipped($flag) {
-    if (!is_bool($flag)) {
-      throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'boolean');
-    }
-
-    $this->_stopOnSkipped = $flag;
-  }
-
-  /**
-   * Returns the time spent running the tests.
-   *
-   * @return float
-   */
-  public function time() {
-    return $this->time;
-  }
-
-  /**
-   * Returns whether the entire test was successful or not.
-   *
-   * @return bool
-   */
-  public function wasSuccessful() {
-    return
-      $this->_errors->count() == 0 &&
-      $this->_failures->count() == 0 &&
-      $this->_warnings->count() == 0;
   }
 
   /**

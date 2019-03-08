@@ -10,6 +10,7 @@
 
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
 use Zynga\PHPUnit\V2\TestCase;
+use Zynga\PHPUnit\V2\TestFailure;
 
 use \Exception;
 
@@ -48,7 +49,7 @@ class PHPUnit_Util_Log_JSON extends PHPUnit_Util_Printer implements TestListener
             'error',
             $time,
             PHPUnit_Util_Filter::getFilteredStacktrace($e, false),
-            PHPUnit_Framework_TestFailure::exceptionToString($e),
+            TestFailure::exceptionToString($e),
             $test
         );
 
@@ -70,7 +71,7 @@ class PHPUnit_Util_Log_JSON extends PHPUnit_Util_Printer implements TestListener
             'warning',
             $time,
             PHPUnit_Util_Filter::getFilteredStacktrace($e, false),
-            PHPUnit_Framework_TestFailure::exceptionToString($e),
+            TestFailure::exceptionToString($e),
             $test
         );
 
@@ -90,7 +91,7 @@ class PHPUnit_Util_Log_JSON extends PHPUnit_Util_Printer implements TestListener
             'fail',
             $time,
             PHPUnit_Util_Filter::getFilteredStacktrace($e, false),
-            PHPUnit_Framework_TestFailure::exceptionToString($e),
+            TestFailure::exceptionToString($e),
             $test
         );
 

@@ -88,7 +88,6 @@ return array(
     'PHPUnit_Framework_SyntheticError' => $vendorDir . '/phpunit/phpunit/src/Framework/SyntheticError.php',
     'TestInterface' => $vendorDir . '/phpunit/phpunit/src/Framework/Test.php',
     'PHPUnit_Framework_TestCase' => $vendorDir . '/phpunit/phpunit/src/Framework/TestCase.php',
-    'PHPUnit_Framework_TestFailure' => $vendorDir . '/phpunit/phpunit/src/Framework/TestFailure.php',
     'PHPUnit_Framework_TestListener' => $vendorDir . '/phpunit/phpunit/src/Framework/TestListener.php',
     'PHPUnit_Framework_TestResult' => $vendorDir . '/phpunit/phpunit/src/Framework/TestResult.php',
     'PHPUnit_Framework_TestSuite' => $vendorDir . '/phpunit/phpunit/src/Framework/TestSuite.php',

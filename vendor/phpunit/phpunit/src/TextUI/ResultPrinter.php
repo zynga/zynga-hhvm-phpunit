@@ -14,6 +14,7 @@ use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCase;
 use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
 use Zynga\PHPUnit\V2\TestCase;
+use Zynga\PHPUnit\V2\TestFailure;
 
 /**
  * Prints the result of a TextUI TestRunner run.
@@ -215,10 +216,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
    * @param array  $defects
    * @param string $type
    */
-  protected function printDefects(
-    Vector<PHPUnit_Framework_TestFailure> $defects,
-    $type,
-  ) {
+  protected function printDefects(Vector<TestFailure> $defects, $type) {
     $count = count($defects);
 
     if ($count == 0) {
@@ -253,32 +251,26 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
   }
 
   /**
-   * @param PHPUnit_Framework_TestFailure $defect
+   * @param TestFailure $defect
    * @param int                           $count
    */
-  protected function printDefect(
-    PHPUnit_Framework_TestFailure $defect,
-    $count,
-  ) {
+  protected function printDefect(TestFailure $defect, $count) {
     $this->printDefectHeader($defect, $count);
     $this->printDefectTrace($defect);
   }
 
   /**
-   * @param PHPUnit_Framework_TestFailure $defect
+   * @param TestFailure $defect
    * @param int                           $count
    */
-  protected function printDefectHeader(
-    PHPUnit_Framework_TestFailure $defect,
-    $count,
-  ) {
+  protected function printDefectHeader(TestFailure $defect, $count) {
     $this->write(sprintf("\n%d) %s\n", $count, $defect->getTestName()));
   }
 
   /**
-   * @param PHPUnit_Framework_TestFailure $defect
+   * @param TestFailure $defect
    */
-  protected function printDefectTrace(PHPUnit_Framework_TestFailure $defect) {
+  protected function printDefectTrace(TestFailure $defect) {
     $e = $defect->thrownException();
 
     if ($e instanceof Exception) {

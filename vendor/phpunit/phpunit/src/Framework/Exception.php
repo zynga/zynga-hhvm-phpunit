@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\PHPUnit\V2\TestFailure;
+
 /**
  * Base class for all PHPUnit Framework exceptions.
  *
@@ -61,7 +63,7 @@ class PHPUnit_Framework_Exception extends RuntimeException implements PHPUnit_Ex
      */
     public function __toString()
     {
-        $string = PHPUnit_Framework_TestFailure::exceptionToString($this);
+        $string = TestFailure::exceptionToString($this);
 
         if ($trace = PHPUnit_Util_Filter::getFilteredStacktrace($this)) {
             $string .= "\n" . $trace;

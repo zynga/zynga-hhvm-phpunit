@@ -11,6 +11,7 @@
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
 use Zynga\PHPUnit\V2\TestCase;
+use Zynga\PHPUnit\V2\TestFailure;
 
 use \Exception;
 
@@ -449,7 +450,7 @@ class PHPUnit_Util_Log_JUnit extends PHPUnit_Util_Printer implements TestListene
             $buffer = '';
         }
 
-        $buffer .= PHPUnit_Framework_TestFailure::exceptionToString($e) .
+        $buffer .= TestFailure::exceptionToString($e) .
                    "\n" .
                    PHPUnit_Util_Filter::getFilteredStacktrace($e);
 

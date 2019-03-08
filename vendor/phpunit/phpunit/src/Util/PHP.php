@@ -9,6 +9,7 @@
  */
 
 use SebastianBergmann\Environment\Runtime;
+use Zynga\PHPUnit\V2\TestFailure;
 
 /**
  * Utility methods for PHP sub-processes.
@@ -373,16 +374,16 @@ abstract class PHPUnit_Util_PHP
     }
 
     /**
-     * Gets the thrown exception from a PHPUnit_Framework_TestFailure.
+     * Gets the thrown exception from a TestFailure.
      *
-     * @param PHPUnit_Framework_TestFailure $error
+     * @param TestFailure $error
      *
      * @return Exception
      *
      * @since Method available since Release 3.6.0
      * @see    https://github.com/sebastianbergmann/phpunit/issues/74
      */
-    private function getException(PHPUnit_Framework_TestFailure $error)
+    private function getException(TestFailure $error)
     {
         $exception = $error->thrownException();
 

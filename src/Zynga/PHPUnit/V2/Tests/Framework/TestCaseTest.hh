@@ -39,11 +39,11 @@ use Zynga\PHPUnit\V2\Tests\Mock\TestSkipped;
 use Zynga\PHPUnit\V2\Tests\Mock\ThrowExceptionTestCase;
 use Zynga\PHPUnit\V2\Tests\Mock\ThrowNoExceptionTestCase;
 use Zynga\PHPUnit\V2\Tests\Mock\WasRun;
+use Zynga\PHPUnit\V2\TestFailure;
 use Zynga\PHPUnit\V2\Version;
 
 use \PHPUnit_Framework_TestResult;
 use \PHPUnit_Framework_TestSuite;
-use \PHPUnit_Framework_TestFailure;
 
 use \Exception;
 use \Throwable;
@@ -114,9 +114,7 @@ class TestCaseTest extends TestCase {
     }
   }
 
-  private function _debugExceptions(
-    Vector<PHPUnit_Framework_TestFailure> $exceptions,
-  ): void {
+  private function _debugExceptions(Vector<TestFailure> $exceptions): void {
     foreach ($exceptions as $exception) {
       $this->_debugException($exception->thrownException());
     }

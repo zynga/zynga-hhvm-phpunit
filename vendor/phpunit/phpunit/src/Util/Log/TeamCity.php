@@ -11,6 +11,7 @@
 use SebastianBergmann\Comparator\ComparisonFailure;
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 use Zynga\PHPUnit\V2\TestCase;
+use Zynga\PHPUnit\V2\TestFailure;
 
 use \Exception;
 
@@ -355,7 +356,7 @@ class PHPUnit_Util_Log_TeamCity extends PHPUnit_TextUI_ResultPrinter
 
         while ($previous) {
             $stackTrace .= "\nCaused by\n" .
-                PHPUnit_Framework_TestFailure::exceptionToString($previous) . "\n" .
+                TestFailure::exceptionToString($previous) . "\n" .
                 PHPUnit_Util_Filter::getFilteredStacktrace($previous);
 
             $previous = $previous->getPrevious();

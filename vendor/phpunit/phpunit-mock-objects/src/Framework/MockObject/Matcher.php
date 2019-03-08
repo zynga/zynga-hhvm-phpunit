@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\PHPUnit\V2\TestFailure;
+
 /**
  * Main matcher which defines a full expectation using method, parameter and
  * invocation matchers.
@@ -253,7 +255,7 @@ class PHPUnit_Framework_MockObject_Matcher implements PHPUnit_Framework_MockObje
                     "Expectation failed for %s when %s.\n%s",
                     $this->methodNameMatcher->toString(),
                     $this->invocationMatcher->toString(),
-                    PHPUnit_Framework_TestFailure::exceptionToString($e)
+                    TestFailure::exceptionToString($e)
                 )
             );
         }
