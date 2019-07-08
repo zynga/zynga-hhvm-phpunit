@@ -89,8 +89,6 @@ return array(
     'TestInterface' => $vendorDir . '/phpunit/phpunit/src/Framework/Test.php',
     'PHPUnit_Framework_TestCase' => $vendorDir . '/phpunit/phpunit/src/Framework/TestCase.php',
     'PHPUnit_Framework_TestListener' => $vendorDir . '/phpunit/phpunit/src/Framework/TestListener.php',
-    'PHPUnit_Framework_TestSuite' => $vendorDir . '/phpunit/phpunit/src/Framework/TestSuite.php',
-    'PHPUnit_Framework_TestSuite_DataProvider' => $vendorDir . '/phpunit/phpunit/src/Framework/TestSuite/DataProvider.php',
     'PHPUnit_Framework_UnintentionallyCoveredCodeError' => $vendorDir . '/phpunit/phpunit/src/Framework/UnintentionallyCoveredCodeError.php',
     'PHPUnit_Framework_WarningTestCase' => $vendorDir . '/phpunit/phpunit/src/Framework/WarningTestCase.php',
     'PHPUnit_Runner_BaseTestRunner' => $vendorDir . '/phpunit/phpunit/src/Runner/BaseTestRunner.php',

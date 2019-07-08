@@ -12,8 +12,6 @@
 use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
 
-use \PHPUnit_Framework_TestSuite;
-
 /**
  * An empty Listener that can be extended to implement TestListener
  * with just a few lines of code.

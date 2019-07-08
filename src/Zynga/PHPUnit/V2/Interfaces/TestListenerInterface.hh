@@ -107,7 +107,7 @@ interface TestListenerInterface {
   /**
    * A test suite started.
    *
-   * @param PHPUnit_Framework_TestSuite $suite
+   * @param TestSuite $suite
    *
    * @since Method available since Release 2.2.0
    */
@@ -116,7 +116,7 @@ interface TestListenerInterface {
   /**
    * A test suite ended.
    *
-   * @param PHPUnit_Framework_TestSuite $suite
+   * @param TestSuite $suite
    *
    * @since Method available since Release 2.2.0
    */

@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\PHPUnit\V2\TestSuite;
+
 /**
  * @since Class available since Release 4.0.0
  */
@@ -21,9 +23,9 @@ abstract class PHPUnit_Runner_Filter_GroupFilterIterator extends RecursiveFilter
     /**
      * @param RecursiveIterator           $iterator
      * @param array                       $groups
-     * @param PHPUnit_Framework_TestSuite $suite
+     * @param TestSuite $suite
      */
-    public function __construct(RecursiveIterator $iterator, array $groups, PHPUnit_Framework_TestSuite $suite)
+    public function __construct(RecursiveIterator $iterator, array $groups, TestSuite $suite)
     {
         parent::__construct($iterator);
 
@@ -48,7 +50,7 @@ abstract class PHPUnit_Runner_Filter_GroupFilterIterator extends RecursiveFilter
     {
         $test = $this->getInnerIterator()->current();
 
-        if ($test instanceof PHPUnit_Framework_TestSuite) {
+        if ($test instanceof TestSuite) {
             return true;
         }
 

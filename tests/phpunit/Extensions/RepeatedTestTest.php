@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\PHPUnit\V2\TestSuite;
+
 /**
  * @since      Class available since Release 2.0.0
  * @covers     PHPUnit_Extensions_RepeatedTest
@@ -18,7 +20,7 @@ class Extensions_RepeatedTestTest extends PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->suite = new PHPUnit_Framework_TestSuite;
+        $this->suite = new TestSuite();
 
         $this->suite->addTest(new Success);
         $this->suite->addTest(new Success);

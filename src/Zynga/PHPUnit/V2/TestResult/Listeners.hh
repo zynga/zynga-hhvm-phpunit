@@ -7,7 +7,6 @@ use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
 use Zynga\PHPUnit\V2\TestCase;
 
 use \PHPUnit_Util_Printer;
-use \PHPUnit_Framework_TestSuite;
 use \Exception;
 
 class Listeners implements TestListenerInterface {

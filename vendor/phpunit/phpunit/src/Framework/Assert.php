@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-use SebastianBergmann\PHPUnit\Assertions;
+use Zynga\PHPUnit\V2\Assertions;
 
 // --
 // We are in the process of porting all of these assertion bits into hacklang

@@ -2,14 +2,8 @@
 
 namespace Zynga\PHPUnit\V2;
 
-use Zynga\PHPUnit\V2\Annotations;
-use Zynga\PHPUnit\V2\Interfaces\TestInterface;
-use Zynga\PHPUnit\V2\TestCase\OutputBuffer;
-use Zynga\PHPUnit\V2\TestCase\Requirements;
-use Zynga\PHPUnit\V2\TestCase\Size;
-use Zynga\PHPUnit\V2\TestCase\Status;
 use SebastianBergmann\Exporter\Exporter;
-use SebastianBergmann\PHPUnit\Assertions;
+use Zynga\PHPUnit\V2\Assertions;
 use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
 use SebastianBergmann\PHPUnit\Exceptions\ErrorException;
 use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentException;
@@ -19,6 +13,13 @@ use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
 use SebastianBergmann\PHPUnit\Exceptions\WarningException;
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 use Zynga\Framework\Dynamic\V1\DynamicMethodCall;
+use Zynga\PHPUnit\V2\Annotations;
+use Zynga\PHPUnit\V2\Interfaces\TestInterface;
+use Zynga\PHPUnit\V2\Test\Base;
+use Zynga\PHPUnit\V2\Test\Requirements;
+use Zynga\PHPUnit\V2\TestCase\OutputBuffer;
+use Zynga\PHPUnit\V2\TestCase\Size;
+use Zynga\PHPUnit\V2\TestCase\Status;
 
 // JEO: needs conversion.
 use Zynga\PHPUnit\V2\TestResult;
@@ -115,7 +116,7 @@ abstract class TestCase extends Assertions implements TestInterface {
    *
    * @return string
    */
-  final public function toString(): string {
+  public function toString(): string {
 
     $buffer = sprintf('%s::%s', $this->getClass(), $this->getName(false));
 
@@ -174,72 +175,6 @@ abstract class TestCase extends Assertions implements TestInterface {
   }
 
   /**
-   * Returns the annotations for this test.
-   *
-   * @return array
-   *
-   * @since Method available since Release 3.4.0
-   */
-  final public function getAnnotations(
-  ): Map<string, Map<string, Vector<string>>> {
-
-    $className = $this->getClass();
-    $methodName = $this->getName(false);
-
-    return Annotations::parseTestMethodAnnotations($className, $methodName);
-
-  }
-
-  final public function getAllAnnotationsForKey(string $key): Vector<string> {
-
-    $collapsed = Vector {};
-
-    $classValues = $this->getAnnotationsForKey('class', $key);
-
-    foreach ($classValues as $classValue) {
-      if (is_string($classValue)) {
-        $collapsed->add($classValue);
-      }
-    }
-
-    $methodValues = $this->getAnnotationsForKey('method', $key);
-
-    foreach ($methodValues as $methodValue) {
-      if (is_string($methodValue)) {
-        $collapsed->add($methodValue);
-      }
-    }
-
-    // return the stack of annotation combined
-    return $collapsed;
-
-  }
-
-  final public function getAnnotationsForKey(
-    string $context,
-    string $key,
-  ): Vector<string> {
-
-    $allAnnotations = $this->getAnnotations();
-
-    $contextAnnotations = $allAnnotations->get($context);
-
-    if ($contextAnnotations instanceof Map) {
-
-      $keyValue = $contextAnnotations->get($key);
-
-      if ($keyValue instanceof Vector) {
-        return $keyValue;
-      }
-
-    }
-
-    // not found
-    return Vector {};
-
-  }
-
-  /**
    * @return string
    *
    * @since Method available since Release 3.6.0
@@ -284,6 +219,11 @@ abstract class TestCase extends Assertions implements TestInterface {
     return $this->status()->getMessage();
   }
 
+  final public function setGroupsFromAnnotation(): bool {
+    $groups = $this->getGroupsFromAnnotation();
+    $this->setGroups($groups);
+    return true;
+  }
   /**
    * @since Method available since Release 5.4.0
    */
@@ -502,31 +442,21 @@ abstract class TestCase extends Assertions implements TestInterface {
       }
     }
 
-    $annotations = $this->getAnnotations();
+    $large = $this->getAnnotationsForKey('method', 'large');
+    $medium = $this->getAnnotationsForKey('method', 'medium');
+    $small = $this->getAnnotationsForKey('method', 'small');
 
-    $methodAnnotations = $annotations->get('method');
-
-    if (!$methodAnnotations instanceof Map) {
-      return false;
-    }
-
-    $large = $methodAnnotations->get('large');
-
-    if ($large !== null) {
+    if ($large->count() > 0) {
       $this->_size = Size::LARGE;
       return true;
     }
 
-    $medium = $methodAnnotations->get('medium');
-
-    if ($medium !== null) {
+    if ($medium->count() > 0) {
       $this->_size = Size::MEDIUM;
       return true;
     }
 
-    $small = $methodAnnotations->get('small');
-
-    if ($small !== null) {
+    if ($small->count() > 0) {
       $this->_size = Size::SMALL;
       return true;
     }
@@ -779,26 +709,11 @@ abstract class TestCase extends Assertions implements TestInterface {
    */
   final public function setUseErrorHandlerFromAnnotation(): bool {
 
-    $annotations = $this->getAnnotations();
+    $errorHandler = $this->getAllAnnotationsForKey('errorHandler');
 
-    $classAnnotations = $annotations->get('class');
-
-    if ($classAnnotations instanceof Map) {
-      $useErrorHandler = $classAnnotations->get('errorHandler');
-      if ($useErrorHandler !== null) {
-        $this->setUseErrorHandler(boolval($useErrorHandler));
-        return true;
-      }
-    }
-
-    $methodAnnotations = $annotations->get('method');
-
-    if ($methodAnnotations instanceof Map) {
-      $useErrorHandler = $methodAnnotations->get('errorHandler');
-      if ($useErrorHandler !== null) {
-        $this->setUseErrorHandler(boolval($useErrorHandler));
-        return true;
-      }
+    if ($errorHandler->count() > 0) {
+      $this->setUseErrorHandler(boolval($errorHandler->get(0)));
+      return true;
     }
 
     return true;
@@ -862,6 +777,11 @@ abstract class TestCase extends Assertions implements TestInterface {
       $this->markTestSkipped(implode(PHP_EOL, $missingRequirements));
     }
 
+  }
+
+  final public function setDependenciesFromAnnotation(): bool {
+    // @TODO: Verify that we are not getting DI from somewhere else on this
+    return true;
   }
 
   /**
@@ -1186,7 +1106,7 @@ abstract class TestCase extends Assertions implements TestInterface {
    * @throws Exception|PHPUnit_Framework_Exception
    * @throws PHPUnit_Framework_Exception
    */
-  final public function runTest(): mixed {
+  public function runTest(): mixed {
 
     $testName = $this->getName(false);
 
@@ -1221,58 +1141,6 @@ abstract class TestCase extends Assertions implements TestInterface {
     }
 
     return $testResult;
-
-  }
-
-  final public function mergeHooks(
-    Vector<string> $template,
-    Vector<string> $userDefined,
-  ): Vector<string> {
-
-    $combinedMap = Map {};
-
-    foreach ($template as $hook) {
-      $combinedMap->set($hook, true);
-    }
-
-    foreach ($userDefined as $hook) {
-      $combinedMap->set($hook, true);
-    }
-
-    return $combinedMap->keys();
-
-  }
-
-  final public function getHookMethods(): Map<string, Vector<string>> {
-
-    $beforeClassMethods = $this->mergeHooks(
-      Vector {'setUpBeforeClass'},
-      $this->getAllAnnotationsForKey('beforeClass'),
-    );
-
-    $afterClassMethods = $this->mergeHooks(
-      Vector {'tearDownAfterClass'},
-      $this->getAllAnnotationsForKey('afterClass'),
-    );
-
-    $beforeMethods = $this->mergeHooks(
-      Vector {'setUp'},
-      $this->getAllAnnotationsForKey('before'),
-    );
-
-    $afterMethods = $this->mergeHooks(
-      Vector {'tearDown'},
-      $this->getAllAnnotationsForKey('after'),
-    );
-
-    $hooks = Map {
-      'beforeClass' => $beforeClassMethods,
-      'before' => $beforeMethods,
-      'after' => $afterMethods,
-      'afterClass' => $afterClassMethods,
-    };
-
-    return $hooks;
 
   }
 

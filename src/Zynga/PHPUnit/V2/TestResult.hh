@@ -37,7 +37,6 @@ use \PHPUnit_Framework_InvalidCoversTargetException;
 //use \PHPUnit_Framework_MockObject_Exception;
 use \PHPUnit_Framework_MissingCoversAnnotationException;
 use \PHPUnit_Framework_OutputError;
-use \PHPUnit_Framework_TestSuite;
 use \PHPUnit_Framework_WarningTestCase;
 use \PHPUnit_Framework_UnintentionallyCoveredCodeError;
 use \PHPUnit_Util_Blacklist;
@@ -68,7 +67,7 @@ class TestResult {
   private int $_timeoutForMediumTests;
   private int $_timeoutForLargeTests;
   private Map<string, Map<string, mixed>> $_passed;
-  private ?PHPUnit_Framework_TestSuite $_topTestSuite;
+  private ?TestInterface $_topTestSuite;
   private ?CodeCoverage $_codeCoverage;
   private bool $_convertErrorsToExceptions;
   private bool $_errorHandlerSet;
@@ -643,7 +642,7 @@ class TestResult {
   /**
    * Informs the result that a testsuite will be started.
    *
-   * @param PHPUnit_Framework_TestSuite $suite
+   * @param TestSuite $suite
    *
    * @since Method available since Release 2.2.0
    */
@@ -651,17 +650,16 @@ class TestResult {
 
     $this->listeners()->startTestSuite($suite);
 
-    if ($this->_topTestSuite === null &&
-        $suite instanceof PHPUnit_Framework_TestSuite) {
-      $this->_topTestSuite = $suite;
-    }
+    // if ($this->_topTestSuite === null && $suite instanceof TestSuite) {
+    $this->_topTestSuite = $suite;
+    //}
 
   }
 
   /**
    * Informs the result that a testsuite was completed.
    *
-   * @param PHPUnit_Framework_TestSuite $suite
+   * @param TestSuite $suite
    *
    * @since Method available since Release 2.2.0
    */
@@ -765,11 +763,11 @@ class TestResult {
   /**
    * Returns the (top) test suite.
    *
-   * @return PHPUnit_Framework_TestSuite
+   * @return TestSuite
    *
    * @since Method available since Release 3.0.0
    */
-  public function topTestSuite(): ?PHPUnit_Framework_TestSuite {
+  public function topTestSuite(): ?TestInterface {
     return $this->_topTestSuite;
   }
 

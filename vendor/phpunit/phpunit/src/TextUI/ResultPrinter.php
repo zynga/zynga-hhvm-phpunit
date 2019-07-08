@@ -16,6 +16,7 @@ use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
 use Zynga\PHPUnit\V2\TestCase;
 use Zynga\PHPUnit\V2\TestFailure;
 use Zynga\PHPUnit\V2\TestResult;
+use Zynga\PHPUnit\V2\TestSuite;
 
 /**
  * Prints the result of a TextUI TestRunner run.
@@ -527,7 +528,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
   /**
    * A testsuite started.
    *
-   * @param PHPUnit_Framework_TestSuite $suite
+   * @param TestSuite $suite
    *
    * @since Method available since Release 2.2.0
    */
@@ -545,7 +546,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
   /**
    * A testsuite ended.
    *
-   * @param PHPUnit_Framework_TestSuite $suite
+   * @param TestSuite $suite
    *
    * @since Method available since Release 2.2.0
    */

@@ -10,6 +10,7 @@
 
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 use Zynga\PHPUnit\V2\TestCase;
+use Zynga\PHPUnit\V2\FileLoader;
 
 /**
  * The standard test suite loader.
@@ -28,13 +29,13 @@ class PHPUnit_Runner_StandardTestSuiteLoader implements PHPUnit_Runner_TestSuite
      */
     public function load($suiteClassName, $suiteClassFile = '')
     {
-
+    
       if ( is_object($suiteClassName) ) {
         $class = ReflectionClasses::getReflection(get_class($suiteClassName));
         return $class;
       }
 
-        $suiteClassName = str_replace('.php', '', $suiteClassName);
+      $suiteClassName = str_replace('.php', '', $suiteClassName);
 
         if (empty($suiteClassFile)) {
             $suiteClassFile = PHPUnit_Util_Filesystem::classNameToFilename(
@@ -45,11 +46,21 @@ class PHPUnit_Runner_StandardTestSuiteLoader implements PHPUnit_Runner_TestSuite
         if (!class_exists($suiteClassName, false)) {
             $loadedClasses = get_declared_classes();
 
-            $filename = PHPUnit_Util_Fileloader::checkAndLoad($suiteClassFile);
+            $filename = FileLoader::checkAndLoad($suiteClassFile);
 
             $loadedClasses = array_values(
                 array_diff(get_declared_classes(), $loadedClasses)
             );
+
+        }
+
+        if ( count($loadedClasses) > 0 ) {
+            foreach ( $loadedClasses as $loadedClass ) {
+                if ( preg_match('/' . $suiteClassName . '$/', $loadedClass) ) {
+                    $suiteClassName = $loadedClass;
+                    break;
+                }
+            }
         }
 
         if (!class_exists($suiteClassName, false) && !empty($loadedClasses)) {

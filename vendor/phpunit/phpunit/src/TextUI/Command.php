@@ -9,7 +9,9 @@
  */
 
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+use Zynga\PHPUnit\V2\FileLoader;
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
+use Zynga\PHPUnit\V2\TestSuite;
 
 /**
  * A TestRunner for the Command Line Interface (CLI)
@@ -771,7 +773,7 @@ class PHPUnit_TextUI_Command
         if (isset($this->arguments['test']) && is_string($this->arguments['test']) && substr($this->arguments['test'], -5, 5) == '.phpt') {
             $test = new PHPUnit_Extensions_PhptTestCase($this->arguments['test']);
 
-            $this->arguments['test'] = new PHPUnit_Framework_TestSuite;
+            $this->arguments['test'] = new TestSuite();
             $this->arguments['test']->addTest($test);
         }
 
@@ -883,7 +885,7 @@ class PHPUnit_TextUI_Command
     protected function handleBootstrap($filename)
     {
         try {
-            PHPUnit_Util_Fileloader::checkAndLoad($filename);
+            FileLoader::checkAndLoad($filename);
         } catch (PHPUnit_Framework_Exception $e) {
             $this->showError($e->getMessage());
         }

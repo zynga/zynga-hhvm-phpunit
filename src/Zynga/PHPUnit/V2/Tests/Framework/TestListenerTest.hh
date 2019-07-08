@@ -19,7 +19,6 @@ use Zynga\PHPUnit\V2\Tests\Mock\Success;
 use Zynga\PHPUnit\V2\Tests\Mock\TestError;
 use Zynga\PHPUnit\V2\TestResult;
 
-use \PHPUnit_Framework_TestSuite;
 use \Exception;
 
 /**

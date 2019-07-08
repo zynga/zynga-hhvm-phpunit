@@ -4,6 +4,7 @@ namespace Zynga\PHPUnit\V2;
 
 use Zynga\Framework\ReflectionCache\V1\ReflectionClassDocComments;
 use Zynga\Framework\ReflectionCache\V1\ReflectionMethodDocComments;
+use Zynga\PHPUnit\V2\Annotations\AnnotationsContainer;
 
 use \ReflectionClass;
 use \ReflectionException;
@@ -11,10 +12,8 @@ use \ReflectionMethod;
 
 class Annotations {
 
-  private static Map<string, Map<string, Vector<string>>>
-    $_classCache = Map {};
-  private static Map<string, Map<string, Vector<string>>>
-    $_methodCache = Map {};
+  private static Map<string, AnnotationsContainer> $_classCache = Map {};
+  private static Map<string, AnnotationsContainer> $_methodCache = Map {};
 
   /**
    * @param string $docblock
@@ -25,9 +24,9 @@ class Annotations {
    */
   private static function parseAnnotations(
     string $docblock,
-  ): Map<string, Vector<string>> {
+  ): AnnotationsContainer {
 
-    $annotations = Map {};
+    $annotations = new AnnotationsContainer();
 
     // Strip away the docblock header and footer to ease parsing of one line annotations
     $docblock = substr($docblock, 3, -2);
@@ -42,18 +41,12 @@ class Annotations {
       $numMatches = count($matches[0]);
 
       for ($i = 0; $i < $numMatches; ++$i) {
+
         $key = $matches['name'][$i];
         $value = $matches['value'][$i];
 
-        $currentValue = $annotations->get($key);
+        $annotations->addValueToKey($key, $value);
 
-        if ($currentValue == null) {
-          $currentValue = Vector {};
-          $currentValue->add($value);
-        } else {
-          $currentValue->add($value);
-        }
-        $annotations->set($key, $currentValue);
       }
 
     }
@@ -64,13 +57,13 @@ class Annotations {
 
   public static function parseClassAnnotations(
     string $className,
-  ): Map<string, Vector<string>> {
+  ): AnnotationsContainer {
 
     $key = $className;
 
     $data = self::$_classCache->get($key);
 
-    if ($data instanceof Map) {
+    if ($data instanceof AnnotationsContainer) {
       return $data;
     }
 
@@ -89,13 +82,13 @@ class Annotations {
   public static function parseMethodAnnotations(
     string $className,
     string $methodName,
-  ): Map<string, Vector<string>> {
+  ): AnnotationsContainer {
 
     $key = $className.'::'.$methodName;
 
     $data = self::$_methodCache->get($key);
 
-    if ($data instanceof Map) {
+    if ($data instanceof AnnotationsContainer) {
       return $data;
     }
 
@@ -127,17 +120,74 @@ class Annotations {
     string $methodName = '',
   ): Map<string, Map<string, Vector<string>>> {
 
+    $classValues = self::parseClassAnnotations($className)->getValuesAsMap();
+
     if ($methodName == '') {
-      return Map {
-        'class' => self::parseClassAnnotations($className),
-        'method' => Map {},
-      };
+      return Map {'class' => $classValues, 'method' => Map {}};
     }
 
-    return Map {
-      'class' => self::parseClassAnnotations($className),
-      'method' => self::parseMethodAnnotations($className, $methodName),
-    };
+    $methodValues =
+      self::parseMethodAnnotations($className, $methodName)->getValuesAsMap();
+
+    return Map {'class' => $classValues, 'method' => $methodValues};
+
+  }
+
+  final public static function getAllAnnotationsForKey(
+    string $key,
+    string $className,
+    string $methodName = '',
+  ): Vector<string> {
+
+    $collapsed = Vector {};
+
+    $classValues =
+      self::getAnnotationsForKey('class', $key, $className, $methodName);
+
+    foreach ($classValues as $classValue) {
+      if (is_string($classValue)) {
+        $collapsed->add($classValue);
+      }
+    }
+
+    $methodValues =
+      self::getAnnotationsForKey('method', $key, $className, $methodName);
+
+    foreach ($methodValues as $methodValue) {
+      if (is_string($methodValue)) {
+        $collapsed->add($methodValue);
+      }
+    }
+
+    // return the stack of annotation combined
+    return $collapsed;
+
+  }
+
+  final public static function getAnnotationsForKey(
+    string $context,
+    string $key,
+    string $className,
+    string $methodName = '',
+  ): Vector<string> {
+
+    $allAnnotations =
+      self::parseTestMethodAnnotations($className, $methodName);
+
+    $contextAnnotations = $allAnnotations->get($context);
+
+    if ($contextAnnotations instanceof Map) {
+
+      $keyValue = $contextAnnotations->get($key);
+
+      if ($keyValue instanceof Vector) {
+        return $keyValue;
+      }
+
+    }
+
+    // not found
+    return Vector {};
 
   }
 

@@ -21,9 +21,12 @@ use SebastianBergmann\CodeCoverage\Report\PHP as PhpReport;
 use SebastianBergmann\CodeCoverage\Report\Text as TextReport;
 use SebastianBergmann\CodeCoverage\Report\Xml\Facade as XmlReport;
 use SebastianBergmann\Environment\Runtime;
+
+use Zynga\PHPUnit\V2\Filter\Container as FilterContainer;
 use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
 use Zynga\PHPUnit\V2\TestResult;
+use Zynga\PHPUnit\V2\TestSuite;
 
 /**
  * A TestRunner for the Command Line Interface (CLI)
@@ -96,7 +99,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
     {
 
         if ($test instanceof ReflectionClass) {
-            $test = new PHPUnit_Framework_TestSuite($test);
+            $test = new TestSuite($test);
         }
 
         if ($test instanceof TestInterface) {
@@ -121,7 +124,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
         return new TestResult;
     }
 
-    private function processSuiteFilters(PHPUnit_Framework_TestSuite $suite, array $arguments)
+    private function processSuiteFilters(TestSuite $suite, array $arguments)
     {
         if (!$arguments['filter'] &&
             empty($arguments['groups']) &&
@@ -129,30 +132,19 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
             return;
         }
 
-        $filterFactory = new PHPUnit_Runner_Filter_Factory();
-
         if (!empty($arguments['excludeGroups'])) {
-            $filterFactory->addFilter(
-                ReflectionClasses::getReflection('PHPUnit_Runner_Filter_Group_Exclude'),
-                $arguments['excludeGroups']
-            );
+          FilterContainer::addGroupExcludeFilter($arguments['excludeGroups']);
         }
 
         if (!empty($arguments['groups'])) {
-            $filterFactory->addFilter(
-                ReflectionClasses::getReflection('PHPUnit_Runner_Filter_Group_Include'),
-                $arguments['groups']
-            );
+          FilterContainer::addGroupIncludeFilter($arguments['groups']);
         }
 
         if ($arguments['filter']) {
-          // echo "injectingTestFilter?\n";
-            $filterFactory->addFilter(
-                ReflectionClasses::getReflection('PHPUnit_Runner_Filter_Test'),
-                $arguments['filter']
-            );
+          //echo "injectingTestFilter? " . $arguments['filter'] . "\n";
+          FilterContainer::addTestFilter($arguments['filter']);
         }
-        $suite->injectFilter($filterFactory);
+
     }
 
     /**
@@ -176,26 +168,13 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
             $GLOBALS['__PHPUNIT_BOOTSTRAP'] = $arguments['bootstrap'];
         }
 
-        if ($arguments['backupGlobals'] === false) {
-            $suite->setBackupGlobals(false);
-        }
-
-        if ($arguments['backupStaticAttributes'] === true) {
-            $suite->setBackupStaticAttributes(true);
-        }
-
-        if ($arguments['beStrictAboutChangesToGlobalState'] === true) {
-            $suite->setbeStrictAboutChangesToGlobalState(true);
-        }
-
         if (is_integer($arguments['repeat'])) {
             $test = new PHPUnit_Extensions_RepeatedTest(
                 $suite,
-                $arguments['repeat'],
-                $arguments['processIsolation']
+                $arguments['repeat']
             );
 
-            $suite = new PHPUnit_Framework_TestSuite();
+            $suite = new TestSuite();
             $suite->addTest($test);
         }
 
@@ -465,10 +444,6 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
         $result->setTimeoutForMediumTests($arguments['timeoutForMediumTests']);
         $result->setTimeoutForLargeTests($arguments['timeoutForLargeTests']);
 
-        if ($suite instanceof PHPUnit_Framework_TestSuite) {
-            $suite->setRunTestInSeparateProcess($arguments['processIsolation']);
-        }
-
         $suite->run($result);
 
         unset($suite);
@@ -706,21 +681,6 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
                 $arguments['deprecatedCheckForUnintentionallyCoveredCodeSettingUsed'] = true;
             }
 
-            if (isset($phpunitConfiguration['backupGlobals']) &&
-                !isset($arguments['backupGlobals'])) {
-                $arguments['backupGlobals'] = $phpunitConfiguration['backupGlobals'];
-            }
-
-            if (isset($phpunitConfiguration['backupStaticAttributes']) &&
-                !isset($arguments['backupStaticAttributes'])) {
-                $arguments['backupStaticAttributes'] = $phpunitConfiguration['backupStaticAttributes'];
-            }
-
-            if (isset($phpunitConfiguration['beStrictAboutChangesToGlobalState']) &&
-                !isset($arguments['beStrictAboutChangesToGlobalState'])) {
-                $arguments['beStrictAboutChangesToGlobalState'] = $phpunitConfiguration['beStrictAboutChangesToGlobalState'];
-            }
-
             if (isset($phpunitConfiguration['bootstrap']) &&
                 !isset($arguments['bootstrap'])) {
                 $arguments['bootstrap'] = $phpunitConfiguration['bootstrap'];
@@ -749,11 +709,6 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
             if (isset($phpunitConfiguration['convertWarningsToExceptions']) &&
                 !isset($arguments['convertWarningsToExceptions'])) {
                 $arguments['convertWarningsToExceptions'] = $phpunitConfiguration['convertWarningsToExceptions'];
-            }
-
-            if (isset($phpunitConfiguration['processIsolation']) &&
-                !isset($arguments['processIsolation'])) {
-                $arguments['processIsolation'] = $phpunitConfiguration['processIsolation'];
             }
 
             if (isset($phpunitConfiguration['stopOnError']) &&
@@ -1046,9 +1001,6 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
 
         $arguments['addUncoveredFilesFromWhitelist']                  = isset($arguments['addUncoveredFilesFromWhitelist'])                  ? $arguments['addUncoveredFilesFromWhitelist']                  : true;
         $arguments['processUncoveredFilesFromWhitelist']              = isset($arguments['processUncoveredFilesFromWhitelist'])              ? $arguments['processUncoveredFilesFromWhitelist']              : false;
-        $arguments['backupGlobals']                                   = isset($arguments['backupGlobals'])                                   ? $arguments['backupGlobals']                                   : null;
-        $arguments['backupStaticAttributes']                          = isset($arguments['backupStaticAttributes'])                          ? $arguments['backupStaticAttributes']                          : null;
-        $arguments['beStrictAboutChangesToGlobalState']               = isset($arguments['beStrictAboutChangesToGlobalState'])               ? $arguments['beStrictAboutChangesToGlobalState']               : null;
         $arguments['cacheTokens']                                     = isset($arguments['cacheTokens'])                                     ? $arguments['cacheTokens']                                     : false;
         $arguments['columns']                                         = isset($arguments['columns'])                                         ? $arguments['columns']                                         : 80;
         $arguments['colors']                                          = isset($arguments['colors'])                                          ? $arguments['colors']                                          : PHPUnit_TextUI_ResultPrinter::COLOR_DEFAULT;
@@ -1057,7 +1009,6 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
         $arguments['convertWarningsToExceptions']                     = isset($arguments['convertWarningsToExceptions'])                     ? $arguments['convertWarningsToExceptions']                     : true;
         $arguments['excludeGroups']                                   = isset($arguments['excludeGroups'])                                   ? $arguments['excludeGroups']                                   : [];
         $arguments['groups']                                          = isset($arguments['groups'])                                          ? $arguments['groups']                                          : [];
-        $arguments['processIsolation']                                = isset($arguments['processIsolation'])                                ? $arguments['processIsolation']                                : false;
         $arguments['repeat']                                          = isset($arguments['repeat'])                                          ? $arguments['repeat']                                          : false;
         $arguments['reportHighLowerBound']                            = isset($arguments['reportHighLowerBound'])                            ? $arguments['reportHighLowerBound']                            : 90;
         $arguments['reportLowUpperBound']                             = isset($arguments['reportLowUpperBound'])                             ? $arguments['reportLowUpperBound']                             : 50;

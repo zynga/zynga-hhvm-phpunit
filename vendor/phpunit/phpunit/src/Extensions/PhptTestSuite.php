@@ -8,12 +8,14 @@
  * file that was distributed with this source code.
  */
 
+use Zynga\PHPUnit\V2\TestSuite;
+
 /**
  * Suite for .phpt test cases.
  *
  * @since Class available since Release 3.1.4
  */
-class PHPUnit_Extensions_PhptTestSuite extends PHPUnit_Framework_TestSuite
+class PHPUnit_Extensions_PhptTestSuite extends TestSuite
 {
     /**
      * Constructs a new TestSuite for .phpt test cases.

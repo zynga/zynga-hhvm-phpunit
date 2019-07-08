@@ -10,6 +10,7 @@
 
 use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\TestResult;
+use Zynga\PHPUnit\V2\TestSuite;
 
 /**
  * A Decorator that runs a test repeatedly.
@@ -82,7 +83,7 @@ class PHPUnit_Extensions_RepeatedTest extends PHPUnit_Extensions_TestDecorator
         //@codingStandardsIgnoreStart
         for ($i = 0; $i < $this->timesRepeat && !$result->shouldStop(); $i++) {
             //@codingStandardsIgnoreEnd
-            if ($this->test instanceof PHPUnit_Framework_TestSuite) {
+            if ($this->test instanceof TestSuite) {
                 $this->test->setRunTestInSeparateProcess($this->processIsolation);
             }
             $this->test->run($result);

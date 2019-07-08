@@ -3261,7 +3261,7 @@ XML;
       $this->assertCount(2, '');
     } catch (InvalidArgumentException $e) {
       $this->assertEquals(
-        'Argument #2 (No Value) of SebastianBergmann\PHPUnit\Assertions\AssertCount::evaluate() must be a countable or traversable',
+        'Argument #2 (No Value) of Zynga\PHPUnit\V2\Assertions\AssertCount::evaluate() must be a countable or traversable',
         $e->getMessage(),
       );
 

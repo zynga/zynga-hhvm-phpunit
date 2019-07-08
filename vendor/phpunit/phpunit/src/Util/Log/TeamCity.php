@@ -13,6 +13,7 @@ use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 use Zynga\PHPUnit\V2\TestCase;
 use Zynga\PHPUnit\V2\TestFailure;
 use Zynga\PHPUnit\V2\TestResult;
+use Zynga\PHPUnit\V2\TestSuite;
 
 use \Exception;
 
@@ -195,9 +196,9 @@ class PHPUnit_Util_Log_TeamCity extends PHPUnit_TextUI_ResultPrinter
     /**
      * A testsuite started.
      *
-     * @param PHPUnit_Framework_TestSuite $suite
+     * @param TestSuite $suite
      */
-    public function startTestSuite(PHPUnit_Framework_TestSuite $suite)
+    public function startTestSuite(TestSuite $suite)
     {
         if (stripos(ini_get('disable_functions'), 'getmypid') === false) {
             $this->flowId = getmypid();
@@ -241,9 +242,9 @@ class PHPUnit_Util_Log_TeamCity extends PHPUnit_TextUI_ResultPrinter
     /**
      * A testsuite ended.
      *
-     * @param PHPUnit_Framework_TestSuite $suite
+     * @param TestSuite $suite
      */
-    public function endTestSuite(PHPUnit_Framework_TestSuite $suite)
+    public function endTestSuite(TestSuite $suite)
     {
         $suiteName = $suite->getName();
 

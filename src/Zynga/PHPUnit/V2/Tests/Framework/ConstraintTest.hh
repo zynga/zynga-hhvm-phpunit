@@ -11,7 +11,7 @@ namespace Zynga\PHPUnit\V2\Tests\Framework;
  * file that was distributed with this source code.
  */
 
-use SebastianBergmann\PHPUnit\Assertions;
+use Zynga\PHPUnit\V2\Assertions;
 use SebastianBergmann\PHPUnit\Exceptions\ExceptionUtil;
 use SebastianBergmann\PHPUnit\Exceptions\ExpectationFailedException;
 use SebastianBergmann\PHPUnit\Constraints\Factory as ConstraintFactory;

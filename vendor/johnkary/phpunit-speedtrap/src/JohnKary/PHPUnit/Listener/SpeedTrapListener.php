@@ -4,8 +4,8 @@ namespace JohnKary\PHPUnit\Listener;
 
 use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
+use Zynga\PHPUnit\V2\TestSuite;
 
-use \PHPUnit_Framework_TestSuite;
 use \Exception;
 use Zynga\Framework\Testing\TestCase\V2\Base as TestingTestCaseBase;
 
@@ -163,7 +163,7 @@ class SpeedTrapListener implements TestListenerInterface {
   /**
    * A test suite started.
    *
-   * @param PHPUnit_Framework_TestSuite $suite
+   * @param TestSuite $suite
    */
   public function startTestSuite(TestInterface $suite): void {
     $this->suites++;
@@ -172,7 +172,7 @@ class SpeedTrapListener implements TestListenerInterface {
   /**
    * A test suite ended.
    *
-   * @param \PHPUnit_Framework_TestSuite $suite
+   * @param TestSuite $suite
    */
   public function endTestSuite(TestInterface $suite) {
     $this->suites--;

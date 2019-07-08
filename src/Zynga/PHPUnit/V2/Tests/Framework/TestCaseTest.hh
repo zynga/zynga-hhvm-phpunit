@@ -17,6 +17,7 @@ use Zynga\Framework\Environment\SuperGlobals\V1\SuperGlobals;
 use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentException;
 use Zynga\PHPUnit\V2\TestCase;
 use Zynga\PHPUnit\V2\TestCase\Status;
+use Zynga\PHPUnit\V2\TestSuite;
 use Zynga\PHPUnit\V2\Tests\Framework\BaseTest;
 use Zynga\PHPUnit\V2\Tests\Mock\ChangeCurrentWorkingDirectory;
 use Zynga\PHPUnit\V2\Tests\Mock\ExceptionInAssertPreConditions;
@@ -42,8 +43,6 @@ use Zynga\PHPUnit\V2\Tests\Mock\WasRun;
 use Zynga\PHPUnit\V2\TestFailure;
 use Zynga\PHPUnit\V2\TestResult;
 use Zynga\PHPUnit\V2\Version;
-
-use \PHPUnit_Framework_TestSuite;
 
 use \Exception;
 use \Throwable;
@@ -216,7 +215,7 @@ class TestCaseTest extends TestCase {
   }
 
   private function _verifyTestSuite(
-    PHPUnit_Framework_TestSuite $test,
+    TestSuite $test,
     TestResult $result,
     bool $debug = false,
     int $errorCount = 0,
@@ -481,7 +480,7 @@ class TestCaseTest extends TestCase {
 
   public function testNoArgTestCasePasses(): void {
 
-    $suite = new PHPUnit_Framework_TestSuite(NoArgTestCase::class);
+    $suite = new TestSuite(NoArgTestCase::class);
 
     $result = $suite->run();
 
