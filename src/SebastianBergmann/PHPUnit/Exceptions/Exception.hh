@@ -7,7 +7,7 @@ namespace SebastianBergmann\PHPUnit\Exceptions;
 // simplify the base exception pretty significantly.
 // --
 
-use SebastianBergmann\PHPUnit\Interfaces\ExceptionInterface;
+use Zynga\PHPUnit\V2\Interfaces\ExceptionInterface;
 use \RuntimeException;
 
 class Exception extends RuntimeException implements ExceptionInterface {}

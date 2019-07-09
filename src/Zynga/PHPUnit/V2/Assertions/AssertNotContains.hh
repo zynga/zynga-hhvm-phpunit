@@ -3,9 +3,9 @@
 namespace Zynga\PHPUnit\V2\Assertions;
 
 use Zynga\PHPUnit\V2\Assertions;
-use SebastianBergmann\PHPUnit\Constraints\NotConstraint;
-use SebastianBergmann\PHPUnit\Constraints\StringContainsConstraint;
-use SebastianBergmann\PHPUnit\Constraints\TraversableContainsConstraint;
+use Zynga\PHPUnit\V2\Constraints\NotConstraint;
+use Zynga\PHPUnit\V2\Constraints\StringContainsConstraint;
+use Zynga\PHPUnit\V2\Constraints\TraversableContainsConstraint;
 use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentExceptionFactory;
 
 class AssertNotContains {

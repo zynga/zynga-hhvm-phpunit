@@ -6,7 +6,7 @@ use SebastianBergmann\Comparator\ComparisonFailure;
 use SebastianBergmann\PHPUnit\Exceptions\ErrorException;
 use SebastianBergmann\PHPUnit\Exceptions\ExceptionWrapper;
 use SebastianBergmann\PHPUnit\Exceptions\ExpectationFailedException;
-use SebastianBergmann\PHPUnit\Interfaces\SelfDescribingInterface;
+use Zynga\PHPUnit\V2\Interfaces\SelfDescribingInterface;
 use \Exception;
 
 class ExceptionUtil {

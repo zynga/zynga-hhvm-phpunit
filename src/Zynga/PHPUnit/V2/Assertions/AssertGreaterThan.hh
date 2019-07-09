@@ -3,7 +3,7 @@
 namespace Zynga\PHPUnit\V2\Assertions;
 
 use Zynga\PHPUnit\V2\Assertions;
-use SebastianBergmann\PHPUnit\Constraints\GreaterThanConstraint;
+use Zynga\PHPUnit\V2\Constraints\GreaterThanConstraint;
 
 class AssertGreaterThan {
 

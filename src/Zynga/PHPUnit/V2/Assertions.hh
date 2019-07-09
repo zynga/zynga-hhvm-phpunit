@@ -116,7 +116,7 @@ use Zynga\PHPUnit\V2\Assertions\AssertXmlStringNotEqualsXmlString;
 use Zynga\PHPUnit\V2\Assertions\GetObjectAttribute;
 use Zynga\PHPUnit\V2\Assertions\GetStaticAttribute;
 use Zynga\PHPUnit\V2\Assertions\ReadAttribute;
-use SebastianBergmann\PHPUnit\Interfaces\ConstraintInterface;
+use Zynga\PHPUnit\V2\Interfaces\ConstraintInterface;
 use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
 use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;

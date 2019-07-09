@@ -3,8 +3,8 @@
 namespace Zynga\PHPUnit\V2\Assertions;
 
 use Zynga\PHPUnit\V2\Assertions;
-use SebastianBergmann\PHPUnit\Constraints\NotConstraint;
-use SebastianBergmann\PHPUnit\Constraints\StringMatchesConstraint;
+use Zynga\PHPUnit\V2\Constraints\NotConstraint;
+use Zynga\PHPUnit\V2\Constraints\StringMatchesConstraint;
 use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentExceptionFactory;
 
 class AssertStringNotMatchesFormatFile {

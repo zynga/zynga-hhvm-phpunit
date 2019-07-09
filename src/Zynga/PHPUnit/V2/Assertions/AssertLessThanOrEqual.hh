@@ -3,9 +3,9 @@
 namespace Zynga\PHPUnit\V2\Assertions;
 
 use Zynga\PHPUnit\V2\Assertions;
-use SebastianBergmann\PHPUnit\Constraints\IsEqualConstraint;
-use SebastianBergmann\PHPUnit\Constraints\LessThanConstraint;
-use SebastianBergmann\PHPUnit\Constraints\OrConstraint;
+use Zynga\PHPUnit\V2\Constraints\IsEqualConstraint;
+use Zynga\PHPUnit\V2\Constraints\LessThanConstraint;
+use Zynga\PHPUnit\V2\Constraints\OrConstraint;
 
 class AssertLessThanOrEqual {
 

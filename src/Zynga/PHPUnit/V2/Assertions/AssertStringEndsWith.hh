@@ -3,7 +3,7 @@
 namespace Zynga\PHPUnit\V2\Assertions;
 
 use Zynga\PHPUnit\V2\Assertions;
-use SebastianBergmann\PHPUnit\Constraints\StringEndsWithConstraint;
+use Zynga\PHPUnit\V2\Constraints\StringEndsWithConstraint;
 use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentExceptionFactory;
 
 class AssertStringEndsWith {

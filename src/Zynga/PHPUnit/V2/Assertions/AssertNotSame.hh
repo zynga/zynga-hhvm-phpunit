@@ -3,8 +3,8 @@
 namespace Zynga\PHPUnit\V2\Assertions;
 
 use Zynga\PHPUnit\V2\Assertions;
-use SebastianBergmann\PHPUnit\Constraints\IsIdenticalConstraint;
-use SebastianBergmann\PHPUnit\Constraints\NotConstraint;
+use Zynga\PHPUnit\V2\Constraints\IsIdenticalConstraint;
+use Zynga\PHPUnit\V2\Constraints\NotConstraint;
 
 class AssertNotSame {
 

@@ -3,7 +3,7 @@
 namespace Zynga\PHPUnit\V2\Assertions;
 
 use Zynga\PHPUnit\V2\Assertions;
-use SebastianBergmann\PHPUnit\Constraints\ClassHasStaticAttributeConstraint;
+use Zynga\PHPUnit\V2\Constraints\ClassHasStaticAttributeConstraint;
 use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentExceptionFactory;
 
 class AssertClassHasStaticAttribute {

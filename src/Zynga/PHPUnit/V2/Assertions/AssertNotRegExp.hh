@@ -3,8 +3,8 @@
 namespace Zynga\PHPUnit\V2\Assertions;
 
 use Zynga\PHPUnit\V2\Assertions;
-use SebastianBergmann\PHPUnit\Constraints\NotConstraint;
-use SebastianBergmann\PHPUnit\Constraints\PCREMatchConstraint;
+use Zynga\PHPUnit\V2\Constraints\NotConstraint;
+use Zynga\PHPUnit\V2\Constraints\PCREMatchConstraint;
 use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentExceptionFactory;
 
 class AssertNotRegExp {

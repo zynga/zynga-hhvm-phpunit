@@ -3,8 +3,8 @@
 namespace Zynga\PHPUnit\V2\Assertions;
 
 use Zynga\PHPUnit\V2\Assertions;
-use SebastianBergmann\PHPUnit\Constraints\JsonMatchesConstraint;
-use SebastianBergmann\PHPUnit\Constraints\NotConstraint;
+use Zynga\PHPUnit\V2\Constraints\JsonMatchesConstraint;
+use Zynga\PHPUnit\V2\Constraints\NotConstraint;
 
 class AssertJsonStringNotEqualsJsonFile {
 

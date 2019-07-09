@@ -3,8 +3,8 @@
 namespace Zynga\PHPUnit\V2\Assertions;
 
 use Zynga\PHPUnit\V2\Assertions;
-use SebastianBergmann\PHPUnit\Constraints\CountConstraint;
-use SebastianBergmann\PHPUnit\Constraints\NotConstraint;
+use Zynga\PHPUnit\V2\Constraints\CountConstraint;
+use Zynga\PHPUnit\V2\Constraints\NotConstraint;
 use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentExceptionFactory;
 use \Countable;
 use \Traversable;

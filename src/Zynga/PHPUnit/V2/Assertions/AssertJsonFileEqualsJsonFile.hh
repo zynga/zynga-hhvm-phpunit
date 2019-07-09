@@ -3,7 +3,7 @@
 namespace Zynga\PHPUnit\V2\Assertions;
 
 use Zynga\PHPUnit\V2\Assertions;
-use SebastianBergmann\PHPUnit\Constraints\JsonMatchesConstraint;
+use Zynga\PHPUnit\V2\Constraints\JsonMatchesConstraint;
 
 class AssertJsonFileEqualsJsonFile {
 

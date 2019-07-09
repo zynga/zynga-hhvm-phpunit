@@ -4,8 +4,8 @@ namespace Zynga\PHPUnit\V2\Assertions;
 
 use Zynga\PHPUnit\V2\Assertions;
 use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentExceptionFactory;
-use SebastianBergmann\PHPUnit\Constraints\StringContainsConstraint;
-use SebastianBergmann\PHPUnit\Constraints\TraversableContainsConstraint;
+use Zynga\PHPUnit\V2\Constraints\StringContainsConstraint;
+use Zynga\PHPUnit\V2\Constraints\TraversableContainsConstraint;
 
 class AssertContains {
 

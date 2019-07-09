@@ -12,7 +12,7 @@ namespace SebastianBergmann\PHPUnit\Exceptions;
  */
 
 use SebastianBergmann\PHPUnit\Exceptions\Exception;
-use SebastianBergmann\PHPUnit\Interfaces\SelfDescribingInterface;
+use Zynga\PHPUnit\V2\Interfaces\SelfDescribingInterface;
 
 /**
  * Thrown when an assertion failed.
