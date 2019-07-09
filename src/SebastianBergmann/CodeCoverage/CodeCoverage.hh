@@ -824,7 +824,7 @@ class CodeCoverage {
   private function initializeData(): void {
     $this->isInitialized = true;
 
-    echo date('r')." - initalizeData - start\n";
+    echo date('r')." - CodeCoverage::initalizeData - start\n";
 
     $fileCount = 0;
 
@@ -851,7 +851,7 @@ class CodeCoverage {
 
     }
 
-    echo date('r')." - initalizeData - complete fileCount=$fileCount\n";
+    echo date('r')." - CodeCoverage::initalizeData - complete fileCount=$fileCount\n";
 
   }
 
