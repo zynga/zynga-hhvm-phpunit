@@ -152,6 +152,7 @@ class SpeedTrapListener implements TestListenerInterface {
     }
 
     $time = $this->toMilliseconds($time);
+
     $threshold = $this->slowThreshold;
 
     if ($this->isSlow($time, $threshold)) {
@@ -237,9 +238,9 @@ class SpeedTrapListener implements TestListenerInterface {
   protected function makeLabel(TestInterface $test) {
     $name = 'UNKNOWN';
 
-    if ($test instanceof TestCase) {
-      $name = $test->getName();
-    }
+    //if ($test instanceof TestCase) {
+    $name = $test->getName();
+    //}
     return sprintf('%s:%s', get_class($test), $name);
   }
 
