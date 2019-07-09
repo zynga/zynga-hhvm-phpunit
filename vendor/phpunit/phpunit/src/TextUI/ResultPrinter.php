@@ -124,6 +124,9 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
    */
   private $defectListPrinted = false;
 
+  private int $_slowTestMax;
+  private Map<string, int> $_slowTests;
+
   /**
    * Constructor.
    *
@@ -194,6 +197,10 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
     } else {
       $this->colors = (self::COLOR_ALWAYS === $colors);
     }
+
+    $this->_slowTestMax = 10; // 10ms by default.
+    $this->_slowTests = Map {};
+
   }
 
   /**
@@ -291,6 +298,16 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
   }
 
   /**
+   * Convert PHPUnit's reported test time (microseconds) to milliseconds.
+   *
+   * @param float $time
+   * @return int
+   */
+  protected function toMilliseconds($time) {
+    return (int) round($time * 1000);
+  }
+
+  /**
    * @param TestResult $result
    */
   protected function printErrors(TestResult $result) {
@@ -344,10 +361,39 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
    * @param TestResult $result
    */
   protected function printFooter(TestResult $result) {
+
     if (count($result) === 0) {
       $this->writeWithColor('fg-black, bg-yellow', 'No tests executed!');
-
       return;
+    }
+
+    if ($this->_slowTests->count() > 0) {
+
+      $perfColor = 'bg-black, fg-red';
+
+      $this->writeWithColor(
+        $perfColor,
+        sprintf(
+          'Your should really fix these slow tests (>%dms)',
+          $this->_slowTestMax,
+        ),
+      );
+
+      $i = 0;
+
+      foreach ($this->_slowTests as $slowTest => $elapsed) {
+
+        $i++;
+
+        $this->writeWithColor(
+          $perfColor,
+          sprintf(' %4d. %dms to run %s', $i, $elapsed, $slowTest),
+        );
+
+      }
+
+      $this->writeNewLine();
+
     }
 
     $color = '';
@@ -415,6 +461,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
       $this->writeCountString($result->riskyCount(), 'Risky', $color);
       $this->writeWithColor($color, '.', true);
     }
+
   }
 
   /**
@@ -435,7 +482,14 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
     Exception $e,
     float $time,
   ): void {
-    $this->writeProgressWithColor('fg-red, bold', 'E');
+    $this->numTestsRun++;
+
+    if ($this->debug) {
+      $this->printSingleTestDebugLine($test, 'ERROR', $time, 'fg-red, bold');
+    } else {
+      $this->writeProgressWithColor('fg-red, bold', 'E');
+    }
+
     $this->lastTestFailed = true;
   }
 
@@ -451,7 +505,19 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
     Exception $e,
     float $time,
   ): void {
-    $this->writeProgressWithColor('bg-red, fg-white', 'F');
+    $this->numTestsRun++;
+
+    if ($this->debug) {
+      $this->printSingleTestDebugLine(
+        $test,
+        'FAILED',
+        $time,
+        'bg-red, fg-white',
+      );
+    } else {
+      $this->writeProgressWithColor('bg-red, fg-white', 'F');
+    }
+
     $this->lastTestFailed = true;
   }
 
@@ -469,7 +535,19 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
     Exception $e,
     float $time,
   ): void {
-    $this->writeProgressWithColor('fg-yellow, bold', 'W');
+    $this->numTestsRun++;
+
+    if ($this->debug) {
+      $this->printSingleTestDebugLine(
+        $test,
+        'WARNING',
+        $time,
+        'fg-yellow, bold',
+      );
+    } else {
+      $this->writeProgressWithColor('fg-yellow, bold', 'W');
+    }
+
     $this->lastTestFailed = true;
   }
 
@@ -485,7 +563,20 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
     Exception $e,
     float $time,
   ): void {
-    $this->writeProgressWithColor('fg-yellow, bold', 'I');
+
+    $this->numTestsRun++;
+
+    if ($this->debug) {
+      $this->printSingleTestDebugLine(
+        $test,
+        'INCOMPLETE',
+        $time,
+        'fg-yellow, bold',
+      );
+    } else {
+      $this->writeProgressWithColor('fg-yellow, bold', 'I');
+    }
+
     $this->lastTestFailed = true;
   }
 
@@ -503,7 +594,20 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
     Exception $e,
     float $time,
   ): void {
-    $this->writeProgressWithColor('fg-yellow, bold', 'R');
+
+    $this->numTestsRun++;
+
+    if ($this->debug) {
+      $this->printSingleTestDebugLine(
+        $test,
+        'RISKY',
+        $time,
+        'fg-yellow, bold',
+      );
+    } else {
+      $this->writeProgressWithColor('fg-yellow, bold', 'R');
+    }
+
     $this->lastTestFailed = true;
   }
 
@@ -521,7 +625,20 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
     Exception $e,
     float $time,
   ): void {
-    $this->writeProgressWithColor('fg-cyan, bold', 'S');
+
+    $this->numTestsRun++;
+
+    if ($this->debug) {
+      $this->printSingleTestDebugLine(
+        $test,
+        'SKIPPED',
+        $time,
+        'fg-cyan, bold',
+      );
+    } else {
+      $this->writeProgressWithColor('fg-cyan, bold', 'S');
+    }
+
     $this->lastTestFailed = true;
   }
 
@@ -558,16 +675,48 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
    * @param TestInterface $test
    */
   public function startTest(TestInterface $test): void {
-    if ($this->debug) {
-      $this->write(
-        "\n".
-        date('r').
-        sprintf(
-          " - Starting test '%s'.\n",
-          PHPUnit_Util_Test::describe($test),
-        ),
-      );
+
+    $testName = PHPUnit_Util_Test::describe($test);
+
+    $this->printSingleTestDebugLine($test, 'Started', 0.0);
+
+  }
+
+  private function printSingleTestDebugLine(
+    TestInterface $test,
+    string $message,
+    float $elapsed,
+    string $color = 'bg-black, fg-green',
+  ): void {
+
+    if ($this->debug !== true) {
+      return;
     }
+
+    $testName = PHPUnit_Util_Test::describe($test);
+
+    $elapsedMS = $this->toMilliseconds($elapsed);
+
+    if ($elapsedMS > $this->_slowTestMax) {
+      $message .= ', but elapsed > '.$this->_slowTestMax.'ms';
+      $color = 'bg-black, fg-red';
+      $this->_slowTests->set($testName, $elapsedMS);
+    }
+
+    $this->writeWithColor(
+      $color,
+      date('r').
+      sprintf(
+        " - '%100s' - %30s - [%4dms elapsed] - Status %6d/%6d (%3s%%)",
+        $testName,
+        $message,
+        $elapsedMS,
+        $this->numTestsRun,
+        $this->numTests,
+        floor(($this->numTestsRun / $this->numTests) * 100),
+      ),
+    );
+
   }
 
   /**
@@ -577,8 +726,17 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
    * @param float                  $time
    */
   public function endTest(TestInterface $test, float $time): void {
+
+    $this->numTestsRun++;
+
+    $testName = PHPUnit_Util_Test::describe($test);
+
     if (!$this->lastTestFailed) {
-      $this->writeProgress('.');
+      if ($this->debug) {
+        $this->printSingleTestDebugLine($test, 'OK', $time);
+      } else {
+        $this->writeProgress('.');
+      }
     }
 
     if ($test instanceof TestCase) {
@@ -596,6 +754,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
         $this->write($test->getActualOutput());
       }
     }
+
   }
 
   /**
@@ -604,7 +763,6 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
   protected function writeProgress($progress) {
     $this->write($progress);
     $this->column++;
-    $this->numTestsRun++;
 
     if ($this->column == $this->maxColumn ||
         $this->numTestsRun == $this->numTests) {
