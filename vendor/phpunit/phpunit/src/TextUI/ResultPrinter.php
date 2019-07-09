@@ -678,6 +678,11 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
 
     $testName = PHPUnit_Util_Test::describe($test);
 
+    $this->writeWithColor(
+      'bg-black, fg-green',
+      date('r').sprintf(" - '%s'", $testName),
+    );
+
     $this->printSingleTestDebugLine($test, 'Started', 0.0);
 
   }
@@ -707,8 +712,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
       $color,
       date('r').
       sprintf(
-        " - '%100s' - %30s - [%4dms elapsed] - Status %6d/%6d (%3s%%)",
-        $testName,
+        " - %30s - [%4dms elapsed] - Status %6d/%6d (%3s%%)",
         $message,
         $elapsedMS,
         $this->numTestsRun,
