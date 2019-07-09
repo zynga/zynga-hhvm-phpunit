@@ -1,8 +1,8 @@
 <?hh // strict
 
-namespace SebastianBergmann\PHPUnit\Exceptions;
+namespace Zynga\PHPUnit\V2\Exceptions;
 
-use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentException;
+use Zynga\PHPUnit\V2\Exceptions\InvalidArgumentException;
 
 class InvalidArgumentExceptionFactory {
 

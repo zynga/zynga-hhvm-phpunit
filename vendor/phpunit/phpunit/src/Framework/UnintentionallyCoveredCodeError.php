@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-use SebastianBergmann\PHPUnit\Exceptions\TestError\RiskyException;
+use Zynga\PHPUnit\V2\Exceptions\TestError\RiskyException;
 
 /**
  * Extension to RiskyException to mark the special

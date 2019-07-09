@@ -3,7 +3,7 @@
 namespace Zynga\PHPUnit\V2\Assertions;
 
 use Zynga\PHPUnit\V2\Assertions;
-use SebastianBergmann\PHPUnit\Environment\XML;
+use Zynga\PHPUnit\V2\Environment\XML;
 
 class AssertXmlStringEqualsXmlFile {
 

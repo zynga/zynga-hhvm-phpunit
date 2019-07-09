@@ -4,7 +4,7 @@ namespace Zynga\PHPUnit\V2\Assertions;
 
 use Zynga\PHPUnit\V2\Assertions;
 use Zynga\PHPUnit\V2\Constraints\FileExistsConstraint;
-use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentExceptionFactory;
+use Zynga\PHPUnit\V2\Exceptions\InvalidArgumentExceptionFactory;
 
 class AssertFileExists {
 

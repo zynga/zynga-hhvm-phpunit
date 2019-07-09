@@ -2,7 +2,7 @@
 
 namespace Zynga\PHPUnit\V2\Tests\Framework;
 
-use SebastianBergmann\PHPUnit\Exceptions\Exception;
+use Zynga\PHPUnit\V2\Exceptions\Exception;
 use Zynga\PHPUnit\V2\TestCase;
 use Zynga\PHPUnit\V2\TestFailure;
 

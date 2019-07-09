@@ -15,8 +15,8 @@ Changes from vanilla phpunit here:
 1. Changed ordering of classes, functions, lines to be consistent throughout the UI.
 1. Removed / reduced the usage of TextTemplate usage within the html template, as we have a very large code base the amount of str_replace overhead catches up with you.
 1. Removed the file require|inclusion within code coverage. This lead to older php code being blind executed. Also hid some of the performance issues around loading of certain legacy libraries.
-1. Migrated PHP_Util_XML to SebastianBergmann\PHPUnit\Environment\XML
-1. Migrated PHP_Util_String to SebastianBergmann\PHPUnit\Environment\Strings
+1. Migrated PHP_Util_XML to Zynga\PHPUnit\V2\Environment\XML
+1. Migrated PHP_Util_String to Zynga\PHPUnit\V2\Environment\Strings
 
 # TODO  
 1. SebastianBergmann\TokenStream\Token\StreamMethodStructure->methodSignature isn't working correctly, needs fixing. Might be only multi-line function signatures that are broken - TBD.

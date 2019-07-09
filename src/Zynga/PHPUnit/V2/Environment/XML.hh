@@ -1,6 +1,6 @@
 <?hh // strict
 
-namespace SebastianBergmann\PHPUnit\Environment;
+namespace Zynga\PHPUnit\V2\Environment;
 
 /*
  * This file is part of PHPUnit.
@@ -11,8 +11,8 @@ namespace SebastianBergmann\PHPUnit\Environment;
  * file that was distributed with this source code.
  */
 
-use SebastianBergmann\PHPUnit\Environment\Strings;
-use SebastianBergmann\PHPUnit\Exceptions\XML\LoadException;
+use Zynga\PHPUnit\V2\Environment\Strings;
+use Zynga\PHPUnit\V2\Exceptions\XML\LoadException;
 use Zynga\Framework\Dynamic\V1\DynamicClassCreation;
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 

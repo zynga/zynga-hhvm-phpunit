@@ -1,6 +1,6 @@
 <?hh // strict
 
-namespace SebastianBergmann\PHPUnit\Exceptions;
+namespace Zynga\PHPUnit\V2\Exceptions;
 
 /*
  * This file is part of PHPUnit.
@@ -11,16 +11,15 @@ namespace SebastianBergmann\PHPUnit\Exceptions;
  * file that was distributed with this source code.
  */
 
-use SebastianBergmann\PHPUnit\Exceptions\Exception;
-use Zynga\PHPUnit\V2\Interfaces\SelfDescribingInterface;
+use Zynga\PHPUnit\V2\Exceptions\Exception;
 
 /**
- * Thrown when an assertion failed.
+ * Thrown when an there is a warning.
  *
- * @since Class available since Release 2.0.0
+ * @since Class available since Release 5.0.0
  */
-class AssertionFailedException extends Exception
-  implements SelfDescribingInterface {
+class WarningException extends Exception {
+
   /**
    * Wrapper for getMessage() which is declared as final.
    *
@@ -29,4 +28,5 @@ class AssertionFailedException extends Exception
   public function toString(): string {
     return $this->getMessage();
   }
+
 }

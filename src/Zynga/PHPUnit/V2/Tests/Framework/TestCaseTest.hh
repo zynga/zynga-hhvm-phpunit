@@ -14,7 +14,7 @@ namespace Zynga\PHPUnit\V2\Tests\Framework;
 //use SebastianBergmann\TextTemplate\Template as Text_Template;
 
 use Zynga\Framework\Environment\SuperGlobals\V1\SuperGlobals;
-use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentException;
+use Zynga\PHPUnit\V2\Exceptions\InvalidArgumentException;
 use Zynga\PHPUnit\V2\TestCase;
 use Zynga\PHPUnit\V2\TestCase\Status;
 use Zynga\PHPUnit\V2\TestSuite;

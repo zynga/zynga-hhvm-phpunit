@@ -3,7 +3,7 @@
 namespace Zynga\PHPUnit\V2\Assertions;
 
 use Zynga\PHPUnit\V2\Assertions;
-use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentExceptionFactory;
+use Zynga\PHPUnit\V2\Exceptions\InvalidArgumentExceptionFactory;
 
 class ReadAttribute {
 

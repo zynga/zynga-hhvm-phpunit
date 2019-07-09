@@ -2,13 +2,13 @@
 
 namespace Zynga\PHPUnit\V2\TestResult;
 
-use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
-use SebastianBergmann\PHPUnit\Exceptions\ExpectationFailedException;
-use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentException;
-use SebastianBergmann\PHPUnit\Exceptions\WarningException;
-use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
-use SebastianBergmann\PHPUnit\Exceptions\TestError\RiskyException;
-use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
+use Zynga\PHPUnit\V2\Exceptions\AssertionFailedException;
+use Zynga\PHPUnit\V2\Exceptions\ExpectationFailedException;
+use Zynga\PHPUnit\V2\Exceptions\InvalidArgumentException;
+use Zynga\PHPUnit\V2\Exceptions\WarningException;
+use Zynga\PHPUnit\V2\Exceptions\TestError\IncompleteException;
+use Zynga\PHPUnit\V2\Exceptions\TestError\RiskyException;
+use Zynga\PHPUnit\V2\Exceptions\TestError\SkippedException;
 use Zynga\Framework\Dynamic\V1\DynamicMethodCall;
 use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\TestFailure;

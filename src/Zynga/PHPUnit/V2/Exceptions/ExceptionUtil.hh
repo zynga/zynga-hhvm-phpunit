@@ -1,11 +1,11 @@
 <?hh // strict
 
-namespace SebastianBergmann\PHPUnit\Exceptions;
+namespace Zynga\PHPUnit\V2\Exceptions;
 
 use SebastianBergmann\Comparator\ComparisonFailure;
-use SebastianBergmann\PHPUnit\Exceptions\ErrorException;
-use SebastianBergmann\PHPUnit\Exceptions\ExceptionWrapper;
-use SebastianBergmann\PHPUnit\Exceptions\ExpectationFailedException;
+use Zynga\PHPUnit\V2\Exceptions\ErrorException;
+use Zynga\PHPUnit\V2\Exceptions\ExceptionWrapper;
+use Zynga\PHPUnit\V2\Exceptions\ExpectationFailedException;
 use Zynga\PHPUnit\V2\Interfaces\SelfDescribingInterface;
 use \Exception;
 

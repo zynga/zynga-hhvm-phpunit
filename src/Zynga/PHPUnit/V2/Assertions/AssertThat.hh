@@ -3,8 +3,8 @@
 namespace Zynga\PHPUnit\V2\Assertions;
 
 use Zynga\PHPUnit\V2\Assertions;
-use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
-use SebastianBergmann\PHPUnit\Exceptions\ExpectationFailedException;
+use Zynga\PHPUnit\V2\Exceptions\AssertionFailedException;
+use Zynga\PHPUnit\V2\Exceptions\ExpectationFailedException;
 use Zynga\PHPUnit\V2\Interfaces\ConstraintInterface;
 
 class AssertThat {

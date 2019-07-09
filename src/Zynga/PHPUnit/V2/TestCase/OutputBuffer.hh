@@ -2,8 +2,8 @@
 
 namespace Zynga\PHPUnit\V2\TestCase;
 
-use SebastianBergmann\PHPUnit\Environment\OutputBuffering;
-use SebastianBergmann\PHPUnit\Exceptions\TestError\RiskyException;
+use Zynga\PHPUnit\V2\Environment\OutputBuffering;
+use Zynga\PHPUnit\V2\Exceptions\TestError\RiskyException;
 
 class OutputBuffer {
 

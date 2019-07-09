@@ -12,7 +12,7 @@ namespace Zynga\PHPUnit\V2\Constraints;
  */
 
 use Zynga\PHPUnit\V2\Constraints\Base;
-use SebastianBergmann\PHPUnit\Environment\LanguageTypes;
+use Zynga\PHPUnit\V2\Environment\LanguageTypes;
 
 /**
  * Constraint that asserts that the value it is evaluated for is of a

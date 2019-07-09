@@ -8,9 +8,9 @@
  * file that was distributed with this source code.
  */
 
-use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
-use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
-use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
+use Zynga\PHPUnit\V2\Exceptions\AssertionFailedException;
+use Zynga\PHPUnit\V2\Exceptions\TestError\IncompleteException;
+use Zynga\PHPUnit\V2\Exceptions\TestError\SkippedException;
 use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\TestResult;
 

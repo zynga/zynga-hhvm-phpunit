@@ -1,6 +1,6 @@
 <?hh // strict
 
-namespace SebastianBergmann\PHPUnit\Environment\JSON;
+namespace Zynga\PHPUnit\V2\Environment\JSON;
 
 /*
  * This file is part of PHPUnit.

@@ -3,9 +3,9 @@
 namespace Zynga\PHPUnit\V2\Assertions;
 
 use Zynga\PHPUnit\V2\Assertions;
-use SebastianBergmann\PHPUnit\Environment\XML;
-use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
-use SebastianBergmann\PHPUnit\Exceptions\XML\LoadException;
+use Zynga\PHPUnit\V2\Environment\XML;
+use Zynga\PHPUnit\V2\Exceptions\AssertionFailedException;
+use Zynga\PHPUnit\V2\Exceptions\XML\LoadException;
 
 class AssertXmlStringEqualsXmlString {
 

@@ -2,7 +2,7 @@
 
 namespace Zynga\PHPUnit\V2\TestSuite\DataProvider;
 
-use SebastianBergmann\PHPUnit\Exceptions\Exception as PHPUnitException;
+use Zynga\PHPUnit\V2\Exceptions\Exception as PHPUnitException;
 
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 //use Zynga\Framework\ReflectionCache\V1\ReflectionFunctions;

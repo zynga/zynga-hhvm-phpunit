@@ -2,9 +2,9 @@
 
 namespace Zynga\PHPUnit\V2\TestSuite;
 
-use SebastianBergmann\PHPUnit\Exceptions\Exception as PHPUnitException;
-use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
-use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
+use Zynga\PHPUnit\V2\Exceptions\Exception as PHPUnitException;
+use Zynga\PHPUnit\V2\Exceptions\TestError\IncompleteException;
+use Zynga\PHPUnit\V2\Exceptions\TestError\SkippedException;
 use Zynga\PHPUnit\V2\Annotations;
 use Zynga\PHPUnit\V2\IncompleteTestCase;
 use Zynga\PHPUnit\V2\Interfaces\TestInterface;

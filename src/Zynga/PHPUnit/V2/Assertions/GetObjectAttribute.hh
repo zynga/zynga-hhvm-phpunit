@@ -2,8 +2,8 @@
 
 namespace Zynga\PHPUnit\V2\Assertions;
 
-use SebastianBergmann\PHPUnit\Exceptions\AttributeNotFoundException;
-use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentExceptionFactory;
+use Zynga\PHPUnit\V2\Exceptions\AttributeNotFoundException;
+use Zynga\PHPUnit\V2\Exceptions\InvalidArgumentExceptionFactory;
 
 use \ReflectionClass;
 use \ReflectionObject;

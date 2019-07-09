@@ -6,7 +6,7 @@ use Zynga\PHPUnit\V2\Assertions;
 use Zynga\PHPUnit\V2\Constraints\NotConstraint;
 use Zynga\PHPUnit\V2\Constraints\StringContainsConstraint;
 use Zynga\PHPUnit\V2\Constraints\TraversableContainsConstraint;
-use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentExceptionFactory;
+use Zynga\PHPUnit\V2\Exceptions\InvalidArgumentExceptionFactory;
 
 class AssertNotContains {
 

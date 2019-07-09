@@ -11,11 +11,11 @@ namespace Zynga\PHPUnit\V2\Tests\Framework;
  * file that was distributed with this source code.
  */
 
-use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
-use SebastianBergmann\PHPUnit\Exceptions\AttributeNotFoundException;
-use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentException;
-use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
-use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
+use Zynga\PHPUnit\V2\Exceptions\AssertionFailedException;
+use Zynga\PHPUnit\V2\Exceptions\AttributeNotFoundException;
+use Zynga\PHPUnit\V2\Exceptions\InvalidArgumentException;
+use Zynga\PHPUnit\V2\Exceptions\TestError\IncompleteException;
+use Zynga\PHPUnit\V2\Exceptions\TestError\SkippedException;
 
 use Zynga\Framework\Environment\CodePath\V1\CodePath;
 use Zynga\PHPUnit\V2\Tests\Mock\Author;

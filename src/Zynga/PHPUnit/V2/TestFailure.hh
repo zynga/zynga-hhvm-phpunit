@@ -11,8 +11,8 @@ namespace Zynga\PHPUnit\V2;
  * file that was distributed with this source code.
  */
 
-use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
-use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
+use Zynga\PHPUnit\V2\Exceptions\AssertionFailedException;
+use Zynga\PHPUnit\V2\Exceptions\TestError\IncompleteException;
 use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\TestCase;
 use \PHPUnit_Framework_SelfDescribing;

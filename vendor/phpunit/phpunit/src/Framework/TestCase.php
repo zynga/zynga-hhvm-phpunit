@@ -10,12 +10,12 @@
  */
 
 use SebastianBergmann\Exporter\Exporter;
-use SebastianBergmann\PHPUnit\Environment\OutputBuffering;
-use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
-use SebastianBergmann\PHPUnit\Exceptions\WarningException;
-use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
-use SebastianBergmann\PHPUnit\Exceptions\TestError\RiskyException;
-use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
+use Zynga\PHPUnit\V2\Environment\OutputBuffering;
+use Zynga\PHPUnit\V2\Exceptions\AssertionFailedException;
+use Zynga\PHPUnit\V2\Exceptions\WarningException;
+use Zynga\PHPUnit\V2\Exceptions\TestError\IncompleteException;
+use Zynga\PHPUnit\V2\Exceptions\TestError\RiskyException;
+use Zynga\PHPUnit\V2\Exceptions\TestError\SkippedException;
 use DeepCopy\DeepCopy;
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 use Zynga\PHPUnit\V2\TestCase;

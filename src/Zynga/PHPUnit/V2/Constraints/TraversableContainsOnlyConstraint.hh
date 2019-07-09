@@ -12,7 +12,7 @@ namespace Zynga\PHPUnit\V2\Constraints;
  */
 
 use Zynga\PHPUnit\V2\Constraints\Base;
-use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
+use Zynga\PHPUnit\V2\Exceptions\AssertionFailedException;
 use Zynga\PHPUnit\V2\Interfaces\ConstraintInterface;
 use \Exception;
 

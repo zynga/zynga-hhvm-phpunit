@@ -3,7 +3,7 @@
 namespace Zynga\PHPUnit\V2\Assertions;
 
 use Zynga\PHPUnit\V2\Assertions;
-use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
+use Zynga\PHPUnit\V2\Exceptions\AssertionFailedException;
 use
   Zynga\Framework\Environment\ErrorCapture\V1\Handler\ConvertErrorsToExceptions
 ;

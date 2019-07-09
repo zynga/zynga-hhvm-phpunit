@@ -5,8 +5,8 @@ namespace Zynga\PHPUnit\V2\Assertions;
 use Zynga\PHPUnit\V2\Assertions;
 use Zynga\PHPUnit\V2\Constraints\NotConstraint;
 use Zynga\PHPUnit\V2\Constraints\TraversableContainsOnlyConstraint;
-use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentExceptionFactory;
-use SebastianBergmann\PHPUnit\Environment\LanguageTypes;
+use Zynga\PHPUnit\V2\Exceptions\InvalidArgumentExceptionFactory;
+use Zynga\PHPUnit\V2\Environment\LanguageTypes;
 
 class AssertNotContainsOnly {
   /**

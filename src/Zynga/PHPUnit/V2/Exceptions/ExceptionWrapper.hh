@@ -1,9 +1,9 @@
 <?hh // strict
 
-namespace SebastianBergmann\PHPUnit\Exceptions;
+namespace Zynga\PHPUnit\V2\Exceptions;
 
-use SebastianBergmann\PHPUnit\Exceptions\Exception as ExceptionBase;
-use SebastianBergmann\PHPUnit\Exceptions\ExceptionUtil;
+use Zynga\PHPUnit\V2\Exceptions\Exception as ExceptionBase;
+use Zynga\PHPUnit\V2\Exceptions\ExceptionUtil;
 
 use \Exception;
 

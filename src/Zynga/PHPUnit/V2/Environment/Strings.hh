@@ -1,6 +1,6 @@
 <?hh // strict
 
-namespace SebastianBergmann\PHPUnit\Environment;
+namespace Zynga\PHPUnit\V2\Environment;
 
 /*
  * This file is part of PHPUnit.

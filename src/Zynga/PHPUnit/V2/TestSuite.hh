@@ -2,9 +2,9 @@
 
 namespace Zynga\PHPUnit\V2;
 
-use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentExceptionFactory;
+use Zynga\PHPUnit\V2\Exceptions\InvalidArgumentExceptionFactory;
 use
-  SebastianBergmann\PHPUnit\Exceptions\TestSuiteError\SkippedException as TestSuiteSkippedException
+  Zynga\PHPUnit\V2\Exceptions\TestSuiteError\SkippedException as TestSuiteSkippedException
 ;
 
 use Zynga\Framework\Dynamic\V1\DynamicMethodCall;

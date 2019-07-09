@@ -1,6 +1,6 @@
 <?hh // strict
 
-namespace SebastianBergmann\PHPUnit\Exceptions;
+namespace Zynga\PHPUnit\V2\Exceptions;
 
 /*
  * This file is part of PHPUnit.
@@ -11,7 +11,7 @@ namespace SebastianBergmann\PHPUnit\Exceptions;
  * file that was distributed with this source code.
  */
 
-use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
+use Zynga\PHPUnit\V2\Exceptions\AssertionFailedException;
 use SebastianBergmann\Comparator\ComparisonFailure;
 use \Exception;
 

@@ -117,9 +117,9 @@ use Zynga\PHPUnit\V2\Assertions\GetObjectAttribute;
 use Zynga\PHPUnit\V2\Assertions\GetStaticAttribute;
 use Zynga\PHPUnit\V2\Assertions\ReadAttribute;
 use Zynga\PHPUnit\V2\Interfaces\ConstraintInterface;
-use SebastianBergmann\PHPUnit\Exceptions\AssertionFailedException;
-use SebastianBergmann\PHPUnit\Exceptions\TestError\IncompleteException;
-use SebastianBergmann\PHPUnit\Exceptions\TestError\SkippedException;
+use Zynga\PHPUnit\V2\Exceptions\AssertionFailedException;
+use Zynga\PHPUnit\V2\Exceptions\TestError\IncompleteException;
+use Zynga\PHPUnit\V2\Exceptions\TestError\SkippedException;
 use Zynga\PHPUnit\V2\Test\Base;
 
 use \DOMElement;

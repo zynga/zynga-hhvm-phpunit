@@ -12,7 +12,7 @@ namespace Zynga\PHPUnit\V2\Constraints;
  */
 
 use Zynga\PHPUnit\V2\Constraints\Base;
-use SebastianBergmann\PHPUnit\Environment\JSON\ErrorMessageProvider;
+use Zynga\PHPUnit\V2\Environment\JSON\ErrorMessageProvider;
 
 /**
  * Constraint that asserts that a string is valid JSON.

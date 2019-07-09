@@ -12,8 +12,8 @@ namespace Zynga\PHPUnit\V2\Tests\Framework;
  */
 
 use Zynga\PHPUnit\V2\Assertions;
-use SebastianBergmann\PHPUnit\Exceptions\ExceptionUtil;
-use SebastianBergmann\PHPUnit\Exceptions\ExpectationFailedException;
+use Zynga\PHPUnit\V2\Exceptions\ExceptionUtil;
+use Zynga\PHPUnit\V2\Exceptions\ExpectationFailedException;
 use Zynga\PHPUnit\V2\Constraints\Factory as ConstraintFactory;
 use Zynga\PHPUnit\V2\TestCase;
 

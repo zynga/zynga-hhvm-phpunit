@@ -1,6 +1,6 @@
 <?hh // strict
 
-namespace SebastianBergmann\PHPUnit\Environment;
+namespace Zynga\PHPUnit\V2\Environment;
 
 class OutputBuffering {
   private static bool $_isActive = false;

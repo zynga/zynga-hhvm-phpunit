@@ -4,7 +4,7 @@ namespace Zynga\PHPUnit\V2\Assertions;
 
 use Zynga\PHPUnit\V2\Assertions;
 use Zynga\PHPUnit\V2\Constraints\SameSizeConstraint;
-use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentExceptionFactory;
+use Zynga\PHPUnit\V2\Exceptions\InvalidArgumentExceptionFactory;
 
 use \Countable;
 use \Traversable;

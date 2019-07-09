@@ -13,7 +13,7 @@ namespace Zynga\PHPUnit\V2\Constraints;
 
 use SebastianBergmann\Exporter\Exporter;
 use SebastianBergmann\Comparator\ComparisonFailure;
-use SebastianBergmann\PHPUnit\Exceptions\ExpectationFailedException;
+use Zynga\PHPUnit\V2\Exceptions\ExpectationFailedException;
 use Zynga\PHPUnit\V2\Interfaces\SelfDescribingInterface;
 use Zynga\PHPUnit\V2\Interfaces\ConstraintInterface;
 use \Countable;

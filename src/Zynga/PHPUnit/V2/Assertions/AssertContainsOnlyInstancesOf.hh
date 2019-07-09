@@ -4,8 +4,8 @@ namespace Zynga\PHPUnit\V2\Assertions;
 
 use Zynga\PHPUnit\V2\Assertions;
 use Zynga\PHPUnit\V2\Constraints\TraversableContainsOnlyConstraint;
-//use SebastianBergmann\PHPUnit\Environment\LanguageTypes;
-use SebastianBergmann\PHPUnit\Exceptions\InvalidArgumentExceptionFactory;
+//use Zynga\PHPUnit\V2\Environment\LanguageTypes;
+use Zynga\PHPUnit\V2\Exceptions\InvalidArgumentExceptionFactory;
 
 class AssertContainsOnlyInstancesOf {
 

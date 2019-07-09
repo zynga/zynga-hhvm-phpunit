@@ -11,7 +11,7 @@ namespace Zynga\PHPUnit\V2;
  * file that was distributed with this source code.
  */
 
-use SebastianBergmann\PHPUnit\Exceptions\WarningException;
+use Zynga\PHPUnit\V2\Exceptions\WarningException;
 use Zynga\PHPUnit\V2\TestCase;
 
 /**
