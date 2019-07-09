@@ -831,8 +831,6 @@ class TestResult {
     $risky = false;
     $skipped = false;
 
-    $this->startTest($test);
-
     $this->run_handleErrorHandler();
 
     $codeCoverage = $this->getCodeCoverage();
@@ -844,6 +842,8 @@ class TestResult {
     if ($collectCodeCoverage && $codeCoverage instanceof CodeCoverage) {
       $codeCoverage->start($test);
     }
+
+    $this->startTest($test);
 
     $monitorFunctions =
       $this->isStrictAboutResourceUsageDuringSmallTests() &&
