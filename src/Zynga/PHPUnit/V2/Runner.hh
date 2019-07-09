@@ -53,7 +53,8 @@ class Runner {
       return RunnerPartialShim::runPHPUnit(true, $argStack->toArray());
 
     } catch (Exception $e) {
-      return $this->failure($e->getMessage() . ' backtrace=' . $e->getTraceAsString());
+      return
+        $this->failure($e->getMessage().' backtrace='.$e->getTraceAsString());
     }
 
     return 0;
@@ -69,7 +70,7 @@ class Runner {
       $argStack->add($programName);
     }
 
-    // $argStack->add('--debug');
+    $argStack->add('--debug');
     // $argStack->add('--stop-on-failure');
     $argStack->add('--coverage-html='.$this->htmlDir);
     $argStack->add('--coverage-text');
