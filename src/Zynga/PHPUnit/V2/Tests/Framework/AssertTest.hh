@@ -3426,12 +3426,15 @@ XML;
     $expected,
     $actual,
   ) {
+
     try {
       $this->assertJsonStringEqualsJsonString($expected, $actual);
     } catch (AssertionFailedException $e) {
       return;
     }
+
     $this->fail('Expected exception not found');
+
   }
 
   public function testAssertJsonStringNotEqualsJsonString() {
@@ -3449,12 +3452,15 @@ XML;
     $expected,
     $actual,
   ) {
+
     try {
       $this->assertJsonStringNotEqualsJsonString($expected, $actual);
     } catch (AssertionFailedException $e) {
       return;
     }
+
     $this->fail('Expected exception not found');
+
   }
 
   public function testAssertJsonStringEqualsJsonFile() {
