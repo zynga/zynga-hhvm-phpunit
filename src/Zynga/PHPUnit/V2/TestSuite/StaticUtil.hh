@@ -89,7 +89,10 @@ class StaticUtil {
     $className = $theClass->getName();
 
     try {
+
       $data = Loader::getProvidedData($className, $name);
+      return $data;
+
     } catch (IncompleteException $e) {
 
       $message = sprintf(
@@ -169,9 +172,12 @@ class StaticUtil {
 
       $parameters = $constructor->getParameters();
 
-      if (count($parameters) < 2) {
+      $paramCount = count($parameters);
+
+      if ($paramCount < 2) {
         $test = self::createTest_Simple($theClass, $name, Vector {$name});
       } else {
+
         // Support for dataprovider based loading.
         // TestCase($name, $data)
         $data = self::createTest_LoadData($theClass, $name);
