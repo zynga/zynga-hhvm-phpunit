@@ -374,7 +374,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
       $this->writeWithColor(
         $perfColor,
         sprintf(
-          'Your should really fix these slow tests (>%dms)',
+          "\nYou should really fix these slow tests (>%dms)",
           $this->_slowTestMax,
         ),
       );
@@ -712,7 +712,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
       $color,
       date('r').
       sprintf(
-        " - %30s - [%4dms elapsed] - Status %6d/%6d (%3s%%)",
+        " - %30s - [%4dms elapsed] - Overall state: %6d / %6d (%3s%%)",
         $message,
         $elapsedMS,
         $this->numTestsRun,
