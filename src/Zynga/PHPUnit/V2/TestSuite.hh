@@ -395,11 +395,6 @@ class TestSuite extends Base {
       }
 
       if (!$suiteMethod && !$testClass->isAbstract()) {
-        // --
-        // @TODO: Resolve this issue.
-        // JEO: This will stay as a error until we port the rest of the
-        // constructor over.
-        // --
         $this->addTest(new self($testClass));
       }
 
@@ -707,7 +702,7 @@ class TestSuite extends Base {
         } else if ($class->implementsInterface(
                      'Zynga\PHPUnit\V2\Interfaces\TestInterface',
                    )) {
-            // echo "addTestSuite=" . $className . "\n";
+          // echo "addTestSuite=" . $className . "\n";
           $this->addTestSuite($class);
         }
       }
