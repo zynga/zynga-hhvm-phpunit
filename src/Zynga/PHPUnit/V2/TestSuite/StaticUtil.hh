@@ -185,15 +185,20 @@ class StaticUtil {
         // Test method with @dataProvider.
         if ($data != null) {
 
-          // JEO: Reminder, until the testsuite constructor is fully converted we are going to
-          // have a error on this line.
-          // @TODO: cleanup this comment after TestSuite conversion.
           $test = new DataProvider($className.'::'.$name);
 
           $groups = $test->getGroupsFromAnnotation();
 
           if ($data instanceof TestInterface) {
             $test->addTest($data, $groups);
+          } else if (is_object($data)) {
+            $args = Vector {
+              $name,
+              array($data),
+              Loader::getProviderFunctionName($className, $name),
+            };
+            $_test = self::createTest_Simple($theClass, $name, $args);
+            $test->addTest($_test, $groups);
           } else if (is_array($data)) {
             foreach ($data as $_dataName => $_data) {
               // JEO: At times $_dataName can be a int somehow? Let's coerce it to string.
@@ -206,6 +211,7 @@ class StaticUtil {
           $test = self::createTest_Simple($theClass, $name, Vector {$name});
         }
       }
+
     }
 
     if (!$test instanceof TestInterface) {
