@@ -855,10 +855,8 @@ class TestResult {
       XDebug::startMonitoringFunctions(ResourceOperations::getFunctions());
     }
 
-    $perf = new PerformanceTracker();
-    $perf->startTimer('run');
-
     try {
+
       $test->runBare();
 
       // @TODO: Cleanup this block.
@@ -867,6 +865,7 @@ class TestResult {
       // } catch (PHPUnit_Framework_MockObject_Exception $e) {
       //   $e = new WarningException($e->getMessage());
       //   $warning = true;
+
     } catch (InvalidArgumentException $e) {
       $error = true;
     } catch (SkippedException $e) {
@@ -902,9 +901,7 @@ class TestResult {
       $error = true;
     }
 
-    $perf->endTimer('run');
-    $runPerf = $perf->getTimer('run');
-    $time = $runPerf->getElapsedTime();
+    $time = $test->getBareElapsed();
 
     // $test->addToAssertionCount(PHPUnit_Framework_Assert::getCount());
     $test->addToAssertionCount($test->getCount());
