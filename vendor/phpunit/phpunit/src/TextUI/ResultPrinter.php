@@ -381,6 +381,10 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
 
       $i = 0;
 
+      //$sortedSlowTests = $this->_slowTests->toArray();
+
+      arsort($this->_slowTests);
+
       foreach ($this->_slowTests as $slowTest => $elapsed) {
 
         $i++;
@@ -651,7 +655,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
    */
   public function startTestSuite(TestInterface $suite): void {
     if ($this->numTests == -1) {
-      $this->numTests = count($suite);
+      $this->numTests = $suite->count();
       $this->numTestsWidth = strlen((string) $this->numTests);
       $this->maxColumn =
         $this->numberOfColumns -
