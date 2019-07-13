@@ -247,8 +247,16 @@ class TestSuite extends Base {
 
     $numTests = 0;
 
-    foreach ($this->_tests as $test) {
-      $numTests += $test->count();
+    // foreach ($this->_tests as $test) {
+    //   $numTests += $test->count();
+    // }
+
+    // --
+    // JEO: We need to support both test count() and testSuite count which
+    //      requires iterating to children to find them all.
+    // --
+    foreach ($this->getIterator()->getChildren() as $child) {
+      $numTests += $child->count();
     }
 
     return $numTests;
@@ -256,6 +264,7 @@ class TestSuite extends Base {
   }
 
   final public function getCount(): int {
+
     return $this->count();
   }
 
@@ -318,43 +327,36 @@ class TestSuite extends Base {
       $vecGroups = $groups;
     }
 
-    $reflection = ReflectionClasses::getReflection($test);
+    $this->_tests->add($test);
 
-    if ($reflection instanceof ReflectionClass &&
-        !$reflection->isAbstract()) {
+    // @TODO: looking at not forward porting this value.
+    // $this->numTests = -1;
 
-      $this->_tests->add($test);
+    if ($test instanceof TestSuite && $vecGroups->count() == 0) {
+      $groups = $test->getGroups();
+    }
 
-      // @TODO: looking at not forward porting this value.
-      // $this->numTests = -1;
+    if ($vecGroups->count() == 0) {
+      $vecGroups = Vector {'default'};
+    }
 
-      if ($test instanceof TestSuite && $vecGroups->count() == 0) {
-        $groups = $test->getGroups();
+    foreach ($vecGroups as $group) {
+
+      $existingGroup = $this->_groups->get($group);
+
+      if ($existingGroup instanceof Vector) {
+        $existingGroup->add($test);
+      } else {
+        $existingGroup = Vector {$test};
+        $this->_groups->set($group, $existingGroup);
       }
 
-      if ($vecGroups->count() == 0) {
-        $vecGroups = Vector {'default'};
-      }
+    }
 
-      foreach ($vecGroups as $group) {
-
-        $existingGroup = $this->_groups->get($group);
-
-        if ($existingGroup instanceof Vector) {
-          $existingGroup->add($test);
-        } else {
-          $existingGroup = Vector {$test};
-          $this->_groups->set($group, $existingGroup);
-        }
-
-      }
-
-      if ($test instanceof ZyngaTestCaseBase) {
-        $test->setGroups($groups);
-      } else if ($test instanceof TestCase) {
-        $test->setGroups($groups);
-      }
-
+    if ($test instanceof ZyngaTestCaseBase) {
+      $test->setGroups($groups);
+    } else if ($test instanceof TestCase) {
+      $test->setGroups($groups);
     }
 
   }
