@@ -119,10 +119,10 @@ class TestSuiteIterator {
     foreach ($grandChildren as $grandChild) {
       if ($grandChild instanceof TestSuite) {
         $this->_recurseChildren($grandChild, $children);
-      }
-      if ($grandChild instanceof TestInterface) {
+      } else if ($grandChild instanceof TestInterface) {
         $children->add($grandChild);
       }
+
     }
 
   }
