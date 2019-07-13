@@ -37,15 +37,12 @@ class Loader {
     string $methodName,
   ): mixed {
 
-    $dataProviderMethods = Annotations::getAllAnnotationsForKey(
-      'dataProvider',
-      $className,
-      $methodName,
-    );
-
     $data = null;
 
-    foreach ($dataProviderMethods as $dataProviderMethod) {
+    $dataProviderMethod =
+      self::getProviderFunctionName($className, $methodName);
+
+    if (is_string($dataProviderMethod)) {
 
       $data = DynamicMethodCall::callMethod(
         $className,
@@ -60,6 +57,25 @@ class Loader {
     }
 
     return $data;
+
+  }
+
+  public static function getProviderFunctionName(
+    string $className,
+    string $methodName,
+  ): ?string {
+
+    $dataProviderMethods = Annotations::getAllAnnotationsForKey(
+      'dataProvider',
+      $className,
+      $methodName,
+    );
+
+    foreach ($dataProviderMethods as $dataProviderMethod) {
+      return $dataProviderMethod;
+    }
+
+    return null;
 
   }
 
