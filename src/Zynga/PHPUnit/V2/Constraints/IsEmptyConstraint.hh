@@ -58,6 +58,10 @@ class IsEmptyConstraint extends Base {
       return true;
     }
 
+    if (is_null($other)) {
+      return true;
+    }
+
     return false;
 
     // return empty($other);
