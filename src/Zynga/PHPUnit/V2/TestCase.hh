@@ -23,6 +23,7 @@ use Zynga\PHPUnit\V2\TestCase\Status;
 
 // JEO: needs conversion.
 use Zynga\PHPUnit\V2\TestResult;
+use Zynga\Framework\Performance\V1\Tracker as PerformanceTracker;
 
 use \Throwable;
 use \Exception;
@@ -69,6 +70,7 @@ abstract class TestCase extends Assertions implements TestInterface {
   private ?TestResult $_testResult;
   private Vector<mixed> $_data;
   private string $_dataName;
+  private PerformanceTracker $_perf;
 
   public function __construct(
     string $name,
@@ -104,7 +106,7 @@ abstract class TestCase extends Assertions implements TestInterface {
     $this->_dataName = $dataName;
 
     $this->_name = $name;
-
+    $this->_perf = new PerformanceTracker();
   }
 
   final public function getTest(): TestCase {
@@ -1115,15 +1117,14 @@ abstract class TestCase extends Assertions implements TestInterface {
 
     try {
 
-      $class = ReflectionClasses::getReflection($this);
+      $testArguments = $this->getData();
 
-      if ($class instanceof ReflectionClass) {
-        $method = $class->getMethod($testName);
-        $testArguments = $this->getData();
-        $testResult = $method->invokeArgs($this, $testArguments->toArray());
-      } else {
-        $this->fail('ReflectionError class='.$class);
-      }
+      $testResult = DynamicMethodCall::callMethodOnObject(
+        $this,
+        $testName,
+        $testArguments,
+      );
+
     } catch (Exception $_e) {
       $e = $_e;
     }
@@ -1142,6 +1143,19 @@ abstract class TestCase extends Assertions implements TestInterface {
 
     return $testResult;
 
+  }
+
+  final public function getBareElapsed(): float {
+    $barePerf = $this->_perf->getTimer('runBare');
+    return $barePerf->getElapsedTime();
+  }
+
+  final public function startBareTimer(): bool {
+    return $this->_perf->startTimer('runBare');
+  }
+
+  final public function endBareTimer(): bool {
+    return $this->_perf->endTimer('runBare');
   }
 
   /**
@@ -1174,7 +1188,9 @@ abstract class TestCase extends Assertions implements TestInterface {
 
       $this->assertPreConditions();
 
+      $this->startBareTimer();
       $t_result = $this->runTest();
+      $this->endBareTimer();
 
       if ($t_result instanceof TestResult) {
         $this->setResult($t_result);
@@ -1185,18 +1201,23 @@ abstract class TestCase extends Assertions implements TestInterface {
       $this->status()->setMessageAndCode('', Status::STATUS_PASSED);
 
     } catch (IncompleteException $e) {
+      $this->endBareTimer();
       $this->status()
         ->setMessageAndCode($e->getMessage(), Status::STATUS_INCOMPLETE);
     } catch (SkippedException $e) {
+      $this->endBareTimer();
       $this->status()
         ->setMessageAndCode($e->getMessage(), Status::STATUS_SKIPPED);
     } catch (WarningException $e) {
+      $this->endBareTimer();
       $this->status()
         ->setMessageAndCode($e->getMessage(), Status::STATUS_WARNING);
     } catch (AssertionFailedException $e) {
+      $this->endBareTimer();
       $this->status()
         ->setMessageAndCode($e->getMessage(), Status::STATUS_FAILURE);
     } catch (Exception $_e) {
+      $this->endBareTimer();
       $e = $_e;
     }
 
