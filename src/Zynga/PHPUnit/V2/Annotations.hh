@@ -2,6 +2,8 @@
 
 namespace Zynga\PHPUnit\V2;
 
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+use Zynga\Framework\ReflectionCache\V1\ReflectionMethods;
 use Zynga\Framework\ReflectionCache\V1\ReflectionClassDocComments;
 use Zynga\Framework\ReflectionCache\V1\ReflectionMethodDocComments;
 use Zynga\PHPUnit\V2\Annotations\AnnotationsContainer;
@@ -14,44 +16,29 @@ class Annotations {
 
   private static Map<string, AnnotationsContainer> $_classCache = Map {};
   private static Map<string, AnnotationsContainer> $_methodCache = Map {};
-
-  /**
-   * @param string $docblock
-   *
-   * @return array
-   *
-   * @since Method available since Release 3.4.0
-   */
-  private static function parseAnnotations(
-    string $docblock,
+  
+  public static function createAnnotationContainerFromAttributeData(
+    mixed $rawData,
   ): AnnotationsContainer {
 
-    $annotations = new AnnotationsContainer();
+    $data = new AnnotationsContainer();
 
-    // Strip away the docblock header and footer to ease parsing of one line annotations
-    $docblock = substr($docblock, 3, -2);
+    if (is_array($rawData) && count($rawData) > 0) {
 
-    $matches = array();
+      $data = new AnnotationsContainer();
 
-    if (preg_match_all(
-          '/@(?P<name>[A-Za-z_-]+)(?:[ \t]+(?P<value>.*?))?[ \t]*\r?$/m',
-          $docblock,
-          $matches,
-        )) {
-      $numMatches = count($matches[0]);
-
-      for ($i = 0; $i < $numMatches; ++$i) {
-
-        $key = $matches['name'][$i];
-        $value = $matches['value'][$i];
-
-        $annotations->addValueToKey($key, $value);
-
+      foreach ($rawData as $key => $values) {
+        if (is_string($values)) {
+          $data->addValueToKey($key, $values);
+        } else if (is_array($values)) {
+          foreach ($values as $value) {
+            $data->addValueToKey($key, $value);
+          }
+        }
       }
-
     }
 
-    return $annotations;
+    return $data;
 
   }
 
@@ -67,11 +54,22 @@ class Annotations {
       return $data;
     }
 
-    $data = Map {};
+    // Find the class attribute data and pull it across into our stack.
+    $class = ReflectionClasses::getReflection($className);
 
-    $docComment = ReflectionClassDocComments::getDocComment($className);
+    if ($class instanceof ReflectionClass) {
 
-    $data = self::parseAnnotations(strval($docComment));
+      $rawData = $class->getAttributes();
+
+      $data = self::createAnnotationContainerFromAttributeData($rawData);
+
+      self::$_classCache->set($key, $data);
+
+      return $data;
+
+    }
+
+    $data = new AnnotationsContainer();
 
     self::$_classCache->set($key, $data);
 
@@ -92,15 +90,26 @@ class Annotations {
       return $data;
     }
 
-    $data = Map {};
+    // Find the method attribute data and pull it across into our stack.
+    $method = ReflectionMethods::getReflection($className, $methodName);
 
-    $docComment =
-      ReflectionMethodDocComments::getDocComment($className, $methodName);
+    if ($method instanceof ReflectionMethod) {
 
-    $data = self::parseAnnotations(strval($docComment));
+      $rawData = $method->getAttributes();
 
+      $data = self::createAnnotationContainerFromAttributeData($rawData);
+
+      self::$_methodCache->set($key, $data);
+
+      return $data;
+
+    }
+
+    // --
+    // Default behavior is there is no annotations on this item, just return as, we are now done.
+    // --
+    $data = new AnnotationsContainer();
     self::$_methodCache->set($key, $data);
-
     return $data;
 
   }
