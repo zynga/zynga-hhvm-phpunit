@@ -1182,7 +1182,6 @@ abstract class TestCase extends Assertions implements TestInterface {
       $this->setExpectedExceptionFromAnnotation();
 
       foreach ($hookMethods['before'] as $method) {
-        // JEO: make this be dynamic calling.
         DynamicMethodCall::callMethodOnObject($this, $method, Vector {});
       }
 
