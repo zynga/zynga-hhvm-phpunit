@@ -65,19 +65,19 @@ class Exporter
 
         foreach ($data as $key => $value) {
             if (is_array($value)) {
-                if ($context->contains($data[$key]) !== false) {
+                // --
+                // JEO: changed $data[$key] to $value in the following. We were seeing odd 
+                // behvaiors on how the reference handling was working. 
+                // --
+                if ($context->contains($value) !== false) {
                     $result[] = '*RECURSION*';
-                }
-
-                else {
+                } else {
                     $result[] = sprintf(
                         'array(%s)',
-                        $this->shortenedRecursiveExport($data[$key], $context)
+                        $this->shortenedRecursiveExport($value, $context)
                     );
                 }
-            }
-
-            else {
+            } else {
                 $result[] = $exporter->shortenedExport($value);
             }
         }
