@@ -20,6 +20,7 @@ use Zynga\PHPUnit\V2\TestResult;
 use Zynga\PHPUnit\V2\TestSuite\DataProvider;
 use Zynga\PHPUnit\V2\TestSuite\StaticUtil;
 use Zynga\PHPUnit\V2\TestSuiteIterator;
+use Zynga\PHPUnit\V2\TestSuite\OnTestClassChangeListener;
 
 use \Exception;
 use \RecursiveIterator;
@@ -505,6 +506,24 @@ class TestSuite extends Base {
       strpos($docComment, '@scenario') !== false;
   }
 
+  private function suiteFailedMarkAllTestsFailed(
+    TestResult $result,
+    Exception $e,
+  ): TestResult {
+    $numTests = $this->getCount();
+
+    for ($i = 0; $i < $numTests; $i++) {
+      $result->startTest($this);
+      $result->addError($this, $e, 0.0);
+      $result->endTest($this, 0.0);
+    }
+
+    $this->tearDown();
+    $result->endTestSuite($this);
+
+    return $result;
+  }
+
   /**
    * Runs the tests and collects their result in a TestResult.
    *
@@ -562,54 +581,43 @@ class TestSuite extends Base {
 
       }
 
-      // --
-      // JEO: Run the doSetupBeforeClass or the older setUpBeforeClass on the first test.
-      // --
-      foreach ($hookMethods['beforeClass'] as $beforeClassMethod) {
-        DynamicMethodCall::callMethodOnObject(
-          $firstTest,
-          $beforeClassMethod,
-          Vector {},
-          false,
-          true,
-        );
-      }
-
-    } catch (TestSuiteSkippedException $e) {
-      $numTests = $this->getCount();
-
-      for ($i = 0; $i < $numTests; $i++) {
-        $result->startTest($this);
-        $result->addFailure($this, $e, 0.0);
-        $result->endTest($this, 0.0);
-      }
-
-      $this->tearDown();
-      $result->endTestSuite($this);
-
-      return $result;
-      // } catch (Throwable $_t) {
-      //   $t = $_t;
-    } catch (Exception $_t) {
-      $t = $_t;
-    }
-
-    if ($t instanceof Exception) {
-      $numTests = $this->getCount();
-
-      for ($i = 0; $i < $numTests; $i++) {
-        $result->startTest($this);
-        $result->addError($this, $t, 0.0);
-        $result->endTest($this, 0.0);
-      }
-
-      $this->tearDown();
-      $result->endTestSuite($this);
-
-      return $result;
+    } catch (TestSuiteSkippedException $skip) {
+      return $this->suiteFailedMarkAllTestsFailed($result, $skip);
+    } catch (Exception $e) {
+      return $this->suiteFailedMarkAllTestsFailed($result, $e);
     }
 
     foreach ($this->getIterator()->getChildren() as $test) {
+
+      $didClassChange = OnTestClassChangeListener::isClassChange($test);
+
+      if ($didClassChange === true) {
+
+        // --
+        // JEO: Currently there's no failure trapping around outgoing tests
+        // having shitty afterClass methods. This could lead to instability
+        // on a suite to suite transition basis. Should improve this in
+        // the future.
+        // --
+        list($afterOk, $afterException) =
+          OnTestClassChangeListener::handleAfterClass(
+            $hookMethods['afterClass'],
+          );
+
+        // Time for the incoming class to get it's day in the sun.
+        //OnTestClassChangeListener::handleRequirements();
+        list($beforeOk, $beforeException) =
+          OnTestClassChangeListener::handleBeforeClass(
+            $test,
+            $hookMethods['beforeClass'],
+          );
+
+        if ($beforeOk !== true && $beforeException instanceof Exception) {
+          return
+            $this->suiteFailedMarkAllTestsFailed($result, $beforeException);
+        }
+
+      }
 
       if ($result->shouldStop()) {
         break;
@@ -617,18 +625,22 @@ class TestSuite extends Base {
 
       $test->run($result);
 
+      if ($didClassChange === true) {
+        OnTestClassChangeListener::setClass($test);
+      }
+
     }
 
     // JEO: Run the doTearDownAfterClass
-    foreach ($hookMethods['afterClass'] as $afterClassMethod) {
-      DynamicMethodCall::callMethodOnObject(
-        $lastTest,
-        $afterClassMethod,
-        Vector {},
-        false,
-        true,
-      );
-    }
+    // foreach ($hookMethods['afterClass'] as $afterClassMethod) {
+    //   DynamicMethodCall::callMethodOnObject(
+    //     $lastTest,
+    //     $afterClassMethod,
+    //     Vector {},
+    //     false,
+    //     true,
+    //   );
+    // }
 
     $this->tearDown();
 
