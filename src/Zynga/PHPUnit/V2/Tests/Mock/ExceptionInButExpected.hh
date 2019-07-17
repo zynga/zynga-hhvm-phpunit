@@ -20,12 +20,12 @@ class ExceptionInButExpected extends TestCase {
     $this->assertPreConditions = true;
   }
 
-  /**
-   * @expectedException Exception
-   * @expectedExceptionMessage expected message
-   * @expectedExceptionMessageRegExp /mess/
-   * @expectedExceptionCode 42
-   */
+  <<
+  expectedException("Exception"),
+  expectedExceptionMessage("expected message"),
+  expectedExceptionMessageRegExp("/mess/"),
+  expectedExceptionCode("42")
+  >>
   public function testSomething() {
     $this->testSomething = true;
     throw new Exception('expected message', 42);
