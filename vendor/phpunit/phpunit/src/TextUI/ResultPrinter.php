@@ -125,6 +125,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
   private $defectListPrinted = false;
 
   private int $_slowTestMax;
+  private int $_slowTestDisplayMax;
   private Map<string, int> $_slowTests;
 
   /**
@@ -199,6 +200,7 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
     }
 
     $this->_slowTestMax = 10; // 10ms by default.
+    $this->_slowTestDisplayMax = 10; // only show 10 tests at max
     $this->_slowTests = Map {};
 
   }
@@ -388,6 +390,14 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
       foreach ($this->_slowTests as $slowTest => $elapsed) {
 
         $i++;
+
+        if ($i > $this->_slowTestDisplayMax) {
+          $this->writeWithColor(
+            $perfColor,
+            sprintf('Omitted %d tests...', $this->_slowTests->count() - $i),
+          );
+          break;
+        }
 
         $this->writeWithColor(
           $perfColor,
