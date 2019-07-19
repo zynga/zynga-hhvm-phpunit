@@ -23,7 +23,7 @@ use Zynga\PHPUnit\V2\Tests\Mock\ChangeCurrentWorkingDirectory;
 use Zynga\PHPUnit\V2\Tests\Mock\ExceptionInAssertPreConditions;
 use Zynga\PHPUnit\V2\Tests\Mock\ExceptionInAssertPostConditions;
 use Zynga\PHPUnit\V2\Tests\Mock\ExceptionInButExpected;
-use Zynga\PHPUnit\V2\Tests\Mock\ExceptionInSetUp;
+use Zynga\PHPUnit\V2\Tests\Mock\ExceptionInSetup;
 use Zynga\PHPUnit\V2\Tests\Mock\ExceptionInTearDown;
 use Zynga\PHPUnit\V2\Tests\Mock\ExceptionIn;
 use Zynga\PHPUnit\V2\Tests\Mock\Failure;
@@ -419,7 +419,7 @@ class TestCaseTest extends TestCase {
 
   public function testExceptionInSetUp(): void {
 
-    $test = new ExceptionInSetUp('testSomething');
+    $test = new ExceptionInSetup('testSomething');
     $result = $test->run();
 
     $this->assertTrue($test->setUp);
