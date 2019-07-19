@@ -1015,6 +1015,8 @@ class TestResult {
       error_log(
         'JEO WARNING - NON-Exception based error thrown e='.gettype($e),
       );
+    } else if ($error === true && $skipped == true) {
+      // skipped is a noop atm.
     } else if ($error === true && $e instanceof Exception) {
       $this->addError($test, $e, $time);
     } else if ($failure === true && $e instanceof Exception) {
