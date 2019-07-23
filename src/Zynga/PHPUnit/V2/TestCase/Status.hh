@@ -3,6 +3,7 @@
 namespace Zynga\PHPUnit\V2\TestCase;
 
 class Status {
+  const int STATUS_NOT_STARTED = -1;
   const int STATUS_PASSED = 0;
   const int STATUS_SKIPPED = 1;
   const int STATUS_INCOMPLETE = 2;
@@ -12,7 +13,7 @@ class Status {
   const int STATUS_WARNING = 6;
 
   private string $message = '';
-  private int $code = 0;
+  private int $code = -1;
 
   public function setMessageAndCode(string $message, int $code): bool {
     if ($this->setCode($code) && $this->setMessage($message)) {

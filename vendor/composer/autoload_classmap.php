@@ -33,7 +33,6 @@ return array(
     'PHPUnit_Framework_Error_Notice' => $vendorDir . '/phpunit/phpunit/src/Framework/Error/Notice.php',
     'PHPUnit_Framework_Error_Warning' => $vendorDir . '/phpunit/phpunit/src/Framework/Error/Warning.php',
     'PHPUnit_Framework_Exception' => $vendorDir . '/phpunit/phpunit/src/Framework/Exception.php',
-    'PHPUnit_Framework_ExceptionWrapper' => $vendorDir . '/phpunit/phpunit/src/Framework/ExceptionWrapper.php',
     'PHPUnit_Framework_ExpectationFailedException' => $vendorDir . '/phpunit/phpunit/src/Framework/ExpectationFailedException.php',
     'PHPUnit_Framework_IncompleteTestCase' => $vendorDir . '/phpunit/phpunit/src/Framework/IncompleteTestCase.php',
     'PHPUnit_Framework_InvalidCoversTargetException' => $vendorDir . '/phpunit/phpunit/src/Framework/InvalidCoversTargetException.php',

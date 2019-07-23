@@ -33,6 +33,7 @@ class AssertInstanceOf {
     }
 
     $constraint = new IsInstanceOfConstraint();
+    // error_log('JEO expected=' . $expected);
     $constraint->setExpected($expected);
 
     return $assertions->assertThat($actual, $constraint, $message);

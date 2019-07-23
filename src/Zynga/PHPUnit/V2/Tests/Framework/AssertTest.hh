@@ -264,24 +264,6 @@ class AssertTest extends TestCase {
     $this->fail();
   }
 
-  // JEO: invalid test function sig arraykey, array, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertArrayNotHasKeyThrowsExceptionForInvalidFirstArgument()
-  // {
-  //     $this->assertArrayNotHasKey(null, []);
-  // }
-
-  // JEO: invalid test function sig arraykey, array, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertArrayNotHasKeyThrowsExceptionForInvalidSecondArgument()
-  // {
-  //     $this->assertArrayNotHasKey(0, null);
-  // }
-
   public function testAssertArrayNotHasIntegerKey() {
     $this->assertArrayNotHasKey(1, ['foo']);
 
@@ -318,65 +300,6 @@ class AssertTest extends TestCase {
 
     $this->fail();
   }
-
-  // JEO: invalid test function sig arraykey, array, string
-  // public function testAssertArrayHasKeyAcceptsArrayObjectValue()
-  // {
-  //     $array        = new ArrayObject();
-  //     $array['foo'] = 'bar';
-  //     $this->assertArrayHasKey('foo', $array);
-  // }
-
-  // JEO: invalid test function sig arraykey, array, string
-  // /**
-  //  * @expectedException AssertionFailedException
-  //  */
-  // public function testAssertArrayHasKeyProperlyFailsWithArrayObjectValue()
-  // {
-  //     $array        = new ArrayObject();
-  //     $array['bar'] = 'bar';
-  //     $this->assertArrayHasKey('foo', $array);
-  // }
-
-  // JEO: invalid test function sig arraykey, array, string
-  // public function testAssertArrayHasKeyAcceptsArrayAccessValue()
-  // {
-  //     $array        = new SampleArrayAccess();
-  //     $array['foo'] = 'bar';
-  //     $this->assertArrayHasKey('foo', $array);
-  // }
-
-  // JEO: invalid test function sig arraykey, array, string
-  // /**
-  //  * @expectedException AssertionFailedException
-  //  */
-  // public function testAssertArrayHasKeyProperlyFailsWithArrayAccessValue()
-  // {
-  //     $array        = new SampleArrayAccess();
-  //     $array['bar'] = 'bar';
-  //     $this->assertArrayHasKey('foo', $array);
-  // }
-
-  // JEO: invalid test function sig arraykey, array, string
-  // public function testAssertArrayNotHasKeyAcceptsArrayAccessValue()
-  // {
-  //     $array        = new ArrayObject();
-  //     $array = array();
-  //     $array['foo'] = 'bar';
-  //     $this->assertArrayNotHasKey('bar', $array);
-  // }
-
-  // JEO: invalid test function sig arraykey, array, string
-  // /**
-  //  * @expectedException AssertionFailedException
-  //  */
-  // public function testAssertArrayNotHasKeyPropertlyFailsWithArrayAccessValue()
-  // {
-  //     $array        = new ArrayObject();
-  //     $array = array();
-  //     $array['bar'] = 'bar';
-  //     $this->assertArrayNotHasKey('bar', $array);
-  // }
 
   public function testAssertContainsThrowsException() {
     try {
@@ -510,33 +433,6 @@ class AssertTest extends TestCase {
 
     $this->fail();
   }
-
-  // JEO: invalid test function sig string, mixed, bool, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertContainsOnlyThrowsException()
-  // {
-  //     $this->assertContainsOnly(null, null);
-  // }
-
-  // JEO: invalid test function sig string, mixed, bool, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertNotContainsOnlyThrowsException()
-  // {
-  //     $this->assertNotContainsOnly(null, null);
-  // }
-
-  // JEO: invalid test function sig classname<T>, mixed, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertContainsOnlyInstancesOfThrowsException()
-  // {
-  //     $this->assertContainsOnlyInstancesOf(null, null);
-  // }
 
   public function testAssertArrayContainsOnlyIntegers() {
     $this->assertContainsOnly('integer', [1, 2, 3]);
@@ -1041,15 +937,6 @@ XML;
     $this->assertNotEquals('A', 0);
   }
 
-  // JEO: invalid test function sig string, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertFileExistsThrowsException()
-  // {
-  //     $this->assertFileExists(null);
-  // }
-
   public function testAssertFileExists() {
     $this->assertFileExists(__FILE__);
 
@@ -1061,15 +948,6 @@ XML;
 
     $this->fail();
   }
-
-  // JEO: invalid test function sig string, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertFileNotExistsThrowsException()
-  // {
-  //     $this->assertFileNotExists(null);
-  // }
 
   public function testAssertFileNotExists() {
     $this->assertFileNotExists(__DIR__.DIRECTORY_SEPARATOR.'NotExisting');
@@ -1220,42 +1098,6 @@ XML;
 
     $this->fail();
   }
-
-  // JEO: invalid test function sig, string, string, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertRegExpThrowsException()
-  // {
-  //     $this->assertRegExp(null, null);
-  // }
-
-  // JEO: invalid test function sig string, string, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertRegExpThrowsException2()
-  // {
-  //     $this->assertRegExp('', null);
-  // }
-
-  // JEO: invalid test function sig string, string, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertNotRegExpThrowsException()
-  // {
-  //     $this->assertNotRegExp(null, null);
-  // }
-
-  // JEO: invalid test function sig string, string, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertNotRegExpThrowsException2()
-  // {
-  //     $this->assertNotRegExp('', null);
-  // }
 
   public function testAssertRegExp() {
     $this->assertRegExp('/foo/', 'foobar');
@@ -1534,15 +1376,6 @@ XML;
     );
   }
 
-  // JEO: invalid test function sig untyped, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testReadAttribute3()
-  // {
-  //     $this->readAttribute('StdClass', null);
-  // }
-
   public function testReadAttribute4() {
     try {
       $this->readAttribute('NotExistingClass', 'foo');
@@ -1572,34 +1405,6 @@ XML;
     }
     $this->fail();
   }
-
-  // JEO: invalid test function sig classname<T>, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testGetStaticAttributeRaisesExceptionForInvalidFirstArgument()
-  // {
-  //     static::getStaticAttribute(null, 'foo');
-  // }
-
-  // JEO: invalid test, function signature has classname<T> typechecker borks on
-  // invalid use.
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testGetStaticAttributeRaisesExceptionForInvalidFirstArgument2()
-  // {
-  //     static::getStaticAttribute('NotExistingClass', 'foo');
-  // }
-
-  // JEO: invalid test function sig classname<T>, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testGetStaticAttributeRaisesExceptionForInvalidSecondArgument()
-  // {
-  //     static::getStaticAttribute(stdClass::class, null);
-  // }
 
   public function testGetStaticAttributeRaisesExceptionForInvalidSecondArgument2(
   ) {
@@ -1633,15 +1438,6 @@ XML;
     }
     $this->fail();
   }
-
-  // JEO: invalid test function sig untyped, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testGetObjectAttributeRaisesExceptionForInvalidSecondArgument()
-  // {
-  //     static::getObjectAttribute(new stdClass(), null);
-  // }
 
   public function testGetObjectAttributeRaisesExceptionForInvalidSecondArgument2(
   ) {
@@ -2077,26 +1873,6 @@ XML;
     $this->fail();
   }
 
-  // JEO: invalid test function sig string, string, string
-  // /**
-  //  * @covers            PHPUnit_Framework_Assert::assertClassHasAttribute
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertClassHasAttributeThrowsException()
-  // {
-  //     $this->assertClassHasAttribute(null, null);
-  // }
-
-  // JEO: invalid test function sig string, string, string
-  // /**
-  //  * @covers            PHPUnit_Framework_Assert::assertClassHasAttribute
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertClassHasAttributeThrowsException2()
-  // {
-  //     $this->assertClassHasAttribute('foo', null);
-  // }
-
   public function testAssertClassHasAttributeThrowsExceptionIfAttributeNameIsNotValid(
   ) {
     try {
@@ -2111,26 +1887,6 @@ XML;
     $this->fail();
   }
 
-  // JEO: invalid test function sig string, string, string
-  // /**
-  //  * @covers            PHPUnit_Framework_Assert::assertClassNotHasAttribute
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertClassNotHasAttributeThrowsException()
-  // {
-  //     $this->assertClassNotHasAttribute(null, null);
-  // }
-
-  // JEO: invalid test function sig string, string, string
-  // /**
-  //  * @covers            PHPUnit_Framework_Assert::assertClassNotHasAttribute
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertClassNotHasAttributeThrowsException2()
-  // {
-  //     $this->assertClassNotHasAttribute('foo', null);
-  // }
-
   public function testAssertClassNotHasAttributeThrowsExceptionIfAttributeNameIsNotValid(
   ) {
     try {
@@ -2144,26 +1900,6 @@ XML;
     }
     $this->fail();
   }
-
-  // JEO: invalid test function sig, string, string, string
-  // /**
-  //  * @covers            PHPUnit_Framework_Assert::assertClassHasStaticAttribute
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertClassHasStaticAttributeThrowsException()
-  // {
-  //     $this->assertClassHasStaticAttribute(null, null);
-  // }
-
-  // JEO: invalid test function sig, string, string, string
-  // /**
-  //  * @covers            PHPUnit_Framework_Assert::assertClassHasStaticAttribute
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertClassHasStaticAttributeThrowsException2()
-  // {
-  //     $this->assertClassHasStaticAttribute('foo', null);
-  // }
 
   public function testAssertClassHasStaticAttributeThrowsExceptionIfAttributeNameIsNotValid(
   ) {
@@ -2182,26 +1918,6 @@ XML;
     $this->fail();
   }
 
-  // JEO: invalid test function sig string, string, string
-  // /**
-  //  * @covers            PHPUnit_Framework_Assert::assertClassNotHasStaticAttribute
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertClassNotHasStaticAttributeThrowsException()
-  // {
-  //     $this->assertClassNotHasStaticAttribute(null, null);
-  // }
-
-  // JEO: invalid test function sig string, string, string
-  // /**
-  //  * @covers            PHPUnit_Framework_Assert::assertClassNotHasStaticAttribute
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertClassNotHasStaticAttributeThrowsException2()
-  // {
-  //     $this->assertClassNotHasStaticAttribute('foo', null);
-  // }
-
   public function testAssertClassNotHasStaticAttributeThrowsExceptionIfAttributeNameIsNotValid(
   ) {
     try {
@@ -2218,16 +1934,6 @@ XML;
     }
     $this->fail();
   }
-
-  // JEO: invalid function sig string, mixed, string
-  // /**
-  //  * @covers            PHPUnit_Framework_Assert::assertObjectHasAttribute
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertObjectHasAttributeThrowsException()
-  // {
-  //     $this->assertObjectHasAttribute(null, null);
-  // }
 
   public function testAssertObjectHasAttributeThrowsException2() {
     try {
@@ -2255,16 +1961,6 @@ XML;
     }
     $this->fail();
   }
-
-  // JEO: invalid test function sig string, mixed, string
-  // /**
-  //  * @covers            PHPUnit_Framework_Assert::assertObjectNotHasAttribute
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertObjectNotHasAttributeThrowsException()
-  // {
-  //     $this->assertObjectNotHasAttribute(null, null);
-  // }
 
   public function testAssertObjectNotHasAttributeThrowsException2() {
     try {
@@ -2551,86 +2247,6 @@ XML;
     $this->fail();
   }
 
-  // JEO: invalid test function sig string, string, string
-  // /**
-  //  * @covers            PHPUnit_Framework_Assert::assertStringStartsWith
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertStringStartsWithThrowsException()
-  // {
-  //     $this->assertStringStartsWith(null, null);
-  // }
-
-  // JEO: invalid test function sig string, string, string
-  // /**
-  //  * @covers            PHPUnit_Framework_Assert::assertStringStartsWith
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertStringStartsWithThrowsException2()
-  // {
-  //     $this->assertStringStartsWith('', null);
-  // }
-
-  // JEO: invalid test function sig string, string, string
-  // /**
-  //  * @covers            PHPUnit_Framework_Assert::assertStringStartsNotWith
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertStringStartsNotWithThrowsException()
-  // {
-  //     $this->assertStringStartsNotWith(null, null);
-  // }
-
-  // JEO: invalid test function sig string, string, string
-  // /**
-  //  * @covers            PHPUnit_Framework_Assert::assertStringStartsNotWith
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertStringStartsNotWithThrowsException2()
-  // {
-  //     $this->assertStringStartsNotWith('', null);
-  // }
-
-  // JEO: invalid test function sig string, string, string
-  // /**
-  //  * @covers            PHPUnit_Framework_Assert::assertStringEndsWith
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertStringEndsWithThrowsException()
-  // {
-  //     $this->assertStringEndsWith(null, null);
-  // }
-
-  // JEO: invalid test function sig string, string, string
-  // /**
-  //  * @covers            PHPUnit_Framework_Assert::assertStringEndsWith
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertStringEndsWithThrowsException2()
-  // {
-  //     $this->assertStringEndsWith('', null);
-  // }
-
-  // JEO: invalid test function sig string, string, string
-  // /**
-  //  * @covers            PHPUnit_Framework_Assert::assertStringEndsNotWith
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertStringEndsNotWithThrowsException()
-  // {
-  //     $this->assertStringEndsNotWith(null, null);
-  // }
-
-  // JEO: Invalid test function sig string, string, string
-  // /**
-  //  * @covers            PHPUnit_Framework_Assert::assertStringEndsNotWith
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertStringEndsNotWithThrowsException2()
-  // {
-  //     $this->assertStringEndsNotWith('', null);
-  // }
-
   public function testAssertStringStartsWith() {
     $this->assertStringStartsWith('prefix', 'prefixfoo');
 
@@ -2679,24 +2295,6 @@ XML;
     $this->fail();
   }
 
-  // JEO: invalid test function sig string, string, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertStringMatchesFormatRaisesExceptionForInvalidFirstArgument()
-  // {
-  //     $this->assertStringMatchesFormat(null, '');
-  // }
-
-  // JEO: invalid test function sig string, string, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertStringMatchesFormatRaisesExceptionForInvalidSecondArgument()
-  // {
-  //     $this->assertStringMatchesFormat('', null);
-  // }
-
   public function testAssertStringMatchesFormat() {
     $this->assertStringMatchesFormat('*%s*', '***');
   }
@@ -2709,24 +2307,6 @@ XML;
       return;
     }
   }
-
-  // JEO: invalid test function sig string, string, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertStringNotMatchesFormatRaisesExceptionForInvalidFirstArgument()
-  // {
-  //     $this->assertStringNotMatchesFormat(null, '');
-  // }
-
-  // JEO: invalid test function sig string, string, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertStringNotMatchesFormatRaisesExceptionForInvalidSecondArgument()
-  // {
-  //     $this->assertStringNotMatchesFormat('', null);
-  // }
 
   public function testAssertStringNotMatchesFormat() {
 
@@ -2898,15 +2478,6 @@ XML;
     $this->fail();
   }
 
-  // JEO: Invalid test function sig array, array, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertNotCountThrowsExceptionIfExpectedCountIsNoInteger()
-  // {
-  //     $this->assertNotCount('a', []);
-  // }
-
   public function testAssertNotCountThrowsExceptionIfElementIsNotCountable() {
 
     try {
@@ -2980,33 +2551,6 @@ XML;
 
     $this->fail();
   }
-
-  // JEO: invalid test function sig is array, array, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertNotSameSizeThrowsExceptionIfExpectedIsNotCountable()
-  // {
-  //     $this->assertNotSameSize('a', []);
-  // }
-
-  // JEO: invalid test function sig is array, array, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertNotSameSizeThrowsExceptionIfActualIsNotCountable()
-  // {
-  //     $this->assertNotSameSize([], '');
-  // }
-
-  // JEO: invalid test function sig is string, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertJsonRaisesExceptionForInvalidArgument()
-  // {
-  //     $this->assertJson(null);
-  // }
 
   public function testAssertJson() {
     $this->assertJson('{}');
@@ -3153,15 +2697,6 @@ XML;
     $this->fail();
   }
 
-  // JEO: invalid test as the function signature is classname<T>, mixed, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertInstanceOfThrowsExceptionForInvalidArgument()
-  // {
-  //     $this->assertInstanceOf(null, new stdClass);
-  // }
-
   public function testAssertAttributeInstanceOf() {
     $o = new stdClass();
     $o->a = new stdClass();
@@ -3180,15 +2715,6 @@ XML;
 
     $this->fail();
   }
-
-  // JEO: This test is invalid as signature is classname<T>, mixed, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertNotInstanceOfThrowsExceptionForInvalidArgument()
-  // {
-  //     $this->assertNotInstanceOf(null, new stdClass);
-  // }
 
   public function testAssertAttributeNotInstanceOf() {
     $o = new stdClass();
@@ -3222,15 +2748,6 @@ XML;
     $this->fail();
   }
 
-  // JEO: This test is invalid as the signature is string, mixed, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertInternalTypeThrowsExceptionForInvalidArgument()
-  // {
-  //     $this->assertInternalType(null, 1);
-  // }
-
   public function testAssertAttributeInternalType() {
     $o = new stdClass();
     $o->a = 1;
@@ -3250,15 +2767,6 @@ XML;
     $this->fail();
   }
 
-  // JEO: This test is invalid as the signature is string, mixed, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertNotInternalTypeThrowsExceptionForInvalidArgument()
-  // {
-  //     $this->assertNotInternalType(null, 1);
-  // }
-
   public function testAssertAttributeNotInternalType() {
     $o = new stdClass();
     $o->a = 1;
@@ -3277,15 +2785,6 @@ XML;
     }
     $this->fail();
   }
-
-  // JEO: This test is invalid as the signature due to hhi is string, string, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertStringMatchesFormatFileThrowsExceptionForInvalidArgument2()
-  // {
-  //     $this->assertStringMatchesFormatFile($this->getFilesDirectory() . 'expectedFileFormat.txt', null);
-  // }
 
   public function testAssertStringMatchesFormatFile() {
     $this->assertStringMatchesFormatFile(
@@ -3316,15 +2815,6 @@ XML;
     }
     $this->fail();
   }
-
-  // JEO: This test is invalidated as the hhi for the function has been changed to string, string, string
-  // /**
-  //  * @expectedException PHPUnit_Framework_Exception
-  //  */
-  // public function testAssertStringNotMatchesFormatFileThrowsExceptionForInvalidArgument2()
-  // {
-  //   $this->assertStringNotMatchesFormatFile($this->getFilesDirectory() . 'expectedFileFormat.txt', null);
-  // }
 
   public function testAssertStringNotMatchesFormatFile() {
     $this->assertStringNotMatchesFormatFile(

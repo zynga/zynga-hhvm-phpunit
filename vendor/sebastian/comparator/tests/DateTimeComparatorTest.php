@@ -180,10 +180,7 @@ class DateTimeComparatorTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($exception, 'Unexpected ComparisonFailure');
     }
 
-    /**
-     * @covers       ::assertEquals
-     * @dataProvider assertEqualsFailsProvider
-     */
+    <<covers("::assertEquals"), dataProvider("assertEqualsFailsProvider">>     
     public function testAssertEqualsFails($expected, $actual, $delta = 0.0)
     {
         $this->setExpectedException(
@@ -193,19 +190,13 @@ class DateTimeComparatorTest extends \PHPUnit_Framework_TestCase
         $this->comparator->assertEquals($expected, $actual, $delta);
     }
 
-    /**
-     * @requires PHP 5.5
-     * @covers   ::accepts
-     */
+    <<requires("PHP 5.5"), covers("::accepts")>>
     public function testAcceptsDateTimeInterface()
     {
         $this->assertTrue($this->comparator->accepts(new DateTime, new DateTimeImmutable));
     }
 
-    /**
-     * @requires PHP 5.5
-     * @covers   ::assertEquals
-     */
+    <<requires("PHP 5.5"), covers("::assertEquals")>>
     public function testSupportsDateTimeInterface()
     {
         $this->comparator->assertEquals(

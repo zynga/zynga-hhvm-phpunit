@@ -17,6 +17,21 @@ Changes from vanilla phpunit here:
 1. Removed the file require|inclusion within code coverage. This lead to older php code being blind executed. Also hid some of the performance issues around loading of certain legacy libraries.
 1. Migrated PHP_Util_XML to Zynga\PHPUnit\V2\Environment\XML
 1. Migrated PHP_Util_String to Zynga\PHPUnit\V2\Environment\Strings
+1. @covers is removed.
+
+# Atributes
+
+Starting with 2.x release track attributes are used instead of the older @foo docblocks.
+
+Crib sheet:
+1. @dataProvider becomes <<dataProvider("..")>>
+1. @requires becomes: <<requires("..")>>
+1. @expectedException becomes: <expectedException("..")>>
+1. @expectedExceptionMessage becomes: <<expectedExceptionMessage("..")>>
+1. @expectedExceptionCode becomes: <<expectedExceptionCode("..")>>
+
+What if I need to specify multiple of the same attribute, use an array:
+1. <<requires(["foo", "bar"])>>
 
 # TODO  
 1. SebastianBergmann\TokenStream\Token\StreamMethodStructure->methodSignature isn't working correctly, needs fixing. Might be only multi-line function signatures that are broken - TBD.

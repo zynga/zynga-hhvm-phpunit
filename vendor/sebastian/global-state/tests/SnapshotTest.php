@@ -81,9 +81,7 @@ class SnapshotTest extends PHPUnit_Framework_TestCase
         $this->assertNotContains('Countable', $interfaces);
     }
 
-    /**
-     * @requires PHP 5.4
-     */
+    <<requires("PHP 5.4")>>
     public function testTraits()
     {
         spl_autoload_call('SebastianBergmann\GlobalState\TestFixture\SnapshotTrait');

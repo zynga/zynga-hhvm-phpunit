@@ -59,7 +59,7 @@ class ExceptionWrapper extends ExceptionBase {
   }
 
   /**
-   * @return PHPUnit_Framework_ExceptionWrapper
+   * @return ExceptionWrapper
    */
   public function getPreviousWrapped(): ?ExceptionWrapper {
     return $this->previousException;
@@ -70,10 +70,12 @@ class ExceptionWrapper extends ExceptionBase {
    */
   public function __toString(): string {
     $string = ExceptionUtil::exceptionToString($this);
+
+    $string .= ' file='.$this->file.' line='.$this->line;
     $string .= $this->getTraceAsString();
 
-    if ($this->previous) {
-      $string .= "\nCaused by\n".$this->previous;
+    if ($this->previousException) {
+      $string .= "\nCaused by\n".$this->previousException;
     }
 
     return $string;

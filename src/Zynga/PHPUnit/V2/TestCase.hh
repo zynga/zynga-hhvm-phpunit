@@ -1054,7 +1054,7 @@ abstract class TestCase extends Assertions implements TestInterface {
     $expectedException = $this->getExpectedException();
 
     if ($expectedException == '') {
-      return true;
+      return false;
     }
 
     if (!$e instanceof Exception) {
@@ -1126,6 +1126,7 @@ abstract class TestCase extends Assertions implements TestInterface {
       );
 
     } catch (Exception $_e) {
+      //error_log('JEO Caught testName='.$testName.' e='.get_class($_e));
       $e = $_e;
     }
 
@@ -1135,12 +1136,15 @@ abstract class TestCase extends Assertions implements TestInterface {
     // --
     if ($this->runTest_Handle_Exception_Trapping($e) == true) {
       // We have handled the exception.
+      //error_log('JEO testName='.$testName.' handledException?');
       return null;
     } else if ($e instanceof Exception) {
+      //error_log('JEO unmonitored Exception='.get_class($e));
       // So we have a non-monitored exception, re-throw.
       throw $e;
     }
 
+    //error_log('JEO testName='.$testName.' noExceptions, returning');
     return $testResult;
 
   }
@@ -1204,6 +1208,7 @@ abstract class TestCase extends Assertions implements TestInterface {
       $this->status()
         ->setMessageAndCode($e->getMessage(), Status::STATUS_INCOMPLETE);
     } catch (SkippedException $e) {
+      //error_log('JEO caughtSkipped!');
       $this->endBareTimer();
       $this->status()
         ->setMessageAndCode($e->getMessage(), Status::STATUS_SKIPPED);
@@ -1216,6 +1221,7 @@ abstract class TestCase extends Assertions implements TestInterface {
       $this->status()
         ->setMessageAndCode($e->getMessage(), Status::STATUS_FAILURE);
     } catch (Exception $_e) {
+      //error_log('JEO default trap?');
       $this->endBareTimer();
       $e = $_e;
     }

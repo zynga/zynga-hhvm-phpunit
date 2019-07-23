@@ -28,10 +28,12 @@ class IsInstanceOfConstraint extends Base {
   private string $className = '';
 
   public function setExpected(mixed $className): bool {
-    if (is_string($className) && class_exists($className)) {
+    if (is_string($className) &&
+        (class_exists($className) || interface_exists($className))) {
       $this->className = $className;
       return true;
     }
+    var_dump($className);
     return false;
   }
 
@@ -87,8 +89,16 @@ class IsInstanceOfConstraint extends Base {
 
     $interfaces = $reflection->getInterfaces();
 
-    foreach ($interfaces as $interface) {
-      if (strtolower($interface) == $lcClassName) {
+    // error_log(
+    //   'JEO interfaceCount='.
+    //   count($interfaces).
+    //   ' target='.
+    //   strval($lcClassName),
+    // );
+
+    foreach ($interfaces as $interfaceName => $interface) {
+      // error_log('JEO interface='.$interfaceName);
+      if (strtolower($interfaceName) == $lcClassName) {
         return true;
       }
     }

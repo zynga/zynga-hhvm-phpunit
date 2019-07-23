@@ -205,6 +205,10 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
 
   }
 
+  private function printSeperator() {
+    $this->write("\n".str_repeat('-', 80)."\n");
+  }
+
   /**
    * @param TestResult $result
    */
@@ -235,7 +239,8 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
     }
 
     if ($this->defectListPrinted) {
-      $this->write("\n--\n\n");
+      $this->printSeperator();
+      //$this->write("\n--\n\n");
     }
 
     $this->write(
@@ -255,6 +260,9 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
     }
 
     foreach ($defects as $defect) {
+      if ( $i != 1 ) {
+        $this->writeNewLine();
+      }
       $this->printDefect($defect, $i++);
     }
 
@@ -275,7 +283,10 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
    * @param int                           $count
    */
   protected function printDefectHeader(TestFailure $defect, $count) {
-    $this->write(sprintf("\n%d) %s\n", $count, $defect->getTestName()));
+    $this->writeWithColor(
+      "fg-red, bg-black",
+      sprintf("\n%d) %s", $count, $defect->getTestName()),
+    );
   }
 
   /**
@@ -353,10 +364,13 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
    */
   protected function printSkipped(TestResult $result) {
     $this->printDefects($result->skipped(), 'skipped test');
+    $this->printSeperator();
+    //$this->write("\n--\n");
   }
 
   protected function printHeader() {
     $this->write("\n\n".PHP_Timer::resourceUsage()."\n\n");
+    $this->printSeperator();
   }
 
   /**
@@ -405,6 +419,8 @@ class PHPUnit_TextUI_ResultPrinter extends PHPUnit_Util_Printer
         );
 
       }
+
+      $this->printSeperator();
 
       $this->writeNewLine();
 

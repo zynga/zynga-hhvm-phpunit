@@ -1489,10 +1489,7 @@ class ConstraintTest extends TestCase {
  //     }
  //     JEO: Note i had to remove the start comment and end comment from this
  //          docblock.
- //     **
- //      * @expectedException PHPUnit_Framework_ExpectationFailedException
- //      * @expectedExceptionMessage Failed asserting that 'This fails' is accepted by specified callback.
- //      *
+ //     <<expectedException("PHPUnit_Framework_ExpectationFailedException"), expectedExceptionMessage("Failed asserting that 'This fails' is accepted by specified callback.")>>
  //     public function testConstraintCallbackFailure()
  //     {
  //         $constraint = PHPUnit_Framework_Assert::callback(function () {

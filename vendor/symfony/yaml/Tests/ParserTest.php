@@ -576,9 +576,7 @@ EOF;
         );
     }
 
-    /**
-     * @requires extension iconv
-     */
+    <<requires("extension iconv")>>
     public function testNonUtf8Exception()
     {
         $yamls = array(

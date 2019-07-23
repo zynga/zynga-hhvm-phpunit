@@ -16,7 +16,7 @@ class Annotations {
 
   private static Map<string, AnnotationsContainer> $_classCache = Map {};
   private static Map<string, AnnotationsContainer> $_methodCache = Map {};
-  
+
   public static function createAnnotationContainerFromAttributeData(
     mixed $rawData,
   ): AnnotationsContainer {
@@ -26,16 +26,8 @@ class Annotations {
     if (is_array($rawData) && count($rawData) > 0) {
 
       $data = new AnnotationsContainer();
+      $data->addValuesFromAttributes($rawData);
 
-      foreach ($rawData as $key => $values) {
-        if (is_string($values)) {
-          $data->addValueToKey($key, $values);
-        } else if (is_array($values)) {
-          foreach ($values as $value) {
-            $data->addValueToKey($key, $value);
-          }
-        }
-      }
     }
 
     return $data;

@@ -28,11 +28,11 @@ use Zynga\PHPUnit\V2\Profiler\XDebug;
 use Zynga\PHPUnit\V2\TestResult\Listeners;
 use Zynga\PHPUnit\V2\TestResult\TestFailures;
 use Zynga\PHPUnit\V2\TestCase\Size;
+use Zynga\PHPUnit\V2\Exceptions\ExceptionWrapper;
 
 use \Exception;
 use \PHPUnit_Framework_CoveredCodeNotExecutedException;
 use \PHPUnit_Framework_Exception;
-use \PHPUnit_Framework_ExceptionWrapper;
 use \PHPUnit_Framework_InvalidCoversTargetException;
 //use \PHPUnit_Framework_MockObject_Exception;
 use \PHPUnit_Framework_MissingCoversAnnotationException;
@@ -888,7 +888,7 @@ class TestResult {
       // @TODO: cleanup this catch as it doesn't apply anymore.
       // JEO: you cannot bind against throwable in hack strict.
       // } catch (Throwable $e) {
-      //   $e = new PHPUnit_Framework_ExceptionWrapper($e);
+      //   $e = new ExceptionWrapper($e);
       //   $error = true;
     } catch (Exception $e) {
       // var_dump('TestResult::Exception trap');
@@ -897,7 +897,7 @@ class TestResult {
       // // var_dump(debug_backtrace(2));
       // var_dump($e->getTrace());
       // exit();
-      $e = new PHPUnit_Framework_ExceptionWrapper($e);
+      $e = new ExceptionWrapper($e);
       $error = true;
     }
 

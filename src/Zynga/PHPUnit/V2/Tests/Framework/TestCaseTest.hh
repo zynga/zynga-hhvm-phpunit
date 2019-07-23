@@ -43,7 +43,10 @@ use Zynga\PHPUnit\V2\Tests\Mock\WasRun;
 use Zynga\PHPUnit\V2\TestFailure;
 use Zynga\PHPUnit\V2\TestResult;
 use Zynga\PHPUnit\V2\Version;
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+use Zynga\PHPUnit\V2\Assertions\AssertExceptionRegexpMessage;
 
+use \ReflectionClass;
 use \Exception;
 use \Throwable;
 use \RuntimeException;
@@ -559,19 +562,30 @@ class TestCaseTest extends TestCase {
   public function testExceptionWithMessage(): void {
     $test = new ThrowExceptionTestCase('test');
     $test->expectException(RuntimeException::class);
-    $test->expectExceptionMessage('A runtime error occurred');
+    $test->expectExceptionMessage('MOCK: A runtime error occurred');
 
     $result = $test->run();
 
-    $this->assertEquals(1, count($result));
-    $this->assertTrue($result->wasSuccessful());
+    $this->_verifyTest(
+      $test,
+      $result,
+      false,
+      Status::STATUS_PASSED,
+      '',
+      0,
+      0,
+      0,
+      0,
+    );
+
   }
 
   public function testExceptionWithWrongMessage(): void {
 
     $test = new ThrowExceptionTestCase('test');
     $test->expectException(RuntimeException::class);
-    $test->expectExceptionMessage('A logic error occurred');
+    // JEO: Purposely set the message to a non-matching value, in this case 'logic' isn't in the exception message.
+    $test->expectExceptionMessage('MOCK: A logic error occurred');
 
     $result = $test->run();
 
@@ -582,7 +596,7 @@ class TestCaseTest extends TestCase {
       $result,
       false,
       Status::STATUS_FAILURE,
-      'Failed asserting that \'A runtime error occurred\' is equal to <string:A logic error occurred>.',
+      'Failed asserting that \'MOCK: A runtime error occurred\' is equal to <string:MOCK: A logic error occurred>.',
       0,
       1,
       0,
@@ -605,6 +619,8 @@ class TestCaseTest extends TestCase {
   public function testExceptionWithWrongRegexpMessage(): void {
     $test = new ThrowExceptionTestCase('test');
     $test->expectException(RuntimeException::class);
+
+    // JEO: Purposely set the message to a non-matching value, in this case 'logic' isn't in the exception message.
     $test->expectExceptionMessageRegExp('/logic .*? occurred/');
 
     $result = $test->run();
@@ -616,9 +632,10 @@ class TestCaseTest extends TestCase {
       $result,
       false,
       Status::STATUS_FAILURE,
-      'Failed asserting that \'A runtime error occurred\' matches PCRE pattern "/logic .*? occurred/".',
+      "Failed asserting that 'MOCK: A runtime error occurred' matches PCRE pattern \"/logic .*? occurred/\".",
       0,
       1,
+      0,
       0,
     );
 
@@ -627,13 +644,31 @@ class TestCaseTest extends TestCase {
   public function testExceptionWithInvalidRegexpMessage(): void {
     $test = new ThrowExceptionTestCase('test');
     $test->expectException(RuntimeException::class);
+
+    // JEO: Purposely set a broken regexp to see the handling for that situation.
     $test->expectExceptionMessageRegExp('#runtime .*? occurred/'); // wrong delimiter
 
     $result = $test->run();
 
-    $this->assertEquals(
-      "Invalid regex provided: No ending delimiter '#' found: [#runtime .*? occurred/]",
-      $test->getStatusMessage(),
+    $reflect =
+      ReflectionClasses::getReflection(AssertExceptionRegexpMessage::class);
+
+    $filePath = 'unable-to-resolve';
+
+    if ($reflect instanceof ReflectionClass) {
+      $filePath = strval($reflect->getFileName());
+    }
+
+    $this->_verifyTest(
+      $test,
+      $result,
+      false,
+      Status::STATUS_FAILURE,
+      "Invalid regex provided: No ending delimiter '#' found: [#runtime .*? occurred/] file=$filePath:30",
+      0,
+      1,
+      0,
+      0,
     );
 
   }
@@ -657,15 +692,19 @@ class TestCaseTest extends TestCase {
       0,
     );
 
-    $this->assertEquals(1, $result->failureCount());
-    $this->assertEquals(1, count($result));
   }
 
   public function testWrongException(): void {
+
     $test = new ThrowExceptionTestCase('test');
+
     $test->expectException(InvalidArgumentException::class);
 
     $result = $test->run();
+
+    // Failed asserting that RuntimeException Object (...) is an instance of class "Zynga\PHPUnit\V2\Exceptions\InvalidArgumentException".'
+    // Failed asserting that 'RuntimeException' Object (...) is equal to <string:Zynga\PHPUnit\V2\Exceptions\InvalidArgumentException>.'
+    // Failed asserting that RuntimeException Object (...) is an instance of class "Zynga\PHPUnit\V2\Exceptions\InvalidArgumentException".
 
     $this->assertEquals(1, count($result));
 
@@ -674,9 +713,10 @@ class TestCaseTest extends TestCase {
       $result,
       false,
       Status::STATUS_FAILURE,
-      'Failed asserting that \'RuntimeException\' is equal to <string:Zynga\\PHPUnit\\V2\\Tests\\Framework\\InvalidArgumentException>.',
+      "Failed asserting that RuntimeException Object (...) is an instance of class \"Zynga\PHPUnit\V2\Exceptions\InvalidArgumentException\".",
       0,
       1,
+      0,
       0,
     );
 
@@ -821,12 +861,11 @@ class TestCaseTest extends TestCase {
       Status::STATUS_FAILURE,
       'Failed asserting that \'bar\' is equal to <string:foo>.',
       0,
-      0,
+      1,
       0,
       0,
     );
 
-    // $this->assertFalse($result->wasSuccessful());
   }
 
   public function testExpectOutputRegexFooActualFoo(): void {
@@ -996,7 +1035,7 @@ class TestCaseTest extends TestCase {
     $this->_verifyTest(
       $test,
       $result,
-      false,
+      true,
       Status::STATUS_SKIPPED,
       $expectedOutput,
       0,

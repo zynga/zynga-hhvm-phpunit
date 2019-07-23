@@ -9,6 +9,28 @@ class AnnotationsContainer {
     $this->_annotations = Map {};
   }
 
+  public function addValuesFromAttributes(mixed $attributes): bool {
+    if (is_array($attributes)) {
+      foreach ($attributes as $key => $value) {
+        $this->addValueFromAttribute($key, $value);
+      }
+    }
+    return true;
+  }
+
+  public function addValueFromAttribute(string $key, mixed $value): bool {
+    if (is_string($value)) {
+      return $this->addValueToKey($key, $value);
+    }
+    if (is_array($value)) {
+      foreach ($value as $elem) {
+        return $this->addValueFromAttribute($key, $elem);
+      }
+      return true;
+    }
+    return false;
+  }
+
   public function getValuesAsMap(): Map<string, Vector<string>> {
     return $this->_annotations;
   }
