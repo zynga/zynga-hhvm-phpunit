@@ -1,4 +1,5 @@
-<?php
+<?hh 
+
 /*
  * This file is part of PHPUnit.
  *
@@ -12,7 +13,7 @@
 use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 
 use SebastianBergmann\CodeCoverage\CodeCoverage;
-use SebastianBergmann\CodeCoverage\Exception as CodeCoverageException;
+use SebastianBergmann\CodeCoverage\Exception\CodeCoverageException as CodeCoverageException;
 use SebastianBergmann\CodeCoverage\Filter as CodeCoverageFilter;
 use SebastianBergmann\CodeCoverage\Report\Clover as CloverReport;
 use SebastianBergmann\CodeCoverage\Report\Crap4j as Crap4jReport;
@@ -27,6 +28,7 @@ use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
 use Zynga\PHPUnit\V2\TestResult;
 use Zynga\PHPUnit\V2\TestSuite;
+use Zynga\PHPUnit\V2\Output\ResultPrinter;
 
 /**
  * A TestRunner for the Command Line Interface (CLI)
@@ -40,10 +42,8 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
     const FAILURE_EXIT   = 1;
     const EXCEPTION_EXIT = 2;
 
-    /**
-     * @var CodeCoverageFilter
-     */
-    protected $codeCoverageFilter;
+    protected CodeCoverageFilter $codeCoverageFilter;
+    protected CodeCoverage $codeCoverage;
 
     /**
      * @var PHPUnit_Runner_TestSuiteLoader
@@ -51,7 +51,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
     protected $loader = null;
 
     /**
-     * @var PHPUnit_TextUI_ResultPrinter
+     * @var ResultPrinter
      */
     protected $printer = null;
 
@@ -76,15 +76,25 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
      *
      * @since Method available since Release 3.4.0
      */
-    public function __construct(PHPUnit_Runner_TestSuiteLoader $loader = null, CodeCoverageFilter $filter = null)
+    public function __construct(?PHPUnit_Runner_TestSuiteLoader $loader = null, ?CodeCoverageFilter $filter = null)
     {
         if ($filter === null) {
-            $filter = new CodeCoverageFilter;
+            $filter = new CodeCoverageFilter();
         }
 
         $this->codeCoverageFilter = $filter;
+        
+        
+        // JEO: If we ever need to support anything other than html reports,
+        // i'll appologize now.
+        $this->codeCoverage = new CodeCoverage(
+         '/dev/null',
+          null,
+          $filter
+        );
+
         $this->loader             = $loader;
-        $this->runtime            = new Runtime;
+        $this->runtime            = new Runtime();
     }
 
     /**
@@ -103,7 +113,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
         }
 
         if ($test instanceof TestInterface) {
-            $aTestRunner = new self;
+            $aTestRunner = new self();
 
             return $aTestRunner->doRun(
                 $test,
@@ -121,10 +131,10 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
      */
     protected function createTestResult()
     {
-        return new TestResult;
+        return new TestResult();
     }
 
-    private function processSuiteFilters(TestSuite $suite, array $arguments)
+    private function processSuiteFilters(TestInterface $suite, array $arguments)
     {
         if (!$arguments['filter'] &&
             empty($arguments['groups']) &&
@@ -168,7 +178,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
             $GLOBALS['__PHPUNIT_BOOTSTRAP'] = $arguments['bootstrap'];
         }
 
-        if (is_integer($arguments['repeat'])) {
+        if (is_int($arguments['repeat'])) {
             $test = new PHPUnit_Extensions_RepeatedTest(
                 $suite,
                 $arguments['repeat']
@@ -221,19 +231,8 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
                 $arguments['printer'] instanceof PHPUnit_Util_Printer) {
                 $this->printer = $arguments['printer'];
             } else {
-                $printerClass = 'PHPUnit_TextUI_ResultPrinter';
-
-                if (isset($arguments['printer']) &&
-                    is_string($arguments['printer']) &&
-                    class_exists($arguments['printer'], false)) {
-                    $class = ReflectionClasses::getReflection($arguments['printer']);
-
-                    if ($class->isSubclassOf('PHPUnit_TextUI_ResultPrinter')) {
-                        $printerClass = $arguments['printer'];
-                    }
-                }
-
-                $this->printer = new $printerClass(
+                
+                $this->printer = new ResultPrinter(
                     isset($arguments['stderr']) ? 'php://stderr' : null,
                     $arguments['verbose'],
                     $arguments['colors'],
@@ -241,6 +240,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
                     $arguments['columns'],
                     $arguments['reverseList']
                 );
+
             }
         }
 
@@ -357,54 +357,49 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
         }
 
         if ($codeCoverageReports > 0) {
-            // JEO: If we ever need to support anything other than html reports,
-            // i'll appologize now.
-            $codeCoverage = new CodeCoverage(
-              $arguments['coverageHtml'],
-                null,
-                $this->codeCoverageFilter
-            );
 
-            $codeCoverage->setUnintentionallyCoveredSubclassesWhitelist(
+            $this->codeCoverage->setTarget('coverageHtml');
+
+            $this->codeCoverage->setUnintentionallyCoveredSubclassesWhitelist(
                 [SebastianBergmann\Comparator\Comparator::class]
             );
 
-            $codeCoverage->setAddUncoveredFilesFromWhitelist(
+            $this->codeCoverage->setAddUncoveredFilesFromWhitelist(
                 $arguments['addUncoveredFilesFromWhitelist']
             );
 
-            $codeCoverage->setCheckForUnintentionallyCoveredCode(
+            $this->codeCoverage->setCheckForUnintentionallyCoveredCode(
                 $arguments['strictCoverage']
             );
 
-            $codeCoverage->setCheckForMissingCoversAnnotation(
+            $this->codeCoverage->setCheckForMissingCoversAnnotation(
                 $arguments['strictCoverage']
             );
 
-            $codeCoverage->setProcessUncoveredFilesFromWhitelist(
+            $this->codeCoverage->setProcessUncoveredFilesFromWhitelist(
                 $arguments['processUncoveredFilesFromWhitelist']
             );
 
             if (isset($arguments['forceCoversAnnotation'])) {
-                $codeCoverage->setForceCoversAnnotation(
+                $this->codeCoverage->setForceCoversAnnotation(
                     $arguments['forceCoversAnnotation']
                 );
             }
 
             if (isset($arguments['disableCodeCoverageIgnore'])) {
-                $codeCoverage->setDisableIgnoredLines(true);
+                $this->codeCoverage->setDisableIgnoredLines(true);
             }
 
             if (isset($arguments['whitelist'])) {
                 $this->codeCoverageFilter->addDirectoryToWhitelist($arguments['whitelist']);
             }
 
-            $result->setCodeCoverage($codeCoverage);
+            $result->setCodeCoverage($this->codeCoverage);
         }
 
         if ($codeCoverageReports > 1) {
             if (isset($arguments['cacheTokens'])) {
-                $codeCoverage->setCacheTokens($arguments['cacheTokens']);
+                $this->codeCoverage->setCacheTokens($arguments['cacheTokens']);
             }
         }
 
@@ -449,11 +444,11 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
         unset($suite);
         $result->flushListeners();
 
-        if ($this->printer instanceof PHPUnit_TextUI_ResultPrinter) {
+        if ($this->printer instanceof ResultPrinter) {
             $this->printer->printResult($result);
         }
 
-        if (isset($codeCoverage)) {
+  
             if (isset($arguments['coverageClover'])) {
                 $this->printer->write(
                     "\nGenerating code coverage report in Clover XML format ..."
@@ -461,7 +456,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
 
                 try {
                     $writer = new CloverReport();
-                    $writer->process($codeCoverage, $arguments['coverageClover']);
+                    $writer->process($this->codeCoverage, $arguments['coverageClover']);
 
                     $this->printer->write(" done\n");
                     unset($writer);
@@ -479,7 +474,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
 
                 try {
                     $writer = new Crap4jReport($arguments['crap4jThreshold']);
-                    $writer->process($codeCoverage, $arguments['coverageCrap4J']);
+                    $writer->process($this->codeCoverage, $arguments['coverageCrap4J']);
 
                     $this->printer->write(" done\n");
                     unset($writer);
@@ -506,11 +501,12 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
                         )
                     );
 
-                    $writer->process($codeCoverage, $arguments['coverageHtml']);
+                    $writer->process($this->codeCoverage, $arguments['coverageHtml']);
 
                     $this->printer->write(date('r') . " - HTML generation - done\n");
                     unset($writer);
                 } catch (CodeCoverageException $e) {
+                   
                     $this->printer->write(
                         " failed\n" . $e->getMessage() . "\n"
                     );
@@ -518,62 +514,65 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
             }
 
             if (isset($arguments['coveragePHP'])) {
-                $this->printer->write(
-                    "\nGenerating code coverage report in PHP format ..."
-                );
+                // JEO: I think we're removing code coverage in php layout
+                // $this->printer->write(
+                //     "\nGenerating code coverage report in PHP format ..."
+                // );
 
-                try {
-                    $writer = new PhpReport();
-                    $writer->process($codeCoverage, $arguments['coveragePHP']);
+                // try {
+                //     $writer = new PhpReport();
+                //     $writer->process($codeCoverage, $arguments['coveragePHP']);
 
-                    $this->printer->write(" done\n");
-                    unset($writer);
-                } catch (CodeCoverageException $e) {
-                    $this->printer->write(
-                        " failed\n" . $e->getMessage() . "\n"
-                    );
-                }
+                //     $this->printer->write(" done\n");
+                //     unset($writer);
+                // } catch (CodeCoverageException $e) {
+                //     $this->printer->write(
+                //         " failed\n" . $e->getMessage() . "\n"
+                //     );
+                // }
             }
 
             if (isset($arguments['coverageText'])) {
-                if ($arguments['coverageText'] == 'php://stdout') {
-                    $outputStream = $this->printer;
-                    $colors       = $arguments['colors'] && $arguments['colors'] != PHPUnit_TextUI_ResultPrinter::COLOR_NEVER;
-                } else {
-                    $outputStream = new PHPUnit_Util_Printer($arguments['coverageText']);
-                    $colors       = false;
-                }
+                // JEO: I think we're removing code coverage in text layout
+                // if ($arguments['coverageText'] == 'php://stdout') {
+                //     $outputStream = $this->printer;
+                //     $colors       = $arguments['colors'] && $arguments['colors'] != ResultPrinter::COLOR_NEVER;
+                // } else {
+                //     $outputStream = new PHPUnit_Util_Printer($arguments['coverageText']);
+                //     $colors       = false;
+                // }
 
-                $processor = new TextReport(
-                    $arguments['reportLowUpperBound'],
-                    $arguments['reportHighLowerBound'],
-                    $arguments['coverageTextShowUncoveredFiles'],
-                    $arguments['coverageTextShowOnlySummary']
-                );
+                // $processor = new TextReport(
+                //     $arguments['reportLowUpperBound'],
+                //     $arguments['reportHighLowerBound'],
+                //     $arguments['coverageTextShowUncoveredFiles'],
+                //     $arguments['coverageTextShowOnlySummary']
+                // );
 
-                $outputStream->write(
-                    $processor->process($codeCoverage, $colors)
-                );
+                // $outputStream->write(
+                //     $processor->process($codeCoverage, $colors)
+                // );
             }
 
             if (isset($arguments['coverageXml'])) {
-                $this->printer->write(
-                    "\nGenerating code coverage report in PHPUnit XML format ..."
-                );
+                // JEO: I think we're removing code coverage in XML format.
+                // $this->printer->write(
+                //     "\nGenerating code coverage report in PHPUnit XML format ..."
+                // );
 
-                try {
-                    $writer = new XmlReport;
-                    $writer->process($codeCoverage, $arguments['coverageXml']);
+                // try {
+                //     $writer = new XmlReport;
+                //     $writer->process($codeCoverage, $arguments['coverageXml']);
 
-                    $this->printer->write(" done\n");
-                    unset($writer);
-                } catch (CodeCoverageException $e) {
-                    $this->printer->write(
-                        " failed\n" . $e->getMessage() . "\n"
-                    );
-                }
+                //     $this->printer->write(" done\n");
+                //     unset($writer);
+                // } catch (CodeCoverageException $e) {
+                //     $this->printer->write(
+                //         " failed\n" . $e->getMessage() . "\n"
+                //     );
+                // }
             }
-        }
+        
 
         if ($exit) {
             if ($result->wasSuccessful()) {
@@ -601,9 +600,9 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
     }
 
     /**
-     * @param PHPUnit_TextUI_ResultPrinter $resultPrinter
+     * @param ResultPrinter $resultPrinter
      */
-    public function setPrinter(PHPUnit_TextUI_ResultPrinter $resultPrinter)
+    public function setPrinter(ResultPrinter $resultPrinter)
     {
         $this->printer = $resultPrinter;
     }
@@ -648,7 +647,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
     public function getLoader()
     {
         if ($this->loader === null) {
-            $this->loader = new PHPUnit_Runner_StandardTestSuiteLoader;
+            $this->loader = new PHPUnit_Runner_StandardTestSuiteLoader();
         }
 
         return $this->loader;
@@ -847,14 +846,16 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
 
                 if (class_exists($listener['class'])) {
                     if (count($listener['arguments']) == 0) {
-                        $listener = new $listener['class'];
+                        $listener = new $listener['class']();
                     } else {
                         $listenerClass = ReflectionClasses::getReflection(
                             $listener['class']
                         );
+                        if ( $listenerClass instanceof ReflectionClass ) {
                         $listener      = $listenerClass->newInstanceArgs(
                             $listener['arguments']
                         );
+                        }
                     }
 
                     if ($listener instanceof TestListenerInterface) {
@@ -926,7 +927,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
             }
 
             if (isset($loggingConfiguration['plain'])) {
-                $arguments['listeners'][] = new PHPUnit_TextUI_ResultPrinter(
+                $arguments['listeners'][] = new ResultPrinter(
                     $loggingConfiguration['plain'],
                     true
                 );
@@ -1003,7 +1004,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
         $arguments['processUncoveredFilesFromWhitelist']              = isset($arguments['processUncoveredFilesFromWhitelist'])              ? $arguments['processUncoveredFilesFromWhitelist']              : false;
         $arguments['cacheTokens']                                     = isset($arguments['cacheTokens'])                                     ? $arguments['cacheTokens']                                     : false;
         $arguments['columns']                                         = isset($arguments['columns'])                                         ? $arguments['columns']                                         : 80;
-        $arguments['colors']                                          = isset($arguments['colors'])                                          ? $arguments['colors']                                          : PHPUnit_TextUI_ResultPrinter::COLOR_DEFAULT;
+        $arguments['colors']                                          = isset($arguments['colors'])                                          ? $arguments['colors']                                          : ResultPrinter::COLOR_DEFAULT;
         $arguments['convertErrorsToExceptions']                       = isset($arguments['convertErrorsToExceptions'])                       ? $arguments['convertErrorsToExceptions']                       : true;
         $arguments['convertNoticesToExceptions']                      = isset($arguments['convertNoticesToExceptions'])                      ? $arguments['convertNoticesToExceptions']                      : true;
         $arguments['convertWarningsToExceptions']                     = isset($arguments['convertWarningsToExceptions'])                     ? $arguments['convertWarningsToExceptions']                     : true;

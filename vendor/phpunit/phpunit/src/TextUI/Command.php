@@ -268,7 +268,7 @@ class PHPUnit_TextUI_Command
         foreach ($this->options[0] as $option) {
             switch ($option[0]) {
                 case '--colors':
-                    $this->arguments['colors'] = $option[1] ?: PHPUnit_TextUI_ResultPrinter::COLOR_AUTO;
+                    $this->arguments['colors'] = $option[1] ?: ResultPrinter::COLOR_AUTO;
                     break;
 
                 case '--bootstrap':
@@ -859,7 +859,7 @@ class PHPUnit_TextUI_Command
             if ($class->implementsInterface('TestListenerInterface') &&
                 $class->isSubclassOf('PHPUnit_Util_Printer') &&
                 $class->isInstantiable()) {
-                if ($class->isSubclassOf('PHPUnit_TextUI_ResultPrinter')) {
+                if ($class->isSubclassOf('ResultPrinter')) {
                     return $printerClass;
                 }
 

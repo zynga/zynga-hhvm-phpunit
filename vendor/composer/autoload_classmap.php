@@ -101,7 +101,6 @@ return array(
     'PHPUnit_Runner_TestSuiteLoader' => $vendorDir . '/phpunit/phpunit/src/Runner/TestSuiteLoader.php',
     'PHPUnit_Runner_Version' => $vendorDir . '/phpunit/phpunit/src/Runner/Version.php',
     'PHPUnit_TextUI_Command' => $vendorDir . '/phpunit/phpunit/src/TextUI/Command.php',
-    'PHPUnit_TextUI_ResultPrinter' => $vendorDir . '/phpunit/phpunit/src/TextUI/ResultPrinter.php',
     'PHPUnit_TextUI_TestRunner' => $vendorDir . '/phpunit/phpunit/src/TextUI/TestRunner.php',
     'PHPUnit_Util_Blacklist' => $vendorDir . '/phpunit/phpunit/src/Util/Blacklist.php',
     'PHPUnit_Util_Configuration' => $vendorDir . '/phpunit/phpunit/src/Util/Configuration.php',

@@ -16,6 +16,9 @@ use \ReflectionMethod;
 
 use Zynga\PHPUnit\V2\Annotations;
 use Zynga\Framework\Dynamic\V1\DynamicMethodCall;
+use
+  Zynga\PHPUnit\V2\Exceptions\TestSuite\DataProvider\InvalidDataProviderMethodException
+;
 
 class Loader {
 
@@ -43,6 +46,25 @@ class Loader {
       self::getProviderFunctionName($className, $methodName);
 
     if (is_string($dataProviderMethod)) {
+
+      $reflectionMethod =
+        ReflectionMethods::getReflection($className, $dataProviderMethod);
+
+      if (!$reflectionMethod instanceof ReflectionMethod) {
+
+        throw new InvalidDataProviderMethodException(
+          'method='.$dataProviderMethod.' does not exist',
+        );
+        
+      }
+
+      if ($reflectionMethod->isStatic() === false) {
+
+        throw new InvalidDataProviderMethodException(
+          'method='.$dataProviderMethod.' is static',
+        );
+
+      }
 
       $data = DynamicMethodCall::callMethod(
         $className,

@@ -161,6 +161,10 @@ class CodeCoverage {
     return $this->target;
   }
 
+  public function setTarget(string $target): void {
+    $this->target = $target;
+  }
+
   /**
    * Returns the code coverage information as a graph of node objects.
    *
@@ -321,8 +325,7 @@ class CodeCoverage {
     $size = 'unknown';
     $status = null;
 
-    if ($id instanceof ZyngaTestCaseBase ||
-        $id instanceof TestCase) {
+    if ($id instanceof ZyngaTestCaseBase || $id instanceof TestCase) {
       $_size = $id->getSize();
 
       if ($_size == \PHPUnit_Util_Test::SMALL) {
@@ -676,7 +679,7 @@ class CodeCoverage {
   private function getLinesToBeIgnored($filename) {
 
     // --
-    // JEO: this is fully deprecated at this point on our version of 
+    // JEO: this is fully deprecated at this point on our version of
     // phpunit. This will sadden some people.
     // --
     return array();
@@ -851,7 +854,10 @@ class CodeCoverage {
 
     }
 
-    echo date('r')." - CodeCoverage::initalizeData - complete fileCount=$fileCount\n";
+    echo
+      date('r').
+      " - CodeCoverage::initalizeData - complete fileCount=$fileCount\n"
+    ;
 
   }
 

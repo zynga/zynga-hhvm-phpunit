@@ -11,7 +11,7 @@
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          forceCoversAnnotation="false"
-         printerClass="PHPUnit_TextUI_ResultPrinter"
+         printerClass="ResultPrinter"
          stopOnFailure="false"
          stopOnWarning="false"
          failOnWarning="false"

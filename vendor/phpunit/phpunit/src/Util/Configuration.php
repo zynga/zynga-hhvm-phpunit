@@ -11,6 +11,7 @@
 
 use Zynga\PHPUnit\V2\TestSuite;
 use Zynga\PHPUnit\V2\TestSuite\RootNode;
+use Zynga\PHPUnit\V2\Output\ResultPrinter;
 
 /**
  * Wrapper for the PHPUnit XML configuration file.
@@ -30,7 +31,7 @@ use Zynga\PHPUnit\V2\TestSuite\RootNode;
  *          convertNoticesToExceptions="true"
  *          convertWarningsToExceptions="true"
  *          forceCoversAnnotation="false"
- *          printerClass="PHPUnit_TextUI_ResultPrinter"
+ *          printerClass="ResultPrinter"
  *          processIsolation="false"
  *          stopOnError="false"
  *          stopOnFailure="false"
@@ -554,9 +555,9 @@ class PHPUnit_Util_Configuration {
       /* only allow boolean for compatibility with previous versions
        'always' only allowed from command line */
       if ($this->getBoolean($root->getAttribute('colors'), false)) {
-        $result['colors'] = PHPUnit_TextUI_ResultPrinter::COLOR_AUTO;
+        $result['colors'] = ResultPrinter::COLOR_AUTO;
       } else {
-        $result['colors'] = PHPUnit_TextUI_ResultPrinter::COLOR_NEVER;
+        $result['colors'] = ResultPrinter::COLOR_NEVER;
       }
     }
 

@@ -14,11 +14,13 @@ namespace Zynga\PHPUnit\V2\Tests\Framework;
 //use SebastianBergmann\TextTemplate\Template as Text_Template;
 
 use Zynga\Framework\Environment\SuperGlobals\V1\SuperGlobals;
+
+use Zynga\PHPUnit\V2\Tests\BaseTest;
+
 use Zynga\PHPUnit\V2\Exceptions\InvalidArgumentException;
 use Zynga\PHPUnit\V2\TestCase;
 use Zynga\PHPUnit\V2\TestCase\Status;
 use Zynga\PHPUnit\V2\TestSuite;
-use Zynga\PHPUnit\V2\Tests\Framework\BaseTest;
 use Zynga\PHPUnit\V2\Tests\Mock\ChangeCurrentWorkingDirectory;
 use Zynga\PHPUnit\V2\Tests\Mock\ExceptionInAssertPreConditions;
 use Zynga\PHPUnit\V2\Tests\Mock\ExceptionInAssertPostConditions;
@@ -65,7 +67,7 @@ use \RuntimeException;
  * @since      Class available since Release 2.0.0
  * @covers     TestCase
  */
-class TestCaseTest extends TestCase {
+class TestCaseTest extends BaseTest {
 
   public function doSetUpBeforeClass(): void {
     // noop
@@ -82,241 +84,241 @@ class TestCaseTest extends TestCase {
     );
   }
 
-  private function _debugException(Exception $e): void {
+  // private function _debugException(Exception $e): void {
 
-    print 'message='."\n";
-    var_dump($e->getMessage());
-    print 'file='.$e->getFile().'('.$e->getLine().')'."\n";
-    print 'trace='."\n";
-    $offset = 0;
-    foreach ($e->getTrace() as $traceFrame) {
-      $file = '';
-      $class = '';
-      $function = '';
-      $line = '';
+  //   print 'message='."\n";
+  //   var_dump($e->getMessage());
+  //   print 'file='.$e->getFile().'('.$e->getLine().')'."\n";
+  //   print 'trace='."\n";
+  //   $offset = 0;
+  //   foreach ($e->getTrace() as $traceFrame) {
+  //     $file = '';
+  //     $class = '';
+  //     $function = '';
+  //     $line = '';
 
-      if (array_key_exists('file', $traceFrame)) {
-        $file = $traceFrame['file'];
-      }
-      if (array_key_exists('class', $traceFrame)) {
-        $class = $traceFrame['class'].'::';
-      }
-      if (array_key_exists('function', $traceFrame)) {
-        $function = $traceFrame['function'];
-      }
+  //     if (array_key_exists('file', $traceFrame)) {
+  //       $file = $traceFrame['file'];
+  //     }
+  //     if (array_key_exists('class', $traceFrame)) {
+  //       $class = $traceFrame['class'].'::';
+  //     }
+  //     if (array_key_exists('function', $traceFrame)) {
+  //       $function = $traceFrame['function'];
+  //     }
 
-      if (array_key_exists('line', $traceFrame)) {
-        $line = $traceFrame['line'];
-      }
+  //     if (array_key_exists('line', $traceFrame)) {
+  //       $line = $traceFrame['line'];
+  //     }
 
-      print 'frame='.$offset."\n";
-      print '  file='.$file.'('.$line.') '.$class.$function."\n";
+  //     print 'frame='.$offset."\n";
+  //     print '  file='.$file.'('.$line.') '.$class.$function."\n";
 
-      $offset++;
-    }
-  }
+  //     $offset++;
+  //   }
+  // }
 
-  private function _debugExceptions(Vector<TestFailure> $exceptions): void {
-    foreach ($exceptions as $exception) {
-      $this->_debugException($exception->thrownException());
-    }
-  }
+  // private function _debugExceptions(Vector<TestFailure> $exceptions): void {
+  //   foreach ($exceptions as $exception) {
+  //     $this->_debugException($exception->thrownException());
+  //   }
+  // }
 
-  private function _debugTestResult(
-    TestResult $result,
-    bool $debug,
-    int $errorCount = 0,
-    int $failureCount = 0,
-    int $skippedCount = 0,
-    int $incompleteCount = 0,
-  ): void {
+  // private function _debugTestResult(
+  //   TestResult $result,
+  //   bool $debug,
+  //   int $errorCount = 0,
+  //   int $failureCount = 0,
+  //   int $skippedCount = 0,
+  //   int $incompleteCount = 0,
+  // ): void {
 
-    if ($debug != true) {
-      return;
-    }
+  //   if ($debug != true) {
+  //     return;
+  //   }
 
-    $actualErrorCount = $result->errorCount();
-    $actualErrors = $result->errors();
+  //   $actualErrorCount = $result->errorCount();
+  //   $actualErrors = $result->errors();
 
-    print
-      'errorCount expected='.$errorCount.' actual='.$actualErrorCount."\n"
-    ;
-    $this->_debugExceptions($actualErrors);
+  //   print
+  //     'errorCount expected='.$errorCount.' actual='.$actualErrorCount."\n"
+  //   ;
+  //   $this->_debugExceptions($actualErrors);
 
-    $actualFailureCount = $result->failureCount();
-    $actualFailures = $result->failures();
+  //   $actualFailureCount = $result->failureCount();
+  //   $actualFailures = $result->failures();
 
-    print
-      'failureCount'.
-      ' expected='.
-      $failureCount.
-      ' actual='.
-      $actualFailureCount.
-      "\n"
-    ;
+  //   print
+  //     'failureCount'.
+  //     ' expected='.
+  //     $failureCount.
+  //     ' actual='.
+  //     $actualFailureCount.
+  //     "\n"
+  //   ;
 
-    $this->_debugExceptions($actualFailures);
+  //   $this->_debugExceptions($actualFailures);
 
-    $actualSkippedCount = $result->skippedCount();
-    $actualSkipped = $result->skipped();
+  //   $actualSkippedCount = $result->skippedCount();
+  //   $actualSkipped = $result->skipped();
 
-    var_dump(
-      'skippedCount'.
-      ' expected='.
-      $skippedCount.
-      ' actual='.
-      $actualSkippedCount,
-    );
+  //   var_dump(
+  //     'skippedCount'.
+  //     ' expected='.
+  //     $skippedCount.
+  //     ' actual='.
+  //     $actualSkippedCount,
+  //   );
 
-    $this->_debugExceptions($actualSkipped);
+  //   $this->_debugExceptions($actualSkipped);
 
-    $actualIncompleteCount = $result->notImplementedCount();
-    $actualIncomplete = $result->notImplemented();
+  //   $actualIncompleteCount = $result->notImplementedCount();
+  //   $actualIncomplete = $result->notImplemented();
 
-    print
-      'incompleteCount'.
-      'expected='.
-      $incompleteCount.
-      ' actual='.
-      $actualIncompleteCount.
-      "\n"
-    ;
+  //   print
+  //     'incompleteCount'.
+  //     'expected='.
+  //     $incompleteCount.
+  //     ' actual='.
+  //     $actualIncompleteCount.
+  //     "\n"
+  //   ;
 
-    $this->_debugExceptions($actualIncomplete);
+  //   $this->_debugExceptions($actualIncomplete);
 
-  }
+  // }
 
-  private function _verifyTestResult(
-    TestResult $result,
-    bool $debug = false,
-    int $errorCount = 0,
-    int $failureCount = 0,
-    int $skippedCount = 0,
-    int $incompleteCount = 0,
-  ): void {
+  // private function _verifyTestResult(
+  //   TestResult $result,
+  //   bool $debug = false,
+  //   int $errorCount = 0,
+  //   int $failureCount = 0,
+  //   int $skippedCount = 0,
+  //   int $incompleteCount = 0,
+  // ): void {
 
-    $this->assertEquals($errorCount, $result->errorCount(), 'errorCount');
+  //   $this->assertEquals($errorCount, $result->errorCount(), 'errorCount');
 
-    $this->assertEquals(
-      $failureCount,
-      $result->failureCount(),
-      'failureCount',
-    );
+  //   $this->assertEquals(
+  //     $failureCount,
+  //     $result->failureCount(),
+  //     'failureCount',
+  //   );
 
-    $this->assertEquals(
-      $skippedCount,
-      $result->skippedCount(),
-      'skippedCount',
-    );
+  //   $this->assertEquals(
+  //     $skippedCount,
+  //     $result->skippedCount(),
+  //     'skippedCount',
+  //   );
 
-    $this->assertEquals(
-      $incompleteCount,
-      $result->notImplementedCount(),
-      'incompleteCount',
-    );
+  //   $this->assertEquals(
+  //     $incompleteCount,
+  //     $result->notImplementedCount(),
+  //     'incompleteCount',
+  //   );
 
-  }
+  // }
 
-  private function _verifyTestSuite(
-    TestSuite $test,
-    TestResult $result,
-    bool $debug = false,
-    int $errorCount = 0,
-    int $failureCount = 0,
-    int $skippedCount = 0,
-    int $incompleteCount = 0,
-  ): void {
+  // private function _verifyTestSuite(
+  //   TestSuite $test,
+  //   TestResult $result,
+  //   bool $debug = false,
+  //   int $errorCount = 0,
+  //   int $failureCount = 0,
+  //   int $skippedCount = 0,
+  //   int $incompleteCount = 0,
+  // ): void {
 
-    $this->_debugTestResult(
-      $result,
-      $debug,
-      $errorCount,
-      $failureCount,
-      $skippedCount,
-      $incompleteCount,
-    );
+  //   $this->_debugTestResult(
+  //     $result,
+  //     $debug,
+  //     $errorCount,
+  //     $failureCount,
+  //     $skippedCount,
+  //     $incompleteCount,
+  //   );
 
-    $this->_verifyTestResult(
-      $result,
-      $debug,
-      $errorCount,
-      $failureCount,
-      $skippedCount,
-      $incompleteCount,
-    );
+  //   $this->_verifyTestResult(
+  //     $result,
+  //     $debug,
+  //     $errorCount,
+  //     $failureCount,
+  //     $skippedCount,
+  //     $incompleteCount,
+  //   );
 
-  }
+  // }
 
-  private function _verifyTest(
-    TestCase $test,
-    TestResult $result,
-    bool $debug = false,
-    int $statusCode = Status::STATUS_PASSED,
-    string $statusMessage = '',
-    int $errorCount = 0,
-    int $failureCount = 0,
-    int $skippedCount = 0,
-    int $incompleteCount = 0,
-  ): void {
+  // private function _verifyTest(
+  //   TestCase $test,
+  //   TestResult $result,
+  //   bool $debug = false,
+  //   int $statusCode = Status::STATUS_PASSED,
+  //   string $statusMessage = '',
+  //   int $errorCount = 0,
+  //   int $failureCount = 0,
+  //   int $skippedCount = 0,
+  //   int $incompleteCount = 0,
+  // ): void {
 
-    if ($debug == true) {
+  //   if ($debug == true) {
 
-      // --
-      // JEO: Need a better way to dump things into phphunit's output buffer.
-      // --
-      var_dump('_verifyTestResults::debug');
+  //     // --
+  //     // JEO: Need a better way to dump things into phphunit's output buffer.
+  //     // --
+  //     var_dump('_verifyTestResults::debug');
 
-      var_dump(
-        'statusCode expected='.$statusCode.' actual='.$test->getStatus(),
-      );
+  //     var_dump(
+  //       'statusCode expected='.$statusCode.' actual='.$test->getStatus(),
+  //     );
 
-      var_dump('statusMessage expected=');
-      var_dump($statusMessage);
+  //     var_dump('statusMessage expected=');
+  //     var_dump($statusMessage);
 
-      var_dump('statusMessage actual=');
-      var_dump($test->getStatusMessage());
+  //     var_dump('statusMessage actual=');
+  //     var_dump($test->getStatusMessage());
 
-      print 'expectedOutput='.$test->getExpectedOutput()."\n";
-      print 'expectedOutputRegex='.$test->getExpectedOutputRegex()."\n";
+  //     print 'expectedOutput='.$test->getExpectedOutput()."\n";
+  //     print 'expectedOutputRegex='.$test->getExpectedOutputRegex()."\n";
 
-      print 'expectedException='.$test->getExpectedException()."\n";
+  //     print 'expectedException='.$test->getExpectedException()."\n";
 
-      print
-        'expectedExceptionMessage='.
-        $test->getExpectedExceptionMessage().
-        "\n"
-      ;
+  //     print
+  //       'expectedExceptionMessage='.
+  //       $test->getExpectedExceptionMessage().
+  //       "\n"
+  //     ;
 
-      print
-        'expectedExceptionMessageRegExp='.
-        $test->getExpectedExceptionMessageRegExp().
-        "\n"
-      ;
+  //     print
+  //       'expectedExceptionMessageRegExp='.
+  //       $test->getExpectedExceptionMessageRegExp().
+  //       "\n"
+  //     ;
 
-      $this->_debugTestResult(
-        $result,
-        $debug,
-        $errorCount,
-        $failureCount,
-        $skippedCount,
-        $incompleteCount,
-      );
+  //     $this->_debugTestResult(
+  //       $result,
+  //       $debug,
+  //       $errorCount,
+  //       $failureCount,
+  //       $skippedCount,
+  //       $incompleteCount,
+  //     );
 
-    }
+  //   }
 
-    $this->assertEquals($statusCode, $test->getStatus());
-    $this->assertEquals($statusMessage, $test->getStatusMessage());
+  //   $this->assertEquals($statusCode, $test->getStatus());
+  //   $this->assertEquals($statusMessage, $test->getStatusMessage());
 
-    $this->_verifyTestResult(
-      $result,
-      $debug,
-      $errorCount,
-      $failureCount,
-      $skippedCount,
-      $incompleteCount,
-    );
+  //   $this->_verifyTestResult(
+  //     $result,
+  //     $debug,
+  //     $errorCount,
+  //     $failureCount,
+  //     $skippedCount,
+  //     $incompleteCount,
+  //   );
 
-  }
+  // }
 
   public function testSuccess(): void {
 
@@ -487,9 +489,7 @@ class TestCaseTest extends TestCase {
 
     $result = $suite->run();
 
-    $this->assertEquals(1, count($result));
-
-    $this->_verifyTestSuite($suite, $result, false, 0, 0, 0);
+    $this->_verifyTestSuite($suite, $result, false, 1, 0, 0, 0);
 
   }
 

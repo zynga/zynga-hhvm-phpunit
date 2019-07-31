@@ -4,9 +4,13 @@ namespace Zynga\PHPUnit\V2;
 
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\CoveredCodeNotExecutedException;
-use SebastianBergmann\CodeCoverage\Exception as CodeCoverageException;
 use SebastianBergmann\CodeCoverage\MissingCoversAnnotationException;
 use SebastianBergmann\CodeCoverage\UnintentionallyCoveredCodeException;
+use SebastianBergmann\ResourceOperations\ResourceOperations;
+
+use Zynga\Framework\Performance\V1\Tracker as PerformanceTracker;
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
+use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
 
 use Zynga\PHPUnit\V2\Exceptions\AssertionFailedException;
 use Zynga\PHPUnit\V2\Exceptions\ExpectationFailedException;
@@ -15,13 +19,7 @@ use Zynga\PHPUnit\V2\Exceptions\WarningException;
 use Zynga\PHPUnit\V2\Exceptions\TestError\IncompleteException;
 use Zynga\PHPUnit\V2\Exceptions\TestError\RiskyException;
 use Zynga\PHPUnit\V2\Exceptions\TestError\SkippedException;
-
-use SebastianBergmann\ResourceOperations\ResourceOperations;
-
-use Zynga\Framework\Performance\V1\Tracker as PerformanceTracker;
-use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
-use Zynga\Framework\Testing\TestCase\V2\Base as ZyngaTestCaseBase;
-
+use Zynga\PHPUnit\V2\IncompleteTestCase;
 use Zynga\PHPUnit\V2\Interfaces\TestInterface;
 use Zynga\PHPUnit\V2\Interfaces\TestListenerInterface;
 use Zynga\PHPUnit\V2\Profiler\XDebug;
@@ -29,6 +27,7 @@ use Zynga\PHPUnit\V2\TestResult\Listeners;
 use Zynga\PHPUnit\V2\TestResult\TestFailures;
 use Zynga\PHPUnit\V2\TestCase\Size;
 use Zynga\PHPUnit\V2\Exceptions\ExceptionWrapper;
+use Zynga\PHPUnit\V2\WarningTestCase;
 
 use \Exception;
 use \PHPUnit_Framework_CoveredCodeNotExecutedException;
@@ -125,6 +124,16 @@ class TestResult {
    */
   final public function wasSuccessful(): bool {
     return $this->_testFailures->wasSuccessful();
+  }
+
+  final public function successfulCount(): int {
+    $passed = 0;
+    foreach ($this->_passed as $name => $result) {
+      if ($name != WarningTestCase::class.'::Warning') {
+        $passed++;
+      }
+    }
+    return $passed;
   }
 
   /**
@@ -1024,7 +1033,8 @@ class TestResult {
     } else if ($warning === true && $e instanceof Exception) {
       $this->addWarning($test, $e, $time);
     } else if ($this->isStrictAboutTestsThatDoNotTestAnything() &&
-               $test->getNumAssertions() == 0) {
+               $test->getNumAssertions() == 0 &&
+               !$test instanceof IncompleteTestCase) {
       $this->addFailure(
         $test,
         new RiskyException('This test did not perform any assertions'),

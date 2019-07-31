@@ -11,8 +11,6 @@
 
 namespace SebastianBergmann\CodeCoverage;
 
-use SebastianBergmann\CodeCoverage\Exception;
+use SebastianBergmann\CodeCoverage\Exception\CodeCoverageException;
 
-use \RuntimeException as BaseRuntimeException;
-
-class RuntimeException extends BaseRuntimeException implements Exception {}
+class RuntimeException extends CodeCoverageException {}

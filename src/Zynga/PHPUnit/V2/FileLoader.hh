@@ -2,6 +2,8 @@
 
 namespace Zynga\PHPUnit\V2;
 
+use Zynga\PHPUnit\V2\Exceptions\FailedToLoadFileException;
+
 /*
  * This file is part of PHPUnit.
  *
@@ -28,15 +30,13 @@ class FileLoader {
    *
    * @throws PHPUnit_Framework_Exception
    */
-  public static function checkAndLoad(
-    string $filename,
-  ): Vector<string> {
+  public static function checkAndLoad(string $filename): Vector<string> {
 
     $includePathFilename = stream_resolve_include_path($filename);
 
-    if (!$includePathFilename || !is_readable($includePathFilename)) {
-      throw new PHPUnit_Framework_Exception(
-        sprintf('Cannot open file "%s".'."\n", $filename),
+    if (!is_readable($includePathFilename)) {
+      throw new FailedToLoadFileException(
+        sprintf('Cannot open file "%s", unreadable', $filename),
       );
     }
 
@@ -58,13 +58,16 @@ class FileLoader {
   public static function load(string $filename): Vector<string> {
 
     $beforeClasses = self::captureDeclaredClasses();
+
     include_once $filename;
 
     $afterClasses = self::captureDeclaredClasses();
 
     $diff = Vector {};
 
-    $diff->addAll(array_diff($afterClasses->toArray(), $beforeClasses->toArray()));
+    $diff->addAll(
+      array_diff($afterClasses->toArray(), $beforeClasses->toArray()),
+    );
 
     return $diff;
 

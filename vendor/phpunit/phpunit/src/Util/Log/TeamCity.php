@@ -23,7 +23,7 @@ use \Exception;
  *
  * @since Class available since Release 5.0.0
  */
-class PHPUnit_Util_Log_TeamCity extends PHPUnit_TextUI_ResultPrinter
+class PHPUnit_Util_Log_TeamCity extends ResultPrinter
 {
     /**
      * @var bool
