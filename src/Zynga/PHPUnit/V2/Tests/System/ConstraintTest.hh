@@ -1,6 +1,6 @@
 <?hh // strict
 
-namespace Zynga\PHPUnit\V2\Tests\Framework;
+namespace Zynga\PHPUnit\V2\Tests\System;
 
 /*
  * This file is part of PHPUnit.

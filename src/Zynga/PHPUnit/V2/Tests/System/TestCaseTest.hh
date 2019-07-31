@@ -1,6 +1,6 @@
 <?hh // strict
 
-namespace Zynga\PHPUnit\V2\Tests\Framework;
+namespace Zynga\PHPUnit\V2\Tests\System;
 
 /*
  * This file is part of PHPUnit.
@@ -15,7 +15,7 @@ namespace Zynga\PHPUnit\V2\Tests\Framework;
 
 use Zynga\Framework\Environment\SuperGlobals\V1\SuperGlobals;
 
-use Zynga\PHPUnit\V2\Tests\BaseTest;
+use Zynga\PHPUnit\V2\Tests\System\BaseTest;
 
 use Zynga\PHPUnit\V2\Exceptions\InvalidArgumentException;
 use Zynga\PHPUnit\V2\TestCase;

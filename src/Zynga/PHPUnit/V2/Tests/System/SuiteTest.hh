@@ -1,6 +1,6 @@
 <?hh // strict
 
-namespace Zynga\PHPUnit\V2\Tests;
+namespace Zynga\PHPUnit\V2\Tests\System;
 
 /*
  * This file is part of PHPUnit.
@@ -13,7 +13,7 @@ namespace Zynga\PHPUnit\V2\Tests;
 use Zynga\PHPUnit\V2\TestCase\Status;
 use Zynga\PHPUnit\V2\TestResult;
 use Zynga\PHPUnit\V2\TestSuite;
-use Zynga\PHPUnit\V2\Tests\BaseTest;
+use Zynga\PHPUnit\V2\Tests\System\BaseTest;
 use Zynga\PHPUnit\V2\Tests\Mock\BeforeAndAfterTest;
 use Zynga\PHPUnit\V2\Tests\Mock\BeforeClassAndAfterClassTest;
 use Zynga\PHPUnit\V2\Tests\Mock\BeforeClassWithOnlyDataProviderTest;

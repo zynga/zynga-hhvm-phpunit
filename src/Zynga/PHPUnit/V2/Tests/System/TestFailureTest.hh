@@ -1,6 +1,6 @@
 <?hh // strict
 
-namespace Zynga\PHPUnit\V2\Tests\Framework;
+namespace Zynga\PHPUnit\V2\Tests\System;
 
 use Zynga\PHPUnit\V2\Exceptions\Exception;
 use Zynga\PHPUnit\V2\TestCase;

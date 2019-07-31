@@ -1,6 +1,6 @@
 <?hh // strict
 
-namespace Zynga\PHPUnit\V2\Tests;
+namespace Zynga\PHPUnit\V2\Tests\System;
 
 use Zynga\Framework\Environment\CodePath\V1\CodePath;
 use Zynga\PHPUnit\V2\TestFailure;
