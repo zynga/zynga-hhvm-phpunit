@@ -248,9 +248,9 @@ class AssertTest extends TestCase {
 
   <<dataProvider("assertArraySubsetInvalidArgumentProvider")>>
   public function testAssertArraySubsetRaisesExceptionForInvalidArguments(
-    $partial,
-    $subject,
-  ) {
+    mixed $partial,
+    mixed $subject,
+  ): void {
     $message = 'array or ArrayAccess';
     try {
       $this->assertArraySubset($partial, $subject);
@@ -485,12 +485,12 @@ class AssertTest extends TestCase {
 
   <<dataProvider("equalProvider")>>
   public function testAssertEqualsSucceeds(
-    $a,
-    $b,
-    $delta = 0.0,
-    $canonicalize = false,
-    $ignoreCase = false,
-  ) {
+    mixed $a,
+    mixed $b,
+    float $delta = 0.0,
+    bool $canonicalize = false,
+    bool $ignoreCase = false,
+  ): void {
     if (is_float($delta) != true) {
       $delta = floatval($delta);
     }
@@ -499,12 +499,12 @@ class AssertTest extends TestCase {
 
   <<dataProvider("notEqualProvider")>>
   public function testAssertEqualsFails(
-    $a,
-    $b,
-    $delta = 0.0,
-    $canonicalize = false,
-    $ignoreCase = false,
-  ) {
+    mixed $a,
+    mixed $b,
+    float $delta = 0.0,
+    bool $canonicalize = false,
+    bool $ignoreCase = false,
+  ): void {
     try {
       if (is_float($delta) != true) {
         $delta = floatval($delta);
@@ -519,12 +519,12 @@ class AssertTest extends TestCase {
 
   <<dataProvider("notEqualProvider")>>
   public function testAssertNotEqualsSucceeds(
-    $a,
-    $b,
-    $delta = 0.0,
-    $canonicalize = false,
-    $ignoreCase = false,
-  ) {
+    mixed $a,
+    mixed $b,
+    float $delta = 0.0,
+    bool $canonicalize = false,
+    bool $ignoreCase = false,
+  ): void {
     if (is_float($delta) != true) {
       $delta = floatval($delta);
     }
@@ -541,12 +541,12 @@ class AssertTest extends TestCase {
 
   <<dataProvider("equalProvider")>>
   public function testAssertNotEqualsFails(
-    $a,
-    $b,
-    $delta = 0.0,
-    $canonicalize = false,
-    $ignoreCase = false,
-  ) {
+    mixed $a,
+    mixed $b,
+    float $delta = 0.0,
+    bool $canonicalize = false,
+    bool $ignoreCase = false,
+  ): void {
     try {
       if (is_float($delta) != true) {
         $delta = floatval($delta);
@@ -568,12 +568,12 @@ class AssertTest extends TestCase {
   }
 
   <<dataProvider("sameProvider")>>
-  public function testAssertSameSucceeds($a, $b) {
+  public function testAssertSameSucceeds(mixed $a, mixed $b): void {
     $this->assertSame($a, $b);
   }
 
   <<dataProvider("notSameProvider")>>
-  public function testAssertSameFails($a, $b) {
+  public function testAssertSameFails(mixed $a, mixed $b): void {
     try {
       $this->assertSame($a, $b);
     } catch (AssertionFailedException $e) {
@@ -584,12 +584,12 @@ class AssertTest extends TestCase {
   }
 
   <<dataProvider("notSameProvider")>>
-  public function testAssertNotSameSucceeds($a, $b) {
+  public function testAssertNotSameSucceeds(mixed $a, mixed $b): void {
     $this->assertNotSame($a, $b);
   }
 
   <<dataProvider("sameProvider")>>
-  public function testAssertNotSameFails($a, $b) {
+  public function testAssertNotSameFails(mixed $a, mixed $b): void {
     try {
       $this->assertNotSame($a, $b);
     } catch (AssertionFailedException $e) {
@@ -2566,9 +2566,9 @@ XML;
 
   <<dataProvider("validInvalidJsonDataProvider")>>
   public function testAssertJsonStringEqualsJsonStringErrorRaised(
-    $expected,
-    $actual,
-  ) {
+    string $expected,
+    string $actual,
+  ): void {
 
     try {
       $this->assertJsonStringEqualsJsonString($expected, $actual);
@@ -2590,9 +2590,9 @@ XML;
 
   <<dataProvider("validInvalidJsonDataProvider")>>
   public function testAssertJsonStringNotEqualsJsonStringErrorRaised(
-    $expected,
-    $actual,
-  ) {
+    string $expected,
+    string $actual,
+  ): void {
 
     try {
       $this->assertJsonStringNotEqualsJsonString($expected, $actual);
@@ -2837,6 +2837,7 @@ XML;
   // ------------------------------------------------------------------------------------------------------------------------------
   // Data providers for all of the assertions.
   // ------------------------------------------------------------------------------------------------------------------------------
+
   /**
    * @return array
    */
@@ -2865,7 +2866,7 @@ XML;
     return array_merge(self::equalValues(), self::sameValues());
   }
 
-  public static function notSameProvider() {
+  public static function notSameProvider(): array<array<mixed, mixed>> {
     // not equal |= not same
     // equal, ¬same |= not same
     return array_merge(self::notEqualValues(), self::equalValues());
@@ -2917,11 +2918,11 @@ XML;
 
     return [
       // strings
-      ['a', 'A', 0, false, true], // ignore case
+      ['a', 'A', floatval(0), false, true], // ignore case
       // arrays
       [['a' => 1, 'b' => 2], ['b' => 2, 'a' => 1]],
       [[1], ['1']],
-      [[3, 2, 1], [2, 3, 1], 0, true], // canonicalized comparison
+      [[3, 2, 1], [2, 3, 1], floatval(0), true], // canonicalized comparison
       // floats
       [2.3, 2.5, 0.5],
       [[2.3], [2.5], 0.5],
@@ -2929,7 +2930,7 @@ XML;
       [new Struct(2.3), new Struct(2.5), 0.5],
       [[new Struct(2.3)], [new Struct(2.5)], 0.5],
       // numeric with delta
-      [1, 2, 1],
+      [1, 2, floatval(1)],
       // objects
       [$object1, $object2],
       [$book1, $book2],
@@ -2971,7 +2972,7 @@ XML;
           '2013-03-29 04:13:25',
           new DateTimeZone('America/New_York'),
         ),
-        10,
+        floatval(10),
       ],
       [
         new DateTime(
@@ -2982,7 +2983,7 @@ XML;
           '2013-03-29 04:14:40',
           new DateTimeZone('America/New_York'),
         ),
-        65,
+        floatval(65),
       ],
       [
         new DateTime('2013-03-29', new DateTimeZone('America/New_York')),
@@ -3007,7 +3008,7 @@ XML;
           '2013-03-29 03:13:49',
           new DateTimeZone('America/Chicago'),
         ),
-        15,
+        floatval(15),
       ],
       [
         new DateTime('2013-03-30', new DateTimeZone('America/New_York')),
@@ -3022,7 +3023,7 @@ XML;
           '2013-03-29 23:01:30',
           new DateTimeZone('America/Chicago'),
         ),
-        100,
+        floatval(100),
       ],
       [
         new DateTime('@1364616000'),
@@ -3182,7 +3183,7 @@ XML;
           '2013-03-29 03:13:35',
           new DateTimeZone('America/New_York'),
         ),
-        3500,
+        floatval(3500),
       ],
       [
         new DateTime(
@@ -3193,7 +3194,7 @@ XML;
           '2013-03-29 05:13:35',
           new DateTimeZone('America/New_York'),
         ),
-        3500,
+        floatval(3500),
       ],
       [
         new DateTime('2013-03-29', new DateTimeZone('America/New_York')),
@@ -3202,7 +3203,7 @@ XML;
       [
         new DateTime('2013-03-29', new DateTimeZone('America/New_York')),
         new DateTime('2013-03-30', new DateTimeZone('America/New_York')),
-        43200,
+        floatval(43200),
       ],
       [
         new DateTime(
@@ -3223,7 +3224,7 @@ XML;
           '2013-03-29 04:13:35',
           new DateTimeZone('America/Chicago'),
         ),
-        3500,
+        floatval(3500),
       ],
       [
         new DateTime('2013-03-30', new DateTimeZone('America/New_York')),

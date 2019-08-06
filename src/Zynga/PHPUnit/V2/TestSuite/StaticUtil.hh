@@ -304,19 +304,23 @@ class StaticUtil {
     $className = $theClass->getName();
     $groups = $test->getGroupsFromAnnotation();
 
-    if (self::verifyTestArgumentsFitShapeRequested($theClass, $name, $data) ===
-        false) {
+    list($argOk, $argError) =
+      self::verifyTestArgumentsFitShapeRequested($theClass, $name, $data);
 
-      $incompleteTest = new IncompleteTestCase(
-        $theClass->getName(),
-        $name,
-        'Data was invalid for test data='.
-        get_class($data).
-        ' className='.
-        $className.
-        ' method='.
-        $name,
-      );
+    if ($argOk !== true) {
+
+      $incompleteTest =
+        new IncompleteTestCase(
+          $className,
+          $name,
+          sprintf(
+            'Data was invalid for test  className=%s method=%s data=%s argError=%s',
+            $className,
+            $name,
+            json_encode($data),
+            $argError,
+          ),
+        );
 
       $test->addTest($incompleteTest, $groups);
 
@@ -338,12 +342,26 @@ class StaticUtil {
 
   }
 
+  private static function isAssociativeArray(mixed $data): bool {
+    if (!is_array($data)) {
+      return false;
+    }
+    if (array() === $data) {
+      return false;
+    }
+    return array_keys($data) !== range(0, count($data) - 1);
+  }
+
   private static function addToDataProvidedTest_ArrayParam(
     ReflectionClass $theClass,
     string $name,
     DataProvider $test,
     mixed $data,
   ): TestInterface {
+
+    if (!is_array($data)) {
+      return $test;
+    }
 
     // --
     // Verify that the shape of the params being passed in are kosher with the
@@ -352,16 +370,69 @@ class StaticUtil {
     $groups = $test->getGroupsFromAnnotation();
     $className = $theClass->getName();
 
-    if (is_array($data)) {
+    // First is this an associative array for $data
+
+    $isAssoc = self::isAssociativeArray($data);
+
+    if ($isAssoc === true) {
+
+      foreach ($data as $_dataKey => $_dataValues) {
+
+        if (is_array($_dataValues)) {
+
+          foreach ($_dataValues as $_dataValue) {
+
+            $_data = array($_dataKey, $_dataValue);
+            $_dataName = $_dataKey.' '.json_encode($_dataValue);
+
+            list($argOk, $argError) =
+              self::verifyTestArgumentsFitShapeRequested(
+                $theClass,
+                $name,
+                $_data,
+              );
+
+            if ($argOk === true) {
+
+              $args = Vector {$name, $_data, $_dataName};
+              $_test = self::createTest_Simple($theClass, $name, $args);
+              $test->addTest($_test, $groups);
+
+            } else {
+
+              $incompleteTest =
+                new IncompleteTestCase(
+                  $className,
+                  $name,
+                  sprintf(
+                    'Data was invalid for test  className=%s method=%s data=%s argError=%s',
+                    $className,
+                    $name,
+                    json_encode($_data),
+                    $argError,
+                  ),
+                );
+
+              $test->addTest($incompleteTest, $groups);
+            }
+
+          }
+
+        }
+
+      }
+
+    } else {
 
       foreach ($data as $_dataName => $_data) {
 
-        if (self::verifyTestArgumentsFitShapeRequested(
-              $theClass,
-              $name,
-              $_data,
-            ) ===
-            true) {
+        list($argOk, $argError) = self::verifyTestArgumentsFitShapeRequested(
+          $theClass,
+          $name,
+          $_data,
+        );
+
+        if ($argOk === true) {
 
           // JEO: At times $_dataName can be a int somehow? Let's coerce it to string.
           $args = Vector {$name, $_data, strval($_dataName)};
@@ -370,23 +441,24 @@ class StaticUtil {
 
         } else {
 
-          $incompleteTest = new IncompleteTestCase(
-            $theClass->getName(),
-            $name,
-            'Data was invalid for test data='.
-            json_encode($_data).
-            ' className='.
-            $className.
-            ' method='.
-            $name,
-          );
+          $incompleteTest =
+            new IncompleteTestCase(
+              $className,
+              $name,
+              sprintf(
+                'Data was invalid for test  className=%s method=%s data=%s argError=%s',
+                $className,
+                $name,
+                json_encode($_data),
+                $argError,
+              ),
+            );
 
           $test->addTest($incompleteTest, $groups);
 
         }
 
       }
-
     }
 
     return $test;
@@ -396,13 +468,13 @@ class StaticUtil {
     ReflectionClass $theClass,
     string $name,
     mixed $args,
-  ): bool {
+  ): (bool, string) {
 
     // Extract the method for the test, it should exist and be  static.
     $theTestMethod = $theClass->getMethod($name);
 
     if (!$theTestMethod instanceof ReflectionMethod) {
-      return false;
+      return tuple(false, 'unable to reflect method='.$name);
     }
 
     $t_args = array();
@@ -418,7 +490,16 @@ class StaticUtil {
     $paramCount = count($t_args);
 
     if ($requiredParamCount > 0 && $paramCount < $requiredParamCount) {
-      return false;
+      return tuple(
+        false,
+        'method='.
+        $name.
+        ' requiredParamCount='.
+        $requiredParamCount.
+        ' provided='.
+        $paramCount,
+      );
+
     }
 
     // Test #2) Check that the params are of the same shape as the args provided
@@ -426,49 +507,93 @@ class StaticUtil {
 
     $offset = 0;
     foreach ($params as $param) {
+
       $paramType = $param->getType();
-      $arg = $t_args[$offset];
-      if ($paramType instanceof ReflectionType &&
-          self::verifyParamVsValueProvided($paramType, $arg)) {
-        // We are gtg, noop.
-        $offset++;
+
+      // --
+      // This is an aoptional param, and we didn't provide data for the argument.
+      // --
+      if ($param->isOptional() && !array_key_exists($offset, $t_args)) {
         continue;
+      }
+
+      $arg = $t_args[$offset];
+
+      if ($paramType instanceof ReflectionType) {
+
+        list($paramVerify, $paramError) =
+          self::verifyParamVsValueProvided($paramType, $arg);
+
+        if ($paramVerify === true) {
+          // We are gtg, noop.
+          $offset++;
+          continue;
+        }
+
+        return tuple(false, 'param value is invalid '.$paramError);
+
       } else {
-        return false;
+
+        return tuple(
+          false,
+          'unable to reflect testMethod='.$name.' arg='.$offset,
+        );
+
       }
     }
 
-    return true;
+    return tuple(true, '');
 
   }
 
   private static function verifyParamVsValueProvided(
     ReflectionType $param,
     mixed $value,
-  ): bool {
+  ): (bool, string) {
 
     $paramType = $param->__toString();
     $argType = gettype($value);
 
+    if ($paramType == 'HH\\mixed') {
+      // If the param is mixed, then we are gtg with anything coming in.
+      return tuple(true, '');
+    }
+
     if ($argType == 'object') {
+
       $argType = get_class($value);
+
       if ($argType == $paramType) {
-        return true;
+        return tuple(true, '');
       }
+
+      return tuple(false, 'expected='.$paramType.' provided='.$argType);
+
     } else {
+
       // It is some form of internal type.
       if ($paramType == "HH\\int" && $argType == 'integer') {
-        return true;
+
+        return tuple(true, '');
+
       } else if ($paramType == "HH\\string" && $argType == 'string') {
-        return true;
+
+        return tuple(true, '');
+
       } else if ($paramType == "HH\\float" &&
                  ($argType == 'float' || $argType == 'double')) {
-        return true;
+
+        return tuple(true, '');
+
+      } else if ($paramType == "HH\\bool" && $argType == 'boolean') {
+
+        return tuple(true, '');
+
       }
 
     }
 
-    return false;
+    return tuple(false, 'expected='.$paramType.' argType='.$argType);
 
   }
 
