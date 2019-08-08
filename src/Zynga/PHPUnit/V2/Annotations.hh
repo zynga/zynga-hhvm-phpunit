@@ -142,23 +142,30 @@ class Annotations {
 
     $collapsed = Vector {};
 
-    $classValues =
-      self::getAnnotationsForKey('class', $key, $className, $methodName);
+    $classAnnotations = self::parseClassAnnotations($className);
 
-    foreach ($classValues as $classValue) {
-      if (is_string($classValue)) {
-        $collapsed->add($classValue);
-      }
-    }
+    $classValues = $classAnnotations->getValuesForKey($key);
 
-    $methodValues =
-      self::getAnnotationsForKey('method', $key, $className, $methodName);
+    $collapsed->addAll($classValues);
 
-    foreach ($methodValues as $methodValue) {
-      if (is_string($methodValue)) {
-        $collapsed->add($methodValue);
-      }
-    }
+    // var_dump($key);
+    // var_dump($className);
+    // var_dump($classAnnotations);
+    // var_dump($classValues);
+    // var_dump($collapsed);
+
+    $methodAnnotations =
+      self::parseMethodAnnotations($className, $methodName);
+
+    $methodValues = $methodAnnotations->getValuesForKey($key);
+
+    // var_dump($key);
+    // var_dump($className);
+    // var_dump($methodAnnotations);
+    // var_dump($methodValues);
+    // var_dump($collapsed);
+
+    $collapsed->addAll($methodValues);
 
     // return the stack of annotation combined
     return $collapsed;

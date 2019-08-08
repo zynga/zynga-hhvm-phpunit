@@ -3,6 +3,7 @@
 namespace Zynga\PHPUnit\V2;
 
 use Zynga\PHPUnit\V2\Exceptions\InvalidArgumentExceptionFactory;
+use Zynga\PHPUnit\V2\Exceptions\TestSuite\TestCaseExtensionException;
 use
   Zynga\PHPUnit\V2\Exceptions\TestSuiteError\SkippedException as TestSuiteSkippedException
 ;
@@ -21,6 +22,8 @@ use Zynga\PHPUnit\V2\TestSuite\DataProvider;
 use Zynga\PHPUnit\V2\TestSuite\StaticUtil;
 use Zynga\PHPUnit\V2\TestSuiteIterator;
 use Zynga\PHPUnit\V2\TestSuite\OnTestClassChangeListener;
+use Zynga\PHPUnit\V2\Exceptions\TestSuite\TestCaseNotFoundException;
+use Zynga\PHPUnit\V2\Exceptions\TestSuite\TestMethodHiddenException;
 
 use \Exception;
 use \RecursiveIterator;
@@ -77,9 +80,12 @@ class TestSuite extends Base {
    */
   public function __construct(mixed $theClass = '', string $name = '') {
 
+    parent::__construct();
+
     $this->_name = '';
     $this->_tests = Vector {};
     $this->_groups = Map {};
+
     //$this->_iteratorFilter = null;
 
     $argumentsValid = false;
@@ -100,30 +106,53 @@ class TestSuite extends Base {
 
       $theClass = ReflectionClasses::getReflection($theClass);
     } else if (is_string($theClass)) {
+
       $this->setName($theClass);
+
+      $result = $this->getResult();
+
+      // Off to a bad start here.
+      $result->addError(
+        $this,
+        new TestCaseNotFoundException('class='.$theClass.' is not found.'),
+        0.0,
+      );
+
       return;
+
     }
 
     if (!$theClass instanceof ReflectionClass) {
+
       throw InvalidArgumentExceptionFactory::factory(
         0,
         'ReflectionClass or validClassName',
         $theClass,
       );
+
     }
 
     if (!$theClass->isSubclassOf(ZyngaTestCaseBase::class) &&
         !$theClass->isSubclassOf(TestCase::class)) {
-      throw InvalidArgumentExceptionFactory::factory(
-        0,
-        'Class "'.
-        $theClass->name.
-        '" does not extend ('.
-        ZyngaTestCaseBase::class.
-        ' or '.
-        TestCase::class.
-        ')',
+
+      $result = $this->getResult();
+
+      $result->addError(
+        $this,
+        new TestCaseExtensionException(
+          'class='.
+          $theClass->name.
+          ' does not extend ('.
+          ZyngaTestCaseBase::class.
+          ' or '.
+          TestCase::class.
+          ')',
+        ),
+        0.0,
       );
+
+      return;
+
     }
 
     if ($name != '') {
@@ -425,14 +454,19 @@ class TestSuite extends Base {
     $name = $method->getName();
 
     if (!$method->isPublic()) {
-      $this->addTest(
-        StaticUtil::warning(
+
+      $result = $this->getResult();
+
+      $result->addWarning(
+        $this,
+        new TestMethodHiddenException(
           sprintf(
             'Test method "%s" in test class "%s" is not public.',
             $name,
             $class->getName(),
           ),
         ),
+        0.0,
       );
 
       return;
@@ -444,15 +478,6 @@ class TestSuite extends Base {
 
     $this->addTest($test, $test->getGroups());
 
-  }
-
-  /**
-   * Creates a default TestResult object.
-   *
-   * @return TestResult
-   */
-  final public function createResult(): TestResult {
-    return new TestResult();
   }
 
   /**
@@ -533,8 +558,10 @@ class TestSuite extends Base {
    */
   public function run(?TestResult $result = null): TestResult {
 
-    if ($result === null) {
-      $result = $this->createResult();
+    if ($result instanceof TestResult) {
+      $this->setResult($result);
+    } else {
+      $result = $this->getResult();
     }
 
     if ($this->getCount() == 0) {
@@ -543,7 +570,7 @@ class TestSuite extends Base {
 
     $t = null;
 
-    $hookMethods = $this->getHookMethods();
+    $suiteHooks = $this->getHookMethods();
 
     $result->startTestSuite($this);
 
@@ -564,7 +591,7 @@ class TestSuite extends Base {
       // --
       // JEO: Take care of the requirements before we run any of the pre-class methods.
       // --
-      foreach ($hookMethods['beforeClass'] as $beforeClassMethod) {
+      foreach ($suiteHooks['beforeClass'] as $beforeClassMethod) {
 
         if (class_exists($this->getName(), false) &&
             method_exists($this->getName(), $beforeClassMethod)) {
@@ -593,24 +620,14 @@ class TestSuite extends Base {
 
       if ($didClassChange === true) {
 
-        // --
-        // JEO: Currently there's no failure trapping around outgoing tests
-        // having shitty afterClass methods. This could lead to instability
-        // on a suite to suite transition basis. Should improve this in
-        // the future.
-        // --
+        // handle the afterClass method for the outgoing test first.
         list($afterOk, $afterException) =
-          OnTestClassChangeListener::handleAfterClass(
-            $hookMethods['afterClass'],
-          );
+          OnTestClassChangeListener::handleAfterClass();
 
         // Time for the incoming class to get it's day in the sun.
         //OnTestClassChangeListener::handleRequirements();
         list($beforeOk, $beforeException) =
-          OnTestClassChangeListener::handleBeforeClass(
-            $test,
-            $hookMethods['beforeClass'],
-          );
+          OnTestClassChangeListener::handleBeforeClass($test);
 
         if ($beforeOk !== true && $beforeException instanceof Exception) {
           return
@@ -631,6 +648,9 @@ class TestSuite extends Base {
 
     }
 
+    // handle outgoing tests, happens if we didn't have a class change.
+    OnTestClassChangeListener::handleAfterClass();
+
     // JEO: Run the doTearDownAfterClass
     // foreach ($hookMethods['afterClass'] as $afterClassMethod) {
     //   DynamicMethodCall::callMethodOnObject(
@@ -648,21 +668,6 @@ class TestSuite extends Base {
 
     return $result;
   }
-
-  /**
-   * Runs a test.
-   *
-   * @deprecated
-   *
-   * @param TestInterface       $test
-   * @param TestResult $result
-   */
-  // final public function runTest(
-  //   TestInterface $test,
-  //   TestResult $result,
-  // ): TestResult {
-  //   return $test->run($result);
-  // }
 
   /**
    * Mark the test suite as skipped.

@@ -866,7 +866,7 @@ class TestResult {
 
     try {
 
-      $test->runBare();
+      $test->runBare($this);
 
       // @TODO: Cleanup this block.
       // JEO: I am pretty sure mock objects don't work anymore therefor this trap

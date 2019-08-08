@@ -10,6 +10,11 @@ class OnTestClassChangeListener {
   private static ?TestInterface $_currentClass = null;
 
   public static function isClassChange(TestInterface $candidate): bool {
+
+    if (self::$_currentClass == null) {
+      return true;
+    }
+
     $candidateName = get_class($candidate);
 
     if (self::$_currentClass instanceof TestInterface) {
@@ -32,20 +37,32 @@ class OnTestClassChangeListener {
 
   public static function handleBeforeClass(
     TestInterface $test,
-    Vector<string> $beforeClassMethods,
   ): (bool, ?Exception) {
 
     try {
 
-      foreach ($beforeClassMethods as $beforeClassMethod) {
+      $hooks = $test->getHookMethods();
 
-        DynamicMethodCall::callMethodOnObject(
-          $test,
-          $beforeClassMethod,
-          Vector {},
-          false,
-          true,
-        );
+      $beforeClassMethods = $hooks->get('beforeClass');
+
+      if ($beforeClassMethods instanceof Vector) {
+
+        foreach ($beforeClassMethods as $beforeClassMethod) {
+
+          // var_dump(
+          //   'CALLING_BEFORE class='.get_class($test).'::'.$beforeClassMethod,
+          // );
+
+          DynamicMethodCall::callMethodOnObject(
+            $test,
+            $beforeClassMethod,
+            Vector {},
+            false,
+            true,
+          );
+
+        }
+
       }
 
     } catch (Exception $e) {
@@ -56,32 +73,45 @@ class OnTestClassChangeListener {
 
   }
 
-  public static function handleAfterClass(
-    Vector<string> $afterClassMethods,
-  ): (bool, ?Exception) {
+  public static function handleAfterClass(): (bool, ?Exception) {
 
     $test = self::$_currentClass;
 
     // no after class to call.
-    if (!self::$_currentClass instanceof TestInterface) {
+    if (!$test instanceof TestInterface) {
       return tuple(true, null);
     }
 
     try {
 
-      foreach ($afterClassMethods as $afterClassMethod) {
-        DynamicMethodCall::callMethodOnObject(
-          $test,
-          $afterClassMethod,
-          Vector {},
-          false,
-          true,
-        );
+      $hooks = $test->getHookMethods();
+
+      $afterClassMethods = $hooks->get('afterClass');
+
+      if ($afterClassMethods instanceof Vector) {
+        foreach ($afterClassMethods as $afterClassMethod) {
+
+          // var_dump(
+          //   'CALLING_AFTER class='.get_class($test).'::'.$afterClassMethod,
+          // );
+
+          DynamicMethodCall::callMethodOnObject(
+            $test,
+            $afterClassMethod,
+            Vector {},
+            false,
+            true,
+          );
+
+        }
       }
 
     } catch (Exception $e) {
       return tuple(false, $e);
     }
+
+    // deallocate our pointer to the currentClass as we've called a after moment.
+    self::$_currentClass = null;
 
     return tuple(true, null);
 

@@ -4,12 +4,28 @@ namespace Zynga\PHPUnit\V2\Test;
 
 use Zynga\PHPUnit\V2\Annotations;
 use Zynga\PHPUnit\V2\Interfaces\TestInterface;
+use Zynga\PHPUnit\V2\TestResult;
 
 /**
  * Base class for both TestClass and TestSuite as there is some functionality
  *  overlap that we shouldn't maintain in two places.
  */
 abstract class Base implements TestInterface {
+
+  private TestResult $_result;
+
+  public function __construct() {
+    $this->_result = new TestResult();
+  }
+
+  final public function setResult(TestResult $result): bool {
+    $this->_result = $result;
+    return true;
+  }
+
+  final public function getResult(): TestResult {
+    return $this->_result;
+  }
 
   /**
    * Returns the annotations for this test.
@@ -106,6 +122,7 @@ abstract class Base implements TestInterface {
     // --
     $beforeClassMethods = $this->mergeHooks(
       Vector {'setUpBeforeClass', 'doSetUpBeforeClass'},
+      //Annotations::get
       $this->getAllAnnotationsForKey('beforeClass'),
     );
 
@@ -143,17 +160,11 @@ abstract class Base implements TestInterface {
     Vector<string> $userDefined,
   ): Vector<string> {
 
-    $combinedMap = Map {};
+    $combinedMap = Vector {};
+    $combinedMap->addAll($template);
+    $combinedMap->addAll($userDefined);
 
-    foreach ($template as $hook) {
-      $combinedMap->set($hook, true);
-    }
-
-    foreach ($userDefined as $hook) {
-      $combinedMap->set($hook, true);
-    }
-
-    return $combinedMap->keys();
+    return $combinedMap;
 
   }
 

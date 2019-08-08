@@ -33,7 +33,6 @@ class IsInstanceOfConstraint extends Base {
       $this->className = $className;
       return true;
     }
-    var_dump($className);
     return false;
   }
 

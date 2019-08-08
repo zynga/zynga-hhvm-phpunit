@@ -23,6 +23,9 @@ use Zynga\PHPUnit\V2\Tests\Mock\OneTestCase;
 use Zynga\PHPUnit\V2\Tests\Mock\NoTestCases;
 use Zynga\PHPUnit\V2\Tests\Mock\NoTestCaseClass;
 use Zynga\PHPUnit\V2\Tests\Mock\RequirementsClassBeforeClassHookTest;
+use Zynga\PHPUnit\V2\Tests\Mock\NotVoidTestCase;
+use Zynga\PHPUnit\V2\Tests\Mock\NotPublicTestCase;
+use Zynga\PHPUnit\V2\Tests\Mock\OverrideTestCase;
 
 /**
  * @since      Class available since Release 2.0.0
@@ -96,26 +99,61 @@ class SuiteTest extends BaseTest {
 
   }
 
-  //<<expectedException("JEOPHPUnit_Framework_Exception")>>
   public function testNoTestCaseClass(): void {
+
     $suite = new TestSuite(NoTestCaseClass::class);
+
+    $initialResult = $suite->getResult();
+
+    $this->_verifyTestSuite(
+      $suite,
+      $initialResult,
+      false, // debug
+      Status::STATUS_FAILURE, // status
+      0, // testCount
+      0, // successful
+      1, // error
+      0, // failure
+      0, // skipped
+      0, // incomplete
+      0, // warning
+      0, // notImplemented
+    );
+
   }
 
   public function testNotExistingTestCase(): void {
 
-    $suite = new TestSuite('notExistingMethod');
+    $suite = new TestSuite('NotExistingTestCase');
+
+    $initialResult = $suite->getResult();
+
+    $this->_verifyTestSuite(
+      $suite,
+      $initialResult,
+      false, // debug
+      Status::STATUS_FAILURE, // status
+      0, // testCount
+      0, // successful
+      1, // error
+      0, // failure
+      0, // skipped
+      0, // incomplete
+      0, // warning
+      0, // notImplemented
+    );
 
     $result = $suite->run();
 
     $this->_verifyTestSuite(
       $suite,
       $result,
-      true, // debug
+      false, // debug
       Status::STATUS_FAILURE, // status
-      1, // testCount
+      0, // testCount
       0, // successful
-      0, // error
-      1, // failure
+      1, // error
+      0, // failure
       0, // skipped
       0, // incomplete
       0, // warning
@@ -126,22 +164,22 @@ class SuiteTest extends BaseTest {
 
   public function testNotPublicTestCase(): void {
 
-    $suite = new TestSuite('NotPublicTestCase');
+    $suite = new TestSuite(NotPublicTestCase::class);
 
-    $result = new TestResult(); // dummy on this one.
+    $result = $suite->getResult();
 
     $this->_verifyTestSuite(
       $suite,
       $result,
-      true, // debug
+      false, // debug
       Status::STATUS_NOT_STARTED, // status
-      2, // testCount
+      1, // testCount
       0, // successful
       0, // error
       0, // failure
       0, // skipped
       0, // incomplete
-      0, // warning
+      2, // warning
       0, // notImplemented
     );
 
@@ -149,13 +187,13 @@ class SuiteTest extends BaseTest {
 
   public function testNotVoidTestCase(): void {
 
-    $suite = new TestSuite('NotVoidTestCase');
+    $suite = new TestSuite(NotVoidTestCase::class);
     $result = new TestResult();
 
     $this->_verifyTestSuite(
       $suite,
       $result,
-      true, // debug
+      false, // debug
       Status::STATUS_NOT_STARTED, // status
       1, // testCount
       0, // successful
@@ -171,14 +209,14 @@ class SuiteTest extends BaseTest {
 
   public function testOneTestCase(): void {
 
-    $suite = new TestSuite('OneTestCase');
+    $suite = new TestSuite(OneTestCase::class);
 
     $result = $suite->run();
 
     $this->_verifyTestSuite(
       $suite,
       $result,
-      true, // debug
+      false, // debug
       Status::STATUS_PASSED, // status
       1, // testCount
       1, // successful
@@ -194,14 +232,14 @@ class SuiteTest extends BaseTest {
 
   public function testShadowedTests(): void {
 
-    $suite = new TestSuite('OverrideTestCase');
+    $suite = new TestSuite(OverrideTestCase::class);
 
     $result = $suite->run();
 
     $this->_verifyTestSuite(
       $suite,
       $result,
-      true, // debug
+      false, // debug
       Status::STATUS_PASSED, // status
       1, // testCount
       1, // successful
@@ -217,7 +255,7 @@ class SuiteTest extends BaseTest {
 
   public function testBeforeClassAndAfterClassAnnotations(): void {
 
-    $suite = new TestSuite('BeforeClassAndAfterClassTest');
+    $suite = new TestSuite(BeforeClassAndAfterClassTest::class);
 
     BeforeClassAndAfterClassTest::resetProperties();
 
@@ -281,7 +319,7 @@ class SuiteTest extends BaseTest {
     $this->_verifyTestSuite(
       $suite,
       $result,
-      true, // debug
+      false, // debug
       Status::STATUS_PASSED, // status
       4, // testCount
       4, // successful
@@ -304,7 +342,7 @@ class SuiteTest extends BaseTest {
     $this->_verifyTestSuite(
       $suite,
       $result,
-      true, // debug
+      false, // debug
       Status::STATUS_PASSED, // status
       1, // testCount
       0, // successful
@@ -327,7 +365,7 @@ class SuiteTest extends BaseTest {
     $this->_verifyTestSuite(
       $suite,
       $result,
-      true, // debug
+      false, // debug
       Status::STATUS_PASSED, // status
       3, // testCount
       3, // successful

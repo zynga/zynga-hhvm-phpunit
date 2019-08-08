@@ -15,6 +15,7 @@ use Zynga\PHPUnit\V2\SkippedTestCase;
 use Zynga\PHPUnit\V2\TestSuite\DataProvider;
 use Zynga\PHPUnit\V2\TestSuite\DataProvider\Loader;
 use Zynga\PHPUnit\V2\WarningTestCase;
+use Zynga\Framework\ReflectionCache\V1\ReflectionClasses;
 
 use \Exception;
 use \ReflectionClass;
@@ -546,6 +547,38 @@ class StaticUtil {
 
   }
 
+  private static function doesImplementInterface(
+    string $class,
+    string $desiredInterface,
+  ): bool {
+
+    $classReflection = ReflectionClasses::getReflection($class);
+
+    if ($classReflection instanceof ReflectionClass) {
+
+      // does the class itself implement it directly.
+      if ($classReflection->implementsInterface($desiredInterface) === true) {
+        return true;
+      }
+
+      // walk up the tree to see if one of the parents implements the target interface
+      $parentClass = $classReflection->getParentClass();
+
+      if ($parentClass instanceof ReflectionClass) {
+
+        return self::doesImplementInterface(
+          $parentClass->getName(),
+          $desiredInterface,
+        );
+
+      }
+
+    }
+
+    // no joy, no class matching found
+    return false;
+
+  }
   private static function verifyParamVsValueProvided(
     ReflectionType $param,
     mixed $value,
@@ -561,13 +594,39 @@ class StaticUtil {
 
     if ($argType == 'object') {
 
+      $isInterface = false;
+
+      $paramReflection = ReflectionClasses::getReflection($paramType);
+
+      if ($paramReflection instanceof ReflectionClass) {
+        if ($paramReflection->isInterface()) {
+          $isInterface = true;
+        }
+      }
+
       $argType = get_class($value);
+
+      if ($isInterface === true) {
+
+        if (self::doesImplementInterface($argType, $paramType)) {
+          return tuple(true, '');
+        }
+
+        return tuple(
+          false,
+          'missing expecterInterface='.$paramType.' providedClass='.$argType,
+        );
+
+      }
 
       if ($argType == $paramType) {
         return tuple(true, '');
       }
 
-      return tuple(false, 'expected='.$paramType.' provided='.$argType);
+      return tuple(
+        false,
+        'missing expectedClass='.$paramType.' providedClass='.$argType,
+      );
 
     } else {
 

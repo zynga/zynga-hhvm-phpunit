@@ -109,13 +109,14 @@ abstract class BaseTest extends TestCase {
     $actualSkippedCount = $result->skippedCount();
     $actualSkipped = $result->skipped();
 
-    var_dump(
+    print
       'skippedCount'.
       ' expected='.
       $skippedCount.
       ' actual='.
-      $actualSkippedCount,
-    );
+      $actualSkippedCount.
+      "\n"
+    ;
 
     $this->_debugExceptions($actualSkipped);
 
@@ -182,6 +183,12 @@ abstract class BaseTest extends TestCase {
   ): void {
 
     if ($debug == true) {
+
+      print
+        "---verifyTestSuite::debug isEnabled for test=".
+        $test->getName().
+        "---\n"
+      ;
 
       print
         "testCount"." expected=".$testCount.' actual='.$test->count()."\n"

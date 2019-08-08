@@ -66,5 +66,6 @@ interface TestInterface extends Countable {
     string $context,
     string $key,
   ): Vector<string>;
+  public function getHookMethods(): Map<string, Vector<string>>;
 
 }

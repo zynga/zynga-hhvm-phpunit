@@ -20,6 +20,7 @@ use Zynga\PHPUnit\V2\Test\Requirements;
 use Zynga\PHPUnit\V2\TestCase\OutputBuffer;
 use Zynga\PHPUnit\V2\TestCase\Size;
 use Zynga\PHPUnit\V2\TestCase\Status;
+use Zynga\PHPUnit\V2\Exceptions\TestSuite\TestCaseExtensionException;
 
 // JEO: needs conversion.
 use Zynga\PHPUnit\V2\TestResult;
@@ -66,8 +67,6 @@ abstract class TestCase extends Assertions implements TestInterface {
   private int $_numAssertions;
   private Vector<string> $_dependencies;
   private bool $_hasDependencies;
-  private ?TestResult $_result;
-  private ?TestResult $_testResult;
   private Vector<mixed> $_data;
   private string $_dataName;
   private PerformanceTracker $_perf;
@@ -77,6 +76,8 @@ abstract class TestCase extends Assertions implements TestInterface {
     mixed $data = null,
     string $dataName = '',
   ) {
+
+    parent::__construct();
 
     $this->_status = new Status();
     $this->_name = '';
@@ -96,8 +97,7 @@ abstract class TestCase extends Assertions implements TestInterface {
     $this->_numAssertions = 0;
     $this->_dependencies = Vector {};
     $this->_hasDependencies = false;
-    $this->_result = null;
-    $this->_testResult = null;
+
     $v_data = Vector {};
     if (is_array($data)) {
       $v_data->addAll($data);
@@ -814,56 +814,6 @@ abstract class TestCase extends Assertions implements TestInterface {
     return $this->_hasDependencies;
   }
 
-  /**
-   * Creates a default TestResult object.
-   *
-   * @return TestResult
-   */
-  final public function createResult(): TestResult {
-    return new TestResult();
-  }
-
-  /**
-   * @param mixed $result
-   *
-   * @since Method available since Release 3.4.0
-   */
-  final public function setResult(?TestResult $result): bool {
-    $this->_testResult = $result;
-    return true;
-  }
-
-  final public function getResult(): TestResult {
-    if ($this->_testResult == null) {
-      $this->_testResult = $this->createResult();
-    }
-    return $this->_testResult;
-  }
-
-  /**
-   * @param TestResult $result
-   *
-   * @since Method available since Release 3.6.0
-   */
-  final public function setTestResultObject(TestResult $result): bool {
-    $this->_result = $result;
-    return true;
-  }
-
-  /**
-   * @return TestResult
-   *
-   * @since Method available since Release 3.5.7
-   */
-  final public function getTestResultObject(): ?TestResult {
-    return $this->_result;
-  }
-
-  final public function freeResult(): bool {
-    $this->_result = null;
-    return true;
-  }
-
   final public function getDataName(): string {
     return $this->_dataName;
   }
@@ -929,7 +879,7 @@ abstract class TestCase extends Assertions implements TestInterface {
     if ($this->hasDependencies()) {
 
       $className = $this->getClass();
-      $tr = $this->getTestResultObject();
+      $tr = $this->getResult();
 
       $passed = array();
       if ($tr instanceof TestResult) {
@@ -1009,13 +959,15 @@ abstract class TestCase extends Assertions implements TestInterface {
    */
   final public function run(?TestResult $result = null): TestResult {
 
-    if ($result === null) {
-      $result = $this->createResult();
+    // propigate upwards to the provided result.
+    if ($result instanceof TestResult) {
+      $this->setResult($result);
+    } else {
+      $result = $this->getResult();
     }
 
     // WarningTestCase is probably dead now that Mocks are dead.
     // if (!$this instanceof PHPUnit_Framework_WarningTestCase) {
-    $this->setTestResultObject($result);
     $this->setUseErrorHandlerFromAnnotation();
     //}
 
@@ -1040,8 +992,6 @@ abstract class TestCase extends Assertions implements TestInterface {
     if (is_bool($oldErrorHandlerSetting)) {
       $result->convertErrorsToExceptions($oldErrorHandlerSetting);
     }
-
-    $this->freeResult();
 
     return $result;
 
@@ -1165,7 +1115,7 @@ abstract class TestCase extends Assertions implements TestInterface {
   /**
    * Runs the bare test sequence.
    */
-  final public function runBare(): void {
+  final public function runBare(?TestResult $testResult = null): void {
 
     $this->startOutputBuffering();
 
@@ -1174,8 +1124,8 @@ abstract class TestCase extends Assertions implements TestInterface {
     $hookMethods = $this->getHookMethods();
 
     $e = null;
-    $_e = null;
     $hasMetRequirements = false;
+    $t_result = null;
 
     try {
 
@@ -1192,12 +1142,8 @@ abstract class TestCase extends Assertions implements TestInterface {
       $this->assertPreConditions();
 
       $this->startBareTimer();
-      $t_result = $this->runTest();
+      $this->runTest();
       $this->endBareTimer();
-
-      if ($t_result instanceof TestResult) {
-        $this->setResult($t_result);
-      }
 
       $this->assertPostConditions();
 
@@ -1220,15 +1166,16 @@ abstract class TestCase extends Assertions implements TestInterface {
       $this->endBareTimer();
       $this->status()
         ->setMessageAndCode($e->getMessage(), Status::STATUS_FAILURE);
+    } catch (TestCaseExtensionException $e) {
+      $this->endBareTimer();
+      $this->status()
+        ->setMessageAndCode($e->getMessage(), Status::STATUS_ERROR);
     } catch (Exception $_e) {
       //error_log('JEO default trap?');
       $this->endBareTimer();
-      $e = $_e;
-    }
-
-    if ($_e instanceof Exception) {
       $this->status()
         ->setMessageAndCode($_e->getMessage(), Status::STATUS_ERROR);
+      $e = $_e;
     }
 
     // Tear down the fixture. An exception raised in tearDown() will be
@@ -1266,7 +1213,6 @@ abstract class TestCase extends Assertions implements TestInterface {
     $this->clearLocales();
 
     // Perform assertion on output.
-
     try {
       $output = $this->getActualOutput();
 
@@ -1292,6 +1238,7 @@ abstract class TestCase extends Assertions implements TestInterface {
     if ($e instanceof Exception) {
       $this->onNotSuccessfulTest($e);
     }
+
   }
 
   /**

@@ -79,7 +79,7 @@ class TestCaseTest extends BaseTest {
 
   public function testCaseToString(): void {
     $this->assertEquals(
-      'Zynga\PHPUnit\V2\Tests\Framework\TestCaseTest::testCaseToString',
+      'Zynga\PHPUnit\V2\Tests\System\TestCaseTest::testCaseToString',
       $this->toString(),
     );
   }
@@ -489,7 +489,17 @@ class TestCaseTest extends BaseTest {
 
     $result = $suite->run();
 
-    $this->_verifyTestSuite($suite, $result, false, 1, 0, 0, 0);
+    $this->_verifyTestSuite(
+      $suite,
+      $result,
+      false,
+      Status::STATUS_PASSED,
+      1,
+      1,
+      0,
+      0,
+      0,
+    );
 
   }
 
@@ -1010,32 +1020,38 @@ class TestCaseTest extends BaseTest {
   }
 
   public function testSkipsProvidesMessagesForAllSkippingReasons(): void {
+
     $test = new Requirements('testAllPossibleRequirements');
     $result = $test->run();
 
     $expectedOutput = '';
-    $expectedOutput .=
-      'PHP version '.PHP_VERSION.' >= 99-dev is required.'.PHP_EOL;
-    $expectedOutput .=
-      'PHPUnit version '.
-      Version::VERSION_NUMBER.
-      ' >= 9-dev is required.'.
-      PHP_EOL;
-    $expectedOutput .=
-      'Operating system '.
-      PHP_OS.
-      ' expected /DOESNOTEXIST/i is required.'.
-      PHP_EOL;
-    $expectedOutput .= 'Function testFuncOne is required.'.PHP_EOL;
-    $expectedOutput .= 'Function testFuncTwo is required.'.PHP_EOL;
-    $expectedOutput .= 'Extension testExtOne is required.'.PHP_EOL;
-    $expectedOutput .= 'Extension testExtTwo is required.'.PHP_EOL;
-    $expectedOutput .= 'Extension testExtThree is required to be >= 2.0.';
+    $expectedOutput .= 'PHP version '.PHP_VERSION.' >= 99-dev is required.';
+    // --
+    // JEO: Decided to not support the mutltiple error support as part of the 2.x release
+    // as we don't do a ton of version error failures at Zynga. Leaving the test data here
+    // jic someone gets in the mood to add the support.
+    // --
+    // $expectedOutput .=
+    //   'PHPUnit version '.
+    //   Version::VERSION_NUMBER.
+    //   ' >= 9-dev is required.'.
+    //   PHP_EOL;
+    // $expectedOutput .=
+    //   'Operating system '.
+    //   PHP_OS.
+    //   ' expected /DOESNOTEXIST/i is required.'.
+    //   PHP_EOL;
+
+    // $expectedOutput .= 'Function testFuncOne is required.'.PHP_EOL;
+    // $expectedOutput .= 'Function testFuncTwo is required.'.PHP_EOL;
+    // $expectedOutput .= 'Extension testExtOne is required.'.PHP_EOL;
+    // $expectedOutput .= 'Extension testExtTwo is required.'.PHP_EOL;
+    // $expectedOutput .= 'Extension testExtThree is required to be >= 2.0.';
 
     $this->_verifyTest(
       $test,
       $result,
-      true,
+      false,
       Status::STATUS_SKIPPED,
       $expectedOutput,
       0,
