@@ -30,6 +30,9 @@ Crib sheet:
 1. @expectedExceptionMessage becomes: <<expectedExceptionMessage("..")>>
 1. @expectedExceptionCode becomes: <<expectedExceptionCode("..")>>
 
+Removed:
+1. @testWith - use @dataProvider so we can keep type saftey.
+
 What if I need to specify multiple of the same attribute, use an array:
 1. <<requires(["foo", "bar"])>>
 

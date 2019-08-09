@@ -88,20 +88,24 @@ abstract class BaseTest extends TestCase {
     $actualErrors = $result->errors();
 
     print
-      'errorCount expected='.$errorCount.' actual='.$actualErrorCount."\n"
+      sprintf(
+        "errorCount expected=%d actual=%d\n",
+        $errorCount,
+        $actualErrorCount,
+      )
     ;
+
     $this->_debugExceptions($actualErrors);
 
     $actualFailureCount = $result->failureCount();
     $actualFailures = $result->failures();
 
     print
-      'failureCount'.
-      ' expected='.
-      $failureCount.
-      ' actual='.
-      $actualFailureCount.
-      "\n"
+      sprintf(
+        "failureCount expected=%d actual=%d\n",
+        $failureCount,
+        $actualFailureCount,
+      )
     ;
 
     $this->_debugExceptions($actualFailures);
@@ -110,12 +114,11 @@ abstract class BaseTest extends TestCase {
     $actualSkipped = $result->skipped();
 
     print
-      'skippedCount'.
-      ' expected='.
-      $skippedCount.
-      ' actual='.
-      $actualSkippedCount.
-      "\n"
+      sprintf(
+        "skippedCount expected=%d actual=%d\n",
+        $skippedCount,
+        $actualSkippedCount,
+      )
     ;
 
     $this->_debugExceptions($actualSkipped);
@@ -124,12 +127,11 @@ abstract class BaseTest extends TestCase {
     $actualIncomplete = $result->notImplemented();
 
     print
-      'incompleteCount'.
-      'expected='.
-      $incompleteCount.
-      ' actual='.
-      $actualIncompleteCount.
-      "\n"
+      sprintf(
+        "incompleteCount expected=%d actual=%d\n",
+        $incompleteCount,
+        $actualIncompleteCount,
+      )
     ;
 
     $this->_debugExceptions($actualIncomplete);
@@ -185,13 +187,33 @@ abstract class BaseTest extends TestCase {
     if ($debug == true) {
 
       print
-        "---verifyTestSuite::debug isEnabled for test=".
-        $test->getName().
-        "---\n"
+        sprintf(
+          "---verifyTestSuite::debug isEnabled for test=%s---\n",
+          $test->getName(),
+        )
       ;
 
       print
-        "testCount"." expected=".$testCount.' actual='.$test->count()."\n"
+        sprintf(
+          "  params [statusCode=%d testCount=%d successfulCount=%d errorCount=%d failureCount=%d skippedCount=%d incompleteCount=%d warningCount=%d notImplemented=%d]\n",
+          $statusCode,
+          $testCount,
+          $successfulCount,
+          $errorCount,
+          $failureCount,
+          $skippedCount,
+          $incompleteCount,
+          $warningCount,
+          $notImplemented,
+        )
+      ;
+
+      print
+        sprintf(
+          "testCount expected=%d actual=%d\n",
+          $testCount,
+          $test->count(),
+        )
       ;
 
       print

@@ -94,20 +94,17 @@ class TestSuite extends Base {
     // Supports callables as either:
     // 1) [ReflectionClass, null]
     // 2) [string validClassName, string optionalName defaults to validClassName]
-    if (is_object($theClass) && $theClass instanceof ReflectionClass) {
+    if ($theClass instanceof ReflectionClass) {
       $this->_name = $theClass->getName();
     } else if (is_string($theClass) &&
                $theClass !== '' &&
                class_exists($theClass, true)) {
-
-      if ($name == '') {
-        $this->_name = $theClass;
-      }
-
       $theClass = ReflectionClasses::getReflection($theClass);
+    } else if ($theClass == '') {
+      // This is a stub suite | testcase that doesn't actually have a real class implementation.
+      $this->_name = get_class($this);
+      return;
     } else if (is_string($theClass)) {
-
-      $this->setName($theClass);
 
       $result = $this->getResult();
 
@@ -620,9 +617,14 @@ class TestSuite extends Base {
 
       if ($didClassChange === true) {
 
+        // var_dump("CLASS_CHANGE=".get_class($test));
+
         // handle the afterClass method for the outgoing test first.
         list($afterOk, $afterException) =
           OnTestClassChangeListener::handleAfterClass();
+
+        // Setup for a new class to run.
+        OnTestClassChangeListener::clear();
 
         // Time for the incoming class to get it's day in the sun.
         //OnTestClassChangeListener::handleRequirements();
@@ -650,6 +652,9 @@ class TestSuite extends Base {
 
     // handle outgoing tests, happens if we didn't have a class change.
     OnTestClassChangeListener::handleAfterClass();
+
+    // Now clear the change listener, as we are done.
+    OnTestClassChangeListener::clear();
 
     // JEO: Run the doTearDownAfterClass
     // foreach ($hookMethods['afterClass'] as $afterClassMethod) {

@@ -277,7 +277,7 @@ class SuiteTest extends BaseTest {
 
   public function testBeforeClassWithDataProviders(): void {
 
-    $suite = new TestSuite('BeforeClassWithOnlyDataProviderTest');
+    $suite = new TestSuite(BeforeClassWithOnlyDataProviderTest::class);
 
     BeforeClassWithOnlyDataProviderTest::resetProperties();
 
@@ -289,70 +289,42 @@ class SuiteTest extends BaseTest {
     );
 
     $this->assertTrue(
-      BeforeClassWithOnlyDataProviderTest::$beforeClassWasCalled,
-      '@beforeClass method was not run.',
+      BeforeClassWithOnlyDataProviderTest::$doSetUpBeforeClassWasCalled,
+      'doSetUpBeforeClass method was not run.',
+    );
+
+    $this->assertTrue(
+      BeforeClassWithOnlyDataProviderTest::$someAnnotatedSetupMethodWasCalled,
+      '<<beforeClass("someAnnotatedSetupMethodWasCalled")>> method was not run.',
+    );
+
+    $this->assertTrue(
+      BeforeClassWithOnlyDataProviderTest::$tearDownAfterClassWasCalled,
+      'tearDownAfterClass method was not run.',
+    );
+
+    $this->assertTrue(
+      BeforeClassWithOnlyDataProviderTest::$doTearDownAfterClassWasCalled,
+      'doTearDownAfterClass method was not run.',
+    );
+
+    $this->assertTrue(
+      BeforeClassWithOnlyDataProviderTest::$someAnnotatedTearDownMethodWasCalled,
+      '<<afterClass("someAnnotatedTearDownMethodWasCalled")>> method was not run.',
     );
 
   }
 
   public function testBeforeAnnotation(): void {
 
-    $test = new TestSuite('BeforeAndAfterTest');
+    $suite = new TestSuite(BeforeAndAfterTest::class);
 
     BeforeAndAfterTest::resetProperties();
 
-    $result = $test->run();
+    $result = $suite->run();
 
     $this->assertEquals(2, BeforeAndAfterTest::$beforeWasRun);
     $this->assertEquals(2, BeforeAndAfterTest::$afterWasRun);
-
-  }
-
-  public function testTestWithAnnotation(): void {
-
-    $suite = new TestSuite('TestWithTest');
-
-    BeforeAndAfterTest::resetProperties();
-
-    $result = $suite->run();
-
-    $this->_verifyTestSuite(
-      $suite,
-      $result,
-      false, // debug
-      Status::STATUS_PASSED, // status
-      4, // testCount
-      4, // successful
-      0, // error
-      0, // failure
-      0, // skipped
-      0, // incomplete
-      0, // warning
-      0, // notImplemented
-    );
-
-  }
-
-  public function testSkippedTestDataProvider(): void {
-
-    $suite = new TestSuite('DataProviderSkippedTest');
-
-    $result = $suite->run();
-
-    $this->_verifyTestSuite(
-      $suite,
-      $result,
-      false, // debug
-      Status::STATUS_PASSED, // status
-      1, // testCount
-      0, // successful
-      0, // error
-      0, // failure
-      1, // skipped
-      0, // incomplete
-      0, // warning
-      0, // notImplemented
-    );
 
   }
 
@@ -367,14 +339,14 @@ class SuiteTest extends BaseTest {
       $result,
       false, // debug
       Status::STATUS_PASSED, // status
-      3, // testCount
+      10, // testCount
       3, // successful
       0, // error
       0, // failure
       0, // skipped
-      1, // incomplete
+      6, // incomplete
       0, // warning
-      0, // notImplemented
+      6, // notImplemented
     );
 
   }
@@ -405,30 +377,18 @@ class SuiteTest extends BaseTest {
   public function testDontSkipInheritedClass(): void {
 
     // This isn't a class ref, it's a string label for a 'virtual' test.
-    $suite = new TestSuite('DontSkipInheritedClass');
+    $suite = new TestSuite();
 
     // --
     // JEO: Purposely take a hard path to the tests in order to test the flow around, finding files and
     // adding tests from the file ssystem.
     // --
     $suite->addTestFile(
-      $this->getTestSourcePath().
-      DIRECTORY_SEPARATOR.
-      'Mock'.
-      DIRECTORY_SEPARATOR.
-      'Inheritence'.
-      DIRECTORY_SEPARATOR.
-      'InheritanceA.hh',
+      dirname(dirname(__FILE__)).'/Mock/Inheritence/InheritanceA.hh',
     );
 
     $suite->addTestFile(
-      $this->getTestSourcePath().
-      DIRECTORY_SEPARATOR.
-      'Mock'.
-      DIRECTORY_SEPARATOR.
-      'Inheritence'.
-      DIRECTORY_SEPARATOR.
-      'InheritanceB.hh',
+      dirname(dirname(__FILE__)).'/Mock/Inheritence/InheritanceB.hh',
     );
 
     $result = $suite->run();

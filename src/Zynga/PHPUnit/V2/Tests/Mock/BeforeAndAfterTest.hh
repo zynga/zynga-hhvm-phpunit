@@ -4,6 +4,7 @@ namespace Zynga\PHPUnit\V2\Tests\Mock;
 
 use Zynga\PHPUnit\V2\TestCase;
 
+<<before("initialSetup"), after("finalTeardown")>>
 class BeforeAndAfterTest extends TestCase {
   public static int $beforeWasRun = 0;
   public static int $afterWasRun = 0;
@@ -13,12 +14,10 @@ class BeforeAndAfterTest extends TestCase {
     self::$afterWasRun = 0;
   }
 
-  <<before()>>
   public function initialSetup(): void {
     self::$beforeWasRun++;
   }
 
-  <<after()>>
   public function finalTeardown(): void {
     self::$afterWasRun++;
   }

@@ -8,6 +8,8 @@ use \Exception;
 
 class OnTestClassChangeListener {
   private static ?TestInterface $_currentClass = null;
+  private static bool $_hasCalledBefore = false;
+  private static bool $_hasCalledAfter = false;
 
   public static function isClassChange(TestInterface $candidate): bool {
 
@@ -30,8 +32,16 @@ class OnTestClassChangeListener {
 
   }
 
+  public static function clear(): void {
+    self::$_currentClass = null;
+    self::$_hasCalledBefore = false;
+    self::$_hasCalledAfter = false;
+  }
+
   public static function setClass(TestInterface $class): bool {
     self::$_currentClass = $class;
+    self::$_hasCalledBefore = false;
+    self::$_hasCalledAfter = false;
     return true;
   }
 
@@ -41,9 +51,17 @@ class OnTestClassChangeListener {
 
     try {
 
+      if (self::$_hasCalledBefore === true) {
+        var_dump('hasCalledBefore-true');
+        return tuple(true, null);
+      }
+
       $hooks = $test->getHookMethods();
 
       $beforeClassMethods = $hooks->get('beforeClass');
+
+      // var_dump('beforeClassmethods');
+      // var_dump($beforeClassMethods);
 
       if ($beforeClassMethods instanceof Vector) {
 
@@ -65,6 +83,8 @@ class OnTestClassChangeListener {
 
       }
 
+      self::$_hasCalledBefore = true;
+
     } catch (Exception $e) {
       return tuple(false, $e);
     }
@@ -75,20 +95,25 @@ class OnTestClassChangeListener {
 
   public static function handleAfterClass(): (bool, ?Exception) {
 
-    $test = self::$_currentClass;
-
-    // no after class to call.
-    if (!$test instanceof TestInterface) {
-      return tuple(true, null);
-    }
-
     try {
+
+      $test = self::$_currentClass;
+
+      // no after class to call.
+      if (!$test instanceof TestInterface) {
+        return tuple(true, null);
+      }
+
+      if (self::$_hasCalledAfter === true) {
+        return tuple(true, null);
+      }
 
       $hooks = $test->getHookMethods();
 
       $afterClassMethods = $hooks->get('afterClass');
 
       if ($afterClassMethods instanceof Vector) {
+
         foreach ($afterClassMethods as $afterClassMethod) {
 
           // var_dump(
@@ -106,12 +131,14 @@ class OnTestClassChangeListener {
         }
       }
 
+      self::$_hasCalledAfter = true;
+
     } catch (Exception $e) {
       return tuple(false, $e);
     }
 
     // deallocate our pointer to the currentClass as we've called a after moment.
-    self::$_currentClass = null;
+    // self::$_currentClass = null;
 
     return tuple(true, null);
 
