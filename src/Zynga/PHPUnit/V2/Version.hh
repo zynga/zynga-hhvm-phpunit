@@ -10,7 +10,7 @@ namespace Zynga\PHPUnit\V2;
 //
 // --
 class Version {
-  const string VERSION_NUMBER = "2.1.0";
+  const string VERSION_NUMBER = "2.1.3";
   const string VERSION_NAME = "darkseid";
 
   public static function get(): string {
