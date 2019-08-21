@@ -250,11 +250,11 @@ class Facade {
   private function copyFiles(string $target): void {
 
     if ($this->_needsTemplateCopy($target) === false) {
-      echo date('r')." - copyFiles: skipping shared html components.\n";
+      echo date('r')." - CodeCoverage::copyFiles: skipping shared html components.\n";
       return;
     }
 
-    echo date('r')." - copyFiles: copying shared html components\n";
+    echo date('r')." - CodeCoverage::copyFiles: copying shared html components\n";
 
     $root = $this->getDirectory($target);
 
@@ -300,7 +300,7 @@ class Facade {
     copy($this->templatePath.'js/respond.min.js', $dir.'respond.min.js');
 
     echo
-      date('r')." - copyFiles: copying shared html components - complete\n"
+      date('r')." - CodeCoverage::copyFiles: copying shared html components - complete\n"
     ;
 
   }
