@@ -486,9 +486,12 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
             }
 
             if (isset($arguments['coverageHtml'])) {
+                
+                $outputLocation = $arguments['coverageHtml'];
+
                 $this->printer->write(
                     "\n" .
-                    date('r') . " - Generating code coverage report in HTML format\n"
+                    date('r') . " - CodeCoverage::HTML - start output=$outputLocation\n"
                 );
 
                 try {
@@ -503,7 +506,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
 
                     $writer->process($this->codeCoverage, $arguments['coverageHtml']);
 
-                    $this->printer->write(date('r') . " - HTML generation - done\n");
+                    $this->printer->write(date('r') . " - CodeCoverage::HTML - done output=$outputLocation\n");
                     unset($writer);
                 } catch (CodeCoverageException $e) {
                    
@@ -533,25 +536,26 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
             }
 
             if (isset($arguments['coverageText'])) {
-                // JEO: I think we're removing code coverage in text layout
-                // if ($arguments['coverageText'] == 'php://stdout') {
-                //     $outputStream = $this->printer;
-                //     $colors       = $arguments['colors'] && $arguments['colors'] != ResultPrinter::COLOR_NEVER;
-                // } else {
-                //     $outputStream = new PHPUnit_Util_Printer($arguments['coverageText']);
-                //     $colors       = false;
-                // }
+               
+                 if ($arguments['coverageText'] == 'php://stdout') {
+                     $outputStream = $this->printer;
+                     $colors       = $arguments['colors'] && $arguments['colors'] != ResultPrinter::COLOR_NEVER;
+                 } else {
+                     $outputStream = new PHPUnit_Util_Printer($arguments['coverageText']);
+                     $colors       = false;
+                 }
 
-                // $processor = new TextReport(
-                //     $arguments['reportLowUpperBound'],
-                //     $arguments['reportHighLowerBound'],
-                //     $arguments['coverageTextShowUncoveredFiles'],
-                //     $arguments['coverageTextShowOnlySummary']
-                // );
+                $processor = new TextReport(
+                    $arguments['reportLowUpperBound'],
+                    $arguments['reportHighLowerBound'],
+                    $arguments['coverageTextShowUncoveredFiles'],
+                    $arguments['coverageTextShowOnlySummary']
+                );
 
-                // $outputStream->write(
-                //     $processor->process($codeCoverage, $colors)
-                // );
+                $outputStream->write(
+                    $processor->process($this->codeCoverage, $colors)
+                );
+
             }
 
             if (isset($arguments['coverageXml'])) {
