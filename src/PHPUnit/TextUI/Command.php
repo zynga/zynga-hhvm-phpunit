@@ -113,7 +113,9 @@ class PHPUnit_TextUI_Command
      */
     public static function main($exit = true, $argv = null)
     {
-        $command = new static;
+       self::staticMessage("standup command");
+    
+       $command = new PHPUnit_TextUI_Command();
 
         if ( $argv === null || ! is_array($argv)) {
           $argv = $_SERVER['argv'];
@@ -123,7 +125,12 @@ class PHPUnit_TextUI_Command
         // jic to make sure we don't forget where to add this.
         // var_dump($argv);
 
+      self::staticMessage("start run");
         return $command->run($argv, $exit);
+    }
+
+    public static function staticMessage($message) {     
+        echo date('r') . sprintf(" - %s\n", $message);
     }
 
     /**
@@ -134,9 +141,13 @@ class PHPUnit_TextUI_Command
      */
     public function run(array $argv, $exit = true)
     {
+        self::staticMessage("run::handleArguments - start");
         $this->handleArguments($argv);
+        self::staticMessage("run::handleArguments - end");
 
+        self::staticMessage('run::createRunner - start');
         $runner = $this->createRunner();
+        self::staticMessage('run::createRunner - end');
 
         if (is_object($this->arguments['test']) &&
             $this->arguments['test'] instanceof TestInterface) {
@@ -172,7 +183,9 @@ class PHPUnit_TextUI_Command
         unset($this->arguments['testFile']);
 
         try {
+            self::staticMessage("run::doRun - start");
             $result = $runner->doRun($suite, $this->arguments, $exit);
+            self::staticMessage("run::doRun - end");
         } catch (PHPUnit_Framework_Exception $e) {
             print $e->getMessage() . "\n";
         }
@@ -1116,7 +1129,7 @@ EOT;
             return;
         }
 
-        print PHPUnit_Runner_Version::getVersionString() . "\n\n";
+        print date('r') . ' - ' . PHPUnit_Runner_Version::getVersionString() . "\n\n";
 
         $this->versionStringPrinted = true;
     }

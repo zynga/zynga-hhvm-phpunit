@@ -12,6 +12,7 @@
 namespace SebastianBergmann\Diff\LCS;
 
 use SebastianBergmann\Diff\LCS\LongestCommonSubsequence;
+use \SplFixedArray;
 
 /**
  * Time-efficient implementation of longest common subsequence calculation.
@@ -35,20 +36,25 @@ class TimeEfficientImplementation implements LongestCommonSubsequence {
     $matrix = new SplFixedArray($width * ($toLength + 1));
 
     for ($i = 0; $i <= $fromLength; ++$i) {
-      $matrix[$i] = 0;
+      $matrix->offsetSet($i, 0);
     }
 
     for ($j = 0; $j <= $toLength; ++$j) {
-      $matrix[$j * $width] = 0;
+      $matrix->offsetSet($j * $width, 0);
     }
 
     for ($i = 1; $i <= $fromLength; ++$i) {
       for ($j = 1; $j <= $toLength; ++$j) {
         $o = ($j * $width) + $i;
-        $matrix[$o] = max(
-          $matrix[$o - 1],
-          $matrix[$o - $width],
-          $from[$i - 1] === $to[$j - 1] ? $matrix[$o - $width - 1] + 1 : 0,
+        $matrix->offsetSet(
+          $o,
+          max(
+            $matrix->offsetGet($o - 1),
+            $matrix->offsetGet($o - $width),
+            $from[$i - 1] === $to[$j - 1]
+              ? $matrix->offsetGet($o - $width - 1) + 1
+              : 0,
+          ),
         );
       }
     }
@@ -63,7 +69,7 @@ class TimeEfficientImplementation implements LongestCommonSubsequence {
         --$j;
       } else {
         $o = ($j * $width) + $i;
-        if ($matrix[$o - $width] > $matrix[$o - 1]) {
+        if ($matrix->offsetGet($o - $width) > $matrix->offsetGet($o - 1)) {
           --$j;
         } else {
           --$i;

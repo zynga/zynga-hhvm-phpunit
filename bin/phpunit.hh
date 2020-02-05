@@ -7,8 +7,10 @@
 // --
 $projectRoot = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
 
-require_once $projectRoot . '/vendor/autoload.php';
-require_once $projectRoot . '/vendor/zynga/phpunit/vendor/autoload.php';
+require_once $projectRoot . '/src/autoload.hh';
+
+//require_once $projectRoot . '/vendor/autoload.php';
+//require_once $projectRoot . '/vendor/zynga/phpunit/vendor/autoload.php';
 
 use Zynga\Framework\Environment\CodePath\V1\CodePath;
 use Zynga\PHPUnit\V2\Runner;

@@ -33,7 +33,7 @@ abstract class PHPUnit_Runner_BaseTestRunner
      */
     public function getLoader()
     {
-        return new PHPUnit_Runner_StandardTestSuiteLoader;
+        return new PHPUnit_Runner_StandardTestSuiteLoader();
     }
 
     /**

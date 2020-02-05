@@ -90,7 +90,6 @@ class StringMatchesConstraint extends PCREMatchConstraint {
       ],
       preg_quote($string, '/'),
     );
-
     return '/^'.$string.'$/s';
   }
 

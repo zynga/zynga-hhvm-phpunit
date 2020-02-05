@@ -245,8 +245,9 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
         }
 
         if (!$this->printer instanceof PHPUnit_Util_Log_TAP) {
-            $this->printer->write(
-                PHPUnit_Runner_Version::getVersionString() . "\n"
+
+            $this->writeMessage(
+                'PHPUnit', PHPUnit_Runner_Version::getVersionString()
             );
 
             self::$versionStringPrinted = true;
@@ -350,10 +351,6 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
 
                 $codeCoverageReports = 0;
             }
-        }
-
-        if (!$this->printer instanceof PHPUnit_Util_Log_TAP) {
-            $this->printer->write("\n");
         }
 
         if ($codeCoverageReports > 0) {
@@ -1056,7 +1053,8 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
 
         $this->write(
             sprintf(
-                "%-15s%s\n",
+                "%s - %-15s%s\n",
+                date('r'),
                 $type . ':',
                 $message
             )

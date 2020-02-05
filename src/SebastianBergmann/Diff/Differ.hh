@@ -162,10 +162,30 @@ class Differ {
   ) {
 
     $fromMatches = array();
-    preg_match_all('(\r\n|\r|\n)', $from, $fromMatches);
+
+    foreach ($from as $f) {
+
+      $fm = array();
+      preg_match_all('(\r\n|\r|\n)', $f, $fm);
+
+      foreach ($fm as $fme) {
+        $fromMatches[] = $fme;
+      }
+
+    }
 
     $toMatches = array();
-    preg_match_all('(\r\n|\r|\n)', $to, $toMatches);
+
+    foreach ($to as $t) {
+
+      $tm = array();
+      preg_match_all('(\r\n|\r|\n)', $t, $tm);
+
+      foreach ($tm as $tme) {
+        $toMatches[] = $tme;
+      }
+
+    }
 
     $start = array();
     $end = array();

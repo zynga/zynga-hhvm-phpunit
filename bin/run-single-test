@@ -1,9 +1,16 @@
 #!/usr/bin/env bash
 
+##
+# Simple bash file to wrapper running our hack environment, global configuration changes
+# happen here.
+##
+CODEBASE_ROOT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )/../.." >/dev/null && pwd)"
+
 set -o xtrace
 
-SCRIPT_DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd)"
-PHPUNIT_HACKFILE="${SCRIPT_DIR}/run-single-test.hh";
+RUN_IN_DOCKER="${CODEBASE_ROOT_DIR}/vendor/bin/run-inside-docker";
+
+PHPUNIT_HACKFILE="/var/source/bin/run-single-test.hh";
 
 #echo "scriptDir=$SCRIPT_DIR"
 
@@ -13,7 +20,7 @@ if [[ ! -z "${XDEBUG_REMOTE_PORT}" ]]; then
   T_REMOTE_PORT="--define xdebug.remote_port=${XDEBUG_REMOTE_PORT}"
 fi
 
-/usr/bin/env hhvm \
+${RUN_IN_DOCKER} /usr/bin/env hhvm \
   -d hhvm.jit=false \
   --define xdebug.remote_enable=1 \
   --define xdebug.remote_autostart=1 \
