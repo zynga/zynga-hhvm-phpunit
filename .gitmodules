@@ -1,3 +1,0 @@
-[submodule "vendor/zynga/phpunit/vendor/91carriage/phpunit-hhi"]
-	path = vendor/zynga/phpunit/vendor/91carriage/phpunit-hhi
-	url = https://github.com/zynga/zynga-hhvm-phpunit-hhi.git
