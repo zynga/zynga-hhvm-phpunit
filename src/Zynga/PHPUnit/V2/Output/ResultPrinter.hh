@@ -21,6 +21,8 @@ use Zynga\PHPUnit\V2\TestResult;
 use Zynga\PHPUnit\V2\TestSuite;
 use Zynga\PHPUnit\V2\Output\Printer;
 
+use Zynga\PHPUnit\V2\StackTrace\Stack as StackTrace;
+
 use \Exception;
 
 /**
@@ -219,14 +221,114 @@ class ResultPrinter extends Printer implements TestListenerInterface {
 
     if ($e instanceof Exception) {
 
-      $this->write((string) $e);
+      $this->createCleanStackTrace($e);
 
-      $previousException = $e->getPrevious();
+      /*
+       $this->write('----Legacy mode----');
+       $this->write((string) $e);
+       $previousException = $e->getPrevious();
+       while ($previousException instanceof Exception) {
+       $this->write("\nCaused by\n".$e);
+       $previousException = $previousException->getPrevious();
+       }
+       */
 
-      while ($previousException instanceof Exception) {
-        $this->write("\nCaused by\n".$e);
-        $previousException = $previousException->getPrevious();
+    }
+
+  }
+
+  public function createCleanStackTrace(Exception $e): void {
+
+    // --
+    //
+    // We build up a consolidated frame stack that includes all the
+    //   information including inner exceptions as the trace is linear
+    //   throughout.
+    //
+    // --
+
+    $this->write("Stacktrace:\n");
+
+    $stack = new StackTrace();
+    $stack->consumeException($e);
+
+    $frameId = 0;
+    $currentFile = '';
+    foreach ($stack->getFrames() as $frame) {
+
+      $file = $frame->getShortFileName();
+      $line = $frame->getLine();
+      $class = $frame->getClass();
+      $function = $frame->getFunction();
+
+      // Soon as we get to the phpunit test case, feel free to break out of the excetion trace.
+      if ($class == 'Zynga\PHPUnit\V2\TestCase') {
+        break;
       }
+
+      $this->write(sprintf("%d) %s#%d\n", $frameId, $file, $line));
+
+      $exception = $frame->getException();
+
+      if ($exception instanceof Exception) {
+        $this->write("  Exception trace:\n");
+
+        $exceptionId = 1;
+
+        // write out the parent exception first.
+        $this->write(
+          sprintf(
+            "    E%03d) message=%s\n",
+            $exceptionId,
+            $exception->getMessage(),
+          ),
+        );
+
+        $this->write(sprintf("           class=%s\n", get_class($exception)));
+        $this->write(
+          sprintf(
+            "           file=%s\n",
+            $frame->shortenFileName($exception->getFile()),
+          ),
+        );
+        $this->write(sprintf("           line=%d\n", $exception->getLine()));
+
+        // TODO Process the previous stack too.
+        // loop across all the previous allowing them to stab in their exception moments.
+
+        $previousException = $e->getPrevious();
+        while ($previousException instanceof Exception) {
+          $exceptionId++;
+
+          $this->write(
+            sprintf(
+              "    E%03d) message=%s\n",
+              $exceptionId,
+              $previousException->getMessage(),
+            ),
+          );
+
+          $this->write(
+            sprintf("           class=%s\n", get_class($previousException)),
+          );
+          $this->write(
+            sprintf(
+              "           file=%s\n",
+              $frame->shortenFileName($previousException->getFile()),
+            ),
+          );
+          $this->write(
+            sprintf("           line=%d\n", $previousException->getLine()),
+          );
+
+          $previousException = $previousException->getPrevious();
+        }
+
+      }
+
+      $this->write(sprintf("  %s::%s\n", $class, $function));
+
+      $frameId++;
 
     }
 

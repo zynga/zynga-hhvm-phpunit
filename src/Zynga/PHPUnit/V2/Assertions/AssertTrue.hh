@@ -4,6 +4,7 @@ namespace Zynga\PHPUnit\V2\Assertions;
 
 use Zynga\PHPUnit\V2\Assertions;
 use Zynga\PHPUnit\V2\Constraints\IsTrueConstraint;
+use \Exception;
 
 class AssertTrue {
 
