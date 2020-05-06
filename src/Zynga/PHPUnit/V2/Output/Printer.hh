@@ -42,9 +42,14 @@ class Printer {
   /**
    * @param string $buffer
    */
-  public function write(string $buffer): void {
+  public function write(string $buffer, int $lpad = 0): void {
 
-    print $buffer;
+    $lpadding = '';
+    if ($lpad > 0) {
+      $lpadding = str_repeat(' ', $lpad);
+    }
+
+    print $lpadding.$buffer;
 
     if ($this->autoFlush) {
       $this->incrementalFlush();
