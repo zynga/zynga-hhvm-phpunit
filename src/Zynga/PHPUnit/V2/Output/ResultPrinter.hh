@@ -247,13 +247,18 @@ class ResultPrinter extends Printer implements TestListenerInterface {
     //
     // --
 
-    $this->write("Stacktrace:\n");
+    $this->write("  Stacktrace:\n");
 
     $stack = new StackTrace();
     $stack->consumeException($e);
 
     $frameId = 0;
     $currentFile = '';
+
+    $exceptPad = 3;
+    $innerPad = 5;
+    $tracePad = 7;
+
     foreach ($stack->getFrames() as $frame) {
 
       $file = $frame->getShortFileName();
@@ -266,59 +271,73 @@ class ResultPrinter extends Printer implements TestListenerInterface {
         break;
       }
 
-      $this->write(sprintf("%d) %s#%d\n", $frameId, $file, $line));
+      $this->write(
+        sprintf("[%d] %s#%d\n", $frameId, $file, $line),
+        $exceptPad,
+      );
 
       $exception = $frame->getException();
 
       if ($exception instanceof Exception) {
-        $this->write("  Exception trace:\n");
+        $this->write("Exception trace:\n", $innerPad);
 
         $exceptionId = 1;
 
         // write out the parent exception first.
         $this->write(
           sprintf(
-            "    E%03d) message=%s\n",
+            "[E%03d] message=%s\n",
             $exceptionId,
-            $exception->getMessage(),
+            $this->removeControlCharacters($exception->getMessage()),
           ),
+          $innerPad,
         );
 
-        $this->write(sprintf("           class=%s\n", get_class($exception)));
+        $this->write(sprintf("class=%s\n", get_class($exception)), $tracePad);
+
         $this->write(
           sprintf(
-            "           file=%s\n",
+            "file=%s\n",
             $frame->shortenFileName($exception->getFile()),
           ),
+          $tracePad,
         );
-        $this->write(sprintf("           line=%d\n", $exception->getLine()));
 
-        // TODO Process the previous stack too.
+        $this->write(sprintf("line=%d\n", $exception->getLine()), $tracePad);
+
         // loop across all the previous allowing them to stab in their exception moments.
-
         $previousException = $e->getPrevious();
+
         while ($previousException instanceof Exception) {
           $exceptionId++;
 
           $this->write(
             sprintf(
-              "    E%03d) message=%s\n",
+              "[E%03d] message=%s\n",
               $exceptionId,
-              $previousException->getMessage(),
+              $this->removeControlCharacters(
+                $previousException->getMessage(),
+              ),
             ),
+            $innerPad,
           );
 
           $this->write(
-            sprintf("           class=%s\n", get_class($previousException)),
+            sprintf("class=%s\n", get_class($previousException)),
+            $tracePad,
           );
+
           $this->write(
             sprintf(
-              "           file=%s\n",
+              "file=%s\n",
               $frame->shortenFileName($previousException->getFile()),
             ),
+            $tracePad,
           );
+
           $this->write(
-            sprintf("           line=%d\n", $previousException->getLine()),
+            sprintf("line=%d\n", $previousException->getLine()),
+            $tracePad,
           );
 
           $previousException = $previousException->getPrevious();
@@ -326,12 +345,16 @@ class ResultPrinter extends Printer implements TestListenerInterface {
 
       }
 
-      $this->write(sprintf("  %s::%s\n", $class, $function));
+      $this->write(sprintf("call=%s::%s\n", $class, $function), $tracePad);
 
       $frameId++;
 
     }
 
+  }
+
+  public function removeControlCharacters(string $input): string {
+    return preg_replace('/[[:cntrl:]]/', '[xTCCx]', $input);
   }
 
   /**
@@ -496,6 +519,7 @@ class ResultPrinter extends Printer implements TestListenerInterface {
           $color = 'fg-white, bg-red';
 
           $this->writeWithColor($color, 'FAILURES!');
+
         } else if ($result->warningCount()) {
           $color = 'fg-black, bg-yellow';
 
@@ -737,7 +761,7 @@ class ResultPrinter extends Printer implements TestListenerInterface {
 
     $this->writeWithColor(
       'bg-black, fg-green',
-      date('r').sprintf(" - '%s'", $testName),
+      date('r').sprintf(" - '%s'", get_class($test).'::'.$testName),
     );
 
     $this->printSingleTestDebugLine($test, 'Started', 0.0);
@@ -820,6 +844,7 @@ class ResultPrinter extends Printer implements TestListenerInterface {
    * @param string $progress
    */
   protected function writeProgress(string $progress): void {
+
     $this->write($progress);
     // $this->column++;
 
