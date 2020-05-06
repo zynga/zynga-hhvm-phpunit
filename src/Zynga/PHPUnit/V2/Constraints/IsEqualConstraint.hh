@@ -126,7 +126,10 @@ class IsEqualConstraint extends Base {
 
     if (is_string($this->value)) {
       if (strpos($this->value, "\n") !== false) {
-        return 'is equal to <text>';
+        return sprintf(
+          'is equal to <text:%s...>',
+          substr($this->value, 0, strpos($this->value, "\n")),
+        );
       } else {
         return sprintf('is equal to <string:%s>', $this->value);
       }
