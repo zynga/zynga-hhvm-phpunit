@@ -2,6 +2,8 @@
 
 namespace Zynga\PHPUnit\V2\Environment;
 
+use Zynga\PHPUnit\V2\TestCase\OutputBuffer;
+
 class OutputBuffering {
   private static bool $_isActive = false;
 
@@ -13,9 +15,20 @@ class OutputBuffering {
     return self::$_isActive;
   }
 
-  public static function start(): bool {
+  public static function start(?OutputBuffer $buffer = null): bool {
 
-    ob_start();
+    // var_dump('ob start called currentLevel='.self::getCurrentLevel());
+
+    if ($buffer instanceof OutputBuffer) {
+      // --
+      // Wire up the callback and set it to 1 byte in order to capture the call point
+      // that did the underlying output.
+      // --
+      ob_start(array($buffer, 'outputCallback'), 1);
+    } else {
+      // let the og_call start up
+      ob_start();
+    }
 
     self::$_isActive = true;
 
@@ -25,9 +38,13 @@ class OutputBuffering {
 
   public static function end(): bool {
 
+    // end and clean the buffer
     ob_end_clean();
 
-    if ( self::getCurrentLevel() == 0 ) {
+    // refresh currentLevel as it should of decremented.
+    $currentLevel = self::getCurrentLevel();
+
+    if ($currentLevel == 0) {
       self::$_isActive = false;
     }
 
@@ -37,8 +54,12 @@ class OutputBuffering {
   public static function get(): string {
 
     $contents = ob_get_contents();
-    
-    return $contents;
+
+    if (is_string($contents)) {
+      return $contents;
+    }
+
+    return '';
 
   }
 

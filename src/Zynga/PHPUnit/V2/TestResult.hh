@@ -1042,13 +1042,25 @@ class TestResult {
       );
     } else if ($this->isStrictAboutOutputDuringTests() &&
                $test->hasOutput()) {
+
+      $actualOutput = $test->getActualOutput();
+
+      if (strlen($actualOutput) > 255) {
+        $actualOutput = substr($actualOutput, 0, 255).'<...shortened...>';
+      }
+
       $this->addFailure(
         $test,
         new PHPUnit_Framework_OutputError(
-          sprintf('This test printed output: %s', $test->getActualOutput()),
+          sprintf('This test printed output: %s', $actualOutput).
+          ' startedAt file='.
+          $test->getOutputFile().
+          '::'.
+          $test->getOutputLine(),
         ),
         $time,
       );
+
     } else if ($this->isStrictAboutTodoAnnotatedTests() &&
                $test instanceof TestCase) {
 

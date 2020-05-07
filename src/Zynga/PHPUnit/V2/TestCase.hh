@@ -185,6 +185,14 @@ abstract class TestCase extends Assertions implements TestInterface {
     return $this->_outputBuffer->getActualOutput();
   }
 
+  final public function getOutputFile(): string {
+    return $this->_outputBuffer->getOutputFile();
+  }
+
+  final public function getOutputLine(): int {
+    return $this->_outputBuffer->getOutputLine();
+  }
+
   /**
    * @since Method available since Release 4.2.0
    */
